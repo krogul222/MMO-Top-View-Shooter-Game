@@ -8,4 +8,6 @@ app.get('/',function(request,response){
 
 app.use('/client', express.static(__dirname+'/client'));
 
-server.listen(2000);
+var listener = server.listen(2000, function(){
+    console.log("Listening on port 2000");
+});
