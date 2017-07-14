@@ -1,5 +1,6 @@
 var express = require('express');
 var app = express();
+var server = require('http').Server(app);
 
 app.get('/',function(request,response){
     response.sendFile(__dirname+'/client/index.html');
@@ -7,4 +8,4 @@ app.get('/',function(request,response){
 
 app.use('/client', express.static(__dirname+'/client'));
 
-app.listen(2000);
+server.listen(2000);
