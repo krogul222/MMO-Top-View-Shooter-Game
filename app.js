@@ -168,14 +168,56 @@ Bullet.update = function(){
 
 const DEBUG = true;
 
+const USERS = {
+    // username: password
+}
+
+let isValidPassword = function(data, cb){
+    cb(USERS[data.username] === data.password);
+}
+
+let isUsernameTaken = function(data, cb){
+    cb(USERS[data.username]);
+}
+
+let addUser = function(data, cb){
+    USERS[data.username] = data.password;
+    cb();
+}
+
+
+
 let io = require('socket.io')(server,{});
 io.sockets.on('connection', function(socket){
     console.log("Socket connection");
     socket.id = Math.random();
     SOCKET_LIST[socket.id] = socket;
     
-    Player.onConnect(socket);
 
+
+    socket.on('signIn',function(data){
+        isValidPassword(data, function(res){
+           if(res){
+                Player.onConnect(socket);
+                socket.emit('signInResponse',{success: true});
+           } else{
+                socket.emit('signInResponse',{success: false});
+           }
+        });
+    });    
+
+    socket.on('signUp',function(data){
+        isUsernameTaken(data, function(res){
+            if(res){
+                socket.emit('signUpResponse',{success: false});
+            } else{
+                addUser(data, function(){
+                    socket.emit('signUpResponse',{success: true});
+                });
+            }
+        });
+    });        
+    
     socket.on('disconnect',function(){
         delete SOCKET_LIST[socket.id];
         Player.onDisconnect(socket);
