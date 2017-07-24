@@ -34,6 +34,10 @@ let Entity = function(){
         self.y += self.spdY;
     } 
     
+    self.getDistance = function(pt){
+        return Math.sqrt(Math.pow(self.x - pt.x, 2) + Math.pow(self.y - pt.y, 2));
+    }
+    
     return self;
 }
 
@@ -45,12 +49,24 @@ let Player = function(id){
     self.pressingLeft = false;
     self.pressingUp = false;
     self.pressingDown = false;
+    self.pressingAttack = false;
+    self.mouseAngle = 0;
     self.maxSpd = 10;
     
     let super_update = self.update;
     self.update = function(){
         self.updateSpd();
         super_update();
+        if(self.pressingAttack){
+            self.shootBullet(self.mouseAngle);
+        }
+
+    }
+    
+    self.shootBullet = function(angle){
+        let bullet = Bullet(self.id, angle);
+        bullet.x = self.x;
+        bullet.y = self.y;
     }
     
     self.updateSpd = function(){
@@ -85,6 +101,10 @@ Player.onConnect = function(socket){
            player.pressingUp = data.state;
        if(data.inputId == 'down')
            player.pressingDown = data.state;
+       if(data.inputId == 'attack')
+           player.pressingAttack = data.state;
+       if(data.inputId == 'mouseAngle')
+           player.mouseAngle = data.state;
     });
 }
 
@@ -102,12 +122,13 @@ Player.update = function(){
     return pack;
 }
 
-let Bullet = function(angle){
+let Bullet = function(parent, angle){
     let self = Entity();
     self.id = Math.random();
     self.spdX = Math.cos(angle/180*Math.PI) * 10;
     self.spdY = Math.sin(angle/180*Math.PI) * 10;
     
+    self.parent = parent;
     self.timer = 0;
     self.toRemove = false;
     var super_update = self.update;
@@ -116,6 +137,14 @@ let Bullet = function(angle){
             self.toRemove = true;
         }
         super_update();
+        
+        for(let i in Player.list){
+            let p = Player.list[i];
+            if(self.getDistance(p) < 32 && self.parent !== p.id){
+                // handle collision
+                self.toRemove = true;
+            }
+        }
     }
     Bullet.list[self.id] = self;
     return self;
@@ -124,15 +153,15 @@ Bullet.list = {};
 
 Bullet.update = function(){
     
-    if(Math.random() < 0.1){
-        Bullet(Math.random()*360);
-    }
-    
     let pack =[];
     for(let i in Bullet.list){
         let bullet = Bullet.list[i];
         bullet.update();
-        pack.push({x:bullet.x,y:bullet.y});
+        if(bullet.toRemove){
+            delete Bullet.list[i];
+        } else {
+            pack.push({x:bullet.x,y:bullet.y});     
+        }
     }
     return pack;
 }
