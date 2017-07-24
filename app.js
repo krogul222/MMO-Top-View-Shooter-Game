@@ -137,22 +137,38 @@ Bullet.update = function(){
     return pack;
 }
 
-var io = require('socket.io')(server,{});
+const DEBUG = true;
+
+let io = require('socket.io')(server,{});
 io.sockets.on('connection', function(socket){
     console.log("Socket connection");
     socket.id = Math.random();
     SOCKET_LIST[socket.id] = socket;
     
     Player.onConnect(socket);
+
     socket.on('disconnect',function(){
         delete SOCKET_LIST[socket.id];
         Player.onDisconnect(socket);
     });
     
+    socket.on('sendMsgToServer',function(data){
+        let playerName = ("" + socket.id).slice(2,7);
+        for (let i in SOCKET_LIST){
+            SOCKET_LIST[i].emit('addToChat', playerName + ': ' + data);
+        }
+    });
 
+    socket.on('evalServer',function(data){
+        if(!DEBUG){
+            return;
+        }
+ 
+        let res = eval(data);
+        socket.emit('evalAnswer',res);
+    });
     
-    });    
-
+    });
 
 setInterval(function(){
     
