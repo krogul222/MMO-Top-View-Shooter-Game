@@ -118,7 +118,7 @@ let Player = function(id){
     
     Player.list[id] = self; 
     
-    initPack.player.push({id:self.id, x:self.x, y:self.y, number:self.number});
+    initPack.player.push({id:self.id, x:self.x, y:self.y, number:self.number, hpMax: self.hpMax, hp: self.hp});
     
     return self;
 }
