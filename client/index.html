@@ -20,7 +20,8 @@
 <script src="https://cdn.socket.io/socket.io-1.4.5.js"></script>
 <script>
     let socket = io();   
-    
+    const WIDTH = 500;
+    const HEIGHT = 500;
     //sign
     
     let signDiv = document.getElementById("signDiv");
@@ -101,9 +102,17 @@
         
         self.draw = function(){
             let hpWidth = 30 * self.hp/self.hpMax;
-            ctx.fillText(self.number, self.x, self.y);
+            
+            let x = self.x - Player.list[selfId].x+WIDTH/2;
+            let y = self.y - Player.list[selfId].y+HEIGHT/2;
+            
+          /*  ctx.fillText(self.number, self.x, self.y);
             ctx.fillText(self.score, self.x, self.y-60);
-            ctx.fillRect(self.x - hpWidth/2, self.y - 40, hpWidth, 4);
+            ctx.fillRect(self.x - hpWidth/2, self.y - 40, hpWidth, 4);*/
+            
+            ctx.fillText(self.number, x, y);
+            ctx.fillText(self.score, x, y-60);
+            ctx.fillRect(x - hpWidth/2, y - 40, hpWidth, 4);
         }
         
         Player.list[self.id] = self;
@@ -118,7 +127,13 @@
         self.y = initPack.y;
         
         self.draw = function(){
-            ctx.fillRect(self.x - 5, self.y - 5, 10, 10);
+            
+            let x = self.x - Player.list[selfId].x+WIDTH/2;
+            let y = self.y - Player.list[selfId].y+HEIGHT/2;
+            
+           // ctx.fillRect(self.x - 5, self.y - 5, 10, 10);
+            
+            ctx.fillRect(x - 5, y - 5, 10, 10);
         }
         
         Bullet.list[self.id] = self;
@@ -126,7 +141,12 @@
     }
     Bullet.list = {};    
     
+    var selfId = null;
+    
     socket.on('init', function(data){
+        if(data.selfId){
+            selfId = data.selfId;
+        }
        for(let i = 0, length = data.player.length; i < length; i++){
            new Player(data.player[i]);
        } 
@@ -181,6 +201,10 @@
     });
     
     setInterval(function(){
+        if(!selfId){
+            return;
+        }
+        
         ctx.clearRect(0,0,500,500);
         for(let i in Player.list){
             Player.list[i].draw();

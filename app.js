@@ -141,7 +141,7 @@ Player.onConnect = function(socket){
            player.mouseAngle = data.state;
     });
     
-    socket.emit('init',{player:Player.getAllInitPack(),bullet:Bullet.getAllInitPack()});
+    socket.emit('init',{player:Player.getAllInitPack(),bullet:Bullet.getAllInitPack(),selfId:socket.id});
 }
 
 Player.getAllInitPack = function(){
