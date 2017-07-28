@@ -84,7 +84,10 @@
         
     
     //game
+    var Img = {};
     
+    Img.map = new Image();
+    Img.map.src = '/client/img/map.png';
     
     let ctx = document.getElementById("ctx").getContext("2d");
     ctx.font = '30px Arial';
@@ -206,6 +209,7 @@
         }
         
         ctx.clearRect(0,0,500,500);
+        drawMap();
         for(let i in Player.list){
             Player.list[i].draw();
         }
@@ -214,6 +218,12 @@
         }
     }, 40);
 
+    let drawMap = function(){
+        let x = WIDTH/2 - Player.list[selfId].x;
+        let y = HEIGHT/2 - Player.list[selfId].y;
+        ctx.drawImage(Img.map, x, y);
+    }
+    
     document.onkeydown = function(event){
         if(event.keyCode === 68)  //d
             socket.emit('keyPress', {inputId:'right', state:true});
