@@ -68,6 +68,7 @@ let Player = function(id){
         super_update();
         if(self.pressingAttack){
             self.shootBullet(self.mouseAngle);
+            self.pressingAttack = false;
         }
 
     }
@@ -170,8 +171,8 @@ Player.update = function(){
 let Bullet = function(parent, angle){
     let self = Entity();
     self.id = Math.random();
-    self.spdX = Math.cos(angle/180*Math.PI) * 10;
-    self.spdY = Math.sin(angle/180*Math.PI) * 10;
+    self.spdX = Math.cos(angle/180*Math.PI) * 20;
+    self.spdY = Math.sin(angle/180*Math.PI) * 20;
     
     self.parent = parent;
     self.timer = 0;
