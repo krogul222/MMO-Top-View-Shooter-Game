@@ -18,7 +18,6 @@
 </div>
 
 <script src="https://cdn.socket.io/socket.io-1.4.5.js"></script>
-<script src='/client/js/jquery-3.2.1.min.js'></script>
 <script>
     let socket = io();   
     const WIDTH = 500;
@@ -61,6 +60,7 @@
     let chatText = document.getElementById('chat-text');
     let chatInput = document.getElementById('chat-input');
     let chatForm = document.getElementById('chat-form');
+
     socket.on('addToChat', function(data){
        chatText.innerHTML += '<div>' + data +'</div>'; 
     });
@@ -78,6 +78,7 @@
         socket.emit('sendMsgToServer', chatInput.value);   
         }
             
+
         chatInput.value = '';
     }
         
@@ -96,6 +97,13 @@
     
     let ctx = document.getElementById("ctx").getContext("2d");
     ctx.font = '30px Arial';
+
+    let keydown = {up: false, down: false, left: false, right: false, attack: false};
+    let keyup = {up: false, down: false, left: false, right: false, attack: false};
+    let keytimer = {up: new Date().getTime(), down: new Date().getTime(), left: new Date().getTime(), right: new Date().getTime()};
+    
+    const MAX_KEY_DELAY = 100;
+    
     let Player = function(initPack){
         var self = {};
         self.id = initPack.id;
@@ -113,18 +121,11 @@
             let x = self.x - Player.list[selfId].x+WIDTH/2;
             let y = self.y - Player.list[selfId].y+HEIGHT/2;
             
-          /*  ctx.fillText(self.number, self.x, self.y);
-            ctx.fillText(self.score, self.x, self.y-60);
-            ctx.fillRect(self.x - hpWidth/2, self.y - 40, hpWidth, 4);*/
-            
             var width = Img.player.width*2;
             var height = Img.player.height*2;
             
             ctx.drawImage(Img.player, 0, 0, Img.player.width, Img.player.height, x - width/2, y - height/2, width, height);
             
-          //  ctx.fillText(self.number, x, y);
-          //  ctx.fillStyle = 'black';
-           // ctx.fillText(self.score, x, y-60);
             ctx.fillStyle = 'red';
             ctx.fillRect(x - hpWidth/2, y - 40, hpWidth, 4);
             
@@ -134,6 +135,7 @@
         return self;
     }
     Player.list = {};
+
     let Bullet = function(initPack){
         var self = {};
         self.id = initPack.id;
@@ -150,9 +152,6 @@
             
             ctx.drawImage(Img.bullet, 0, 0, Img.bullet.width, Img.bullet.height, x - width/2, y - height/2, width, height);
             
-           // ctx.fillRect(self.x - 5, self.y - 5, 10, 10);
-          /*  ctx.fillStyle = 'pink';
-            ctx.fillRect(x - 5, y - 5, 10, 10);*/
         }
         
         Bullet.list[self.id] = self;
@@ -223,7 +222,7 @@
         if(!selfId){
             return;
         }
-        
+        sendKeyInput();
         ctx.clearRect(0,0,500,500);
         drawMap();
         drawScore();
@@ -234,6 +233,7 @@
             Bullet.list[i].draw();
         }
     }, 40);
+
     let drawMap = function(){
         let x = WIDTH/2 - Player.list[selfId].x;
         let y = HEIGHT/2 - Player.list[selfId].y;
@@ -244,33 +244,71 @@
        ctx.fillStyle = 'blue';
        ctx.fillText('Score: '+Player.list[selfId].score, 0, 30);
    }
+   
     document.onkeydown = function(event){
-        if(event.keyCode === 68)  //d
-            socket.emit('keyPress', {inputId:'right', state:true});
-        else if(event.keyCode === 83)  //s
-            socket.emit('keyPress', {inputId:'down', state:true});
-        else if(event.keyCode === 65)  //a
-                 socket.emit('keyPress', {inputId:'left', state:true});       
-        else if(event.keyCode === 87)  //w
-            socket.emit('keyPress', {inputId:'up', state:true});
+        
+        let time = new Date().getTime();
+        
+        if(event.keyCode === 68){  //d
+            //socket.emit('keyPress', {inputId:'right', state:true});
+            if(time > keytimer["right"] + MAX_KEY_DELAY )
+                keydown.right = true;
+        }
+        else if(event.keyCode === 83){  //s
+            //socket.emit('keyPress', {inputId:'down', state:true});
+            if(time > keytimer["down"] + MAX_KEY_DELAY )
+                keydown.down = true;
+        }
+        else if(event.keyCode === 65){  //a
+             //    socket.emit('keyPress', {inputId:'left', state:true}); 
+            if(time > keytimer["left"] + MAX_KEY_DELAY )
+                keydown.left = true;
+        }
+        else if(event.keyCode === 87){  //w
+            //socket.emit('keyPress', {inputId:'up', state:true});
+            if(time > keytimer["up"] + MAX_KEY_DELAY )
+                keydown.up = true;
+        }
     }
     
     document.onkeyup = function(event){
-        if(event.keyCode === 68)  //d
-            socket.emit('keyPress', {inputId:'right', state:false});
-        else if(event.keyCode === 83)  //s
-            socket.emit('keyPress', {inputId:'down', state:false});
-        else if(event.keyCode === 65)  //a
-            socket.emit('keyPress', {inputId:'left', state:false});
-        else if(event.keyCode === 87)  //w
-            socket.emit('keyPress', {inputId:'up', state:false});
+        if(event.keyCode === 68){  //d
+           // socket.emit('keyPress', {inputId:'right', state:false});
+            keyup.right = true;
+            keytimer["right"] = new Date().getTime();
+        }
+        else if(event.keyCode === 83){  //s
+            //socket.emit('keyPress', {inputId:'down', state:false});
+            keyup.down = true;
+            keytimer["down"] = new Date().getTime();
+        }
+        else if(event.keyCode === 65){  //a
+            //socket.emit('keyPress', {inputId:'left', state:false});
+            keyup.left = true;
+            keytimer["left"] = new Date().getTime();
+        }
+        else if(event.keyCode === 87){  //w
+            //socket.emit('keyPress', {inputId:'up', state:false});
+            keyup.up = true;
+            keytimer["up"] = new Date().getTime();
+        }
+    }
+    
+    document.onblur = function(event){
+        keyup.right = true;
+        keyup.left = true;
+        keyup.up = true;
+        keyup.down = true;
     }
     
     document.onmousedown = function(event){
-        socket.emit('keyPress', {inputId:'attack', state:true});
+  //      socket.emit('keyPress', {inputId:'attack', state:true});
+        keydown.attack = true;
     }
+
     document.onmouseup = function(event){
-        socket.emit('keyPress', {inputId:'attack', state:false});
+      //  socket.emit('keyPress', {inputId:'attack', state:false});
+        keyup.attack = true;
     }
     
     document.onmousemove = function(event){
@@ -280,19 +318,58 @@
         socket.emit('keyPress', {inputId:'mouseAngle', state: angle});
     }
     
-    $( document ).ready(function() {
-        $("#ctx" ).mousedown(function(event){
-            event.preventDefault();
-        });
-        $("#chat-form" ).mousedown(function(event){
-            event.preventDefault();
-        });
-        $("#chat-text" ).mousedown(function(event){
-            event.preventDefault();
-        });
-        $("#gameDiv" ).mousedown(function(event){
-            event.preventDefault();
-        });
-    });
+    function sendKeyInput(){
+        if(keyup.right){
+            socket.emit('keyPress', {inputId:'right', state:false});    
+        } else{
+            if(keydown.right){
+                socket.emit('keyPress', {inputId:'right', state:true});
+            }
+        }
+
+        if(keyup.up){
+            socket.emit('keyPress', {inputId:'up', state:false});    
+        } else{
+            if(keydown.up){
+                socket.emit('keyPress', {inputId:'up', state:true});
+            }
+        }
+        
+        if(keyup.down){
+            socket.emit('keyPress', {inputId:'down', state:false});    
+        } else{
+            if(keydown.down){
+                socket.emit('keyPress', {inputId:'down', state:true});
+            }
+        }
+        
+        if(keyup.left){
+            socket.emit('keyPress', {inputId:'left', state:false});    
+        } else{
+            if(keydown.left){
+                socket.emit('keyPress', {inputId:'left', state:true});
+            }
+        }
+        
+        if(keydown.attack){
+            socket.emit('keyPress', {inputId:'attack', state:true});    
+        } else{
+            if(keyup.attack){
+                socket.emit('keyPress', {inputId:'attack', state:false});
+            }
+        }
+        
+        keyup.left = false;
+        keyup.right = false;
+        keyup.up = false;
+        keyup.down = false;
+        keyup.attack = false;
+        
+        keydown.left = false;
+        keydown.right = false;
+        keydown.up = false;
+        keydown.down = false;
+        keydown.attack = false;
+    }
     
 </script>
