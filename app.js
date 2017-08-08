@@ -28,10 +28,13 @@ let Entity = function(param){
     let self = {
         x: 250,
         y: 250,
+        width: 32,
+        height: 32,
         spdX: 0,
         spdY: 0,
         id: "",
-        map: 'forest'
+        map: 'forest',
+        img: null
     }
     
     if(param){
@@ -46,6 +49,15 @@ let Entity = function(param){
         }
         if(param.id){
             self.id = param.id;
+        }
+        if(param.img){
+            self.img = param.img;
+        }
+        if(param.width){
+            self.width = param.width;
+        }
+        if(param.height){
+            self.height = param.height;
         }
     }
     self.update = function(){
@@ -71,6 +83,7 @@ let Player = function(param){
     self.pressingUp = false;
     self.pressingDown = false;
     self.pressingAttack = false;
+    self.moving = false;
     self.mouseAngle = 0;
     self.maxSpd = 10;
     self.hp = 10;
@@ -89,7 +102,7 @@ let Player = function(param){
     }
     
     self.shootBullet = function(angle){
-        Bullet({parent: self.id, angle: angle, x: self.x, y: self.y, map: self.map});
+        Bullet({parent: self.id, angle: angle, x: self.x, y: self.y, map: self.map, img: 'bullet', width: 32, height: 32});
     }
     
     self.updateSpd = function(){
@@ -117,7 +130,13 @@ let Player = function(param){
            hp: self.hp,
            hpMax: self.hpMax,
            score: self.score,
-           map: self.map
+           map: self.map,
+           img: self.img,
+           width: self.width,
+           height: self.height,
+           moving: self.moving,
+           aimAngle: self.mouseAngle
+            
         };
     }
 
@@ -127,7 +146,9 @@ let Player = function(param){
            x: self.x,
            y: self.y,
            hp: self.hp,
-           score: self.score
+           moving: self.moving,
+           score: self.score,
+           aimAngle: self.mouseAngle
         };
     }    
     
@@ -140,10 +161,10 @@ let Player = function(param){
 Player.list = {};
 Player.onConnect = function(socket){
     let map = 'forest';
-    if(Math.random() < 0.5){
+    if(Math.random() < -0.5){
         map = 'field';
     }
-    let player = Player({id: socket.id, map: map});
+    let player = Player({id: socket.id, map: map, img: 'player', width: 50, height: 70});
     
     socket.on('keyPress', function(data){
        if(data.inputId == 'left')
@@ -158,6 +179,13 @@ Player.onConnect = function(socket){
            player.pressingAttack = data.state;
        if(data.inputId == 'mouseAngle')
            player.mouseAngle = data.state;
+        
+        
+       if(player.pressingRight || player.pressingLeft || player.pressingUp || player.pressingDown){
+           player.moving = true;
+       } else {
+           player.moving = false;
+       }
     });
     
     socket.emit('init',{player:Player.getAllInitPack(),bullet:Bullet.getAllInitPack(),selfId:socket.id});
@@ -229,7 +257,10 @@ let Bullet = function(param){
            id: self.id,
            x: self.x,
            y: self.y,
-           map: self.map
+           map: self.map,
+           img: self.img,
+           width: self.width,
+           height: self.height
         };
     }
 
