@@ -24,6 +24,15 @@ console.log("Server started.");
 
 const SOCKET_LIST = {};
 const TILE_SIZE = 32;
+let frameCount = 0;
+
+
+testCollisionRectRect = function(rect1,rect2){
+	return rect1.x <= rect2.x+rect2.width 
+		&& rect2.x <= rect1.x+rect1.width
+		&& rect1.y <= rect2.y + rect2.height
+		&& rect2.y <= rect1.y + rect1.height;
+}
 
 let Entity = function(param){
     let self = {
@@ -35,10 +44,17 @@ let Entity = function(param){
         spdY: 0,
         id: "",
         map: 'forest',
-        img: null
+        img: null,
+        type: "entity"
     }
     
     if(param){
+        if(param.spdX){
+            self.spdX = param.spdX;
+        }
+        if(param.spdY){
+            self.spdY = param.spdY;
+        }
         if(param.x){
             self.x = param.x;
         }
@@ -60,6 +76,9 @@ let Entity = function(param){
         if(param.height){
             self.height = param.height;
         }
+        if(param.type){
+            self.type = param.type;
+        }
     }
     self.update = function(){
         self.updatePosition();
@@ -73,7 +92,124 @@ let Entity = function(param){
         return Math.sqrt(Math.pow(self.x - pt.x, 2) + Math.pow(self.y - pt.y, 2));
     }
     
+    self.testCollision = function(entity2){	//return if colliding (true/false)
+		let rect1 = {
+			x:self.x-self.width/2,
+			y:self.y-self.height/2,
+			width:self.width,
+			height:self.height,
+		}
+		let rect2 = {
+			x:entity2.x-entity2.width/2,
+			y:entity2.y-entity2.height/2,
+			width:entity2.width,
+			height:entity2.height,
+		}
+		return testCollisionRectRect(rect1,rect2);
+		
+	}
+    
     return self;
+}
+
+Actor = function(param){
+	var self = Entity(param);
+	
+	self.hp = param.hp;
+	self.hpMax = param.hp;
+	self.atkSpd = param.atkSpd;
+	self.attackCounter = 0;
+	self.aimAngle = 0;
+	
+	self.pressingDown = false;
+	self.pressingUp = false;
+	self.pressingLeft = false;
+	self.pressingRight = false;
+    
+	self.maxSpd = 3;    
+     
+    self.updateSpd  = function(){
+		let leftBumper = {x:self.x - 40,y:self.y};
+		let rightBumper = {x:self.x + 40,y:self.y};
+		let upBumper = {x:self.x,y:self.y - 16};
+		let downBumper = {x:self.x,y:self.y + 64};
+		
+        self.spdX = 0;
+        self.spdY = 0;
+        
+        if(gameMaps[self.map].isPositionWall(bumperRightPos)){
+            self.spdX = -self.maxSpd;
+        } else{
+            if(self.pressingRight)
+                self.spdX = self.maxSpd;
+        }
+        
+        if(gameMaps[self.map].isPositionWall(bumperLeftPos)){
+            self.spdX = self.maxSpd;
+        } else{
+            if(self.pressingLeft)
+                self.spdX = -self.maxSpd;
+        }
+        
+        if(gameMaps[self.map].isPositionWall(bumperDownPos)){
+            self.spdY = -self.maxSpd;
+        } else{
+            if(self.pressingDown)
+                self.spdY = self.maxSpd;
+        }
+
+        if(gameMaps[self.map].isPositionWall(bumperUpPos)){
+            self.spdY = self.maxSpd;
+        } else{
+            if(self.pressingUp)
+                self.spdY = -self.maxSpd;
+        }
+		
+		//ispositionvalid
+		if(self.x < self.width/2)
+			self.x = self.width/2;
+		if(self.x > gameMaps[self.map].width-self.width/2)
+			self.x = gameMaps[self.map].width - self.width/2;
+		if(self.y < self.height/2)
+			self.y = self.height/2;
+		if(self.y > gameMaps[self.map].height - self.height/2)
+			self.y = gameMaps[self.map].height - self.height/2;
+
+	}
+	
+	var super_update = self.update;
+	self.update = function(){
+		super_update();
+        
+		self.attackCounter += self.atkSpd;
+		if(self.hp <= 0)
+			self.onDeath();
+	}
+	self.onDeath = function(){};
+	
+	self.performAttack = function(){
+		if(self.attackCounter > 25){	//every 1 sec
+			self.attackCounter = 0;
+			Bullet.generate(self);
+		}
+	}
+	
+	self.performSpecialAttack = function(){
+		if(self.attackCounter > 50){	//every 1 sec
+			self.attackCounter = 0;
+			/*
+			for(var i = 0 ; i < 360; i++){
+				Bullet.generate(self,i);
+			}
+			*/
+			Bullet.generate(self,self.aimAngle - 5);
+			Bullet.generate(self,self.aimAngle);
+			Bullet.generate(self,self.aimAngle + 5);
+		}
+	}
+
+	
+	return self;
 }
 
 let Player = function(param){
@@ -119,46 +255,32 @@ let Player = function(param){
         self.spdY = 0;
         
         if(gameMaps[self.map].isPositionWall(bumperRightPos)){
-            self.spdX -= self.maxSpd;
+            self.spdX = -self.maxSpd;
         } else{
             if(self.pressingRight)
                 self.spdX = self.maxSpd;
         }
         
         if(gameMaps[self.map].isPositionWall(bumperLeftPos)){
-            self.spdX += self.maxSpd;
+            self.spdX = self.maxSpd;
         } else{
             if(self.pressingLeft)
                 self.spdX = -self.maxSpd;
         }
         
         if(gameMaps[self.map].isPositionWall(bumperDownPos)){
-            self.spdY -= self.maxSpd;
+            self.spdY = -self.maxSpd;
         } else{
             if(self.pressingDown)
                 self.spdY = self.maxSpd;
         }
 
         if(gameMaps[self.map].isPositionWall(bumperUpPos)){
-            self.spdY += self.maxSpd;
+            self.spdY = self.maxSpd;
         } else{
             if(self.pressingUp)
                 self.spdY = -self.maxSpd;
         }
-        /*
-        if(self.pressingRight && !gameMaps[self.map].isPositionWall(bumperRightPos))
-            self.spdX = self.maxSpd;
-        else if(self.pressingLeft  && !gameMaps[self.map].isPositionWall(bumperLeftPos))
-            self.spdX = -self.maxSpd;
-        else
-            self.spdX = 0;
-        
-        if(self.pressingUp  && !gameMaps[self.map].isPositionWall(bumperUpPos))
-            self.spdY = -self.maxSpd;
-        else if(self.pressingDown && !gameMaps[self.map].isPositionWall(bumperDownPos))
-            self.spdY = self.maxSpd;
-        else
-            self.spdY = 0;*/
     }
     
     self.getInitPack = function(){
@@ -204,7 +326,12 @@ Player.onConnect = function(socket){
     if(Math.random() < -0.5){
         map = 'field';
     }
-    let player = Player({id: socket.id, map: map, img: 'player', width: 50, height: 70});
+    let player = Player({id: socket.id, map: map, img: 'player', width: 50, height: 70, type: "player"});
+    Enemy.randomlyGenerate('forest');
+    Enemy.randomlyGenerate('forest');
+    Enemy.randomlyGenerate('forest');
+    Enemy.randomlyGenerate('forest');
+    Enemy.randomlyGenerate('forest');
     
     socket.on('keyPress', function(data){
        if(data.inputId == 'left')
@@ -226,6 +353,8 @@ Player.onConnect = function(socket){
        } else {
            player.moving = false;
        }
+        
+
     });
     
     socket.emit('init',{player:Player.getAllInitPack(),bullet:Bullet.getAllInitPack(),selfId:socket.id});
@@ -355,6 +484,99 @@ Bullet.getAllInitPack = function(){
     return bullets;
 }
 
+Bullet.generate = function(actor,aimOverwrite){
+	//Math.random() returns a number between 0 and 1
+	let x = actor.x;
+	let y = actor.y;
+	let height = 24;
+	let width = 24;
+	let id = Math.random();
+	
+	let angle;
+	if(aimOverwrite !== undefined)
+		angle = aimOverwrite;
+	else angle = actor.aimAngle;
+	
+	let spdX = Math.cos(angle/180*Math.PI)*5;
+	let spdY = Math.sin(angle/180*Math.PI)*5;
+	//Bullet(id,x,y,spdX,spdY,width,height,actor.type);
+    Bullet({id: id, parent: actor.id, x: x, y: y, map: actor.map, img: 'bullet', width: 32, height: 32, spdX: spdX, spdY: spdY, angle: angle});
+}
+
+Enemy = function(param){
+	let self = Actor(param);
+	Enemy.list[param.id] = self;
+	
+	self.toRemove = false;
+	
+	var super_update = self.update; 
+	self.update = function(){
+		super_update();
+		self.updateAim();
+		self.updateKeyPress();
+		self.performAttack();
+	}
+	self.updateAim = function(){
+        let player = self.getClosestPlayer();
+		var diffX = player.x - self.x;
+		var diffY = player.y - self.y;
+		
+		self.aimAngle = Math.atan2(diffY,diffX) / Math.PI * 180
+	}
+	self.updateKeyPress = function(){
+        let player = self.getClosestPlayer();
+		var diffX = player.x - self.x;
+		var diffY = player.y - self.y;
+
+		self.pressingRight = diffX > 3;
+		self.pressingLeft = diffX < -3;
+		self.pressingDown = diffY > 3;
+		self.pressingUp = diffY < -3;
+	}
+	
+	self.onDeath = function(){
+		self.toRemove = true;
+	}
+    
+    self.getClosestPlayer = function(){
+        let distance = 10000;
+        let index = 0;
+        for(let i in Player.list){
+            if(distance > self.getDistance(Player.list[i])){
+                distance = self.getDistance(Player.list[i]);
+                index = i; 
+            }
+          //  index = i; // temporary
+        }
+    return Player.list[index];
+    }
+	
+}
+
+Enemy.list = {};
+
+Enemy.update = function(){
+	/*if(frameCount % 100 === 0)	//every 4 sec
+		Enemy.randomlyGenerate();*/
+	for(var key in Enemy.list){
+		Enemy.list[key].update();
+	}
+	for(var key in Enemy.list){
+		if(Enemy.list[key].toRemove)
+			delete Enemy.list[key];
+	}
+}
+
+Enemy.randomlyGenerate = function(map){
+	//Math.random() returns a number between 0 and 1
+	let x = Math.random()*gameMaps[map].width;
+	let y = Math.random()*gameMaps[map].height;
+	let height = 64*1.5;
+	let width = 64*1.5;
+	let id = Math.random();
+    Enemy({id: id, x: x, y: y, width: width, height: height, hp: 2, atkSpd: 1, map: map});
+}
+
 const DEBUG = true;
 
 const USERS = {
@@ -450,10 +672,13 @@ setInterval(function(){
     
     let pack = {
         player: Player.update(),
-        bullet: Bullet.update()
+        bullet: Bullet.update(),
+        enemy: Enemy.update()
     }
     
-     for(let i in SOCKET_LIST){
+    frameCount++;
+    
+    for(let i in SOCKET_LIST){
             let socket = SOCKET_LIST[i];
             socket.emit('init',initPack);
             socket.emit('update',pack);
@@ -475,9 +700,11 @@ Maps = function(id, grid){
         }
         
         self.isPositionWall = function(pt){
+            console.log(gridX);
+            
             var gridX = Math.floor(pt.x/TILE_SIZE);
             var gridY = Math.floor(pt.y/TILE_SIZE);
-            
+            console.log(gridX);
             if(gridX < 0 || gridX >= self.grid[0].length)
                 return true;
             if(gridY < 0 || gridY >=self.grid.length)
