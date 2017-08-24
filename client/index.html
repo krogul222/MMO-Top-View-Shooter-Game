@@ -304,6 +304,9 @@
             let x = WIDTH/2 - player.x;
             let y = HEIGHT/2 - player.y;
             ctx.drawImage(self.image, 0, 0, self.image.width, self.image.height, x, y, self.image.width*2, self.image.height*2);
+            ctx.drawImage(self.image, 0, 0, self.image.width, self.image.height, x+self.image.width*2, y, self.image.width*2, self.image.height*2);
+            ctx.drawImage(self.image, 0, 0, self.image.width, self.image.height, x, y+self.image.height*2, self.image.width*2, self.image.height*2);
+            ctx.drawImage(self.image, 0, 0, self.image.width, self.image.height, x+self.image.width*2, y+self.image.height*2, self.image.width*2, self.image.height*2);
         }
         return self;
     }

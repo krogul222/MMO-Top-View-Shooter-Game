@@ -890,5 +890,27 @@ for(var i = 0 ; i < 40; i++){
 	}
 }
 
+let merge4Arrays = function(arr1, arr2, arr3, arr4, dim){
+    let array = [];
+    
+    for(let i = 0; i < dim*2; i++){
+        array[i] = [];
+        for(let j = 0; j < dim*2; j++){
+            if(j < dim && i < dim){
+                array[i][j] = arr1[i][j];
+            } else if(j < dim && i >= dim){
+                array[i][j] = arr3[i-dim][j];
+            } else if(j >= dim && i < dim){
+                array[i][j] = arr2[i][j-dim];
+            } else{
+                array[i][j] = arr4[i-dim][j-dim];
+            }
+        }    
+    }
+    
+    return array;
+} 
 
-gameMaps['forest'] = Maps('forest', array2D); 
+let arr2d = merge4Arrays(array2D,array2D,array2D,array2D,40);
+
+gameMaps['forest'] = Maps('forest', arr2d); 
