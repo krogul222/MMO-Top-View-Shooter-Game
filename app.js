@@ -94,16 +94,16 @@ let Entity = function(param){
     
     self.testCollision = function(entity2){	//return if colliding (true/false)
 		let rect1 = {
-			x:self.x-self.width/2,
-			y:self.y-self.height/2,
-			width:self.width,
-			height:self.height,
+			x:self.x-(self.width/2)/2,
+			y:self.y-(self.height/2)/2,
+			width:self.width/2,
+			height:self.height/2,
 		}
 		let rect2 = {
-			x:entity2.x-entity2.width/2,
-			y:entity2.y-entity2.height/2,
-			width:entity2.width,
-			height:entity2.height,
+			x:entity2.x-(entity2.width/2)/2,
+			y:entity2.y-(entity2.height/2)/2,
+			width:entity2.width/2,
+			height:entity2.height/2,
 		}
 		return testCollisionRectRect(rect1,rect2);
 		
@@ -126,15 +126,20 @@ Actor = function(param){
 	self.pressingUp = false;
 	self.pressingLeft = false;
 	self.pressingRight = false;
-    self.moving = false;
+    self.moving = false; 
+    self.atackRadius = 0;  
+  
+    if(param.maxSpd){
+        self.maxSpd = param.maxSpd;
+    } else {
+        self.maxSpd = 3;  
+    }
     
-    self.maxSpd = 3;    
-     
     self.updateSpd  = function(){
-		let leftBumper = {x:self.x - 40,y:self.y};
-		let rightBumper = {x:self.x + 40,y:self.y};
+		let leftBumper = {x:self.x - 10,y:self.y};
+		let rightBumper = {x:self.x + 10,y:self.y};
 		let upBumper = {x:self.x,y:self.y - 16};
-		let downBumper = {x:self.x,y:self.y + 64};
+		let downBumper = {x:self.x,y:self.y + 32};
 		
         self.spdX = 0;
         self.spdY = 0;
@@ -189,7 +194,9 @@ Actor = function(param){
 		if(self.hp <= 0)
 			self.onDeath();
 	}
-	self.onDeath = function(){};
+	self.onDeath = function(){
+        self.atackRadius = 0;
+    };
 	
 	self.performAttack = function(){
 		if(self.attackCounter > 25){	//every 1 sec
@@ -217,28 +224,24 @@ Actor = function(param){
 }
 
 let Player = function(param){
-    let self = Entity(param);    
+    let self = Actor(param);    
     self.number = "" + Math.floor(10*Math.random()),
-    self.pressingRight = false;
-    self.pressingLeft = false;
-    self.pressingUp = false;
-    self.pressingDown = false;
-    self.pressingAttack = false;
-    self.moving = false;
-    self.mouseAngle = 0;
-    self.maxSpd = 10;
-    self.hp = 10;
-    self.hpMax = 10;
     self.score = 0;
     
     let super_update = self.update;
     self.update = function(){
-        self.updateSpd();
+    //    self.updateSpd();
         
         super_update();
 
         if(self.pressingAttack){
-            self.shootBullet(self.mouseAngle);
+            self.shootBullet(self.aimAngle);
+            
+            for(let i = 0; i < self.atackRadius; i++){
+                self.shootBullet(self.aimAngle+(i+1)*2);
+                self.shootBullet(self.aimAngle-(i+1)*2);
+            }
+            
             self.pressingAttack = false;
         }
 
@@ -246,45 +249,6 @@ let Player = function(param){
     
     self.shootBullet = function(angle){
         Bullet({parent: self.id, combatType: 'player',angle: angle, x: self.x, y: self.y, map: self.map, img: 'bullet', width: 32, height: 32});
-    }
-    
-    self.updateSpd = function(){
-        
-        let bumperRightPos = {x: self.x + 18, y: self.y};
-        let bumperLeftPos = {x: self.x - 18, y: self.y};
-        let bumperUpPos = {x: self.x, y: self.y - 16};
-        let bumperDownPos = {x: self.x, y: self.y + 30};
-        
-        self.spdX = 0;
-        self.spdY = 0;
-        
-        if(gameMaps[self.map].isPositionWall(bumperRightPos)){
-            self.spdX = -self.maxSpd;
-        } else{
-            if(self.pressingRight)
-                self.spdX = self.maxSpd;
-        }
-        
-        if(gameMaps[self.map].isPositionWall(bumperLeftPos)){
-            self.spdX = self.maxSpd;
-        } else{
-            if(self.pressingLeft)
-                self.spdX = -self.maxSpd;
-        }
-        
-        if(gameMaps[self.map].isPositionWall(bumperDownPos)){
-            self.spdY = -self.maxSpd;
-        } else{
-            if(self.pressingDown)
-                self.spdY = self.maxSpd;
-        }
-
-        if(gameMaps[self.map].isPositionWall(bumperUpPos)){
-            self.spdY = self.maxSpd;
-        } else{
-            if(self.pressingUp)
-                self.spdY = -self.maxSpd;
-        }
     }
     
     self.getInitPack = function(){
@@ -301,7 +265,7 @@ let Player = function(param){
            width: self.width,
            height: self.height,
            moving: self.moving,
-           aimAngle: self.mouseAngle
+           aimAngle: self.aimAngle
             
         };
     }
@@ -314,7 +278,7 @@ let Player = function(param){
            hp: self.hp,
            moving: self.moving,
            score: self.score,
-           aimAngle: self.mouseAngle
+           aimAngle: self.aimAngle
         };
     }    
     
@@ -325,12 +289,16 @@ let Player = function(param){
     return self;
 }
 Player.list = {};
+
+
+
+
 Player.onConnect = function(socket){
     let map = 'forest';
     if(Math.random() < -0.5){
         map = 'field';
     }
-    let player = Player({id: socket.id, map: map, img: 'player', width: 50, height: 70, type: "player"});
+    let player = Player({id: socket.id, maxSpd: 10, map: map, img: 'player', width: 50, height: 70, type: "player", hp: 10});
     Enemy.randomlyGenerate('forest');
     Enemy.randomlyGenerate('forest');
     Enemy.randomlyGenerate('forest');
@@ -349,7 +317,7 @@ Player.onConnect = function(socket){
        if(data.inputId == 'attack')
            player.pressingAttack = data.state;
        if(data.inputId == 'mouseAngle')
-           player.mouseAngle = data.state;
+           player.aimAngle = data.state;
         
         
        if(player.pressingRight || player.pressingLeft || player.pressingUp || player.pressingDown){
@@ -430,6 +398,7 @@ let Bullet = function(param){
                         if(shooter){
                             shooter.score += 1;
                         }
+                        p.onDeath();
                         p.hp = p.hpMax;
                         p.x = Math.random() * gameMaps[self.map].width; 
                         p.y = Math.random() * gameMaps[self.map].height;
@@ -442,8 +411,8 @@ let Bullet = function(param){
                 }
             }
 		}
-    if(gameMaps[self.map].isPositionWall(self)){
-        self.toRemove = true;
+    if(gameMaps[self.map].isPositionWall(self) && gameMaps[self.map].isPositionWall(self) !== 2){
+        self.toRemove = true; 
         }
     }
     
@@ -536,15 +505,29 @@ Enemy = function(param){
 	}
 	self.updateAim = function(){
         let player = self.getClosestPlayer();
-		var diffX = player.x - self.x;
-		var diffY = player.y - self.y;
+        
+        let diffX = 0;
+        let diffY = 0;
+        
+        if(player){
+            diffX = player.x - self.x;
+		    diffY = player.y - self.y;
+        }
+
 		
 		self.aimAngle = Math.atan2(diffY,diffX) / Math.PI * 180
 	}
 	self.updateKeyPress = function(){
         let player = self.getClosestPlayer();
-		let diffX = player.x - self.x;
-		let diffY = player.y - self.y;
+        
+        let diffX = 0;
+        let diffY = 0;
+        
+        if(player){
+            diffX = player.x - self.x;
+            diffY = player.y - self.y;        
+        }
+
 
 		self.pressingRight = diffX > 3;
 		self.pressingLeft = diffX < -3;
@@ -603,7 +586,7 @@ Enemy = function(param){
         };
     }    
     
-    Enemy.list[self.id] = self;
+   // Enemy.list[self.id] = self;
     initPack.enemy.push(self.getInitPack());
     return self;
 }
@@ -611,8 +594,6 @@ Enemy = function(param){
 Enemy.list = {};
 
 Enemy.update = function(){
-	/*if(frameCount % 100 === 0)	//every 4 sec
-		Enemy.randomlyGenerate();*/
     let pack =[];
     
 	for(let i in Enemy.list){
@@ -629,25 +610,21 @@ Enemy.update = function(){
     return pack;
 }
 
-Player.update = function(){
-    let pack =[];
-    for(let i in Player.list){
-        let player = Player.list[i];
-        player.update();
-        pack.push(player.getUpdatePack());
-    }
-    return pack;
-}
-
 Enemy.randomlyGenerate = function(map){
 	//Math.random() returns a number between 0 and 1
 	let x = Math.random()*gameMaps[map].width;
 	let y = Math.random()*gameMaps[map].height;
+    
+    while(gameMaps[map].isPositionWall({x: x, y: y})){
+        x = Math.random() * gameMaps[map].width; 
+        y = Math.random() * gameMaps[map].height;  
+    }    
+    
     let difficulty = 1+Math.round(Math.random()*2)*0.5;
 	let height = 48*difficulty;
 	let width = 48*difficulty;
 	let id = Math.random();
-    Enemy({id: id, x: x, y: y, width: width, height: height, hp: 10*difficulty, atkSpd: 1*difficulty, map: map, img: 'scorpion', type:'enemy'});
+    Enemy({id: id, x: x, y: y, width: width, height: height, hp: 15*difficulty, atkSpd: 0.4*difficulty, map: map, img: 'scorpion', type:'enemy'});
 }
 
 Enemy.getAllInitPack = function(){
@@ -656,6 +633,106 @@ Enemy.getAllInitPack = function(){
         enemies.push(Enemy.list[i].getInitPack());
     }
     return enemies;
+}
+
+Upgrade = function (param){
+    
+    param.type = "upgrade";
+    
+	var self = Entity(param);
+	
+	self.category = param.category;
+    
+    self.getInitPack = function(){
+        return {
+           id: self.id,
+           x: self.x,
+           y: self.y,
+           map: self.map,
+           img: self.img,
+           width: self.width,
+           height: self.height,
+           category: self.category
+        };
+    }
+    
+    self.getUpdatePack = function(){
+        return {
+           id: self.id,
+           x: self.x,
+           y: self.y,
+        };
+    }    
+    
+	Upgrade.list[self.id] = self;
+
+    initPack.upgrade.push(self.getInitPack());
+    return self;
+}
+
+Upgrade.list = {};
+
+Upgrade.update = function(){
+    let pack =[];
+    
+	if(frameCount % 250 === 0)	//every 10 sec
+		Upgrade.randomlyGenerate('forest');
+	for(let key in Upgrade.list){
+		Upgrade.list[key].update();
+        pack.push(Upgrade.list[key].getUpdatePack());  
+        
+        for(let i in Player.list){
+            let player = Player.list[i];
+        
+            let isColliding = player.testCollision(Upgrade.list[key]);
+            if(isColliding){
+                if(Upgrade.list[key].category === 'hp')
+                    player.hp = player.hpMax;
+                if(Upgrade.list[key].category === 'atack')
+                    player.atackRadius +=1;
+                
+                removePack.upgrade.push(Upgrade.list[key].id);               
+                delete Upgrade.list[key];
+                break;
+            } 
+        }   
+	}
+    
+    return pack;
+}
+
+Upgrade.randomlyGenerate = function(map){
+	//Math.random() returns a number between 0 and 1
+	let x = Math.random()*gameMaps[map].width;;
+	let y = Math.random()*gameMaps[map].height;
+    
+    while(gameMaps[map].isPositionWall({x: x, y: y})){
+        x = Math.random() * gameMaps[map].width; 
+        y = Math.random() * gameMaps[map].height;  
+    }
+    
+	let height = 32;
+	let width = 32;
+	let id = Math.random();
+	let category = 'hp';
+    let img = 'hp';
+	if(Math.random()<0.5){
+		//category = 'score';
+		//img = 'player';
+	} else {
+		category = 'atack';
+		img = 'atackspeed';
+	}
+	
+	Upgrade({id: id, x: x, y: y, width: width, height: height, category: category, map: map, img: img});
+}
+
+Upgrade.getAllInitPack = function(){
+    let upgrades = [];
+    for(let i in Upgrade.list){
+        upgrades.push(Upgrade.list[i].getInitPack());
+    }
+    return upgrades;
 }
 
 const DEBUG = true;
@@ -746,15 +823,16 @@ io.sockets.on('connection', function(socket){
     
     });
 
-let initPack = {player:[],bullet:[], enemy:[]};
-let removePack = {player:[],bullet:[], enemy:[]};
+let initPack = {player:[],bullet:[], enemy:[], upgrade:[]};
+let removePack = {player:[],bullet:[], enemy:[], upgrade:[]};
 
 setInterval(function(){
     
     let pack = {
         player: Player.update(),
         bullet: Bullet.update(),
-        enemy: Enemy.update()
+        enemy: Enemy.update(),
+        upgrade: Upgrade.update()
     }
     
     frameCount++;
@@ -768,10 +846,12 @@ setInterval(function(){
     initPack.player = [];
     initPack.bullet = [];
     initPack.enemy = [];
+    initPack.upgrade = [];
     
     removePack.player = [];
     removePack.bullet = [];
     removePack.enemy = [];
+    removePack.upgrade = [];
 }, 1000/25);
 
 
@@ -800,7 +880,7 @@ Maps = function(id, grid){
 
 let gameMaps = {};
 
-var array = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 502, 502, 502, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 502, 502, 502, 502, 502, 502, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 502, 502, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 502, 502, 502, 502, 502, 502, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 502, 502, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 502, 502, 0, 0, 0, 0, 0, 0, 0, 502, 502, 502, 502, 502, 502, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 502, 502, 0, 0, 0, 0, 0, 0, 0, 502, 502, 502, 502, 502, 502, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 502, 502, 502, 502, 502, 502, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 502, 502, 502, 502, 502, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 502, 502, 502, 502, 502, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 502, 502, 502, 502, 502, 502, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 502, 502, 502, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 502, 502, 502, 502, 502, 502, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 502, 502, 502, 502, 502, 502, 502, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 502, 502, 502, 502, 502, 502, 502, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 502, 502, 502, 502, 502, 502, 502, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 502, 502, 502, 502, 502, 0, 0, 0, 0, 0, 502, 502, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 502, 502, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 502, 502, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 502, 502, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 502, 502, 502, 502, 502, 502, 502, 502, 502, 502, 502, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 502, 502, 502, 502, 502, 502, 502, 502, 502, 502, 502, 502, 502, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 502, 502, 502, 502, 502, 502, 502, 502, 502, 502, 502, 502, 502, 0, 0, 0, 0, 0, 0, 502, 502, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 502, 502, 0, 0, 0, 0, 0, 502, 502, 502, 502, 502, 502, 502, 502, 502, 502, 502, 502, 502, 0, 0, 0, 0, 0, 0, 502, 502, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 502, 502, 0, 0, 0, 0, 0, 502, 502, 502, 502, 502, 502, 502, 502, 502, 502, 502, 502, 502, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 502, 502, 502, 502, 502, 502, 502, 502, 502, 502, 502, 502, 502, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 502, 502, 502, 502, 502, 502, 502, 502, 502, 502, 502, 502, 502, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 502, 502, 502, 502, 502, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 502, 502, 502, 502, 502, 502, 502, 502, 502, 502, 502, 502, 502, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 502, 502, 502, 502, 502, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 502, 502, 502, 502, 502, 502, 502, 502, 502, 502, 502, 502, 502, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 502, 502, 502, 502, 502, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 502, 502, 502, 502, 502, 502, 502, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 502, 502, 502, 502, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 502, 502, 502, 502, 502, 502, 502, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 502, 502, 502, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 502, 502, 502, 502, 502, 502, 502, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 502, 502, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 502, 502, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 502, 502, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 502, 502, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 502, 502, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 502, 502, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
+var array = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 2, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 2, 2, 2, 2, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 502, 502, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 2, 2, 2, 2, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 502, 502, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 502, 502, 0, 0, 0, 0, 0, 0, 0, 2, 2, 2, 2, 2, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 502, 502, 0, 0, 0, 0, 0, 0, 0, 2, 2, 2, 2, 2, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 2, 2, 2, 2, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 2, 2, 2, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 2, 2, 2, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 2, 2, 2, 2, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 2, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 2, 2, 2, 2, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 2, 2, 2, 2, 2, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 2, 2, 2, 2, 2, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 2, 2, 2, 2, 2, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 2, 2, 2, 2, 0, 0, 0, 0, 0, 502, 502, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 502, 502, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 502, 502, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 502, 502, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 502, 502, 502, 502, 502, 502, 502, 502, 502, 502, 502, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 502, 502, 502, 502, 502, 502, 502, 502, 502, 502, 502, 502, 502, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 502, 502, 502, 502, 502, 502, 502, 502, 502, 502, 502, 502, 502, 0, 0, 0, 0, 0, 0, 502, 502, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 502, 502, 0, 0, 0, 0, 0, 502, 502, 502, 502, 502, 502, 502, 502, 502, 502, 502, 502, 502, 0, 0, 0, 0, 0, 0, 502, 502, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 502, 502, 0, 0, 0, 0, 0, 502, 502, 502, 502, 502, 502, 502, 502, 502, 502, 502, 502, 502, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 502, 502, 502, 502, 502, 502, 502, 502, 502, 502, 502, 502, 502, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 502, 502, 502, 502, 502, 502, 502, 502, 502, 502, 502, 502, 502, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 2, 2, 2, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 502, 502, 502, 502, 502, 502, 502, 502, 502, 502, 502, 502, 502, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 2, 2, 2, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 502, 502, 502, 502, 502, 502, 502, 502, 502, 502, 502, 502, 502, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 2, 2, 2, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 502, 502, 502, 502, 502, 502, 502, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 2, 2, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 502, 502, 502, 502, 502, 502, 502, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 2, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 502, 502, 502, 502, 502, 502, 502, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 502, 502, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 502, 502, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 502, 502, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 502, 502, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 502, 502, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 502, 502, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
  
 var array2D = [];
 for(var i = 0 ; i < 40; i++){

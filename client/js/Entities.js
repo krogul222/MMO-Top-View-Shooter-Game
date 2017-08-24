@@ -91,7 +91,7 @@
 
 //----------------------------------------------------------------------------------
 let Enemy = function(initPack){
-    var self = {};
+    let self = {};
     self.id = initPack.id;
     self.number = initPack.number;
     self.x = initPack.x;
@@ -147,3 +147,39 @@ let Enemy = function(initPack){
 }
 
 Enemy.list = {}; 
+
+//-----------------------------------------------------------------------------
+
+Upgrade = function (initPack){
+    let self = {};
+    self.id = initPack.id;
+    self.x = initPack.x;
+    self.y = initPack.y;
+    self.width = initPack.width;
+    self.height = initPack.height;
+    self.map = initPack.map;
+    self.img = Img[initPack.img];
+	self.category = initPack.category;
+    
+    self.draw = function(){
+        if(Player.list[selfId].map !== self.map){
+            return;  
+        }
+
+        let x = self.x - Player.list[selfId].x+WIDTH/2;
+        let y = self.y - Player.list[selfId].y+HEIGHT/2;
+		
+		x -= self.width/2;
+		y -= self.height/2;
+		
+		ctx.drawImage(self.img,
+			0,0,self.img.width,self.img.height,
+			x,y,self.width,self.height);
+		
+    }
+    
+	Upgrade.list[self.id] = self;
+    return self;
+}
+
+Upgrade.list = {};

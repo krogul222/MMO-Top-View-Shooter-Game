@@ -1,30 +1,31 @@
-<div id ="signDiv">
-    Username: <input id = "signDiv-username" type = "text"> <br>
-    Password: <input id = "signDiv-password" type = "password"> <br>
-    <button id = "signDiv-signIn">Sign In</button>
-    <button id = "signDiv-signUp">Sign Up</button>
-</div>
-
-<div id="gameDiv" style="display:none;">
-    <canvas id="ctx" width=500 height="500" style="border:1px solid #000000;"></canvas>
-
-    <div id = "chat-text" style="width:500px;height:100px;overflow-y:scroll">
-        <div>Napisz cos.</div>
+<body style = "margin:0px">
+    <div id ="signDiv">
+        Username: <input id = "signDiv-username" type = "text"> <br>
+        Password: <input id = "signDiv-password" type = "password"> <br>
+        <button id = "signDiv-signIn">Sign In</button>
+        <button id = "signDiv-signUp">Sign Up</button>
     </div>
 
-    <form id="chat-form">
-        <input id="chat-input" type="text" style="width:500px">
-    </form>
-</div>
+    <div id="gameDiv" style="display:none;">
+        <canvas id="canvas" width=500 height="500" style="border:1px solid #000000;"></canvas>
 
+       <div id = "chat-text" style="width:500px;height:100px;overflow-y:scroll;display:none">
+            <div>Napisz cos.</div>
+        </div>
+
+        <form id="chat-form">
+            <input id="chat-input" type="text" style="width:500px;display:none">
+        </form> 
+    </div>
+</body>
 <script src="https://cdn.socket.io/socket.io-1.4.5.js"></script>
 <script src='/client/js/jquery-3.2.1.min.js'></script>
 <script src='/client/js/Entities.js'></script>
 
 <script>
     let socket = io();   
-    const WIDTH = 500;
-    const HEIGHT = 500;
+    let WIDTH = 500;
+    let HEIGHT = 500;
     const TILE_SIZE = 32;
     
 
@@ -107,9 +108,36 @@
     Img.bullet = new Image();
     Img.bullet.src = '/client/img/bullet.png';
     
-    let ctx = document.getElementById("ctx").getContext("2d");
-    ctx.font = '30px Arial';
-
+    Img.atackspeed = new Image();
+    Img.atackspeed.src = '/client/img/atackspeed.png';
+    
+    Img.hp = new Image();
+    Img.hp.src = '/client/img/hp.png';
+    
+    let canvas = document.getElementById("canvas");
+    
+    let ctx = canvas.getContext("2d");
+    
+    let resizeCanvas = function(){
+        WIDTH = window.innerWidth - 4;
+        HEIGHT = window.innerHeight - 18;
+        
+        canvas.width = WIDTH;
+        canvas.height = HEIGHT;
+        
+        ctx.font = '30px Arial';
+        ctx.mozImageSmoothingEnabled = false;
+        ctx.msImageSmoothingEnabled = false;
+        ctx.imageSmoothingEnabled = false;
+    }
+    
+    resizeCanvas();
+    
+    window.addEventListener('resize', function(){
+        resizeCanvas();
+    });
+    
+    
     
     var selfId = null;
     
@@ -122,6 +150,10 @@
        } 
        for(let i = 0, length = data.bullet.length; i < length; i++){
            new Bullet(data.bullet[i]);
+       }  
+
+       for(let i = 0, length = data.upgrade.length; i < length; i++){
+           new Upgrade(data.upgrade[i]);
        }         
         
        for(let i = 0, length = data.enemy.length; i < length; i++){
@@ -193,6 +225,20 @@
                }
            }
        } 
+        
+       for(let i = 0, length = data.upgrade.length; i < length ; i++){
+           let pack = data.upgrade[i];
+           let u = Upgrade.list[pack.id];
+           if(u){
+               if(pack.x !== undefined){
+                   u.x = pack.x;
+               } 
+               if(pack.y !== undefined){
+                   u.y = pack.y;
+               }
+           }
+       }
+        
     });
     
     socket.on('remove', function(data){
@@ -205,6 +251,9 @@
        for(let i = 0, length = data.enemy.length; i < length; i++){
            delete Enemy.list[data.enemy[i]];
        } 
+       for(let i = 0, length = data.upgrade.length; i < length; i++){
+           delete Upgrade.list[data.upgrade[i]];
+       } 
     });
     
     setInterval(function(){
@@ -212,7 +261,7 @@
             return;
         }
         
-        ctx.clearRect(0,0,500,500);
+        ctx.clearRect(0,0,WIDTH,HEIGHT);
         currentMap.draw();
         drawScore();
         for(let i in Player.list){
@@ -223,6 +272,10 @@
         }
         for(let i in Bullet.list){
             Bullet.list[i].draw();
+        }
+        
+        for(let i in Upgrade.list){
+            Upgrade.list[i].draw();
         }
         
         for(let i in Enemy.list){
@@ -291,8 +344,8 @@
     }
     
     document.onmousemove = function(event){
-        let x = -250 + event.clientX - 8;
-        let y = -250 + event.clientY - 8;      
+        let x = -WIDTH/2 + event.clientX - 8;
+        let y = -HEIGHT/2 + event.clientY - 8;      
         let angle = Math.atan2(y,x)/Math.PI * 180;
         
         if(selfId){
