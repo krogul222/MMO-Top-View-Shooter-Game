@@ -478,7 +478,17 @@ Enemy = function(param){
 		super_update();
 		self.updateAim();
 		self.updateKeyPress();
-		self.performAttack();
+
+        let diffX = 0;
+        let diffY = 0;
+        let player = self.getClosestPlayer();
+        if(player){
+            diffX = player.x - self.x;
+		    diffY = player.y - self.y;
+        }
+        
+        if(Math.sqrt(diffX*diffX+diffY*diffY)<500)
+		  self.performAttack();
         
        // console.log("Right "+self.pressingRight );
 	}
