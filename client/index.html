@@ -251,7 +251,9 @@
            delete Player.list[data.player[i]];
        } 
        for(let i = 0, length = data.bullet.length; i < length; i++){
-           Bullet.list[data.bullet[i].id].hit(data.bullet[i].hitCategory, data.bullet[i].hitEntityCategory,data.bullet[i].hitEntityId);
+           if(Bullet.list[data.bullet[i].id]){
+                Bullet.list[data.bullet[i].id].hit(data.bullet[i].hitCategory, data.bullet[i].hitEntityCategory,data.bullet[i].hitEntityId);
+           }
            delete Bullet.list[data.bullet[i].id];
        } 
        for(let i = 0, length = data.enemy.length; i < length; i++){
