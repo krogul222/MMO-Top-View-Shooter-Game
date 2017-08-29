@@ -21,14 +21,15 @@
               return;  
             }
             
+            let spriteRows = 1;
+            let spriteColumns = 20;
+            
             let hpWidth = 30 * self.hp/self.hpMax;
             
             let x = self.x - Player.list[selfId].x+WIDTH/2;
             let y = self.y - Player.list[selfId].y+HEIGHT/2;
 
             
-            let frameWidth = self.img.width/9;
-            let frameHeight = self.img.height/4;
             let aimAngle = self.aimAngle;
             
             if(aimAngle < 0){
@@ -44,9 +45,39 @@
                 directionMod = 0;   // up 
             }
             
-            let walkingMod = Math.floor(self.spriteAnimCounter) % 9;
+            directionMod = 0;
             
-            ctx.drawImage(self.img, walkingMod*frameWidth, directionMod*frameHeight, frameWidth, frameHeight, x - self.width/2, y - self.height/2, self.width, self.height);
+            let walkingMod = Math.floor(self.spriteAnimCounter) % spriteColumns;
+    
+            let frameWidth = Img["walk"].width/spriteColumns;
+            let frameHeight = Img["walk"].height/spriteRows;        
+            
+            ctx.save();
+            ctx.translate(x - self.width/4,y - self.height/4);
+            ctx.translate(self.width/4, self.height/4); 
+            ctx.rotate(aimAngle*Math.PI/180)
+            
+            ctx.drawImage(Img["walk"], walkingMod*frameWidth, directionMod*frameHeight, frameWidth, frameHeight, -self.width/4,-self.height/4, self.width/2, self.height/2);
+            
+            //ctx.drawImage(self.img, walkingMod*frameWidth, directionMod*frameHeight, frameWidth, frameHeight, x - self.width/2, y - self.height/2, self.width, self.height);
+            
+            ctx.restore();            
+            
+            frameWidth = self.img.width/spriteColumns;
+            frameHeight = self.img.height/spriteRows;
+            
+            
+            // the alternative is to untranslate & unrotate after drawing
+            ctx.save();
+            ctx.translate(x - self.width/2,y - self.height/2);
+            ctx.translate(self.width/2, self.height/2); 
+            ctx.rotate(aimAngle*Math.PI/180)
+            
+            ctx.drawImage(self.img, walkingMod*frameWidth, directionMod*frameHeight, frameWidth, frameHeight, -self.width/2,-self.height/2, self.width, self.height);
+            
+            //ctx.drawImage(self.img, walkingMod*frameWidth, directionMod*frameHeight, frameWidth, frameHeight, x - self.width/2, y - self.height/2, self.width, self.height);
+            
+            ctx.restore();
 
             ctx.fillStyle = 'red';
             ctx.fillRect(x - hpWidth/2, y - 40, hpWidth, 4);

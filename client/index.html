@@ -100,7 +100,7 @@
     Img.map['forest'].src = '/client/img/forest.png';
     
     Img.player = new Image();
-    Img.player.src = '/client/img/player.png';
+    Img.player.src = '/client/img/player_gun.png';
     
     Img.scorpion = new Image();
     Img.scorpion.src = '/client/img/scorpion.png';
@@ -116,6 +116,9 @@
     
     Img.atackspeed = new Image();
     Img.atackspeed.src = '/client/img/atackspeed.png';
+
+    Img.walk = new Image();
+    Img.walk.src = '/client/img/walk.png';
     
     Img.hp = new Image();
     Img.hp.src = '/client/img/hp.png';
@@ -274,7 +277,7 @@
         drawScore();
         for(let i in Player.list){
             if(Player.list[i].moving){
-                Player.list[i].spriteAnimCounter += 0.4;
+                Player.list[i].spriteAnimCounter += 0.8;
             }
             Player.list[i].draw();
         }

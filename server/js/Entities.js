@@ -277,7 +277,7 @@ Player.onConnect = function(socket){
     if(Math.random() < -0.5){
         map = 'field';
     }
-    let player = Player({id: socket.id, maxSpd: 10, map: map, img: 'player',atkSpd: 6, width: 50, height: 70, type: "player", hp: 10});
+    let player = Player({id: socket.id, maxSpd: 10, map: map, img: 'player',atkSpd: 6, width: 50, height: 50, type: "player", hp: 10});
     Enemy.randomlyGenerate('forest');
     Enemy.randomlyGenerate('forest');
     Enemy.randomlyGenerate('forest');
