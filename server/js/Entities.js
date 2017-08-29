@@ -371,11 +371,43 @@ Bullet = function(param){
                      if(Enemy.list[key2].hp <= 0){
                         let shooter = Player.list[self.parent];
                         if(shooter){
-                            shooter.score += 1;
+                            shooter.score += 1; 
                         }
                      }
 				}				
 			}
+            
+            for(let i in Player.list){
+                if(Player.list[i].id !== self.parent){
+                    let p = Player.list[i];
+                    if(self.testCollision(p)){
+                        self.toRemove = true;
+
+                        self.hitCategory = 1;
+                        self.hitEntityCategory = "player";
+                        self.hitEntityId = p.id;
+
+                        p.hp -= 1;
+                        if(p.hp <= 0){
+                            let shooter = Player.list[self.parent];
+                            if(shooter){
+                                shooter.score += 1;
+                            }
+                            p.onDeath();
+                            p.hp = p.hpMax;
+                            p.x = Math.random() * gameMaps[self.map].width; 
+                            p.y = Math.random() * gameMaps[self.map].height;
+
+                            while(gameMaps[self.map].isPositionWall(p)){
+                                p.x = Math.random() * gameMaps[self.map].width; 
+                                p.y = Math.random() * gameMaps[self.map].height;  
+                            }
+                        }
+                    }
+                }
+            }            
+            
+            
 		} else if(self.combatType === 'enemy'){
             for(let i in Player.list){
                 let p = Player.list[i];

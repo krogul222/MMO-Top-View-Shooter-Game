@@ -78,13 +78,17 @@
         let y = self.y;
         
         if(entityCategory == "player"){
-            x = Player.list[entityId].x + (1-Math.round(2*Math.random())) * Math.floor(Math.random()*Player.list[entityId].width/4);
-            y = Player.list[entityId].y + (1-Math.round(2*Math.random())) *Math.floor(Math.random()*Player.list[entityId].height/4);
+            if(Player.list[entityId]){
+                x = Player.list[entityId].x + (1-Math.round(2*Math.random())) * Math.floor(Math.random()*Player.list[entityId].width/4);
+                y = Player.list[entityId].y + (1-Math.round(2*Math.random())) *Math.floor(Math.random()*Player.list[entityId].height/4);
+            }
         }   
             
         if(entityCategory == "enemy"){
-            x = Enemy.list[entityId].x + (1-Math.round(2*Math.random())) *Math.floor(Math.random()*Enemy.list[entityId].width/4);
-            y = Enemy.list[entityId].y + (1-Math.round(2*Math.random())) *Math.floor(Math.random()*Enemy.list[entityId].height/4);
+            if(Enemy.list[entityId]){
+                x = Enemy.list[entityId].x + (1-Math.round(2*Math.random())) *Math.floor(Math.random()*Enemy.list[entityId].width/4);
+                y = Enemy.list[entityId].y + (1-Math.round(2*Math.random())) *Math.floor(Math.random()*Enemy.list[entityId].height/4);
+            }
         }   
             
         if(category == 1){
@@ -245,8 +249,6 @@ Explosion = function(param){
 		
         let spriteColumn = Math.floor(self.spriteAnimCounter) % self.animColumns;
         let spriteRow = Math.floor(self.spriteAnimCounter/self.animColumns);
-        
-        console.log(spriteRow+ " "+ spriteColumn );
         
 		ctx.drawImage(self.img,
 			frameWidth*spriteColumn,frameHeight*spriteRow,frameWidth,frameHeight,
