@@ -342,6 +342,11 @@ Bullet = function(param){
     self.angle = param.angle;
     self.combatType = param.combatType;
     
+    self.hitCategory = 0;
+    self.hitEntityCategory = "";
+    self.hitEntityId = "";
+    
+    
     self.parent = param.parent;
     self.timer = 0;
     self.toRemove = false;
@@ -358,6 +363,11 @@ Bullet = function(param){
 				if(self.testCollision(Enemy.list[key2])){
 					self.toRemove = true;
 					Enemy.list[key2].hp -= 1;
+                    
+                    self.hitCategory = 1;
+                    self.hitEntityCategory = "enemy";
+                    self.hitEntityId = Enemy.list[key2].id;
+                    
                      if(Enemy.list[key2].hp <= 0){
                         let shooter = Player.list[self.parent];
                         if(shooter){
@@ -371,6 +381,11 @@ Bullet = function(param){
                 let p = Player.list[i];
                 if(self.testCollision(p)){
                     self.toRemove = true;
+                    
+                    self.hitCategory = 1;
+                    self.hitEntityCategory = "player";
+                    self.hitEntityId = p.id;
+                    
                     p.hp -= 1;
                     if(p.hp <= 0){
                         let shooter = Player.list[self.parent];
@@ -390,8 +405,12 @@ Bullet = function(param){
                 }
             }
 		}
+    
+        
+        
     if(gameMaps[self.map].isPositionWall(self) && gameMaps[self.map].isPositionWall(self) !== 2){
         self.toRemove = true; 
+        self.hitCategory = 2;
         }
     }
     
@@ -404,7 +423,8 @@ Bullet = function(param){
            img: self.img,
            width: self.width,
            height: self.height,
-           combatType: self.combatType
+           combatType: self.combatType,
+           hitCategory: self.hitCategory
         };
     }
 
@@ -412,7 +432,8 @@ Bullet = function(param){
         return {
            id: self.id,
            x: self.x,
-           y: self.y
+           y: self.y,
+           hitCategory: self.hitCategory
         };
     }    
     
@@ -432,7 +453,7 @@ Bullet.update = function(){
         bullet.update();
         if(bullet.toRemove){
             delete Bullet.list[i];
-            removePack.bullet.push(bullet.id);
+            removePack.bullet.push({id: bullet.id, hitCategory: bullet.hitCategory, hitEntityCategory: bullet.hitEntityCategory, hitEntityId: bullet.hitEntityId});
         } else {
             pack.push(bullet.getUpdatePack());     
         }
@@ -560,11 +581,11 @@ Enemy = function(param){
            width: self.width,
            height: self.height,
            moving: self.moving,
-           aimAngle: self.aimAngle
+           aimAngle: self.aimAngle,
         };
     }
     
-    self.getUpdatePack = function(){
+    self.getUpdatePack = function(){       
         return {
            id: self.id,
            x: self.x,

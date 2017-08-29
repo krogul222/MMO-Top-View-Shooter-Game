@@ -108,6 +108,12 @@
     Img.bullet = new Image();
     Img.bullet.src = '/client/img/bullet.png';
     
+    Img.explosion1 = new Image();
+    Img.explosion1.src = '/client/img/explosion1.png';    
+    
+    Img.blood = new Image();
+    Img.blood.src = '/client/img/blood.png'; 
+    
     Img.atackspeed = new Image();
     Img.atackspeed.src = '/client/img/atackspeed.png';
     
@@ -209,7 +215,6 @@
                if(pack.aimAngle !== undefined){
                    p.aimAngle = pack.aimAngle;
                } 
-               
            }
        }         
         
@@ -246,7 +251,8 @@
            delete Player.list[data.player[i]];
        } 
        for(let i = 0, length = data.bullet.length; i < length; i++){
-           delete Bullet.list[data.bullet[i]];
+           Bullet.list[data.bullet[i].id].hit(data.bullet[i].hitCategory, data.bullet[i].hitEntityCategory,data.bullet[i].hitEntityId);
+           delete Bullet.list[data.bullet[i].id];
        } 
        for(let i = 0, length = data.enemy.length; i < length; i++){
            delete Enemy.list[data.enemy[i]];
@@ -270,6 +276,7 @@
             }
             Player.list[i].draw();
         }
+                  
         for(let i in Bullet.list){
             Bullet.list[i].draw();
         }
@@ -284,6 +291,17 @@
             }
             Enemy.list[i].draw();
         }
+        
+        for(let i in Explosion.list){
+            Explosion.list[i].spriteAnimCounter += 0.4;
+        
+            if(Explosion.list[i].isCompleted()){
+                delete Explosion.list[i];
+            }
+            else{
+                Explosion.list[i].draw();
+            } 
+        } 
     }, 40);
     
     Maps = function(id, width, height){

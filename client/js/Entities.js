@@ -68,7 +68,36 @@
         self.img = Img[initPack.img];
         self.width = initPack.width;
         self.height = initPack.height;
+        self.hitCategory = initPack.hitCategory;
         
+        self.hit = function(category, entityCategory, entityId){
+
+          //  console.log("Hit function");
+            
+        let x = self.x;
+        let y = self.y;
+        
+        if(entityCategory == "player"){
+            x = Player.list[entityId].x + (1-Math.round(2*Math.random())) * Math.floor(Math.random()*Player.list[entityId].width/4);
+            y = Player.list[entityId].y + (1-Math.round(2*Math.random())) *Math.floor(Math.random()*Player.list[entityId].height/4);
+        }   
+            
+        if(entityCategory == "enemy"){
+            x = Enemy.list[entityId].x + (1-Math.round(2*Math.random())) *Math.floor(Math.random()*Enemy.list[entityId].width/4);
+            y = Enemy.list[entityId].y + (1-Math.round(2*Math.random())) *Math.floor(Math.random()*Enemy.list[entityId].height/4);
+        }   
+            
+        if(category == 1){
+          //  
+            
+            new Explosion({x: x, y: y, map: self.map, img: "blood", width: 48, height: 48, category: category, spriteRows: 1, spriteColumns: 6});
+            
+            } else if(category == 2){
+              
+                new Explosion({x: x, y: y, map: self.map, img: "explosion1", width: 64, height: 64, category: category, spriteRows: 4, spriteColumns: 10});
+                
+            }
+        }
         
         self.draw = function(){
             if(Player.list[selfId].map !== self.map){
@@ -183,3 +212,57 @@ Upgrade = function (initPack){
 }
 
 Upgrade.list = {};
+
+//------------------------------------------------------------
+
+Explosion = function(param){
+    let self = {};
+    self.id = Math.random();
+    self.x = param.x;
+    self.y = param.y;
+    self.width = param.width;
+    self.height = param.height;
+    self.map = param.map;
+    self.img = Img[param.img];
+	self.category = param.category;
+    
+    self.spriteAnimCounter = 0;
+    self.animRows = param.spriteRows;
+    self.animColumns = param.spriteColumns;
+
+    self.draw = function(){
+        if(Player.list[selfId].map !== self.map){
+            return;  
+        }
+        let frameWidth = self.img.width/self.animColumns;
+        let frameHeight = self.img.height/self.animRows;
+
+        let x = self.x - Player.list[selfId].x+WIDTH/2;
+        let y = self.y - Player.list[selfId].y+HEIGHT/2;
+		
+		x -= self.width/2;
+		y -= self.height/2;
+		
+        let spriteColumn = Math.floor(self.spriteAnimCounter) % self.animColumns;
+        let spriteRow = Math.floor(self.spriteAnimCounter/self.animColumns);
+        
+        console.log(spriteRow+ " "+ spriteColumn );
+        
+		ctx.drawImage(self.img,
+			frameWidth*spriteColumn,frameHeight*spriteRow,frameWidth,frameHeight,
+			x,y,self.width,self.height);
+		
+    }
+    
+    self.isCompleted = function(){
+        if(self.spriteAnimCounter > (self.animRows*self.animColumns))
+            return true;
+        else
+            return false;
+    }
+    
+	Explosion.list[self.id] = self;
+    return self;
+}
+
+Explosion.list = {};
