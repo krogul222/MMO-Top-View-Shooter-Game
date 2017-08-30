@@ -125,28 +125,28 @@ Actor = function(param){
         self.spdY = 0;
         
         if(gameMaps[self.map].isPositionWall(rightBumper)){
-            self.spdX = -self.maxSpd;
+           // self.spdX = -self.maxSpd;
         } else{
             if(self.pressingRight)
                 self.spdX = self.maxSpd;
         }
         
         if(gameMaps[self.map].isPositionWall(leftBumper)){
-            self.spdX = self.maxSpd;
+          //  self.spdX = self.maxSpd;
         } else{
             if(self.pressingLeft)
                 self.spdX = -self.maxSpd;
         }
         
         if(gameMaps[self.map].isPositionWall(downBumper)){
-            self.spdY = -self.maxSpd;
+           // self.spdY = -self.maxSpd;
         } else{
             if(self.pressingDown)
                 self.spdY = self.maxSpd;
         }
 
         if(gameMaps[self.map].isPositionWall(upBumper)){
-            self.spdY = self.maxSpd;
+          //  self.spdY = self.maxSpd;
         } else{
             if(self.pressingUp)
                 self.spdY = -self.maxSpd;
