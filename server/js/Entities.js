@@ -175,7 +175,7 @@ Actor = function(param){
 			self.onDeath();
 	}
 	self.onDeath = function(){
-        self.atackRadius = 0;
+        //self.atackRadius = 0;
     };
 	
 	self.performAttack = function(){
