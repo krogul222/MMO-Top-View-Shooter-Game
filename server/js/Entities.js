@@ -722,6 +722,23 @@ Enemy.randomlyGenerate = function(map){
 	let width = 48*difficulty;
 	let id = Math.random();
     Enemy({id: id, x: x, y: y, width: width, height: height, hp: 15*difficulty, atkSpd: 0.4*difficulty, map: map, img: 'scorpion', type:'enemy'});
+    
+    /*
+    console.log("Enemies");
+    let a = 0;
+    for(let i in Enemy.list){
+        a++;
+    }
+    console.log(a);
+    
+    a = 0;
+    a = 0;
+    for(let i in Bullet.list){
+        a++;
+    }
+        console.log("Bullets");
+    console.log(a);
+*/
 }
 
 Enemy.getAllInitPack = function(){
@@ -772,8 +789,8 @@ Upgrade.list = {};
 Upgrade.update = function(){
     let pack =[];
     
-	/*if(frameCount % 250 === 0)	//every 10 sec
-		Upgrade.randomlyGenerate('forest');*/
+	if(frameCount % 250 === 0)	//every 10 sec
+		Upgrade.randomlyGenerate('forest');
 	for(let key in Upgrade.list){
 		Upgrade.list[key].update();
         pack.push(Upgrade.list[key].getUpdatePack());  
