@@ -326,7 +326,7 @@ Player.onConnect = function(socket){
     if(Math.random() < -0.5){
         map = 'field';
     }
-    let player = Player({id: socket.id, maxSpd: 10, map: map, img: 'player',atkSpd: 6, width: 50, height: 50, type: "player", hp: 10, socket: socket});
+    let player = Player({id: socket.id, maxSpd: 10, map: map, img: 'player',atkSpd: 3, width: 50, height: 50, type: "player", hp: 10, socket: socket});
     Enemy.randomlyGenerate('forest');
     Enemy.randomlyGenerate('forest');
     Enemy.randomlyGenerate('forest');
@@ -392,8 +392,8 @@ Player.update = function(){
 Bullet = function(param){
     let self = Entity(param);
     self.id = Math.random();
-    self.spdX = Math.cos(param.angle/180*Math.PI) * 20;
-    self.spdY = Math.sin(param.angle/180*Math.PI) * 20;
+    self.spdX = Math.cos(param.angle/180*Math.PI) * 50;
+    self.spdY = Math.sin(param.angle/180*Math.PI) * 50;
     self.angle = param.angle;
     self.combatType = param.combatType;
     
