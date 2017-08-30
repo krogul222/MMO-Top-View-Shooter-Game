@@ -8,12 +8,13 @@
         self.hpMax = initPack.hpMax;
         self.score = initPack.score;
         self.map = initPack.map;
-        self.img = Img[initPack.img];
+        self.img = Img["player"+initPack.weapon];
         self.width = initPack.width;
         self.height = initPack.height;
         self.moving = initPack.moving;
         self.aimAngle = 0;
         self.spriteAnimCounter = 0;
+        self.weapon = initPack.weapon;
         
         
         self.draw = function(){
@@ -59,8 +60,6 @@
             
             ctx.drawImage(Img["walk"], walkingMod*frameWidth, directionMod*frameHeight, frameWidth, frameHeight, -self.width/4,-self.height/4, self.width/2, self.height/2);
             
-            //ctx.drawImage(self.img, walkingMod*frameWidth, directionMod*frameHeight, frameWidth, frameHeight, x - self.width/2, y - self.height/2, self.width, self.height);
-            
             ctx.restore();            
             
             frameWidth = self.img.width/spriteColumns;
@@ -75,7 +74,6 @@
             
             ctx.drawImage(self.img, walkingMod*frameWidth, directionMod*frameHeight, frameWidth, frameHeight, -self.width/2,-self.height/2, self.width, self.height);
             
-            //ctx.drawImage(self.img, walkingMod*frameWidth, directionMod*frameHeight, frameWidth, frameHeight, x - self.width/2, y - self.height/2, self.width, self.height);
             
             ctx.restore();
 

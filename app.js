@@ -5,6 +5,8 @@ var db = mongojs('mongodb://buka:buka123@ds123193.mlab.com:23193/brykiet', ['acc
 db.account.insert({username:"buka", password: "buka"});
 
 require('./server/js/Entities');
+require('./client/js/Inventory');
+
 var express = require('express');
 var app = express();
 var server = require('http').Server(app);

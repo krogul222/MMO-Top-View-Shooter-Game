@@ -9,6 +9,7 @@
     <div id="gameDiv" style="display:none;">
         <canvas id="canvas" width=500 height="500" style="border:1px solid #000000;"></canvas>
 
+       <div id = "inventory"></div>
        <div id = "chat-text" style="width:500px;height:100px;overflow-y:scroll;display:none">
             <div>Napisz cos.</div>
         </div>
@@ -21,7 +22,7 @@
 <script src="https://cdn.socket.io/socket.io-1.4.5.js"></script>
 <script src='/client/js/jquery-3.2.1.min.js'></script>
 <script src='/client/js/Entities.js'></script>
-
+<script src='/client/js/Inventory.js'></script>
 <script>
     let socket = io();   
     let WIDTH = 500;
@@ -87,6 +88,12 @@
         chatInput.value = '';
     }
         
+    let inventory = new Inventory(socket, false);
+    
+    socket.on('updateInventory', function(items){
+       inventory.items = items;
+        inventory.refreshRender();
+    });
     
     //game
     var Img = {};
@@ -99,8 +106,23 @@
     Img.map['forest'] = new Image();
     Img.map['forest'].src = '/client/img/forest.png';
     
+    Img.pistol = new Image();
+    Img.pistol.src = '/client/img/pistol.png';    
+    
+    Img.shotgun = new Image();
+    Img.shotgun.src = '/client/img/shotgun.png';    
+    
+    Img.playerknife = new Image();
+    Img.playerknife.src = '/client/img/player_knife.png';   
+    
+    Img.playerpistol= new Image();
+    Img.playerpistol.src = '/client/img/player_pistol.png';   
+
+    Img.playershotgun= new Image();
+    Img.playershotgun.src = '/client/img/player_shotgun.png';       
+    
     Img.player = new Image();
-    Img.player.src = '/client/img/player_gun.png';
+    Img.player.src = '/client/img/player_pistol.png';
     
     Img.scorpion = new Image();
     Img.scorpion.src = '/client/img/scorpion.png';
@@ -129,7 +151,7 @@
     
     let resizeCanvas = function(){
         WIDTH = window.innerWidth - 4;
-        HEIGHT = window.innerHeight - 18;
+        HEIGHT = window.innerHeight - 48;
         
         canvas.width = WIDTH;
         canvas.height = HEIGHT;
@@ -195,6 +217,10 @@
                if(pack.aimAngle !== undefined){
                    p.aimAngle = pack.aimAngle;
                } 
+               if(pack.weapon !== undefined){
+                   p.weapon = pack.weapon;
+                   p.img = Img["player"+pack.weapon];
+               }  
                
            }
        } 
@@ -277,7 +303,7 @@
         drawScore();
         for(let i in Player.list){
             if(Player.list[i].moving){
-                Player.list[i].spriteAnimCounter += 0.8;
+                Player.list[i].spriteAnimCounter += 1;
             }
             Player.list[i].draw();
         }

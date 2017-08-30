@@ -107,6 +107,7 @@ Actor = function(param){
 	self.pressingRight = false;
     self.moving = false; 
     self.atackRadius = 0;  
+    self.weapon = "knife";
   
     if(param.maxSpd){
         self.maxSpd = param.maxSpd;
@@ -197,7 +198,6 @@ Actor = function(param){
 			Bullet.generate(self,self.aimAngle + 5);
 		}
 	}
-
 	
 	return self;
 }
@@ -206,6 +206,12 @@ Player = function(param){
     let self = Actor(param);    
     self.number = "" + Math.floor(10*Math.random()),
     self.score = 0;
+    self.updateEquipment = false;
+    self.weapon = "pistol";
+    
+    self.inventory = new Inventory(param.socket, true);
+    self.inventory.addItem("knife",1);
+    self.inventory.addItem("pistol",1);
     
     let super_update = self.update;
     self.update = function(){
@@ -216,7 +222,12 @@ Player = function(param){
         //console.log('atak '+self.attackCounter);
         if(self.pressingAttack && self.attackCounter > 25){
             self.attackCounter = 0;
-            self.shootBullet(self.aimAngle);
+            
+            if(self.weapon == "knife"){
+                
+            } else{
+                self.shootBullet(self.aimAngle);
+            }
             
             for(let i = 0; i < self.atackRadius; i++){
                 self.shootBullet(self.aimAngle+(i+1)*2);
@@ -226,6 +237,27 @@ Player = function(param){
            // self.pressingAttack = false;
         }
 
+    }
+    
+    self.equipWeapon = function(weapon){
+        self.weapon = weapon;
+        
+         self.maxSpd = 10;
+        
+        if(self.weapon == "shotgun"){
+            self.atackRadius = 3;
+        }
+        
+        if(self.weapon == "pistol"){
+            self.atackRadius = 0;
+        }
+        
+        if(self.weapon == "knife"){
+            self.atackRadius = 0;
+            self.maxSpd = 13;
+        }
+        
+        self.updateEquipment = true;
     }
     
     self.shootBullet = function(angle){
@@ -246,21 +278,37 @@ Player = function(param){
            width: self.width,
            height: self.height,
            moving: self.moving,
-           aimAngle: self.aimAngle
+           aimAngle: self.aimAngle,
+           weapon: self.weapon
             
         };
     }
 
     self.getUpdatePack = function(){
-        return {
-           id: self.id,
-           x: self.x,
-           y: self.y,
-           hp: self.hp,
-           moving: self.moving,
-           score: self.score,
-           aimAngle: self.aimAngle
-        };
+        
+        if(self.updateEquipment){
+            self.updateEquipment = false;
+            return {
+               id: self.id,
+               x: self.x,
+               y: self.y,
+               hp: self.hp,
+               moving: self.moving,
+               score: self.score,
+               aimAngle: self.aimAngle,
+               weapon: self.weapon
+            };
+        } else{
+            return {
+               id: self.id,
+               x: self.x,
+               y: self.y,
+               hp: self.hp,
+               moving: self.moving,
+               score: self.score,
+               aimAngle: self.aimAngle
+            }; 
+        }
     }    
     
     Player.list[self.id] = self; 
@@ -277,7 +325,7 @@ Player.onConnect = function(socket){
     if(Math.random() < -0.5){
         map = 'field';
     }
-    let player = Player({id: socket.id, maxSpd: 10, map: map, img: 'player',atkSpd: 6, width: 50, height: 50, type: "player", hp: 10});
+    let player = Player({id: socket.id, maxSpd: 10, map: map, img: 'player',atkSpd: 6, width: 50, height: 50, type: "player", hp: 10, socket: socket});
     Enemy.randomlyGenerate('forest');
     Enemy.randomlyGenerate('forest');
     Enemy.randomlyGenerate('forest');
@@ -717,7 +765,7 @@ Upgrade.list = {};
 Upgrade.update = function(){
     let pack =[];
     
-	if(frameCount % 250 === 0)	//every 10 sec
+	if(frameCount % 50 === 0)	//every 2 sec
 		Upgrade.randomlyGenerate('forest');
 	for(let key in Upgrade.list){
 		Upgrade.list[key].update();
@@ -728,10 +776,18 @@ Upgrade.update = function(){
         
             let isColliding = player.testCollision(Upgrade.list[key]);
             if(isColliding){
-                if(Upgrade.list[key].category === 'hp')
-                    player.hp = player.hpMax;
-                if(Upgrade.list[key].category === 'atack')
-                    player.atackRadius +=1;
+                if(Upgrade.list[key].category === 'hp'){
+                    player.inventory.addItem('medicalkit', 1);
+                }
+                if(Upgrade.list[key].category === 'pistol'){
+                    //player.atackRadius =1;
+                    player.inventory.addItem('pistol', 1);
+                }
+
+                if(Upgrade.list[key].category === 'shotgun'){
+                    //player.atackRadius +=1;
+                    player.inventory.addItem('shotgun', 1);
+                }                
                 
                 removePack.upgrade.push(Upgrade.list[key].id);               
                 delete Upgrade.list[key];
@@ -758,12 +814,19 @@ Upgrade.randomlyGenerate = function(map){
 	let id = Math.random();
 	let category = 'hp';
     let img = 'hp';
-	if(Math.random()<0.5){
+	if(Math.random()<0.3){
 		//category = 'score';
 		//img = 'player';
 	} else {
-		category = 'atack';
-		img = 'atackspeed';
+        if(Math.random()<0.5){
+            category = 'pistol';
+            img = 'pistol';
+        } else{
+            category = 'shotgun';
+            img = 'shotgun';
+            height = 2*height;
+            width = 2*width;
+        }
 	}
 	
 	Upgrade({id: id, x: x, y: y, width: width, height: height, category: category, map: map, img: img});
