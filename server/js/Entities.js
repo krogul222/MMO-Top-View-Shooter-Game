@@ -765,8 +765,8 @@ Upgrade.list = {};
 Upgrade.update = function(){
     let pack =[];
     
-	if(frameCount % 250 === 0)	//every 10 sec
-		Upgrade.randomlyGenerate('forest');
+	/*if(frameCount % 250 === 0)	//every 10 sec
+		Upgrade.randomlyGenerate('forest');*/
 	for(let key in Upgrade.list){
 		Upgrade.list[key].update();
         pack.push(Upgrade.list[key].getUpdatePack());  
