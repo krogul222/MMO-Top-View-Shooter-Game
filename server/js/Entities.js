@@ -212,6 +212,7 @@ Player = function(param){
     self.inventory = new Inventory(param.socket, true);
     self.inventory.addItem("knife",1);
     self.inventory.addItem("pistol",1);
+    self.inventory.addItem("medicalkit",4);
     
     let super_update = self.update;
     self.update = function(){
@@ -331,6 +332,12 @@ Player.onConnect = function(socket){
     Enemy.randomlyGenerate('forest');
     Enemy.randomlyGenerate('forest');
     Enemy.randomlyGenerate('forest');
+    
+    Upgrade.randomlyGenerate('forest', 'shotgun');
+    Upgrade.randomlyGenerate('forest', 'shotgun');
+    Upgrade.randomlyGenerate('forest', 'medicalkit');
+    Upgrade.randomlyGenerate('forest', 'medicalkit');
+    Upgrade.randomlyGenerate('forest');
     
     socket.on('keyPress', function(data){
        if(data.inputId == 'left')
@@ -776,7 +783,7 @@ Upgrade.update = function(){
         
             let isColliding = player.testCollision(Upgrade.list[key]);
             if(isColliding){
-                if(Upgrade.list[key].category === 'hp'){
+                if(Upgrade.list[key].category === 'medicalkit'){
                     player.inventory.addItem('medicalkit', 1);
                 }
                 if(Upgrade.list[key].category === 'pistol'){
@@ -799,7 +806,7 @@ Upgrade.update = function(){
     return pack;
 }
 
-Upgrade.randomlyGenerate = function(map){
+Upgrade.randomlyGenerate = function(map, item){
 	//Math.random() returns a number between 0 and 1
 	let x = Math.random()*gameMaps[map].width;;
 	let y = Math.random()*gameMaps[map].height;
@@ -811,23 +818,32 @@ Upgrade.randomlyGenerate = function(map){
     
 	let height = 32;
 	let width = 32;
-	let id = Math.random();
-	let category = 'hp';
-    let img = 'hp';
-	if(Math.random()<0.3){
-		//category = 'score';
-		//img = 'player';
-	} else {
-        if(Math.random()<0.5){
-            category = 'pistol';
-            img = 'pistol';
-        } else{
-            category = 'shotgun';
-            img = 'shotgun';
-            height = 2*height;
-            width = 2*width;
+    let category = 'medicalkit';
+    let img = 'medicalkit';
+    
+    if(item){
+        category = item;
+        img = item;
+    } else{
+        let id = Math.random();
+
+        if(Math.random()<0.3){
+            //category = 'score';
+            //img = 'player';
+        } else {
+            if(Math.random()<0.5){
+                category = 'pistol';
+                img = 'pistol';
+            } else{
+                category = 'shotgun';
+                img = 'shotgun';
+                height = 2*height;
+                width = 2*width;
+            }
         }
-	}
+    }
+    
+
 	
 	Upgrade({id: id, x: x, y: y, width: width, height: height, category: category, map: map, img: img});
 }
