@@ -818,15 +818,22 @@ Upgrade.randomlyGenerate = function(map, item){
     
 	let height = 32;
 	let width = 32;
+    let id = Math.random();
     let category = 'medicalkit';
     let img = 'medicalkit';
     
     if(item){
         category = item;
         img = item;
+        
+        if(item == 'shotgun'){
+            height = 2*height;
+            width = 2*width;
+        }
+        
+        
     } else{
-        let id = Math.random();
-
+        
         if(Math.random()<0.3){
             //category = 'score';
             //img = 'player';
@@ -837,8 +844,7 @@ Upgrade.randomlyGenerate = function(map, item){
             } else{
                 category = 'shotgun';
                 img = 'shotgun';
-                height = 2*height;
-                width = 2*width;
+
             }
         }
     }
