@@ -282,7 +282,7 @@ Player = function(param){
     }
     
     self.shootBullet = function(angle){
-        Bullet({parent: self.id, combatType: 'player',angle: angle, x: self.x, y: self.y, map: self.map, img: 'bullet', width: 32, height: 32});
+        Bullet({parent: self.id, combatType: 'player',angle: angle, x: self.x, y: self.y, map: self.map, img: 'bullet', width: 8, height: 8});
     }
     
     self.closeAttack = function(pangle){
@@ -643,7 +643,7 @@ Bullet.generate = function(actor,aimOverwrite){
 	let spdX = Math.cos(angle/180*Math.PI)*5;
 	let spdY = Math.sin(angle/180*Math.PI)*5;
 	//Bullet(id,x,y,spdX,spdY,width,height,actor.type);
-    Bullet({combatType: actor.type, id: id, parent: actor.id, x: x, y: y, map: actor.map, img: 'bullet', width: 32, height: 32, spdX: spdX, spdY: spdY, angle: angle});
+    Bullet({combatType: actor.type, id: id, parent: actor.id, x: x, y: y, map: actor.map, img: 'bullet', width: 16, height: 16, spdX: spdX, spdY: spdY, angle: angle});
 }
 
 Enemy = function(param){
