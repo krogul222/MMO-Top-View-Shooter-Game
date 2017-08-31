@@ -9,9 +9,12 @@
         self.score = initPack.score;
         self.map = initPack.map;
         self.img = Img["player"+initPack.weapon];
+        self.imgMeeleAttack = Img["player"+initPack.weapon+"meeleattack"];
         self.width = initPack.width;
         self.height = initPack.height;
         self.moving = initPack.moving;
+        self.attackStarted = initPack.attackStarted;
+        self.attackMeele = initPack.attackMeele;
         self.aimAngle = 0;
         self.spriteAnimCounter = 0;
         self.weapon = initPack.weapon;
@@ -63,22 +66,62 @@
             ctx.drawImage(Img["walk"], walkingMod*frameWidth, directionMod*frameHeight, frameWidth, frameHeight, -self.width/4,-self.height/4, self.width/2, self.height/2);
             
             ctx.restore();            
-            
-            frameWidth = self.img.width/spriteColumns;
-            frameHeight = self.img.height/spriteRows;
-            
-            
-            // the alternative is to untranslate & unrotate after drawing
-            ctx.save();
-            ctx.translate(x - self.width/2,y - self.height/2);
-            ctx.translate(self.width/2, self.height/2); 
-            ctx.rotate(aimAngle*Math.PI/180)
-            
-            ctx.drawImage(self.img, walkingMod*frameWidth, directionMod*frameHeight, frameWidth, frameHeight, -self.width/2,-self.height/2, self.width, self.height);
-            
-            
-            ctx.restore();
 
+            
+            if(self.attackStarted && self.attackMeele){
+                spriteColumns = 15;
+                let correction = 1.3;
+                let correctionWidth = 1;
+                let correctionHeight = 1;
+                
+                if(self.weapon == "pistol"){
+                    correction = 1.1;
+                }
+                
+                if(self.weapon == "shotgun"){
+                    correction = 1.4;
+                }
+                
+                frameWidth = self.imgMeeleAttack.width/spriteColumns;
+                frameHeight = self.imgMeeleAttack.height/spriteRows;
+
+
+                // the alternative is to untranslate & unrotate after drawing
+                ctx.save();
+                ctx.translate(x - (self.width*correctionWidth)*correction/2,y - self.height*correction/2);
+                ctx.translate((self.width)*correction/2, self.height*correction/2); 
+                ctx.rotate(aimAngle*Math.PI/180)
+
+                console.log(correction);
+                
+                ctx.drawImage(self.imgMeeleAttack, walkingMod*frameWidth, directionMod*frameHeight, frameWidth, frameHeight, -self.width*correction/2,-self.height*correction/2, (self.width)*correction, self.height*correction);
+                ctx.restore();
+                
+                if(self.spriteAnimCounter % spriteColumns == (spriteColumns-1)){
+                    self.spriteAnimCounter = 0;
+                    self.attackStarted = false;
+                }
+                
+            } else{
+                
+                frameWidth = self.img.width/spriteColumns;
+                frameHeight = self.img.height/spriteRows;
+
+
+                // the alternative is to untranslate & unrotate after drawing
+                ctx.save();
+                ctx.translate(x - self.width/2,y - self.height/2);
+                ctx.translate(self.width/2, self.height/2); 
+                ctx.rotate(aimAngle*Math.PI/180)
+
+                ctx.drawImage(self.img, walkingMod*frameWidth, directionMod*frameHeight, frameWidth, frameHeight, -self.width/2,-self.height/2, self.width, self.height);
+               
+                ctx.restore();
+            }
+            
+            
+
+            
             ctx.fillStyle = 'red';
             ctx.fillRect(x - hpWidth/2, y - 40, hpWidth, 4);
             

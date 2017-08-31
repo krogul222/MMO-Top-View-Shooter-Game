@@ -108,6 +108,8 @@ Actor = function(param){
     self.moving = false; 
     self.atackRadius = 0;  
     self.weapon = "knife";
+    self.attackStarted = false;
+    self.attackMeele = false;
   
     if(param.maxSpd){
         self.maxSpd = param.maxSpd;
@@ -211,11 +213,17 @@ Player = function(param){
     self.number = "" + Math.floor(10*Math.random()),
     self.score = 0;
     self.updateEquipment = false;
-    self.weapon = "pistol";
+    
+    //knife
+    self.weapon = "knife";
+    self.atackRadius = 0;
+    self.maxSpd = 11;
+    self.attackMeele = true;
     
     self.inventory = new Inventory(param.socket, true);
     self.inventory.addItem("knife",1);
-    self.inventory.addItem("pistol",1);
+  //  self.inventory.addItem("pistol",1);
+   // self.inventory.addItem("shotgun",1);
     self.inventory.addItem("medicalkit",4);
     
     let super_update = self.update;
@@ -227,9 +235,11 @@ Player = function(param){
         //console.log('atak '+self.attackCounter);
         if(self.pressingAttack && self.attackCounter > 25){
             self.attackCounter = 0;
+            self.attackStarted = true;
             
-            if(self.weapon == "knife"){
-                
+            
+            if(self.attackMeele){
+                self.closeAttack(self.aimAngle);
             } else{
                 self.shootBullet(self.aimAngle);
             }
@@ -247,19 +257,25 @@ Player = function(param){
     self.equipWeapon = function(weapon){
         self.weapon = weapon;
         
-         self.maxSpd = 10;
+         self.maxSpd = 8;
         
         if(self.weapon == "shotgun"){
             self.atackRadius = 3;
+            self.atkSpd = 2;
+            self.attackMeele = false;
         }
         
         if(self.weapon == "pistol"){
             self.atackRadius = 0;
+            self.atkSpd = 4;
+            self.attackMeele = false;
         }
         
         if(self.weapon == "knife"){
             self.atackRadius = 0;
-            self.maxSpd = 13;
+            self.maxSpd = 11;
+            self.atkSpd = 3;
+            self.attackMeele = true;
         }
         
         self.updateEquipment = true;
@@ -267,6 +283,48 @@ Player = function(param){
     
     self.shootBullet = function(angle){
         Bullet({parent: self.id, combatType: 'player',angle: angle, x: self.x, y: self.y, map: self.map, img: 'bullet', width: 32, height: 32});
+    }
+    
+    self.closeAttack = function(pangle){
+        
+        console.log("close attack");
+        
+        let index = -1;
+        
+        for(let i in Enemy.list){
+            let e = Enemy.list[i];
+            let distance = 10000;
+            let x = self.x - e.x;
+            let y = self.y - e.y;
+            
+            
+            let angle = Math.atan2(y,x)/Math.PI * 180;
+            
+            angle = angle - 180;
+            
+            if(angle < 0){
+                angle = 360 + angle;
+            }
+            
+            if(pangle < 0){
+                pangle = 360 + pangle;
+            }
+            
+            if(self.getDistance(e)<Math.sqrt(e.width*e.width/4+e.height*e.height/4)+40){
+                if(angle < (pangle+45) && angle > (pangle-45)){
+                    if(distance > self.getDistance(e)){
+                        distance = self.getDistance(e);
+                        index = i; 
+                    }
+                }
+            }
+        }
+        
+        if(index > -1){
+            Enemy.list[index].hp -= 3;
+        }
+        
+        
     }
     
     self.getInitPack = function(){
@@ -284,12 +342,18 @@ Player = function(param){
            height: self.height,
            moving: self.moving,
            aimAngle: self.aimAngle,
-           weapon: self.weapon
+           weapon: self.weapon,
+           attackStarted: self.attackStarted,
+           attackMeele: self.attackMeele
             
         };
     }
 
     self.getUpdatePack = function(){
+        
+        let attackStartedTmp = self.attackStarted;
+        
+         self.attackStarted = false;
         
         if(self.updateEquipment){
             self.updateEquipment = false;
@@ -301,7 +365,9 @@ Player = function(param){
                moving: self.moving,
                score: self.score,
                aimAngle: self.aimAngle,
-               weapon: self.weapon
+               weapon: self.weapon,
+               attackMeele: self.attackMeele,
+               attackStarted: attackStartedTmp
             };
         } else{
             return {
@@ -311,7 +377,8 @@ Player = function(param){
                hp: self.hp,
                moving: self.moving,
                score: self.score,
-               aimAngle: self.aimAngle
+               aimAngle: self.aimAngle,
+               attackStarted: attackStartedTmp
             }; 
         }
     }    
@@ -330,7 +397,7 @@ Player.onConnect = function(socket){
     if(Math.random() < -0.5){
         map = 'field';
     }
-    let player = Player({id: socket.id, maxSpd: 10, map: map, img: 'player',atkSpd: 3, width: 50, height: 50, type: "player", hp: 10, socket: socket});
+    let player = Player({id: socket.id, maxSpd: 8, map: map, img: 'player',atkSpd: 3, width: 50, height: 50, type: "player", hp: 10, socket: socket});
     Enemy.randomlyGenerate('forest');
     Enemy.randomlyGenerate('forest');
     Enemy.randomlyGenerate('forest');
@@ -590,10 +657,11 @@ Enemy = function(param){
 		super_update();
 		self.updateAim();
 		self.updateKeyPress();
-
+        
+        let player = self.getClosestPlayer();
         let diffX = 0;
         let diffY = 0;
-        let player = self.getClosestPlayer();
+        
         if(player){
             diffX = player.x - self.x;
 		    diffY = player.y - self.y;
@@ -865,6 +933,8 @@ Upgrade.randomlyGenerate = function(map, item){
             } else{
                 category = 'shotgun';
                 img = 'shotgun';
+                height = 2*height;
+                width = 2*width;
 
             }
         }

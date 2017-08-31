@@ -7,7 +7,7 @@
     </div>
 
     <div id="gameDiv" style="display:none;">
-        <canvas id="canvas" width=500 height="500" style="border:1px solid #000000;"></canvas>
+        <canvas id="canvas" width=500 height="500" style="border:1px solid #000000;cursor:crosshair"></canvas>
 
        <div id = "inventory"></div>
        <div id = "chat-text" style="width:500px;height:100px;overflow-y:scroll;display:none">
@@ -118,6 +118,15 @@
     Img.playerknife = new Image();
     Img.playerknife.src = '/client/img/player_knife.png';   
     
+    Img.playerknifemeeleattack = new Image();
+    Img.playerknifemeeleattack.src = '/client/img/player_knife_meeleattack.png';   
+
+    Img.playerpistolmeeleattack = new Image();
+    Img.playerpistolmeeleattack.src = '/client/img/player_pistol_meeleattack.png';    
+    
+    Img.playershotgunmeeleattack = new Image();
+    Img.playershotgunmeeleattack.src = '/client/img/player_shotgun_meeleattack.png';      
+    
     Img.playerpistol= new Image();
     Img.playerpistol.src = '/client/img/player_pistol.png';   
 
@@ -223,6 +232,15 @@
                if(pack.weapon !== undefined){
                    p.weapon = pack.weapon;
                    p.img = Img["player"+pack.weapon];
+                   p.imgMeeleAttack = Img["player"+pack.weapon+"meeleattack"];
+                   p.attackMeele = pack.attackMeele;
+               }  
+               if(pack.attackStarted !== undefined){
+                   console.log("attack"+pack.attackStarted);
+                   if(pack.attackStarted){
+                       p.attackStarted = true;
+                       p.spriteAnimCounter = 0;
+                   }
                }  
                
            }
@@ -305,7 +323,7 @@
         currentMap.draw();
         drawScore();
         for(let i in Player.list){
-            if(Player.list[i].moving){
+            if(Player.list[i].moving || Player.list[i].attackStarted){
                 Player.list[i].spriteAnimCounter += 1;
             }
             Player.list[i].draw();
