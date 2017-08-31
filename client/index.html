@@ -27,6 +27,9 @@
     let socket = io();   
     let WIDTH = 500;
     let HEIGHT = 500;
+    let mouseX = 0;
+    let mouseY = 0;
+    const CAMERA_BOX_ADJUSTMENT = 4;
     const TILE_SIZE = 32;
     
 
@@ -351,7 +354,9 @@
             }
 
             let x = WIDTH/2 - player.x;
+            x = x - (mouseX-WIDTH/2)/CAMERA_BOX_ADJUSTMENT;
             let y = HEIGHT/2 - player.y;
+            y = y - (mouseY-HEIGHT/2)/CAMERA_BOX_ADJUSTMENT;
             ctx.drawImage(self.image, 0, 0, self.image.width, self.image.height, x, y, self.image.width*2, self.image.height*2);
             ctx.drawImage(self.image, 0, 0, self.image.width, self.image.height, x+self.image.width*2, y, self.image.width*2, self.image.height*2);
             ctx.drawImage(self.image, 0, 0, self.image.width, self.image.height, x, y+self.image.height*2, self.image.width*2, self.image.height*2);
@@ -396,8 +401,12 @@
     }
     
     document.onmousemove = function(event){
-        let x = -WIDTH/2 + event.clientX - 8;
-        let y = -HEIGHT/2 + event.clientY - 8;      
+        let x = -WIDTH/2 + event.clientX - 8 - (WIDTH/2 -event.clientX)/CAMERA_BOX_ADJUSTMENT;
+        let y = -HEIGHT/2 + event.clientY - 8 - (HEIGHT/2-event.clientY)/CAMERA_BOX_ADJUSTMENT;
+        
+        mouseX = event.clientX;
+        mouseY = event.clientY;
+        
         let angle = Math.atan2(y,x)/Math.PI * 180;
         
         if(selfId){

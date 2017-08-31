@@ -27,8 +27,10 @@
             
             let hpWidth = 30 * self.hp/self.hpMax;
             
-            let x = self.x - Player.list[selfId].x+WIDTH/2;
-            let y = self.y - Player.list[selfId].y+HEIGHT/2;
+            let x = self.x - (Player.list[selfId].x-WIDTH/2);
+            x = x - (mouseX-WIDTH/2)/CAMERA_BOX_ADJUSTMENT;
+            let y = self.y - (Player.list[selfId].y-HEIGHT/2);
+            y = y - (mouseY-HEIGHT/2)/CAMERA_BOX_ADJUSTMENT;
 
             
             let aimAngle = self.aimAngle;
@@ -137,8 +139,12 @@
               return;  
             }
             
-            let x = self.x - Player.list[selfId].x+WIDTH/2;
-            let y = self.y - Player.list[selfId].y+HEIGHT/2;
+            let x = self.x - (Player.list[selfId].x-WIDTH/2);
+            x = x - (mouseX-WIDTH/2)/CAMERA_BOX_ADJUSTMENT;
+
+            let y = self.y - (Player.list[selfId].y-HEIGHT/2);
+            y = y - (mouseY-HEIGHT/2)/CAMERA_BOX_ADJUSTMENT;
+
             
             ctx.drawImage(self.img, 0, 0, self.img.width, self.img.height, x - self.width/2, y - self.height/2, self.width, self.height);
 
@@ -174,8 +180,12 @@ let Enemy = function(initPack){
             return;  
         }
 
-        let x = self.x - Player.list[selfId].x+WIDTH/2;
-        let y = self.y - Player.list[selfId].y+HEIGHT/2;
+        let x = self.x - (Player.list[selfId].x-WIDTH/2);
+        x = x - (mouseX-WIDTH/2)/CAMERA_BOX_ADJUSTMENT;
+
+        let y = self.y - (Player.list[selfId].y-HEIGHT/2);
+        y = y - (mouseY-HEIGHT/2)/CAMERA_BOX_ADJUSTMENT;
+
         
         let hpWidth = 30 * self.hp/self.hpMax;
             
@@ -228,8 +238,10 @@ Upgrade = function (initPack){
             return;  
         }
 
-        let x = self.x - Player.list[selfId].x+WIDTH/2;
-        let y = self.y - Player.list[selfId].y+HEIGHT/2;
+        let x = self.x - (Player.list[selfId].x-WIDTH/2);
+        x = x - (mouseX-WIDTH/2)/CAMERA_BOX_ADJUSTMENT;
+        let y = self.y - (Player.list[selfId].y-HEIGHT/2);
+        y = y - (mouseY-HEIGHT/2)/CAMERA_BOX_ADJUSTMENT;
 		
 		x -= self.width/2;
 		y -= self.height/2;
@@ -270,8 +282,12 @@ Explosion = function(param){
         let frameWidth = self.img.width/self.animColumns;
         let frameHeight = self.img.height/self.animRows;
 
-        let x = self.x - Player.list[selfId].x+WIDTH/2;
-        let y = self.y - Player.list[selfId].y+HEIGHT/2;
+        let x = self.x - (Player.list[selfId].x-WIDTH/2);
+        x = x - (mouseX-WIDTH/2)/CAMERA_BOX_ADJUSTMENT;
+
+        let y = self.y - (Player.list[selfId].y-HEIGHT/2);
+        y = y - (mouseY-HEIGHT/2)/CAMERA_BOX_ADJUSTMENT;
+
 		
 		x -= self.width/2;
 		y -= self.height/2;
