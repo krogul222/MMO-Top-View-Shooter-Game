@@ -97,19 +97,30 @@ Actor = function(param){
 	self.hp = param.hp;
 	self.hpMax = param.hp;
 	self.atkSpd = param.atkSpd;
+    self.atackRadius = 0;
+    self.attackMeele = true;
 	self.attackCounter = 0;
 	self.aimAngle = 0;
     self.type = param.type;
-	
+	self.atkMeeleDmg = 0;
+    self.atkShootDmg = 0;
+    self.ammo = 0;
+    self.weapon = "knife";
+    
 	self.pressingDown = false;
 	self.pressingUp = false;
 	self.pressingLeft = false;
 	self.pressingRight = false;
     self.moving = false; 
-    self.atackRadius = 0;  
-    self.weapon = "knife";
-    self.attackStarted = false;
-    self.attackMeele = false;
+
+    
+    self.weaponCollection = new WeaponCollection(param.socket, true, self);
+    self.updateEquipment = false;
+    
+    self.inventory = new Inventory(param.socket, true, self);
+    self.inventory.addItem("knife",1);
+    self.inventory.addItem("medicalkit",4);    
+
   
     if(param.maxSpd){
         self.maxSpd = param.maxSpd;
@@ -212,19 +223,15 @@ Player = function(param){
     let self = Actor(param);    
     self.number = "" + Math.floor(10*Math.random()),
     self.score = 0;
-    self.updateEquipment = false;
-    
+    self.inventory.useItem("knife");
+    /*
     //knife
     self.weapon = "knife";
     self.atackRadius = 0;
     self.maxSpd = 11;
-    self.attackMeele = true;
-    
-    self.inventory = new Inventory(param.socket, true);
-    self.inventory.addItem("knife",1);
-  //  self.inventory.addItem("pistol",1);
-   // self.inventory.addItem("shotgun",1);
-    self.inventory.addItem("medicalkit",4);
+    self.attackMeele = true;*/
+    Item.list["knife"].event(self);
+
     
     let super_update = self.update;
     self.update = function(){
@@ -237,48 +244,31 @@ Player = function(param){
             self.attackCounter = 0;
             self.attackStarted = true;
             
-            
-            if(self.attackMeele){
-                self.closeAttack(self.aimAngle);
+            if(self.ammo > 0){
+                if(self.attackMeele){
+                    self.closeAttack(self.aimAngle);
+                } else{
+                    if(self.weaponCollection.shoot(self.weapon,1)){
+                        self.shootBullet(self.aimAngle);
+                    }
+                }
+
+                for(let i = 0; i < self.atackRadius; i++){
+                    if(self.weaponCollection.shoot(self.weapon,1)){
+                        self.shootBullet(self.aimAngle+(i+1)*2);
+                    }
+                    if(self.weaponCollection.shoot(self.weapon,1)){
+                        self.shootBullet(self.aimAngle-(i+1)*2);
+                    }
+                }
             } else{
-                self.shootBullet(self.aimAngle);
-            }
-            
-            for(let i = 0; i < self.atackRadius; i++){
-                self.shootBullet(self.aimAngle+(i+1)*2);
-                self.shootBullet(self.aimAngle-(i+1)*2);
+                self.attackMeele = true;
+                self.closeAttack(self.aimAngle);
             }
             
            // self.pressingAttack = false;
         }
 
-    }
-    
-    self.equipWeapon = function(weapon){
-        self.weapon = weapon;
-        
-         self.maxSpd = 8;
-        
-        if(self.weapon == "shotgun"){
-            self.atackRadius = 3;
-            self.atkSpd = 2;
-            self.attackMeele = false;
-        }
-        
-        if(self.weapon == "pistol"){
-            self.atackRadius = 0;
-            self.atkSpd = 4;
-            self.attackMeele = false;
-        }
-        
-        if(self.weapon == "knife"){
-            self.atackRadius = 0;
-            self.maxSpd = 11;
-            self.atkSpd = 3;
-            self.attackMeele = true;
-        }
-        
-        self.updateEquipment = true;
     }
     
     self.shootBullet = function(angle){
@@ -321,7 +311,7 @@ Player = function(param){
         }
         
         if(index > -1){
-            Enemy.list[index].hp -= 3;
+            Enemy.list[index].hp -= self.atkMeeleDmg;
         }
         
         
@@ -344,7 +334,8 @@ Player = function(param){
            aimAngle: self.aimAngle,
            weapon: self.weapon,
            attackStarted: self.attackStarted,
-           attackMeele: self.attackMeele
+           attackMeele: self.attackMeele,
+           ammo: self.ammo
             
         };
     }
@@ -367,7 +358,8 @@ Player = function(param){
                aimAngle: self.aimAngle,
                weapon: self.weapon,
                attackMeele: self.attackMeele,
-               attackStarted: attackStartedTmp
+               attackStarted: attackStartedTmp,
+               ammo: self.ammo
             };
         } else{
             return {
@@ -378,7 +370,10 @@ Player = function(param){
                moving: self.moving,
                score: self.score,
                aimAngle: self.aimAngle,
-               attackStarted: attackStartedTmp
+               attackStarted: attackStartedTmp,
+                weapon: self.weapon,
+               attackMeele: self.attackMeele,
+               ammo: self.ammo
             }; 
         }
     }    
@@ -488,7 +483,7 @@ Bullet = function(param){
 			for(let key2 in Enemy.list){
 				if(self.testCollision(Enemy.list[key2])){
 					self.toRemove = true;
-					Enemy.list[key2].hp -= 1;
+					Enemy.list[key2].hp -= Player.list[self.parent].atkShootDmg;
                     
                     self.hitCategory = 1;
                     self.hitEntityCategory = "enemy";
@@ -513,7 +508,7 @@ Bullet = function(param){
                         self.hitEntityCategory = "player";
                         self.hitEntityId = p.id;
 
-                        p.hp -= 1;
+                        p.hp -= Player.list[self.parent].atkShootDmg;
                         if(p.hp <= 0){
                             let shooter = Player.list[self.parent];
                             if(shooter){
@@ -883,7 +878,12 @@ Upgrade.update = function(){
                 if(Upgrade.list[key].category === 'shotgun'){
                     //player.atackRadius +=1;
                     player.inventory.addItem('shotgun', 1);
-                }                
+                }            
+                
+                if(Upgrade.list[key].category === 'rifle'){
+                    //player.atackRadius +=1;
+                    player.inventory.addItem('rifle', 1);
+                }     
                 
                 removePack.upgrade.push(Upgrade.list[key].id);               
                 delete Upgrade.list[key];
@@ -915,10 +915,12 @@ Upgrade.randomlyGenerate = function(map, item){
         category = item;
         img = item;
         
-        if(item == 'shotgun'){
+        if(item == 'shotgun' || item == 'rifle'){
             height = 2*height;
             width = 2*width;
         }
+        
+        
         
         
     } else{
@@ -931,11 +933,16 @@ Upgrade.randomlyGenerate = function(map, item){
                 category = 'pistol';
                 img = 'pistol';
             } else{
-                category = 'shotgun';
-                img = 'shotgun';
+                
+                if(Math.random()<0.5){
+                    category = 'shotgun';
+                    img = 'shotgun';
+                } else{
+                    category = 'rifle';
+                    img = 'rifle';
+                }
                 height = 2*height;
                 width = 2*width;
-
             }
         }
     }

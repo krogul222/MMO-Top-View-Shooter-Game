@@ -112,11 +112,17 @@
     Img.pistol = new Image();
     Img.pistol.src = '/client/img/pistol.png';    
     
+    Img.rifle = new Image();
+    Img.rifle.src = '/client/img/rifle.png';   
+    
     Img.shotgun = new Image();
     Img.shotgun.src = '/client/img/shotgun.png';    
     
     Img.playerknife = new Image();
     Img.playerknife.src = '/client/img/player_knife.png';   
+    
+    Img.playerrifle = new Image();
+    Img.playerrifle.src = '/client/img/player_rifle.png';      
     
     Img.playerknifemeeleattack = new Image();
     Img.playerknifemeeleattack.src = '/client/img/player_knife_meeleattack.png';   
@@ -126,6 +132,9 @@
     
     Img.playershotgunmeeleattack = new Image();
     Img.playershotgunmeeleattack.src = '/client/img/player_shotgun_meeleattack.png';      
+ 
+    Img.playerriflemeeleattack = new Image();
+    Img.playerriflemeeleattack.src = '/client/img/player_rifle_meeleattack.png';      
     
     Img.playerpistol= new Image();
     Img.playerpistol.src = '/client/img/player_pistol.png';   
@@ -222,6 +231,9 @@
                }
                if(pack.score !== undefined){
                    p.score = pack.score;
+               }
+               if(pack.ammo !== undefined){
+                   p.ammo = pack.ammo;
                }
                if(pack.moving !== undefined){
                    p.moving = pack.moving;
@@ -322,6 +334,7 @@
         ctx.clearRect(0,0,WIDTH,HEIGHT);
         currentMap.draw();
         drawScore();
+        drawAmmo();
         for(let i in Player.list){
             if(Player.list[i].moving || Player.list[i].attackStarted){
                 Player.list[i].spriteAnimCounter += 1;
@@ -388,6 +401,11 @@
    let drawScore = function(){
        ctx.fillStyle = 'blue';
        ctx.fillText('Score: '+Player.list[selfId].score, 0, 30);
+   }
+   
+   let drawAmmo = function(){
+       ctx.fillStyle = 'blue';
+       ctx.fillText('Ammo: '+Player.list[selfId].ammo, 0, 60);
    }
     document.onkeydown = function(event){
         if(event.keyCode === 68)  //d
