@@ -8,7 +8,7 @@
 
     <div id="gameDiv" style="display:none;">
         <canvas id="canvas" width=500 height="500" style="border:1px solid #000000;cursor:crosshair"></canvas>
-
+        <canvas id="canvasui" width=500 height="100" style="border:1px solid #000000;cursor:crosshair"></canvas>
        <div id = "inventory"></div>
        <div id = "chat-text" style="width:500px;height:100px;overflow-y:scroll;display:none">
             <div>Napisz cos.</div>
@@ -23,11 +23,13 @@
 <script src='/client/js/jquery-3.2.1.min.js'></script>
 <script src='/client/js/Entities.js'></script>
 <script src='/client/js/Inventory.js'></script>
+<script src='/client/js/GUI.js'></script>
 <script src="/client/js/soundmanager2.js"></script>
 <script>
     let socket = io();   
     let WIDTH = 500;
     let HEIGHT = 500;
+    let HEIGHTUI = 100;
     let mouseX = 0;
     let mouseY = 0;
     let mouseWheelCount = 0;
@@ -39,6 +41,11 @@
     soundManager.onload = function() {
       // soundManager should be ready to use/call at this point
       soundManager.createSound('gunshot','/client/mp3/gunshot.mp3');
+      soundManager.createSound('pistol_fire','/client/mp3/pistol_fire.mp3');
+      soundManager.createSound('shotgun_fire','/client/mp3/shotgun_fire.mp3');
+      soundManager.createSound('rifle_fire','/client/mp3/rifle_fire.mp3');
+      soundManager.createSound('knife_swing','/client/mp3/knife_swing.mp3');
+      soundManager.createSound('gun_swing','/client/mp3/gun_swing.mp3');
       soundManager.createSound('squishy1','/client/mp3/squishy1.mp3');
       soundManager.createSound('squishy2','/client/mp3/squishy2.mp3');
       soundManager.createSound('pain','/client/mp3/pain.mp3');
@@ -105,6 +112,8 @@
         
     let inventory = new Inventory(socket, false);
     
+
+    
     socket.on('updateInventory', function(items){
        inventory.items = items;
         inventory.refreshRender();
@@ -123,6 +132,9 @@
     
     Img.pistol = new Image();
     Img.pistol.src = '/client/img/pistol.png';    
+    
+    Img.knife = new Image();
+    Img.knife.src = '/client/img/knife.png'; 
     
     Img.rifle = new Image();
     Img.rifle.src = '/client/img/rifle.png';   
@@ -156,6 +168,9 @@
  
     Img.playerriflemeeleattack = new Image();
     Img.playerriflemeeleattack.src = '/client/img/player_rifle_meeleattack.png';      
+
+    Img.face = new Image();
+    Img.face.src = '/client/img/face.png';         
     
     Img.playerpistol= new Image();
     Img.playerpistol.src = '/client/img/player_pistol.png';   
@@ -188,21 +203,37 @@
     Img.medicalkit.src = '/client/img/hp.png';
     
     let canvas = document.getElementById("canvas");
+    let canvasui = document.getElementById("canvasui");
     
+    let ctxui = canvasui.getContext("2d");
     let ctx = canvas.getContext("2d");
+    
+    let gui = new GUI({ctx: ctxui, width: WIDTH, height: HEIGHTUI});
     
     let resizeCanvas = function(){
         WIDTH = window.innerWidth - 4;
-        HEIGHT = window.innerHeight - 48;
+        HEIGHT = window.innerHeight - 48-HEIGHTUI;
         
         canvas.width = WIDTH;
         canvas.height = HEIGHT;
+        
+        canvasui.width = WIDTH;
+        canvasui.height = HEIGHTUI;
         
         ctx.font = '30px Arial';
         ctx.mozImageSmoothingEnabled = false;
         ctx.msImageSmoothingEnabled = false;
         ctx.imageSmoothingEnabled = false;
+        
+        ctxui.font = '30px Arial';
+        ctxui.mozImageSmoothingEnabled = false;
+        ctxui.msImageSmoothingEnabled = false;
+        ctxui.imageSmoothingEnabled = false;
+        
+        gui.resize(canvasui.width, canvasui.height);
     }
+    
+
     
     resizeCanvas();
     
@@ -210,7 +241,8 @@
         resizeCanvas();
     });
     
-    
+
+    gui.draw();
     
     var selfId = null;
     
@@ -223,7 +255,7 @@
        } 
        for(let i = 0, length = data.bullet.length; i < length; i++){
            new Bullet(data.bullet[i]);
-           soundManager.play('gunshot');
+           
        }  
 
        for(let i = 0, length = data.upgrade.length; i < length; i++){
@@ -252,7 +284,7 @@
                    p.hp = pack.hp;
                }
                if(pack.score !== undefined){
-                   p.score = pack.score;
+                   p.score = pack.score;;
                }
                if(pack.ammo !== undefined){
                    p.ammo = pack.ammo;
@@ -274,9 +306,31 @@
                    if(pack.attackStarted){
                        p.attackStarted = true;
                        p.spriteAnimCounter = 0;
+                       
+                       if(!p.attackMeele){
+                           if(p.weapon === "pistol"){
+                               soundManager.play('pistol_fire');
+                           }
+                           if(p.weapon === "shotgun"){
+                               soundManager.play('shotgun_fire');
+                           }
+                           if(p.weapon === "rifle"){
+                               soundManager.play('rifle_fire');
+                           }
+                       }
+                       else{
+                           if(p.weapon === "knife"){
+                               soundManager.play('knife_swing');
+                           } else{
+                               soundManager.play('gun_swing');
+                           }
+                       }
+                       
+                       
                    }
                }  
                
+            gui.draw()
            }
        } 
         
@@ -356,8 +410,8 @@
         
         ctx.clearRect(0,0,WIDTH,HEIGHT);
         currentMap.draw();
-        drawScore();
-        drawAmmo();
+      //  drawScore();
+        //drawAmmo();
         for(let i in Player.list){
             if(Player.list[i].moving || Player.list[i].attackStarted){
                 Player.list[i].spriteAnimCounter += 1;
