@@ -23,16 +23,28 @@
 <script src='/client/js/jquery-3.2.1.min.js'></script>
 <script src='/client/js/Entities.js'></script>
 <script src='/client/js/Inventory.js'></script>
+<script src="/client/js/soundmanager2.js"></script>
 <script>
     let socket = io();   
     let WIDTH = 500;
     let HEIGHT = 500;
     let mouseX = 0;
     let mouseY = 0;
+    let mouseWheelCount = 0;
+    let mouseWheelTrigger = 240;
     const CAMERA_BOX_ADJUSTMENT = 4;
     const TILE_SIZE = 32;
     
 
+    soundManager.onload = function() {
+      // soundManager should be ready to use/call at this point
+      soundManager.createSound('gunshot','/client/mp3/gunshot.mp3');
+      soundManager.createSound('squishy1','/client/mp3/squishy1.mp3');
+      soundManager.createSound('squishy2','/client/mp3/squishy2.mp3');
+      soundManager.createSound('pain','/client/mp3/pain.mp3');
+      soundManager.createSound('death','/client/mp3/death.mp3');
+    }
+    
     //sign
     
     let signDiv = document.getElementById("signDiv");
@@ -118,6 +130,15 @@
     Img.shotgun = new Image();
     Img.shotgun.src = '/client/img/shotgun.png';    
     
+    Img.shotgunammo = new Image();
+    Img.shotgunammo.src = '/client/img/shotgunammo.png';
+
+    Img.pistolammo = new Image();
+    Img.pistolammo.src = '/client/img/pistolammo.png';
+    
+    Img.rifleammo = new Image();
+    Img.rifleammo.src = '/client/img/rifleammo.png';
+    
     Img.playerknife = new Image();
     Img.playerknife.src = '/client/img/player_knife.png';   
     
@@ -202,6 +223,7 @@
        } 
        for(let i = 0, length = data.bullet.length; i < length; i++){
            new Bullet(data.bullet[i]);
+           soundManager.play('gunshot');
        }  
 
        for(let i = 0, length = data.upgrade.length; i < length; i++){
@@ -311,6 +333,7 @@
     socket.on('remove', function(data){
        for(let i = 0, length = data.player.length; i < length; i++){
            delete Player.list[data.player[i]];
+           soundManager.play('death');
        } 
        for(let i = 0, length = data.bullet.length; i < length; i++){
            if(Bullet.list[data.bullet[i].id]){
@@ -436,6 +459,23 @@
         socket.emit('keyPress', {inputId:'attack', state:false});
     }
     
+     document.onmousewheel =function(event){
+         console.log("Wheeel!!!" +mouseWheelCount);
+         
+         mouseWheelCount += event.wheelDelta;
+         
+         if(mouseWheelTrigger == Math.abs(mouseWheelCount)){
+             if(mouseWheelCount > 0){
+                socket.emit('changeWeapon', {state:'next'});
+             } else{
+                socket.emit('changeWeapon', {state:'prev'});
+             }
+            mouseWheelCount = 0;
+         }
+         
+         
+     }
+    
     document.onmousemove = function(event){
         let x = -WIDTH/2 + event.clientX - 8 - (WIDTH/2 -event.clientX)/CAMERA_BOX_ADJUSTMENT;
         let y = -HEIGHT/2 + event.clientY - 8 - (HEIGHT/2-event.clientY)/CAMERA_BOX_ADJUSTMENT;
@@ -456,6 +496,11 @@
         $("#ctx" ).mousedown(function(event){
             event.preventDefault();
         });
+        
+        $("#ctx" ).mousewheel(function(event){
+            event.preventDefault();
+        });
+        
         $("#chat-form" ).mousedown(function(event){
             event.preventDefault();
         });
@@ -463,6 +508,11 @@
             event.preventDefault();
         });
         $("#gameDiv" ).mousedown(function(event){
+            event.preventDefault();
+        });
+        
+                
+        $("#gameDiv" ).mousewheel(function(event){
             event.preventDefault();
         });
     });

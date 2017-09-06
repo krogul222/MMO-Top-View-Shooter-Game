@@ -245,20 +245,24 @@ Player = function(param){
             self.attackStarted = true;
             
             if(self.ammo > 0){
+                
+                let shootSpeed = self.weaponCollection.getShootSpeed(self.weapon);
+                
                 if(self.attackMeele){
+                    console.log("AAAAAAA");
                     self.closeAttack(self.aimAngle);
                 } else{
                     if(self.weaponCollection.shoot(self.weapon,1)){
-                        self.shootBullet(self.aimAngle);
+                        self.shootBullet(self.aimAngle, shootSpeed, shootSpeed);
                     }
                 }
 
                 for(let i = 0; i < self.atackRadius; i++){
                     if(self.weaponCollection.shoot(self.weapon,1)){
-                        self.shootBullet(self.aimAngle+(i+1)*2);
+                        self.shootBullet(self.aimAngle+(i+1)*2, shootSpeed, shootSpeed);
                     }
                     if(self.weaponCollection.shoot(self.weapon,1)){
-                        self.shootBullet(self.aimAngle-(i+1)*2);
+                        self.shootBullet(self.aimAngle-(i+1)*2, shootSpeed, shootSpeed);
                     }
                 }
             } else{
@@ -271,8 +275,8 @@ Player = function(param){
 
     }
     
-    self.shootBullet = function(angle){
-        Bullet({parent: self.id, combatType: 'player',angle: angle, x: self.x, y: self.y, map: self.map, img: 'bullet', width: 8, height: 8});
+    self.shootBullet = function(angle, spdX, spdY){
+        Bullet({parent: self.id, combatType: 'player',angle: angle, x: self.x, y: self.y, map: self.map, img: 'bullet', width: 8, height: 8, spdX: spdX, spdY: spdY});
     }
     
     self.closeAttack = function(pangle){
@@ -346,23 +350,7 @@ Player = function(param){
         
          self.attackStarted = false;
         
-        if(self.updateEquipment){
-            self.updateEquipment = false;
-            return {
-               id: self.id,
-               x: self.x,
-               y: self.y,
-               hp: self.hp,
-               moving: self.moving,
-               score: self.score,
-               aimAngle: self.aimAngle,
-               weapon: self.weapon,
-               attackMeele: self.attackMeele,
-               attackStarted: attackStartedTmp,
-               ammo: self.ammo
-            };
-        } else{
-            return {
+        return {
                id: self.id,
                x: self.x,
                y: self.y,
@@ -373,9 +361,9 @@ Player = function(param){
                attackStarted: attackStartedTmp,
                 weapon: self.weapon,
                attackMeele: self.attackMeele,
+               attackStarted: attackStartedTmp,
                ammo: self.ammo
             }; 
-        }
     }    
     
     Player.list[self.id] = self; 
@@ -404,6 +392,16 @@ Player.onConnect = function(socket){
     Upgrade.randomlyGenerate('forest', 'medicalkit');
     Upgrade.randomlyGenerate('forest', 'medicalkit');
     Upgrade.randomlyGenerate('forest');
+
+     socket.on('changeWeapon', function(data){
+         if(data.state == 'next'){
+             player.weaponCollection.chooseNextWeaponWithAmmo();
+         }
+         
+        if(data.state == 'prev'){
+             player.weaponCollection.choosePrevWeaponWithAmmo();
+         }
+     });
     
     socket.on('keyPress', function(data){
        if(data.inputId == 'left')
@@ -458,8 +456,8 @@ Player.update = function(){
 Bullet = function(param){
     let self = Entity(param);
     self.id = Math.random();
-    self.spdX = Math.cos(param.angle/180*Math.PI) * 50;
-    self.spdY = Math.sin(param.angle/180*Math.PI) * 50;
+    self.spdX = Math.cos(param.angle/180*Math.PI) * param.spdX;
+    self.spdY = Math.sin(param.angle/180*Math.PI) * param.spdY;
     self.angle = param.angle;
     self.combatType = param.combatType;
     
@@ -635,8 +633,8 @@ Bullet.generate = function(actor,aimOverwrite){
 		angle = aimOverwrite;
 	else angle = actor.aimAngle;
 	
-	let spdX = Math.cos(angle/180*Math.PI)*5;
-	let spdY = Math.sin(angle/180*Math.PI)*5;
+	let spdX = 15;
+	let spdY = 15;
 	//Bullet(id,x,y,spdX,spdY,width,height,actor.type);
     Bullet({combatType: actor.type, id: id, parent: actor.id, x: x, y: y, map: actor.map, img: 'bullet', width: 16, height: 16, spdX: spdX, spdY: spdY, angle: angle});
 }
@@ -790,22 +788,6 @@ Enemy.randomlyGenerate = function(map){
 	let id = Math.random();
     Enemy({id: id, x: x, y: y, width: width, height: height, hp: 15*difficulty, atkSpd: 0.4*difficulty, map: map, img: 'scorpion', type:'enemy'});
     
-    /*
-    console.log("Enemies");
-    let a = 0;
-    for(let i in Enemy.list){
-        a++;
-    }
-    console.log(a);
-    
-    a = 0;
-    a = 0;
-    for(let i in Bullet.list){
-        a++;
-    }
-        console.log("Bullets");
-    console.log(a);
-*/
 }
 
 Enemy.getAllInitPack = function(){
@@ -885,6 +867,33 @@ Upgrade.update = function(){
                     player.inventory.addItem('rifle', 1);
                 }     
                 
+                if(Upgrade.list[key].category === 'shotgunammo'){
+                    //player.atackRadius +=1;
+                    //player.inventory.addItem('shotgunammo', 1);
+                    player.weaponCollection.addWeaponAmmo("shotgun", 200);
+                    if(player.weapon == "shotgun"){
+                        player.ammo = player.weaponCollection.getWeaponAmmo("shotgun");
+                    }
+                }  
+                
+                if(Upgrade.list[key].category === 'pistolammo'){
+                    //player.atackRadius +=1;
+                    //player.inventory.addItem('shotgunammo', 1);
+                    player.weaponCollection.addWeaponAmmo("pistol", 100);
+                    if(player.weapon == "pistol"){
+                        player.ammo = player.weaponCollection.getWeaponAmmo("pistol");
+                    }
+                }  
+                
+                if(Upgrade.list[key].category === 'rifleammo'){
+                    //player.atackRadius +=1;
+                    //player.inventory.addItem('shotgunammo', 1);
+                    player.weaponCollection.addWeaponAmmo("rifle", 50);
+                    if(player.weapon == "rifle"){
+                        player.ammo = player.weaponCollection.getWeaponAmmo("rifle");
+                    }
+                }  
+                
                 removePack.upgrade.push(Upgrade.list[key].id);               
                 delete Upgrade.list[key];
                 break;
@@ -925,24 +934,39 @@ Upgrade.randomlyGenerate = function(map, item){
         
     } else{
         
-        if(Math.random()<0.3){
+        if(Math.random()<0.2){
             //category = 'score';
             //img = 'player';
         } else {
-            if(Math.random()<0.5){
+            if(Math.random()<0.2){
                 category = 'pistol';
                 img = 'pistol';
             } else{
                 
                 if(Math.random()<0.5){
-                    category = 'shotgun';
-                    img = 'shotgun';
+                    if(Math.random()<0.5){
+                        category = 'shotgun';
+                        img = 'shotgun';
+                    } else{
+                        category = 'rifle';
+                        img = 'rifle';
+                    }
+                    height = 2*height;
+                    width = 2*width;
                 } else{
-                    category = 'rifle';
-                    img = 'rifle';
+                     if(Math.random()<0.4){
+                        category = 'shotgunammo';
+                        img = 'shotgunammo';
+                     } else{
+                        if(Math.random()<0.5){
+                            category = 'pistolammo';
+                            img = 'pistolammo';
+                        }else{
+                            category = 'rifleammo';
+                            img = 'rifleammo';
+                        }
+                     }
                 }
-                height = 2*height;
-                width = 2*width;
             }
         }
     }

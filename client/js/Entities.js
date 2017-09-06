@@ -156,6 +156,8 @@
             if(Player.list[entityId]){
                 x = Player.list[entityId].x + (1-Math.round(2*Math.random())) * Math.floor(Math.random()*Player.list[entityId].width/4);
                 y = Player.list[entityId].y + (1-Math.round(2*Math.random())) *Math.floor(Math.random()*Player.list[entityId].height/4);
+                
+                soundManager.play('pain');
             }
         }   
             
@@ -163,6 +165,12 @@
             if(Enemy.list[entityId]){
                 x = Enemy.list[entityId].x + (1-Math.round(2*Math.random())) *Math.floor(Math.random()*Enemy.list[entityId].width/4);
                 y = Enemy.list[entityId].y + (1-Math.round(2*Math.random())) *Math.floor(Math.random()*Enemy.list[entityId].height/4);
+                
+                if(Math.random()<0.5){
+                    soundManager.play('squishy1');
+                } else{
+                    soundManager.play('squishy2');
+                }
             }
         }   
             
