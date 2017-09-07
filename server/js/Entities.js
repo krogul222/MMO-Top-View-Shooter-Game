@@ -100,6 +100,8 @@ Actor = function(param){
     self.atackRadius = 0;
     self.attackMeele = true;
 	self.attackCounter = 0;
+	self.reloadCounter = 0;
+    self.reload = false;
 	self.aimAngle = 0;
     self.type = param.type;
 	self.atkMeeleDmg = 0;
@@ -119,6 +121,7 @@ Actor = function(param){
     
     self.inventory = new Inventory(param.socket, true, self);
     self.inventory.addItem("knife",1);
+        self.inventory.addItem("pistol",1);
     self.inventory.addItem("medicalkit",4);    
 
   
@@ -186,6 +189,13 @@ Actor = function(param){
         self.updateSpd();
         
 		super_update();
+        self.reloadCounter += self.atkSpd; 
+        
+        if(self.reloadCounter > 15*(7-self.atkSpd) && self.reload ){
+            self.reload = false;
+            self.weaponCollection.reload(self.weapon);
+        }
+            
         
 		self.attackCounter += self.atkSpd;
 		if(self.hp <= 0)
@@ -239,8 +249,10 @@ Player = function(param){
         
         super_update();
 
+        
+        
         //console.log('atak '+self.attackCounter);
-        if(self.pressingAttack && self.attackCounter > 25){
+        if(self.pressingAttack && self.attackCounter > 25  && !self.reload){
             self.attackCounter = 0;
             self.attackStarted = true;
             
@@ -249,25 +261,24 @@ Player = function(param){
                 let shootSpeed = self.weaponCollection.getShootSpeed(self.weapon);
                 
                 if(self.attackMeele){
-                    console.log("AAAAAAA");
                     self.closeAttack(self.aimAngle);
                 } else{
                     if(self.weaponCollection.shoot(self.weapon,1)){
                         self.shootBullet(self.aimAngle, shootSpeed, shootSpeed);
+
+                        for(let i = 0; i < self.atackRadius; i++){
+                            self.shootBullet(self.aimAngle+(i+1)*2, shootSpeed, shootSpeed);
+                            self.shootBullet(self.aimAngle-(i+1)*2, shootSpeed, shootSpeed);
+
+                        }
                     }
                 }
 
-                for(let i = 0; i < self.atackRadius; i++){
-                    if(self.weaponCollection.shoot(self.weapon,1)){
-                        self.shootBullet(self.aimAngle+(i+1)*2, shootSpeed, shootSpeed);
-                    }
-                    if(self.weaponCollection.shoot(self.weapon,1)){
-                        self.shootBullet(self.aimAngle-(i+1)*2, shootSpeed, shootSpeed);
-                    }
-                }
+
             } else{
                 self.attackMeele = true;
                 self.closeAttack(self.aimAngle);
+
             }
             
            // self.pressingAttack = false;
@@ -362,7 +373,8 @@ Player = function(param){
                 weapon: self.weapon,
                attackMeele: self.attackMeele,
                attackStarted: attackStartedTmp,
-               ammo: self.ammo
+               ammo: self.ammo,
+               reload: self.reload    
             }; 
     }    
     
@@ -416,7 +428,16 @@ Player.onConnect = function(socket){
            player.pressingAttack = data.state;
        if(data.inputId == 'mouseAngle')
            player.aimAngle = data.state;
-        
+        if(data.inputId == '1')
+            player.weaponCollection.changeWeapon("knife");   
+        if(data.inputId == '2')
+           player.weaponCollection.changeWeapon("pistol"); 
+        if(data.inputId == '3')
+           player.weaponCollection.changeWeapon("shotgun"); 
+        if(data.inputId == '4')
+           player.weaponCollection.changeWeapon("rifle"); 
+        if(data.inputId == 'space')
+           player.weaponCollection.chooseNextWeaponWithAmmo();     
         
        if(player.pressingRight || player.pressingLeft || player.pressingUp || player.pressingDown){
            player.moving = true;
@@ -870,7 +891,7 @@ Upgrade.update = function(){
                 if(Upgrade.list[key].category === 'shotgunammo'){
                     //player.atackRadius +=1;
                     //player.inventory.addItem('shotgunammo', 1);
-                    player.weaponCollection.addWeaponAmmo("shotgun", 200);
+                    player.weaponCollection.addWeaponAmmo("shotgun", 50);
                     if(player.weapon == "shotgun"){
                         player.ammo = player.weaponCollection.getWeaponAmmo("shotgun");
                     }
@@ -888,7 +909,7 @@ Upgrade.update = function(){
                 if(Upgrade.list[key].category === 'rifleammo'){
                     //player.atackRadius +=1;
                     //player.inventory.addItem('shotgunammo', 1);
-                    player.weaponCollection.addWeaponAmmo("rifle", 50);
+                    player.weaponCollection.addWeaponAmmo("rifle", 30);
                     if(player.weapon == "rifle"){
                         player.ammo = player.weaponCollection.getWeaponAmmo("rifle");
                     }

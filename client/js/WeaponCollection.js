@@ -17,7 +17,7 @@ WeaponCollection = function(socket, server, owner){
 				return;
 			}
 		}
-		self.weapons.push({id:id,amount:amount, ammo: 50});
+		self.weapons.push({id:id,amount:amount, ammo: 50, reload: Weapon.list[id].reload});
         console.log("Weapon " +id+" added");
 		//self.refreshRender();
     }
@@ -68,12 +68,35 @@ WeaponCollection = function(socket, server, owner){
         }
     }
     
+    self.reload = function(id){
+        for(var i = 0 ; i < self.weapons.length; i++){
+			if(self.weapons[i].id === id){
+                self.weapons[i].reload = Weapon.list[id].reload;
+                console.log(self.weapons[i].reload );
+            }
+        }
+        
+        
+        
+    }
+    
     self.shoot = function(id, bullets){
         for(var i = 0 ; i < self.weapons.length; i++){
 			if(self.weapons[i].id === id){
                 if(bullets <= self.weapons[i].ammo){
                     self.weapons[i].ammo -= bullets;
                     owner.ammo = self.weapons[i].ammo;
+                    
+                    if(self.weapons[i].reload > 0)
+                        self.weapons[i].reload--;
+                    else
+                        return false;
+                    
+                    if(self.weapons[i].reload ==0){
+                        owner.reload = true;
+                        owner.reloadCounter = 0;
+                    }
+                     console.log("Reload"+ owner.reload+ " " +self.weapons[i].reload );
                     return true;
                 }
 			}
@@ -81,62 +104,72 @@ WeaponCollection = function(socket, server, owner){
 		return false;
     }
     
-    self.chooseNextWeaponWithAmmo = function(){
-        
-        let inc = 1;
-        
-        for(var i = 0 ; i < self.weapons.length; i++){
-            if(self.weapons[i].id === owner.weapon){
-                while(i+inc < self.weapons.length){
-                    if(self.weapons[i+inc].ammo >0 ){
-                        Weapon.list[self.weapons[i+inc].id].equip(owner);
-                        return;
-                    } else{
-                        inc++;
-                    }
-                }
-                inc = 0;
-                while( inc < i){
-                    if(self.weapons[inc].ammo >0 ){
-                        Weapon.list[self.weapons[inc].id].equip(owner);
-                        return;
-                    } else{
-                        inc++;
-                    }
-                }
-                
-                return;
-            }
+    self.changeWeapon = function(id){
+        if(self.hasWeapon(id, 1) && !owner.reload){
+            Weapon.list[id].equip(owner);
         }
     }
     
-self.choosePrevWeaponWithAmmo = function(){
-        
-        let inc = 1;
-        
-        for(var i = 0 ; i < self.weapons.length; i++){
-            if(self.weapons[i].id === owner.weapon){
-                while(i-inc >= 0){
-                    if(self.weapons[i-inc].ammo >0 ){
-                        Weapon.list[self.weapons[i-inc].id].equip(owner);
-                        return;
-                    } else{
-                        inc++;
+    self.chooseNextWeaponWithAmmo = function(){
+        if(!owner.reload){
+            let inc = 1;
+
+            for(var i = 0 ; i < self.weapons.length; i++){
+                if(self.weapons[i].id === owner.weapon){
+                    while(i+inc < self.weapons.length){
+                        if(self.weapons[i+inc].ammo >0 ){
+                            Weapon.list[self.weapons[i+inc].id].equip(owner);
+                            return;
+                        } else{
+                            inc++;
+                        }
                     }
-                }
-                inc = self.weapons.length-1;
-                while( inc > i){
-                    if(self.weapons[inc].ammo >0 ){
-                        Weapon.list[self.weapons[inc].id].equip(owner);
-                        return;
-                    } else{
-                        inc--;
+                    inc = 0;
+                    while( inc < i){
+                        if(self.weapons[inc].ammo >0 ){
+                            Weapon.list[self.weapons[inc].id].equip(owner);
+                            return;
+                        } else{
+                            inc++;
+                        }
                     }
+
+                    return;
                 }
-                
-                return;
-            }
+            } 
         }
+
+    }
+    
+self.choosePrevWeaponWithAmmo = function(){
+        if(!owner.reload){
+            let inc = 1;
+
+            for(var i = 0 ; i < self.weapons.length; i++){
+                if(self.weapons[i].id === owner.weapon){
+                    while(i-inc >= 0){
+                        if(self.weapons[i-inc].ammo >0 ){
+                            Weapon.list[self.weapons[i-inc].id].equip(owner);
+                            return;
+                        } else{
+                            inc++;
+                        }
+                    }
+                    inc = self.weapons.length-1;
+                    while( inc > i){
+                        if(self.weapons[inc].ammo >0 ){
+                            Weapon.list[self.weapons[inc].id].equip(owner);
+                            return;
+                        } else{
+                            inc--;
+                        }
+                    }
+
+                    return;
+                }
+            }      
+        }
+
     }    
     
 
@@ -198,6 +231,12 @@ Weapon = function(id,name, param){
         self.shootSpd = 0;
     }    
     
+    if(param.reload !== undefined){
+        self.reload = param.reload;
+    } else {
+        self.reload = 0;
+    }    
+    
     self.equip = function(actor){
         actor.atackRadius = self.atackRadius;
         actor.atkSpd = self.atkSpd;
@@ -222,6 +261,7 @@ Weapon("pistol","Pistol",{
     atkMeeleDmg : 2,
     maxSpd : 10,
     shootSpd : 20,
+    reload : 6
 });
 
 Weapon("shotgun","Shotgun",{
@@ -231,7 +271,8 @@ Weapon("shotgun","Shotgun",{
     atkShootDmg : 3,
     atkMeeleDmg : 4,
     maxSpd : 8,
-    shootSpd : 15
+    shootSpd : 15,
+    reload : 2
 });
 
 Weapon("knife","Knife",{
@@ -241,6 +282,7 @@ Weapon("knife","Knife",{
     atkShootDmg : 0,
     atkMeeleDmg : 8,
     maxSpd : 11,
+    reload : 0
 });
 
 Weapon("rifle","Rifle",{
@@ -250,6 +292,7 @@ Weapon("rifle","Rifle",{
     atkShootDmg : 15,
     atkMeeleDmg : 4,
     maxSpd : 8,
-    shootSpd : 30
+    shootSpd : 30,
+    reload : 1
 });
     

@@ -33,7 +33,7 @@
     let mouseX = 0;
     let mouseY = 0;
     let mouseWheelCount = 0;
-    let mouseWheelTrigger = 240;
+    let mouseWheelTrigger = 2;
     const CAMERA_BOX_ADJUSTMENT = 4;
     const TILE_SIZE = 32;
     
@@ -50,6 +50,9 @@
       soundManager.createSound('squishy2','/client/mp3/squishy2.mp3');
       soundManager.createSound('pain','/client/mp3/pain.mp3');
       soundManager.createSound('death','/client/mp3/death.mp3');
+      soundManager.createSound('shotgunreload','/client/mp3/shotgunreload.mp3');
+      soundManager.createSound('pistolreload','/client/mp3/pistolreload.mp3');
+      soundManager.createSound('riflereload','/client/mp3/riflereload.mp3');
     }
     
     //sign
@@ -123,6 +126,9 @@
     var Img = {};
     
     Img.map = {}
+ 
+    Img.guibackground = new Image();
+    Img.guibackground.src = '/client/img/guibackground.jpg'
     
     Img.map['field'] = new Image();
     Img.map['field'].src = '/client/img/field.png';
@@ -165,12 +171,24 @@
     
     Img.playershotgunmeeleattack = new Image();
     Img.playershotgunmeeleattack.src = '/client/img/player_shotgun_meeleattack.png';      
- 
+
+    Img.playershotgunreload = new Image();
+    Img.playershotgunreload.src = '/client/img/player_shotgun_reload.png';      
+    
+    Img.playerpistolreload = new Image();
+    Img.playerpistolreload.src = '/client/img/player_pistol_reload.png';     
+    
+    Img.playerriflereload = new Image();
+    Img.playerriflereload.src = '/client/img/player_rifle_reload.png';  
+    
     Img.playerriflemeeleattack = new Image();
     Img.playerriflemeeleattack.src = '/client/img/player_rifle_meeleattack.png';      
 
     Img.face = new Image();
-    Img.face.src = '/client/img/face.png';         
+    Img.face.src = '/client/img/face.png';    
+    
+    Img.faceborder = new Image();
+    Img.faceborder.src = '/client/img/faceborder.png';  
     
     Img.playerpistol= new Image();
     Img.playerpistol.src = '/client/img/player_pistol.png';   
@@ -302,12 +320,13 @@
                    p.attackMeele = pack.attackMeele;
                }  
                if(pack.attackStarted !== undefined){
-                   console.log("attack"+pack.attackStarted);
                    if(pack.attackStarted){
                        p.attackStarted = true;
                        p.spriteAnimCounter = 0;
-                       
+                       if(pack.reload)
+                            soundManager.play(p.weapon+"reload");
                        if(!p.attackMeele){
+                           
                            if(p.weapon === "pistol"){
                                soundManager.play('pistol_fire');
                            }
@@ -319,6 +338,7 @@
                            }
                        }
                        else{
+                           p.reload = false;
                            if(p.weapon === "knife"){
                                soundManager.play('knife_swing');
                            } else{
@@ -328,7 +348,14 @@
                        
                        
                    }
-               }  
+               }
+               if(pack.reload !== undefined){
+                   if(pack.reload){
+                       p.reload = true;
+                   } else{
+                       p.reload = false;
+                   }
+               }
                
             gui.draw()
            }
@@ -414,7 +441,14 @@
         //drawAmmo();
         for(let i in Player.list){
             if(Player.list[i].moving || Player.list[i].attackStarted){
-                Player.list[i].spriteAnimCounter += 1;
+                
+                if(Player.list[i].reload)
+                    if(Player.list[i].weapon == "pistol")
+                        Player.list[i].spriteAnimCounter += 1;
+                    else
+                        Player.list[i].spriteAnimCounter += 0.5;
+                else
+                    Player.list[i].spriteAnimCounter += 1;
             }
             Player.list[i].draw();
         }
@@ -493,6 +527,16 @@
                  socket.emit('keyPress', {inputId:'left', state:true});       
         else if(event.keyCode === 87)  //w
             socket.emit('keyPress', {inputId:'up', state:true});
+        else if(event.keyCode === 49)  //1
+            socket.emit('keyPress', {inputId:'1', state:true});
+        else if(event.keyCode === 50)  //2
+            socket.emit('keyPress', {inputId:'2', state:true});
+        else if(event.keyCode === 51)  //3
+            socket.emit('keyPress', {inputId:'3', state:true});
+        else if(event.keyCode === 52)  //4
+            socket.emit('keyPress', {inputId:'4', state:true});
+        else if(event.keyCode === 32)  //4
+            socket.emit('keyPress', {inputId:'space', state:true});
     }
     
     document.onkeyup = function(event){
@@ -516,7 +560,10 @@
      document.onmousewheel =function(event){
          console.log("Wheeel!!!" +mouseWheelCount);
          
-         mouseWheelCount += event.wheelDelta;
+         if(event.wheelDelta > 0)
+            mouseWheelCount += 1;
+         else
+            mouseWheelCount -= 1;
          
          if(mouseWheelTrigger == Math.abs(mouseWheelCount)){
              if(mouseWheelCount > 0){

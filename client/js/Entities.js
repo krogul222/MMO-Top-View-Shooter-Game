@@ -19,7 +19,7 @@
         self.spriteAnimCounter = 0;
         self.weapon = initPack.weapon;
         self.ammo = initPack.ammo;
-        
+        self.reload = false;
         
         self.draw = function(){
             if(Player.list[selfId].map !== self.map){
@@ -105,19 +105,48 @@
                 
             } else{
                 
-                frameWidth = self.img.width/spriteColumns;
-                frameHeight = self.img.height/spriteRows;
+                if(self.reload){
+                    let reloadImg = Img["player"+self.weapon+"reload"];
+                    
+                    if(self.weapon == "pistol")
+                        spriteColumns = 15;
+                    
+                    frameWidth = reloadImg.width/spriteColumns;
+                    frameHeight = reloadImg.height/spriteRows;
 
 
-                // the alternative is to untranslate & unrotate after drawing
-                ctx.save();
-                ctx.translate(x - self.width/2,y - self.height/2);
-                ctx.translate(self.width/2, self.height/2); 
-                ctx.rotate(aimAngle*Math.PI/180)
+                    // the alternative is to untranslate & unrotate after drawing
+                    ctx.save();
+                    ctx.translate(x - self.width/2,y - self.height/2);
+                    ctx.translate(self.width/2, self.height/2); 
+                    ctx.rotate(aimAngle*Math.PI/180)
 
-                ctx.drawImage(self.img, walkingMod*frameWidth, directionMod*frameHeight, frameWidth, frameHeight, -self.width/2,-self.height/2, self.width, self.height);
-               
-                ctx.restore();
+                    ctx.drawImage(reloadImg, walkingMod*frameWidth, directionMod*frameHeight, frameWidth, frameHeight, -self.width/2,-self.height/2, self.width, self.height);
+
+                    ctx.restore();
+                    
+                    if(self.spriteAnimCounter % spriteColumns == (spriteColumns-1)){
+                        self.spriteAnimCounter = 0;
+                        self.attackStarted = false;
+                        self.reload = false;
+                    }
+                } else{
+                    frameWidth = self.img.width/spriteColumns;
+                    frameHeight = self.img.height/spriteRows;
+
+
+                    // the alternative is to untranslate & unrotate after drawing
+                    ctx.save();
+                    ctx.translate(x - self.width/2,y - self.height/2);
+                    ctx.translate(self.width/2, self.height/2); 
+                    ctx.rotate(aimAngle*Math.PI/180)
+
+                    ctx.drawImage(self.img, walkingMod*frameWidth, directionMod*frameHeight, frameWidth, frameHeight, -self.width/2,-self.height/2, self.width, self.height);
+
+                    ctx.restore();
+
+                }
+                
             }
             
             
