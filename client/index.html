@@ -10,18 +10,19 @@
         <canvas id="canvas" width=500 height="500" style="border:1px solid #000000;cursor:crosshair"></canvas>
         <canvas id="canvasui" width=500 height="100" style="border:1px solid #000000;cursor:crosshair"></canvas>
        <div id = "inventory"></div>
-       <div id = "chat-text" style="width:500px;height:100px;overflow-y:scroll;display:none">
+       <div id = "chat-text" style="width:500px;height:100px;overflow-y:scroll;">
             <div>Napisz cos.</div>
         </div>
 
         <form id="chat-form">
-            <input id="chat-input" type="text" style="width:500px;display:none">
+            <input id="chat-input" type="text" style="width:500px;">
         </form> 
     </div>
 </body>
 <script src="https://cdn.socket.io/socket.io-1.4.5.js"></script>
 <script src='/client/js/jquery-3.2.1.min.js'></script>
 <script src='/client/js/Entities.js'></script>
+<script src='/client/js/WeaponCollection.js'></script>
 <script src='/client/js/Inventory.js'></script>
 <script src='/client/js/GUI.js'></script>
 <script src="/client/js/soundmanager2.js"></script>
@@ -307,6 +308,9 @@
                if(pack.ammo !== undefined){
                    p.ammo = pack.ammo;
                }
+               if(pack.ammoInGun !== undefined){
+                   p.ammoInGun = pack.ammoInGun;
+               }   
                if(pack.moving !== undefined){
                    p.moving = pack.moving;
                } 
@@ -527,6 +531,8 @@
                  socket.emit('keyPress', {inputId:'left', state:true});       
         else if(event.keyCode === 87)  //w
             socket.emit('keyPress', {inputId:'up', state:true});
+        else if(event.keyCode === 69)  //e
+            socket.emit('keyPress', {inputId:'heal', state:true});
         else if(event.keyCode === 49)  //1
             socket.emit('keyPress', {inputId:'1', state:true});
         else if(event.keyCode === 50)  //2
@@ -535,8 +541,10 @@
             socket.emit('keyPress', {inputId:'3', state:true});
         else if(event.keyCode === 52)  //4
             socket.emit('keyPress', {inputId:'4', state:true});
-        else if(event.keyCode === 32)  //4
+        else if(event.keyCode === 32){
             socket.emit('keyPress', {inputId:'space', state:true});
+            return false;
+        }
     }
     
     document.onkeyup = function(event){
@@ -592,6 +600,13 @@
         }
         socket.emit('keyPress', {inputId:'mouseAngle', state: angle});
     }
+    
+    
+    $(document).keydown(function(e) {
+    if (e.which == 32) {
+        return false;
+        }
+    });
     
     $( document ).ready(function() {
         $("#ctx" ).mousedown(function(event){

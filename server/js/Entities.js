@@ -107,7 +107,10 @@ Actor = function(param){
 	self.atkMeeleDmg = 0;
     self.atkShootDmg = 0;
     self.ammo = 0;
+    self.ammoInGun = 0;
     self.weapon = "knife";
+    self.recoil = false;
+    self.recoilCounter = 0;
     
 	self.pressingDown = false;
 	self.pressingUp = false;
@@ -140,6 +143,8 @@ Actor = function(param){
         self.spdX = 0;
         self.spdY = 0;
         
+
+        
         if(gameMaps[self.map].isPositionWall(rightBumper)){
             if(!self.pressingRight)    
                 self.spdX = -self.maxSpd;
@@ -171,6 +176,22 @@ Actor = function(param){
             if(self.pressingUp)
                 self.spdY = -self.maxSpd;
         }
+        
+        
+        if(self.recoil && self.recoilCounter < 15){
+            if(gameMaps[self.map].isPositionWall(downBumper) || gameMaps[self.map].isPositionWall(leftBumper) || gameMaps[self.map].isPositionWall(rightBumper) || gameMaps[self.map].isPositionWall(upBumper)){
+                self.recoil = false;
+                self.recoilCounter = 0
+            } else{
+                self.spdX = Math.cos((self.aimAngle+180)/180*Math.PI) * self.maxSpd*1.5*(15-self.recoilCounter)/15;
+                self.spdY = Math.sin((self.aimAngle+180)/180*Math.PI) * self.maxSpd*1.5*(15-self.recoilCounter)/15;
+                self.recoilCounter++;
+            }
+
+        } else{
+            self.recoil = false;
+            self.recoilCounter = 0;
+        }
 		
 		//ispositionvalid
 		if(self.x < self.width/2)
@@ -189,9 +210,9 @@ Actor = function(param){
         self.updateSpd();
         
 		super_update();
-        self.reloadCounter += self.atkSpd; 
+        self.reloadCounter += self.weaponCollection.getReloadSpd(self.weapon); 
         
-        if(self.reloadCounter > 15*(7-self.atkSpd) && self.reload ){
+        if(self.reloadCounter > 50 && self.reload ){
             self.reload = false;
             self.weaponCollection.reload(self.weapon);
         }
@@ -350,7 +371,8 @@ Player = function(param){
            weapon: self.weapon,
            attackStarted: self.attackStarted,
            attackMeele: self.attackMeele,
-           ammo: self.ammo
+           ammo: self.ammo,
+           ammoInGun: self.ammoInGun    
             
         };
     }
@@ -374,6 +396,7 @@ Player = function(param){
                attackMeele: self.attackMeele,
                attackStarted: attackStartedTmp,
                ammo: self.ammo,
+               ammoInGun: self.ammoInGun,
                reload: self.reload    
             }; 
     }    
@@ -424,6 +447,15 @@ Player.onConnect = function(socket){
            player.pressingUp = data.state;
        if(data.inputId == 'down')
            player.pressingDown = data.state;
+       if(data.inputId == 'heal'){
+           if(!player.inventory.hasItem("medicalkit",1)){
+                console.log("Cheater!");
+                return;
+            }
+                
+            let item = Item.list["medicalkit"];
+            item.event(player);
+       }
        if(data.inputId == 'attack')
            player.pressingAttack = data.state;
        if(data.inputId == 'mouseAngle')

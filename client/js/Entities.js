@@ -19,6 +19,7 @@
         self.spriteAnimCounter = 0;
         self.weapon = initPack.weapon;
         self.ammo = initPack.ammo;
+        self.ammoInGun = initPack.ammoInGun;
         self.reload = false;
         
         self.draw = function(){

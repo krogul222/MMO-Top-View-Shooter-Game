@@ -25,6 +25,7 @@ GUI = function(param){
             self.drawFace();
             self.drawWeapon();
             self.drawAmmo();
+            self.drawItems();
         }
         else{
             self.ctx.fillText('Score: ', 0, 0.3*self.height);
@@ -63,10 +64,19 @@ GUI = function(param){
             if(Img[Player.list[selfId].weapon+"ammo"]){
                 self.ctx.drawImage(Img[Player.list[selfId].weapon+"ammo"], 0, 0, Img[Player.list[selfId].weapon+"ammo"].width, Img[Player.list[selfId].weapon+"ammo"].height, 11*(self.width-0.8*self.height)/32, (self.height-0.4*self.height)/2, 0.4*self.height, 0.4*self.height); 
                 
-                self.ctx.fillText(' x'+Player.list[selfId].ammo, 11*(self.width-0.8*self.height)/32+0.4*self.height, (self.height)/2+10);
+                self.ctx.fillText(' x'+Player.list[selfId].ammo+"  "+Player.list[selfId].ammoInGun+"/"+Weapon.list[Player.list[selfId].weapon].reload, 11*(self.width-0.8*self.height)/32+0.4*self.height, (self.height)/2+10);
             }   
         }
         
+    }
+
+    self.drawItems = function(){
+        if(Player.list[selfId]){
+            self.ctx.drawImage(Img["medicalkit"], 0, 0, Img["medicalkit"].width, Img["medicalkit"].height, 3*(self.width-0.8*self.height)/4, (self.height-0.8*self.height)/2, 0.8*self.height, 0.8*self.height);
+            
+            self.ctx.fillText(' x'+inventory.getItemAmount("medicalkit"), 3*(self.width-0.8*self.height)/4+0.8*self.height, (self.height)/2+10);
+            
+        }
     }
     
     self.resize = function(width, height){

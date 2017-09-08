@@ -45,6 +45,16 @@ Inventory = function(socket, server, owner){
         }
     }
     
+    self.getItemAmount = function(id){
+		for(var i = 0 ; i < self.items.length; i++){
+			if(self.items[i].id === id){
+				return self.items[i].amount;
+			}
+		}
+        
+        return 0;
+    }
+    
 	self.refreshRender = function(){
 		//server
         
