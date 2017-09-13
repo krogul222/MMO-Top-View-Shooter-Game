@@ -203,6 +203,12 @@
     Img.scorpion = new Image();
     Img.scorpion.src = '/client/img/scorpion.png';
     
+    Img.zombie = new Image();
+    Img.zombie.src = '/client/img/zombie_move.png';
+    
+    Img.zombieattack = new Image();
+    Img.zombieattack.src = '/client/img/zombie_attack.png';
+    
     Img.bullet = new Image();
     Img.bullet.src = '/client/img/bullet.png';
     
@@ -384,6 +390,13 @@
                if(pack.aimAngle !== undefined){
                    p.aimAngle = pack.aimAngle;
                } 
+               
+               if(pack.attackStarted !== undefined){
+                   if(pack.attackStarted){
+                       p.attackStarted = true;
+                       p.spriteAnimCounter = 0;
+                   }
+               }
            }
        }         
         
@@ -466,8 +479,13 @@
         }
         
         for(let i in Enemy.list){
-            if(Enemy.list[i].moving){
-                Enemy.list[i].spriteAnimCounter += 0.4;
+            if(Enemy.list[i].moving || Enemy.list[i].attackStarted){
+                if(Enemy.list[i].attackStarted){
+                    Enemy.list[i].spriteAnimCounter += 0.8;
+                } else{
+                    Enemy.list[i].spriteAnimCounter += 0.4;
+                }
+
             }
             Enemy.list[i].draw();
         }

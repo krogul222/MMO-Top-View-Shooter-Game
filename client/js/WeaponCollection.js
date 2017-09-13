@@ -309,7 +309,7 @@ Weapon("shotgun","Shotgun",{
     shootSpd : 15,
     reload : 2,
     reloadSpd: 2,
-    recoil: true
+    recoil: false
 });
 
 Weapon("knife","Knife",{

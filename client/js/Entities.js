@@ -99,7 +99,7 @@
                 ctx.drawImage(self.imgMeeleAttack, walkingMod*frameWidth, directionMod*frameHeight, frameWidth, frameHeight, -self.width*correction/2,-self.height*correction/2, (self.width)*correction, self.height*correction);
                 ctx.restore();
                 
-                if(self.spriteAnimCounter % spriteColumns == (spriteColumns-1)){
+                if(self.spriteAnimCounter % spriteColumns >= (spriteColumns-1)){
                     self.spriteAnimCounter = 0;
                     self.attackStarted = false;
                 }
@@ -240,6 +240,13 @@
 
 
 //----------------------------------------------------------------------------------
+
+let framesMove = {};
+let framesAttack = {};
+framesMove['zombie'] = 17;
+framesAttack['zombie'] = 9;
+
+
 let Enemy = function(initPack){
     let self = {};
     self.id = initPack.id;
@@ -256,6 +263,8 @@ let Enemy = function(initPack){
     self.moving = initPack.moving;
     self.aimAngle = 0;
     self.spriteAnimCounter = 0;
+    self.kind = initPack.kind;
+    self.attackStarted = initPack.attackStarted;
     
     self.draw = function(){
         if(Player.list[selfId].map !== self.map){
@@ -270,7 +279,9 @@ let Enemy = function(initPack){
 
         
         let hpWidth = 30 * self.hp/self.hpMax;
-            
+        
+
+        
         let frameWidth = self.img.width/6;
         let frameHeight = self.img.height/4;
         let aimAngle = self.aimAngle;
@@ -289,8 +300,64 @@ let Enemy = function(initPack){
         }
             
         let walkingMod = Math.floor(self.spriteAnimCounter) % 6;
+        
+        
+        if(self.kind == 'zombie'){
+            directionMod = 0;
             
-        ctx.drawImage(self.img, walkingMod*frameWidth, directionMod*frameHeight, frameWidth, frameHeight, x - self.width/2, y - self.height/2, self.width, self.height);
+            let frameWidth = self.img.width/framesMove[self.kind ];
+            let frameHeight = self.img.height;
+            console.log(self.attackStarted);
+            
+             if(self.attackStarted){
+                let spriteColumns = framesAttack[self.kind];
+                let spriteRows = 1;
+                walkingMod = Math.floor(self.spriteAnimCounter) % spriteColumns;
+                 
+                let correction = 1;
+                let correctionWidth = 1;
+                let correctionHeight = 1;
+                
+                frameWidth = Img[self.kind+'attack'].width/spriteColumns;
+                frameHeight = Img[self.kind+'attack'].height/spriteRows;
+
+
+                // the alternative is to untranslate & unrotate after drawing
+                ctx.save();
+                ctx.translate(x - (self.width*correctionWidth)*correction/2,y - self.height*correction/2);
+                ctx.translate((self.width)*correction/2, self.height*correction/2); 
+                ctx.rotate(aimAngle*Math.PI/180)
+                
+                ctx.drawImage(Img[self.kind+'attack'], walkingMod*frameWidth, directionMod*frameHeight, frameWidth, frameHeight, -self.width*correction/2,-self.height*correction/2, (self.width)*correction, self.height*correction);
+                ctx.restore();
+                
+                if(self.spriteAnimCounter % spriteColumns >= (spriteColumns-1)){
+                    self.spriteAnimCounter = 0;
+                    self.attackStarted = false;
+                }
+             } else{
+            
+                ctx.save();
+                ctx.translate(x - self.width/2,y - self.height/2);
+                ctx.translate(self.width/2, self.height/2); 
+                ctx.rotate(aimAngle*Math.PI/180)
+
+                walkingMod = Math.floor(self.spriteAnimCounter) % framesMove[self.kind];
+
+                ctx.drawImage(self.img, walkingMod*frameWidth, directionMod*frameHeight, frameWidth, frameHeight, -self.width/2,-self.height/2, self.width, self.height);
+
+                ctx.restore();
+             }
+            
+        } else{
+            
+            walkingMod = Math.floor(self.spriteAnimCounter) % 6;
+            
+            ctx.drawImage(self.img, walkingMod*frameWidth, directionMod*frameHeight, frameWidth, frameHeight, x - self.width/2, y - self.height/2, self.width, self.height);
+        }
+        
+        
+
 
         ctx.fillStyle = 'red';
         ctx.fillRect(x - hpWidth/2, y - 40, hpWidth, 4);        

@@ -101,6 +101,7 @@ Actor = function(param){
     self.attackMeele = true;
 	self.attackCounter = 0;
 	self.reloadCounter = 0;
+    self.attackStarted = false;
     self.reload = false;
 	self.aimAngle = 0;
     self.type = param.type;
@@ -228,6 +229,7 @@ Actor = function(param){
 	
 	self.performAttack = function(){
 		if(self.attackCounter > 25){	//every 1 sec
+            self.attackStarted = true;
 			self.attackCounter = 0;
 			Bullet.generate(self);
 		}
@@ -697,6 +699,7 @@ Enemy = function(param){
 	Enemy.list[param.id] = self;
 	
 	self.toRemove = false;
+    self.kind = param.kind;
 	
 	var super_update = self.update; 
 	self.update = function(){
@@ -713,8 +716,14 @@ Enemy = function(param){
 		    diffY = player.y - self.y;
         }
         
-        if(Math.sqrt(diffX*diffX+diffY*diffY)<500)
-		  self.performAttack();
+        if(self.kind = 'zombie'){
+            if(Math.sqrt(diffX*diffX+diffY*diffY)<100)
+		          self.performAttack();
+        } else{
+            if(Math.sqrt(diffX*diffX+diffY*diffY)<500)
+		          self.performAttack();
+        }
+
         
        // console.log("Right "+self.pressingRight );
 	}
@@ -787,17 +796,25 @@ Enemy = function(param){
            height: self.height,
            moving: self.moving,
            aimAngle: self.aimAngle,
+           kind: self.kind,
+           attackStarted: self.attackStarted
         };
     }
     
     self.getUpdatePack = function(){       
+        
+        let attackStartedTmp = self.attackStarted;
+        
+         self.attackStarted = false;
+        
         return {
            id: self.id,
            x: self.x,
            y: self.y,
            hp: self.hp,
            moving: self.moving,
-           aimAngle: self.aimAngle
+           aimAngle: self.aimAngle,
+           attackStarted: attackStartedTmp
         };
     }    
     
@@ -839,7 +856,12 @@ Enemy.randomlyGenerate = function(map){
 	let height = 48*difficulty;
 	let width = 48*difficulty;
 	let id = Math.random();
-    Enemy({id: id, x: x, y: y, width: width, height: height, hp: 15*difficulty, atkSpd: 0.4*difficulty, map: map, img: 'scorpion', type:'enemy'});
+    if(Math.random()<0.5){
+        Enemy({id: id, x: x, y: y, width: width, height: height, hp: 15*difficulty, atkSpd: 0.4*difficulty, map: map, img: 'scorpion', type:'enemy', kind:'scorpion'});
+    } else{
+        Enemy({id: id, x: x, y: y, width: width, height: height, hp: 5*difficulty, atkSpd: 0.2*difficulty, map: map, img: 'zombie', type:'enemy', kind:'zombie'});   
+    }
+
     
 }
 
