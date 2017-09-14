@@ -21,7 +21,7 @@
         self.ammo = initPack.ammo;
         self.ammoInGun = initPack.ammoInGun;
         self.reload = false;
-        
+
         self.draw = function(){
             if(Player.list[selfId].map !== self.map){
               return;  
@@ -265,6 +265,9 @@ let Enemy = function(initPack){
     self.spriteAnimCounter = 0;
     self.kind = initPack.kind;
     self.attackStarted = initPack.attackStarted;
+    self.weapon = initPack.weapon;
+    self.reload = false;
+    self.attackMeele = initPack.attackMeele;
     
     self.draw = function(){
         if(Player.list[selfId].map !== self.map){

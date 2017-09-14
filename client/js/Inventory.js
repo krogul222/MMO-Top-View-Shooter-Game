@@ -177,6 +177,16 @@ Item("rifle","Rifle",function(actor){
     return "Ammo: "+actor.weaponCollection.getWeaponAmmo("rifle");
 });
 
+Item("claws","Claws",function(actor){
+    Weapon.list["claws"].equip(actor);
+}, function(actor, amount){
+    actor.weaponCollection.addWeapon("claws",amount);
+}, function(actor, amount){
+    actor.weaponCollection.removeWeapon("claws", amount);
+}, function(actor){
+    return "";
+});
+
 
 
 

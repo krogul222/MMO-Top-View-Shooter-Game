@@ -52,6 +52,16 @@ WeaponCollection = function(socket, server, owner){
 		return 0;
     }
     
+    self.setWeaponAmmo = function(id, amount){
+        for(var i = 0 ; i < self.weapons.length; i++){
+			if(self.weapons[i].id === id){
+				self.weapons[i].ammo = amount;
+                break;
+			}
+		}  
+		//return 0;
+    }
+    
     self.getWeaponAmmoInGun = function(id){
         for(var i = 0 ; i < self.weapons.length; i++){
 			if(self.weapons[i].id === id){
@@ -271,12 +281,20 @@ Weapon = function(id,name, param){
     
     self.equip = function(actor){
         actor.atackRadius = self.atackRadius;
-        actor.atkSpd = self.atkSpd;
+
         actor.attackMeele = self.attackMeele;
         actor.atkShootDmg = self.atkShootDmg;
         actor.atkMeeleDmg = self.atkMeeleDmg;
         actor.weapon = self.id;
-        actor.maxSpd = self.maxSpd;
+        
+        if(self.maxSpd && actor.defaultMaxSpd>=self.maxSpd){
+            actor.maxSpd = self.maxSpd;
+        }
+
+         if(self.atkSpd && actor.maxAtkSpd > self.atkSpd){
+                actor.atkSpd = self.atkSpd;
+         }
+        
         actor.ammo = actor.weaponCollection.getWeaponAmmo(self.id);
         actor.ammoInGun = actor.weaponCollection.getWeaponAmmoInGun(self.id);
     }
@@ -335,5 +353,16 @@ Weapon("rifle","Rifle",{
     reload : 1,
     reloadSpd: 2,
     recoil: true
+});
+
+Weapon("claws","Claws",{
+    atackRadius: 0,
+    atkSpd: 3,
+    attackMeele : true,
+    atkShootDmg : 0,
+    atkMeeleDmg : 5,
+    reload : 0,
+    reloadSpd: 0,
+    recoil: false
 });
     

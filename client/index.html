@@ -391,10 +391,41 @@
                    p.aimAngle = pack.aimAngle;
                } 
                
+               if(pack.weapon !== undefined){
+                   p.weapon = pack.weapon;
+                   //p.img = Img["player"+pack.weapon];
+                   //p.imgMeeleAttack = Img["player"+pack.weapon+"meeleattack"];
+                   p.attackMeele = pack.attackMeele;
+               }  
+               
                if(pack.attackStarted !== undefined){
                    if(pack.attackStarted){
                        p.attackStarted = true;
                        p.spriteAnimCounter = 0;
+
+                       if(pack.reload)
+                            soundManager.play(p.weapon+"reload");                       
+                        if(!p.attackMeele){
+                           
+                           if(p.weapon === "pistol"){
+                               soundManager.play('pistol_fire');
+                           }
+                           if(p.weapon === "shotgun"){
+                               soundManager.play('shotgun_fire');
+                           }
+                           if(p.weapon === "rifle"){
+                               soundManager.play('rifle_fire');
+                           }
+                       }
+                       else{
+                           p.reload = false;
+                           if(p.weapon === "knife" || p.weapon === "claws"){
+                               soundManager.play('knife_swing');
+                           } else{
+                               soundManager.play('gun_swing');
+                           }
+                       }
+                       
                    }
                }
            }
