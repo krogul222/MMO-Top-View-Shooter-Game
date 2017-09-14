@@ -751,14 +751,20 @@ Enemy = function(param){
         if(self.kind == 'scorpion'){
             self.inventory.addItem("pistol",1);
             self.inventory.addItem("shotgun",1);
+            self.inventory.addItem("rifle",1);
             
             self.weaponCollection.setWeaponAmmo("shotgun",10);
             self.weaponCollection.setWeaponAmmo("pistol",20);
+            self.weaponCollection.setWeaponAmmo("rifle",5);
             
-            if(Math.random()<0.8){
+            if(Math.random()<0.6){
                 self.inventory.useItem("pistol");
             } else{
-                self.inventory.useItem("shotgun");
+                if(Math.random()< 0.5){
+                    self.inventory.useItem("shotgun");
+                } else{
+                    self.inventory.useItem("rifle");
+                }
             }
             
 
