@@ -1,5 +1,5 @@
-let initPack = {player:[],bullet:[], enemy:[], upgrade:[]};
-let removePack = {player:[],bullet:[], enemy:[], upgrade:[]};
+//let initPack = {player:[],bullet:[], enemy:[], upgrade:[]};
+//let removePack = {player:[],bullet:[], enemy:[], upgrade:[]};
 
 testCollisionRectRect = function(rect1,rect2){
 	return rect1.x <= rect2.x+rect2.width 

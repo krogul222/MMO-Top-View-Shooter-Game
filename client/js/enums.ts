@@ -1,0 +1,1 @@
+export enum WeaponType { knife = 0, pistol = 1 };
