@@ -5,7 +5,7 @@ export class GameMap {
     constructor(private _width: number, private _height: number) {}
 
     isPositionWall = (position: Point) =>{
-        
+        return 2;    
     }
 
     get width() { return this._width}

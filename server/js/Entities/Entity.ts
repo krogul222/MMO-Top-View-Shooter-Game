@@ -1,18 +1,16 @@
-import { Rectangle, testCollisionRectRect } from './../../client/js/GeometryAndPhysics';
-import { Velocity, Size, Point } from "../../client/js/GeometryAndPhysics";
-
-let initPack = {player:[],bullet:[], enemy:[], upgrade:[]};
-let removePack = {player:[],bullet:[], enemy:[], upgrade:[]};
+import { Point, Size, Velocity, Rectangle, testCollisionRectRect } from './../../../client/js/GeometryAndPhysics';
+export let initPack = {player:[],bullet:[], enemy:[], upgrade:[]};
+export let removePack = {player:[],bullet:[], enemy:[], upgrade:[]};
 
 
 export class Entity {
     private _position: Point = new Point(250, 250);
     private _size: Size = new Size(32, 32);
     private _speed: Velocity = new Velocity(0, 0);
-    private id: number = -1;
+    private _id: number = Math.random();
     private _map: string = "forest";
     private _type: string = "entity";
-    private img: string = "";
+    private _img: string = "";
 
     constructor(param){
         if(param){
@@ -20,10 +18,10 @@ export class Entity {
             this._size = param.size ? param.size : this._size;
             this._speed = param.speed ? param.speed : this._speed;
             this._size = param.size ? param.size : this._size;
-            this.id = param.id ? param.id : this.id;
+            this._id = param.id ? param.id : this._id;
             this._map = param.map ? param.map : this._map;
             this._type = param.type ? param.type : this._type;
-            this.img = param.img ? param.img : this.img;
+            this._img = param.img ? param.img : this._img;
         }
     }
 
@@ -49,7 +47,14 @@ export class Entity {
     get height() { return this._size.height; }
     get map() { return this._map; }
     get speed() { return this._speed; }
+    get id() { return this._id; }
+    get img() { return this._img; }
     setSpdX = ( speedX ) => { this._speed.x = speedX;}
     setSpdY = ( speedY ) => { this._speed.y = speedY;}
     static getFrameUpdateData = () => {return {removePack: removePack, initPack: initPack};}
+
+    setPosition(position: Point) {
+        this._position.x = position.x;
+        this._position.y = position.y;
+    }
 }

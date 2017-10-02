@@ -1,17 +1,23 @@
+import { Actor } from './Entities/Actor';
 import { Point } from './../../client/js/GeometryAndPhysics';
-import { Actor } from './Entities';
 import { Counter } from './../../client/js/Counter';
 export class MovementController {
-    pressingDown: boolean = false;
-	pressingUp: boolean = false;
-	pressingLeft: boolean = false;
-	pressingRight: boolean = false;
-    moving: boolean = false; 
-    recoilCounter: Counter = new Counter(15);
+    private _pressingDown: boolean = false;
+	private _pressingUp: boolean = false;
+	private _pressingLeft: boolean = false;
+	private _pressingRight: boolean = false;
+    private _moving: boolean = false; 
+    private _aimAngle: number;
+    private _recoilCounter: Counter = new Counter(15);
+    private _maxSpdX: number;
+    private _maxSpdY: number;
 
     collisionBounds = {Up: -16, Down: 32, Left: -10, Right: 10};
 
-    constructor (private parent: Actor, private maxSpdX: number = 10, private maxSpdY: number = 10) {}
+    constructor (private parent: Actor, param) {
+        this._maxSpdX = param.maxSpdX ? param.maxSpdX : 10;
+        this._maxSpdY = param.maxSpdY ? param.maxSpdY : 10;
+    }
 
     updateSpd = () => {
         let map = this.parent.mapController.getMap(this.parent.map);
@@ -31,41 +37,41 @@ export class MovementController {
         // Collisions implementation
 
         if(map.isPositionWall(rightBumper)){
-            speedX = !this.pressingRight ? -this.maxSpdX : speedX;
+            speedX = !this._pressingRight ? -this._maxSpdX : speedX;
         } else{
-            speedX = this.pressingRight ? this.maxSpdX : speedX;
+            speedX = this._pressingRight ? this._maxSpdX : speedX;
         } 
 
         if(map.isPositionWall(leftBumper)){
-            speedX = !this.pressingLeft ? this.maxSpdX : speedX;
+            speedX = !this._pressingLeft ? this._maxSpdX : speedX;
         } else{
-            speedX = this.pressingLeft ? -this.maxSpdX : speedX;
+            speedX = this._pressingLeft ? -this._maxSpdX : speedX;
         } 
 
         if(map.isPositionWall(downBumper)){
-            speedY = !this.pressingDown ? -this.maxSpdY : speedY;
+            speedY = !this._pressingDown ? -this._maxSpdY : speedY;
         } else{
-            speedY = this.pressingDown ? this.maxSpdY : speedY;
+            speedY = this._pressingDown ? this._maxSpdY : speedY;
         } 
 
         if(map.isPositionWall(upBumper)){
-            speedY = !this.pressingUp ? this.maxSpdY : speedY;
+            speedY = !this._pressingUp ? this._maxSpdY : speedY;
         } else{
-            speedY = this.pressingUp ? -this.maxSpdY : speedY;
+            speedY = this._pressingUp ? -this._maxSpdY : speedY;
         } 
 
         //Recoil implementation
 
-        if (this.recoilCounter.isActive() && !this.recoilCounter.resetIfMax()){
+        if (this._recoilCounter.isActive() && !this._recoilCounter.resetIfMax()){
             if(map.isPositionWall(downBumper) || map.isPositionWall(upBumper) || map.isPositionWall(leftBumper) || map.isPositionWall(rightBumper) ){
-                this.recoilCounter.deactivate();
-                this.recoilCounter.reset();
+                this._recoilCounter.deactivate();
+                this._recoilCounter.reset();
             } else{
-                speedX = Math.cos((this.parent.aimAngle+180)/180*Math.PI) * this.maxSpdX*1.5*(15-this.recoilCounter.value)/15;
-                speedY = Math.sin((this.parent.aimAngle+180)/180*Math.PI) * this.maxSpdX*1.5*(15-this.recoilCounter.value)/15;
+                speedX = Math.cos((this._aimAngle+180)/180*Math.PI) * this._maxSpdX*1.5*(15-this._recoilCounter.value)/15;
+                speedY = Math.sin((this._aimAngle+180)/180*Math.PI) * this._maxSpdX*1.5*(15-this._recoilCounter.value)/15;
             }
         } else {
-            this.recoilCounter.deactivate();
+            this._recoilCounter.deactivate();
         }
 
         // Update speed
@@ -89,4 +95,28 @@ export class MovementController {
         this.parent.position.y = (this.parent.position.y < this.parent.height/2) ? this.parent.height/2 : this.parent.position.y;
         this.parent.position.y = (this.parent.position.y > map.height-this.parent.height/2) ? map.height-this.parent.height/2 : this.parent.position.y;
     }
+
+    get pressingLeft() { return this._pressingLeft; }
+    get pressingRight() { return this._pressingRight; }
+    get pressingUp() { return this._pressingUp; }
+    get pressingDown() { return this._pressingDown; }
+
+    set pressingLeft(value: boolean) { this._pressingLeft = value; }
+    set pressingRight(value: boolean) { this._pressingRight = value; }
+    set pressingUp(value: boolean) { this._pressingUp = value; }
+    set pressingDown(value: boolean) { this._pressingDown = value; }
+
+    get aimAngle() { return this._aimAngle; }
+    get moving() { if(this._pressingLeft || this._pressingRight || this._pressingDown || this.pressingUp) {
+        this._moving = true;
+        } else {
+            this._moving = false;
+        }
+        return this._moving; 
+    }
+    get recoilCounter() { return this._recoilCounter; }
+    get maxSpdX() { return this._maxSpdX; }
+    get maxSpdY() { return this._maxSpdY; }
+
+    set aimAngle(value: number) { this._aimAngle = value; }
 } 

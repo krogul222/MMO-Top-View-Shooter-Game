@@ -1,38 +1,45 @@
-import { Enemy, Player, Actor } from './Entities';
+import { Actor } from './Entities/Actor';
 import { SingleWeapon, WeaponCollection } from './../../client/js/WeaponCollection';
 import { Counter } from './../../client/js/Counter';
 import { WeaponType } from '../../client/js/enums';
+import { Player } from './Entities/Player';
+import { Enemy } from './Entities/Enemy';
+import { Point, Velocity } from '../../client/js/GeometryAndPhysics';
 
 export class AttackController {
-    melee: boolean = true;
-    attackStarted: boolean = false;
-    reloadCounter: Counter = new Counter(25);
-    attackCounter: Counter = new Counter(25);
-    activeWeapon: SingleWeapon = new SingleWeapon( WeaponType.knife, 1 ); 
-    weaponCollection = new WeaponCollection();
+    private _melee: boolean = true;
+    private _attackStarted: boolean = false;
+    private _reloadCounter: Counter = new Counter(25);
+    private _attackCounter: Counter = new Counter(25);
+    private _activeWeapon: SingleWeapon = new SingleWeapon( WeaponType.knife, 1 ); 
+    private _weaponCollection = new WeaponCollection();
+    private _pressingAttack: boolean = false;
 
-    constructor (private parent: Actor) {}
+
+    constructor (private parent: Actor, param) {
+        if(param.atkSpd) this._attackCounter.setInc(param.atkSpd);
+    }
 
     update = () => {
-        this.reloadCounter.setInc(this.activeWeapon.reloadSpd);
-        this.attackCounter.setInc(this.activeWeapon.attackSpd);
+        this._reloadCounter.setInc(this._activeWeapon.reloadSpd);
+        this._attackCounter.setInc(this._activeWeapon.attackSpd);
 
-        if(this.reloadCounter.resetIfMax()){
-            this.reloadCounter.deactivate();
-            this.activeWeapon.reload();
+        if(this._reloadCounter.resetIfMax()){
+            this._reloadCounter.deactivate();
+            this._activeWeapon.reload();
         }
 
-        this.reloadCounter.count();
-        this.attackCounter.count();
+        this._reloadCounter.count();
+        this._attackCounter.count();
     }
 
     performAttack = () => {
-        if ( !this.reloadCounter.isActive() && this.attackCounter.resetIfMax() ) {
-            this.attackStarted = true;
+        if ( !this._reloadCounter.isActive() && this._attackCounter.resetIfMax() && this._pressingAttack) {
+            this._attackStarted = true;
 
-            this.melee = (this.activeWeapon.ammo > 0) ? this.melee : true;
+            this._melee = (this._activeWeapon.ammo > 0) ? this._melee : true;
             
-            this.melee ? this.closeAttack(this.parent.aimAngle) : this.distanceAttack();
+            this._melee ? this.closeAttack(this.parent.movementController.aimAngle) : this.distanceAttack();
         }
     }
 
@@ -44,23 +51,23 @@ export class AttackController {
         let maxDistance = Math.sqrt(player.width*player.width/4+player.height*player.height/4) + distance;
 
         if(player){
-            if(this.parent.getDistance(player) < maxDistance){ player.hp -= this.activeWeapon.meleeDmg; }
+            if(this.parent.getDistance(player) < maxDistance){ player.lifeAndBodyController.wasHit( this._activeWeapon.meleeDmg ); }
         }
 
     }
 
     attackCloseByPlayer = (aimAngle) => {
         let enemy: Enemy = this.parent.getClosestEnemy(40, 45);
-        if(enemy) { enemy.hp -= this.activeWeapon.meleeDmg; }
+        if(enemy) { enemy.lifeAndBodyController.wasHit( this._activeWeapon.meleeDmg); }
     }
 
     distanceAttack = () => {
-        if(this.weaponCollection.shoot(this.activeWeapon.weapon,1)){
-            let shootSpeed = this.activeWeapon.shootSpeed;
-            let aimAngle = this.parent.aimAngle;
-            let attackRadius = this.activeWeapon.attackRadius;
+        if(this._weaponCollection.shoot(this._activeWeapon.weapon,1)){
+            let shootSpeed = this._activeWeapon.shootSpeed;
+            let aimAngle = this.parent.movementController.aimAngle;
+            let attackRadius = this._activeWeapon.attackRadius;
 
-            this.shootBullet(this.parent.aimAngle, shootSpeed, shootSpeed);
+            this.shootBullet(this.parent.movementController.aimAngle, shootSpeed, shootSpeed);
 
             for(let i = 0; i < attackRadius; i++){
                 this.shootBullet(aimAngle+(i+1)*2, shootSpeed, shootSpeed);
@@ -71,6 +78,36 @@ export class AttackController {
     }
 
     shootBullet = (aimAngle, shootSpeedX, shootSpeedY) => {
-
+        Bullet({
+            parent: this.parent.id,
+            combatType: this.parent.type,
+            angle: aimAngle,
+            position: new Point(this.parent.position.x, this.parent.position.y),
+            map: this.parent.map, 
+            img: 'bullet',
+            width: 8,
+            height: 8, 
+            speed: new Velocity(shootSpeedX, shootSpeedY)
+        });
     }
+
+    getDamage = () => {
+        let damage: number = 0;
+        
+        damage = (this._melee) ? this._activeWeapon.meleeDmg : this._activeWeapon.shootDmg;
+
+        return damage;
+    }
+
+    get melee() { return this._melee; }
+    get pressingAttack() { return this._pressingAttack; }
+    get weaponCollection() { return this._weaponCollection; }
+    get activeWeapon() { return this._activeWeapon; }
+    get reloadCounter() { return this._reloadCounter; }
+    get attackCounter() { return this._attackCounter; }
+    get attackStarted() { return this._attackStarted; }
+
+    set pressingAttack(value: boolean) { this._pressingAttack = value; }
+    set attackStarted(value: boolean) { this._attackStarted = value; }
+
 }

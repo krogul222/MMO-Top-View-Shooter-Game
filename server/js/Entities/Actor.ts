@@ -1,21 +1,27 @@
-import { MapController } from './MapControler';
-import { Counter } from './../../client/js/Counter';
-import { Velocity, Size, Point, Rectangle, testCollisionRectRect, calculateAngleBetweenEntities } from './../../client/js/GeometryAndPhysics';
-import { WeaponCollection, SingleWeapon } from './../../client/js/WeaponCollection';
-import { WeaponType } from './../../client/js/enums'
-import { AttackController } from './AttackControler';
+import { LifeAndBodyController } from './../LifeAndBodyController';
+import { MapController } from './../MapControler';
 import { Entity } from './Entity';
-import { MovementController } from './MovementController';
+import { Player } from './Player';
+import { Enemy } from './Enemy';
+import { AttackController } from '../AttackControler';
+import { MovementController } from '../MovementController';
+import { calculateAngleBetweenEntities } from '../../../client/js/GeometryAndPhysics';
 
 
 export class Actor extends Entity {
-    aimAngle: number;
-    hp: number;
-    attackController: AttackController = new AttackController(this);
-    movementController: MovementController = new MovementController(this);
-    mapController: MapController = new MapController();
+    
+    lifeAndBodyController: LifeAndBodyController;
+    attackController: AttackController;
+    movementController: MovementController;
+    mapController: MapController;
 
-    constructor(param) { super(param); }
+    constructor(param) {
+         super(param);
+         this.lifeAndBodyController = new LifeAndBodyController(this, param); 
+         this.attackController = new AttackController(this, param);
+         this.movementController = new MovementController(this, param);
+         this.mapController = new MapController(param);
+        }
 
 	update = () => {
         this.movementController.updateSpd();
@@ -38,7 +44,7 @@ export class Actor extends Entity {
     getClosestEnemy = (distance: number, angleLimit: number) => {
         let closestEnemyIndex: string = "0";
         let closestEnemyDistance: number = 100000;
-        let pangle = this.aimAngle;
+        let pangle = this.movementController.aimAngle;
         pangle = (pangle < 0) ? pangle + 360 : pangle;
 
         for(let i in Enemy.list) {
@@ -59,16 +65,6 @@ export class Actor extends Entity {
        
         return Enemy.list[closestEnemyIndex];
     }
-}
 
-export class Enemy extends Actor {
-    constructor(param) { super(param) } 
-
-    static list: Enemy[];
-}
-
-export class Player extends Actor {
-    constructor(param) { super(param) } 
-
-    static list: Player[];
+    onDeath = () => {}
 }
