@@ -5,7 +5,7 @@ import { Player } from './Player';
 import { Enemy } from './Enemy';
 import { AttackController } from '../AttackControler';
 import { MovementController } from '../MovementController';
-import { calculateAngleBetweenEntities } from '../../../client/js/GeometryAndPhysics';
+import { calculateAngleBetweenEntities } from '../GeometryAndPhysics';
 
 
 export class Actor extends Entity {
@@ -26,7 +26,7 @@ export class Actor extends Entity {
 	update = () => {
         this.movementController.updateSpd();
         this.attackController.update();
-        super.update();
+        this.updatePosition();
 	}
 
     getClosestPlayer = () => {

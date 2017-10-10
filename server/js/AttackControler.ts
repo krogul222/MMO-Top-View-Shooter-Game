@@ -1,17 +1,18 @@
+import { SingleWeapon, WeaponCollection } from './WeaponCollection';
+import { Counter } from './Counter';
 import { Actor } from './Entities/Actor';
-import { SingleWeapon, WeaponCollection } from './../../client/js/WeaponCollection';
-import { Counter } from './../../client/js/Counter';
-import { WeaponType } from '../../client/js/enums';
 import { Player } from './Entities/Player';
 import { Enemy } from './Entities/Enemy';
-import { Point, Velocity } from '../../client/js/GeometryAndPhysics';
+import { Point, Velocity } from './GeometryAndPhysics';
+import { Bullet } from './Entities/Bullet';
+import { WeaponType } from './enums';
 
 export class AttackController {
     private _melee: boolean = true;
     private _attackStarted: boolean = false;
     private _reloadCounter: Counter = new Counter(25);
     private _attackCounter: Counter = new Counter(25);
-    private _activeWeapon: SingleWeapon = new SingleWeapon( WeaponType.knife, 1 ); 
+    private _activeWeapon: SingleWeapon = new SingleWeapon( {weapon: WeaponType.knife, ammo: 1 }); 
     private _weaponCollection = new WeaponCollection();
     private _pressingAttack: boolean = false;
 
@@ -78,7 +79,7 @@ export class AttackController {
     }
 
     shootBullet = (aimAngle, shootSpeedX, shootSpeedY) => {
-        Bullet({
+        new Bullet({
             parent: this.parent.id,
             combatType: this.parent.type,
             angle: aimAngle,

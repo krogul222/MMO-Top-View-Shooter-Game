@@ -1,7 +1,6 @@
-import { Point, Size, Velocity, Rectangle, testCollisionRectRect } from './../../../client/js/GeometryAndPhysics';
-export let initPack = {player:[],bullet:[], enemy:[], upgrade:[]};
-export let removePack = {player:[],bullet:[], enemy:[], upgrade:[]};
-
+import { Point, Size, Velocity, Rectangle, testCollisionRectRect } from './../GeometryAndPhysics';
+import { Pack } from '../Pack';
+import { removePack, initPack } from '../globalVariables';
 
 export class Entity {
     private _position: Point = new Point(250, 250);

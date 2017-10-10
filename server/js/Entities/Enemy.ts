@@ -1,8 +1,9 @@
-import { Point } from './../../../client/js/GeometryAndPhysics';
 import { MapController } from './../MapControler';
 import { Player } from './Player';
 import { Actor } from './Actor';
-import { initPack, removePack } from './Entity';
+import { Pack } from '../Pack';
+import { Point } from '../GeometryAndPhysics';
+import { initPack, removePack } from '../globalVariables';
 
 export class Enemy extends Actor {
 
@@ -13,7 +14,7 @@ export class Enemy extends Actor {
 
     constructor(param) {
         super(param);
-        Enemy.list[this.id] = this;
+        Enemy.list[param.id] = this;
         initPack.enemy.push(this.getInitPack());
         if(param.kind) this.kind = param.kind;
         this.attackController.pressingAttack = true;
@@ -106,7 +107,7 @@ export class Enemy extends Actor {
     }   
 
     static update = () => {
-        let pack =[];
+        let pack: any[] =[];
         
         for(let i in Enemy.list){
             let enemy = Enemy.list[i];
@@ -123,7 +124,7 @@ export class Enemy extends Actor {
     }
 
     static getAllInitPack = function(){
-        let enemies = [];
+        let enemies: any[] = [];
         for(let i in Enemy.list){
             enemies.push(Enemy.list[i].getInitPack());
         }
@@ -178,5 +179,5 @@ export class Enemy extends Actor {
         }
     }
 
-    static list: {};
+    static list = {};
 }

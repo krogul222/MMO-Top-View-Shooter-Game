@@ -1,6 +1,6 @@
 import { Actor } from './Entities/Actor';
-import { Point } from './../../client/js/GeometryAndPhysics';
-import { Counter } from './../../client/js/Counter';
+import { Counter } from './Counter';
+import { Point } from './GeometryAndPhysics';
 export class MovementController {
     private _pressingDown: boolean = false;
 	private _pressingUp: boolean = false;

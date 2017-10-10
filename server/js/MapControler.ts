@@ -1,9 +1,18 @@
 import { GameMap } from './GameMap';
 
 export class MapController {
-    maps: GameMap[];
+    maps: GameMap[] = [];
 
-    getMap = (map) => { return this.maps[map]; }
+    getMap = (map) => { 
+        for (let i = 0; i < this.maps.length; i++ ) {
+            if(map == this.maps[i].name) {
+                return this.maps[i]; 
+            }
+        }
+        
+    }
 
-    constructor(param) {}
+    constructor(param) {
+        this.maps.push(new GameMap("forest", 1000 , 1000));
+    }
 }

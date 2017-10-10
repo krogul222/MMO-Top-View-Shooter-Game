@@ -1,10 +1,12 @@
+import { Pack } from './../Pack';
 import { MapController } from './../MapControler';
 import { AttackController } from './../AttackControler';
 import { Enemy } from './Enemy';
 import { LifeAndBodyController } from './../LifeAndBodyController';
-import { Entity, initPack, removePack } from './Entity';
 import { Actor } from './Actor';
 import { Player } from './Player';
+import { Entity } from './Entity';
+import { initPack, removePack } from '../globalVariables';
 
 export class Bullet extends Entity{
 
@@ -29,9 +31,9 @@ export class Bullet extends Entity{
         this.spdX = param.spd ? Math.cos(this.angle/180*Math.PI) * param.spd : Math.cos(this.angle/180*Math.PI);
         this.spdY = param.spd ? Math.sin(this.angle/180*Math.PI) * param.spd : Math.sin(this.angle/180*Math.PI);
         this.parent = param.parent ? param.parent : -1;
-
+        
         initPack.bullet.push(this.getInitPack());
-        Bullet.list[this.id] = this;
+        Bullet.list[param.id] = this;
     }
 
     update = () => {
@@ -116,7 +118,7 @@ export class Bullet extends Entity{
     }  
 
     static update = () =>{
-        let pack =[];
+        let pack: any[] =[];
         for(let i in Bullet.list){
             let bullet = Bullet.list[i];
             bullet.update();
@@ -131,12 +133,12 @@ export class Bullet extends Entity{
     }
 
     static getAllInitPack = function(){
-        let bullets = [];
+        let bullets: any[] = [];
         for(let i in Bullet.list){
             bullets.push(Bullet.list[i].getInitPack());
         }
         return bullets;
     }
 
-    static list:{};
+    static list = {};
 }

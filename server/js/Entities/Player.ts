@@ -1,13 +1,16 @@
-import { Point } from './../../../client/js/GeometryAndPhysics';
+import { initPack, removePack } from './../globalVariables';
+import { Enemy } from './Enemy';
+import { Bullet } from './Bullet';
 import { Actor } from "./Actor";
-import { initPack, removePack } from "./Entity";
+import { Point } from './../GeometryAndPhysics';
+import { Pack } from '../Pack';
 
 export class Player extends Actor {
 
     constructor(param) { 
         super(param);
         initPack.player.push(this.getInitPack());
-        Player.list[this.id] = this;
+        Player.list[param.id] = this;
     } 
 
     getInitPack = () => {
@@ -17,7 +20,6 @@ export class Player extends Actor {
             hp: this.lifeAndBodyController.hp,
             hpMax: this.lifeAndBodyController.hpMax,
             map: this.map,
-            img: this.img,
             width: this.width,
             height: this.height,
             moving: this.movementController.moving,
@@ -49,7 +51,7 @@ export class Player extends Actor {
         }
     }
 
-    onConnect = (socket) => {
+    static onConnect = (socket) => {
         let map = 'forest';
         let player = new Player({
              id: socket.id,
@@ -101,7 +103,7 @@ export class Player extends Actor {
     }
 
     static getAllInitPack = () => {
-        let players = [];
+        let players: any[] = [];
         for(let i in Player.list) { players.push(Player.list[i].getInitPack()); }
         return players;
     }
@@ -112,7 +114,7 @@ export class Player extends Actor {
     }
 
     static update = () => {
-        let pack =[];
+        let pack: any[] =[];
         for(let i in Player.list){
             let player = Player.list[i];
             player.update();
@@ -121,5 +123,5 @@ export class Player extends Actor {
         return pack;
     }
 
-    static list:{};
+    static list = {};
 }
