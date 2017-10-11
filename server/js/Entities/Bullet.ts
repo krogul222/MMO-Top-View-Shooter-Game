@@ -18,7 +18,6 @@ export class Bullet extends Entity{
     private timer: number = 0;
     private toRemove: boolean = false;
     private mapController: MapController;
-    private id: number;
 
     private hitCategory: number = 0;
     private hitEntityCategory: string = "";

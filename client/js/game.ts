@@ -88,14 +88,20 @@ setInterval(function(){
   //  drawScore();
     //drawAmmo();
     for(let i in PlayerClient.list){
-        if(PlayerClient.list[i].moving || PlayerClient.list[i].attackStarted){
-            if(PlayerClient.list[i].reload)
+        if(PlayerClient.list[i].moving){
+            console.log("MOVING");
+            PlayerClient.list[i].walkSpriteAnimCounter += 1;
+        }
+
+        if(PlayerClient.list[i].attackStarted){
+            if(PlayerClient.list[i].reload){
                 if(PlayerClient.list[i].weapon == "pistol")
-                    PlayerClient.list[i].spriteAnimCounter += 1;
+                    PlayerClient.list[i].bodySpriteAnimCounter += 1;
                 else
-                    PlayerClient.list[i].spriteAnimCounter += 0.5;
+                    PlayerClient.list[i].bodySpriteAnimCounter += 0.5;
+            }
             else
-                PlayerClient.list[i].spriteAnimCounter += 1;
+                PlayerClient.list[i].bodySpriteAnimCounter += 1;
         }
         PlayerClient.list[i].draw();
     }

@@ -22,7 +22,8 @@ export class PlayerClient{
     public aimAngle: number = 0;
     public attackStarted: boolean = false;
     public attackMelee: boolean = false;  
-    public spriteAnimCounter: number = 0;
+    public bodySpriteAnimCounter: number = 0;
+    public walkSpriteAnimCounter: number = 0;
     public moving: boolean = false;
     public reload = false;
     public weapon = "pistol";
@@ -71,15 +72,17 @@ export class PlayerClient{
         
         aimAngle = (aimAngle < 0) ? (360 + aimAngle) : aimAngle;
         let directionMod: number = this.inWhichDirection(aimAngle);
-        let walkingMod = Math.floor(this.spriteAnimCounter) % spriteColumns;
-
+        let walkingMod = Math.floor(this.walkSpriteAnimCounter) % spriteColumns;
+        console.log("Walking mod "+walkingMod);
         this.drawWalk(spriteColumns, spriteRows, aimAngle, 0, walkingMod, x, y);
 
         if(this.attackStarted && this.attackMelee){
             spriteColumns = 15;
+            walkingMod = Math.floor(this.bodySpriteAnimCounter) % spriteColumns;
             this.drawMeleeAttackBody(spriteColumns, spriteRows, aimAngle, 0, walkingMod, x, y);
         } else {
             if(this.reload){
+                walkingMod = Math.floor(this.bodySpriteAnimCounter) % spriteColumns;
                 this.drawNormalBodyWithGun(spriteColumns, spriteRows, aimAngle, 0, walkingMod, x, y);
             } else {
                 this.drawNormalBodyWithGun(spriteColumns, spriteRows, aimAngle, 0, walkingMod, x, y);
@@ -133,8 +136,8 @@ export class PlayerClient{
         ctx.drawImage(this.imgMeleeAttack, walkingMod*frameWidth, directionMod*frameHeight, frameWidth, frameHeight, -this.width*correction/2,-this.height*correction/2, (this.width)*correction, this.height*correction);
         ctx.restore();
         
-        if(this.spriteAnimCounter % spriteColumns >= (spriteColumns-1)){
-            this.spriteAnimCounter = 0;
+        if(this.bodySpriteAnimCounter % spriteColumns >= (spriteColumns-1)){
+            this.bodySpriteAnimCounter = 0;
             this.attackStarted = false;
         }
     }
