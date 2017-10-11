@@ -19,9 +19,9 @@ export class AttackController {
 
 
     constructor (private parent: Actor, param) {
-        this._activeWeapon = new SingleWeapon({weapon: "0", ammo: "50", parent: this.parent});
+        this._activeWeapon = new SingleWeapon({weapon: "0", ammo: "20", parent: this.parent});
         if(param.atkSpd) this._attackCounter.setInc(param.atkSpd);
-        this.equip(WeaponType.shotgun);
+        this.equip(WeaponType.pistol);
         this.attackCounter.activate();
     }
 
@@ -72,7 +72,7 @@ export class AttackController {
 
     distanceAttack = () => {
         console.log("Distance attack:")
-        if(this._weaponCollection.shoot(this._activeWeapon.weapon,1)){
+        if(this._activeWeapon.shoot(1)){
             console.log("Shoot");
             let shootSpeed = this._activeWeapon.shootSpeed;
             let aimAngle = this.parent.movementController.aimAngle;

@@ -25,11 +25,17 @@ socket.on('update', function (data) {
             if (pack.hp !== undefined) {
                 p.hp = pack.hp;
             }
+            if (pack.attackMelee !== undefined) {
+                p.attackMelee = pack.attackMelee;
+            }
             if (pack.moving !== undefined) {
                 p.moving = pack.moving;
             }
             if (pack.aimAngle !== undefined) {
                 p.aimAngle = pack.aimAngle;
+            }
+            if (pack.ammo !== undefined) {
+                p.ammo = pack.ammo;
             }
             if (pack.reload !== undefined) {
                 if (pack.reload) {

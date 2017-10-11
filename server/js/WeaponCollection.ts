@@ -60,6 +60,31 @@ export class SingleWeapon {
 
         }
 
+        shoot = (bullets) => {
+            if(bullets <= this._ammo){
+                        this._ammo -= bullets;
+                        console.log("Ammo "+this._ammo);
+                        /*
+                        if(self.weapons[i].reload > 0)
+                            self.weapons[i].reload--;
+                        else
+                            return false;
+                        */
+
+                        //this.ammoInGun = self.weapons[i].reload;
+                        /*
+                        if(self.weapons[i].reload ==0){
+                            owner.reload = true;
+                            owner.reloadCounter = 0;
+                        }*/
+                       // console.log("Reload"+ owner.reload+ " " +self.weapons[i].reload );
+                       /* owner.recoil = Weapon.list[self.weapons[i].id].recoil;
+                        owner.recoilCounter = 0;*/
+                        return true;
+                    }
+            return false;
+            }
+
         equip = (weapon: WeaponType) => {
             for(let i in WeaponTypes.list){
                 let weaponFromBank: WeaponTypes = WeaponTypes.list[i];

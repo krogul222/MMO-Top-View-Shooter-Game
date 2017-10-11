@@ -22,9 +22,12 @@ export class GUI {
         this.ctx.fill();
         this.ctx.fillStyle = "#000000";
 
-        this.drawWeapon();
-        this.drawAmmo();
-
+        if(PlayerClient.list[selfId]){
+            this.drawWeapon();
+            this.drawAmmo();
+            this.drawFace();
+            this.ctx.fillText('Hit points: '+PlayerClient.list[selfId].hp + '/'+PlayerClient.list[selfId].hpMax, 0, 0.6*this.height);
+        }
     }
 
     resize = (width, height) => {
@@ -45,6 +48,26 @@ export class GUI {
                 
                 this.ctx.fillText(' x'+PlayerClient.list[selfId].ammo+"  "+PlayerClient.list[selfId].ammoInGun+"/", 11*(this.width-0.8*this.height)/32+0.4*this.height, (this.height)/2+10);
             }   
+        }
+    }
+
+    drawFace = () => {
+        let spriteRows = 2;
+        let spriteColumns = 4;
+        let facelook = 1;
+
+        this.ctx.drawImage(Img["faceborder"], 0, 0, Img["faceborder"].width, Img["faceborder"].height, (this.width-0.85*this.height)/2, (this.height-0.85*this.height)/2, 0.85*this.height, 0.85*this.height);
+        
+        if(PlayerClient.list[selfId]){ 
+            facelook = Math.round(((PlayerClient.list[selfId].hpMax-PlayerClient.list[selfId].hp)/PlayerClient.list[selfId].hpMax)*(spriteRows*spriteColumns-1));
+            
+            let facex = facelook % spriteColumns;
+            let facey = Math.floor(facelook / spriteColumns);
+            
+            let frameWidth = Img["face"].width/spriteColumns;
+            let frameHeight = Img["face"].height/spriteRows;
+            
+            this.ctx.drawImage(Img["face"], facex*frameWidth, facey*frameHeight, frameWidth, frameHeight, (this.width-0.8*this.height)/2, (this.height-0.8*this.height)/2, 0.8*this.height, 0.8*this.height);
         }
     }
 }

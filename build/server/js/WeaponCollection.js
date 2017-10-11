@@ -32,6 +32,14 @@ class SingleWeapon {
         this.name = "";
         this.reload = () => {
         };
+        this.shoot = (bullets) => {
+            if (bullets <= this._ammo) {
+                this._ammo -= bullets;
+                console.log("Ammo " + this._ammo);
+                return true;
+            }
+            return false;
+        };
         this.equip = (weapon) => {
             for (let i in WeaponTypes_1.WeaponTypes.list) {
                 let weaponFromBank = WeaponTypes_1.WeaponTypes.list[i];

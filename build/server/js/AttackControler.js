@@ -55,7 +55,7 @@ class AttackController {
         };
         this.distanceAttack = () => {
             console.log("Distance attack:");
-            if (this._weaponCollection.shoot(this._activeWeapon.weapon, 1)) {
+            if (this._activeWeapon.shoot(1)) {
                 console.log("Shoot");
                 let shootSpeed = this._activeWeapon.shootSpeed;
                 let aimAngle = this.parent.movementController.aimAngle;
@@ -90,10 +90,10 @@ class AttackController {
             damage = (this._melee) ? this._activeWeapon.meleeDmg : this._activeWeapon.shootDmg;
             return damage;
         };
-        this._activeWeapon = new WeaponCollection_1.SingleWeapon({ weapon: "0", ammo: "50", parent: this.parent });
+        this._activeWeapon = new WeaponCollection_1.SingleWeapon({ weapon: "0", ammo: "20", parent: this.parent });
         if (param.atkSpd)
             this._attackCounter.setInc(param.atkSpd);
-        this.equip(enums_1.WeaponType.shotgun);
+        this.equip(enums_1.WeaponType.pistol);
         this.attackCounter.activate();
     }
     get melee() { return this._melee; }

@@ -38,13 +38,11 @@ export class Bullet extends Entity{
         this.parent = param.parent ? param.parent : -1;
         
         initPack.bullet.push(this.getInitPack());
-        console.log("New Bullet "+ this.position.x+ " "+this.position.y);
         Bullet.list[this.id] = this;
     }
 
     update = () => {
         this.updatePosition();
-        console.log("Bullet "+ this.position.x+ " "+this.position.y);
         if(this.timer++ > 100) this.toRemove = true;
     
         switch(this.combatType){

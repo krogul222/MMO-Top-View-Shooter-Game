@@ -10,8 +10,12 @@ class GUI {
             this.ctx.fillRect(0, 0, this.width, this.height);
             this.ctx.fill();
             this.ctx.fillStyle = "#000000";
-            this.drawWeapon();
-            this.drawAmmo();
+            if (PlayerClient_1.PlayerClient.list[game_1.selfId]) {
+                this.drawWeapon();
+                this.drawAmmo();
+                this.drawFace();
+                this.ctx.fillText('Hit points: ' + PlayerClient_1.PlayerClient.list[game_1.selfId].hp + '/' + PlayerClient_1.PlayerClient.list[game_1.selfId].hpMax, 0, 0.6 * this.height);
+            }
         };
         this.resize = (width, height) => {
             this.width = width;
@@ -28,6 +32,20 @@ class GUI {
                     this.ctx.drawImage(Img[PlayerClient_1.PlayerClient.list[game_1.selfId].weapon + "ammo"], 0, 0, Img[PlayerClient_1.PlayerClient.list[game_1.selfId].weapon + "ammo"].width, Img[PlayerClient_1.PlayerClient.list[game_1.selfId].weapon + "ammo"].height, 11 * (this.width - 0.8 * this.height) / 32, (this.height - 0.4 * this.height) / 2, 0.4 * this.height, 0.4 * this.height);
                     this.ctx.fillText(' x' + PlayerClient_1.PlayerClient.list[game_1.selfId].ammo + "  " + PlayerClient_1.PlayerClient.list[game_1.selfId].ammoInGun + "/", 11 * (this.width - 0.8 * this.height) / 32 + 0.4 * this.height, (this.height) / 2 + 10);
                 }
+            }
+        };
+        this.drawFace = () => {
+            let spriteRows = 2;
+            let spriteColumns = 4;
+            let facelook = 1;
+            this.ctx.drawImage(Img["faceborder"], 0, 0, Img["faceborder"].width, Img["faceborder"].height, (this.width - 0.85 * this.height) / 2, (this.height - 0.85 * this.height) / 2, 0.85 * this.height, 0.85 * this.height);
+            if (PlayerClient_1.PlayerClient.list[game_1.selfId]) {
+                facelook = Math.round(((PlayerClient_1.PlayerClient.list[game_1.selfId].hpMax - PlayerClient_1.PlayerClient.list[game_1.selfId].hp) / PlayerClient_1.PlayerClient.list[game_1.selfId].hpMax) * (spriteRows * spriteColumns - 1));
+                let facex = facelook % spriteColumns;
+                let facey = Math.floor(facelook / spriteColumns);
+                let frameWidth = Img["face"].width / spriteColumns;
+                let frameHeight = Img["face"].height / spriteRows;
+                this.ctx.drawImage(Img["face"], facex * frameWidth, facey * frameHeight, frameWidth, frameHeight, (this.width - 0.8 * this.height) / 2, (this.height - 0.8 * this.height) / 2, 0.8 * this.height, 0.8 * this.height);
             }
         };
         if (param.ctx !== undefined)

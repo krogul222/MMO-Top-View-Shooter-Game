@@ -36,6 +36,7 @@ export class Player extends Actor {
         let attackStartedTmp = this.attackController.attackStarted;
         this.attackController.attackStarted = false;
 
+        //console.log("Update pack " + this.attackController.activeWeapon.ammo);
         return {
             id: this.id,
             position: this.position,
