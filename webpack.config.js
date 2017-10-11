@@ -1,10 +1,10 @@
 const path = require('path');
 
 module.exports = {
-    entry: './client/js/game.ts',
+    entry: {a: './client/js/game.ts', b: './client/js/canvas.ts'},
     output: {
         path: path.resolve(__dirname, 'dist'),  
-        filename: 'bundle.js',
+        filename: "[name].entry.js",
         publicPath: '/dist/'
     },
     resolve: {

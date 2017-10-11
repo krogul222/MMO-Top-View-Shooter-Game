@@ -27,6 +27,8 @@ export class PlayerClient{
     public moving: boolean = false;
     public reload = false;
     public weapon = "pistol";
+    public ammo = 0;
+    public ammoInGun = 0;
 
     constructor(initPack) {
         if(initPack.id) this.id = initPack.id;
@@ -44,6 +46,9 @@ export class PlayerClient{
         if(initPack.moving) this.moving = initPack.moving;
         if(initPack.attackStarted) this.attackStarted = initPack.attackStarted;
         if(initPack.attackMelee) this.attackMelee = initPack.attackMelee;
+        if(initPack.ammo) this.ammo = initPack.ammo;
+        if(initPack.ammoInGun) this.ammoInGun = initPack.ammoInGun;
+
         PlayerClient.list[initPack.id] = this;
     }
 

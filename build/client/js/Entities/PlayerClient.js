@@ -15,10 +15,13 @@ class PlayerClient {
         this.aimAngle = 0;
         this.attackStarted = false;
         this.attackMelee = false;
-        this.spriteAnimCounter = 0;
+        this.bodySpriteAnimCounter = 0;
+        this.walkSpriteAnimCounter = 0;
         this.moving = false;
         this.reload = false;
         this.weapon = "pistol";
+        this.ammo = 0;
+        this.ammoInGun = 0;
         this.draw = () => {
             if (PlayerClient.list[game_1.selfId].map !== this.map) {
                 return;
@@ -39,14 +42,17 @@ class PlayerClient {
             let aimAngle = this.aimAngle;
             aimAngle = (aimAngle < 0) ? (360 + aimAngle) : aimAngle;
             let directionMod = this.inWhichDirection(aimAngle);
-            let walkingMod = Math.floor(this.spriteAnimCounter) % spriteColumns;
+            let walkingMod = Math.floor(this.walkSpriteAnimCounter) % spriteColumns;
+            console.log("Walking mod " + walkingMod);
             this.drawWalk(spriteColumns, spriteRows, aimAngle, 0, walkingMod, x, y);
             if (this.attackStarted && this.attackMelee) {
                 spriteColumns = 15;
+                walkingMod = Math.floor(this.bodySpriteAnimCounter) % spriteColumns;
                 this.drawMeleeAttackBody(spriteColumns, spriteRows, aimAngle, 0, walkingMod, x, y);
             }
             else {
                 if (this.reload) {
+                    walkingMod = Math.floor(this.bodySpriteAnimCounter) % spriteColumns;
                     this.drawNormalBodyWithGun(spriteColumns, spriteRows, aimAngle, 0, walkingMod, x, y);
                 }
                 else {
@@ -87,8 +93,8 @@ class PlayerClient {
             ctx.rotate(aimAngle * Math.PI / 180);
             ctx.drawImage(this.imgMeleeAttack, walkingMod * frameWidth, directionMod * frameHeight, frameWidth, frameHeight, -this.width * correction / 2, -this.height * correction / 2, (this.width) * correction, this.height * correction);
             ctx.restore();
-            if (this.spriteAnimCounter % spriteColumns >= (spriteColumns - 1)) {
-                this.spriteAnimCounter = 0;
+            if (this.bodySpriteAnimCounter % spriteColumns >= (spriteColumns - 1)) {
+                this.bodySpriteAnimCounter = 0;
                 this.attackStarted = false;
             }
         };
@@ -137,6 +143,10 @@ class PlayerClient {
             this.attackStarted = initPack.attackStarted;
         if (initPack.attackMelee)
             this.attackMelee = initPack.attackMelee;
+        if (initPack.ammo)
+            this.ammo = initPack.ammo;
+        if (initPack.ammoInGun)
+            this.ammoInGun = initPack.ammoInGun;
         PlayerClient.list[initPack.id] = this;
     }
 }

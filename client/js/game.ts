@@ -1,3 +1,4 @@
+import { GUI } from './GUI';
 import { PlayerClient } from "./Entities/PlayerClient";
 import { BulletClient } from "./Entities/BulletClient";
 
@@ -7,6 +8,7 @@ declare const HEIGHT;
 declare const CAMERA_BOX_ADJUSTMENT: any;
 declare var mouseX: any;
 declare var mouseY: any;
+declare var gui: GUI;
 
 export var selfId: number = 0;
 
@@ -60,7 +62,7 @@ socket.on('update', function(data){
                 }
             }
            
-        //gui.draw()
+        gui.draw();
        }
 
        for(let i = 0, length = data.bullet.length; i < length ; i++){
@@ -89,7 +91,7 @@ setInterval(function(){
     //drawAmmo();
     for(let i in PlayerClient.list){
         if(PlayerClient.list[i].moving){
-            console.log("MOVING");
+
             PlayerClient.list[i].walkSpriteAnimCounter += 1;
         }
 

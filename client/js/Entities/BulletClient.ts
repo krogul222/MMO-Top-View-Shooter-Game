@@ -50,8 +50,6 @@ export class BulletClient {
 
         let y = by - (mainPlayery-HEIGHT/2);
         y = y - (mouseY-HEIGHT/2)/CAMERA_BOX_ADJUSTMENT;
-
-        console.log("Bullet "+ y+ " "+x);
         ctx.drawImage(this.img, 0, 0, this.img.width, this.img.height, x - this.width/2, y - this.height/2, this.width, this.height);
     }
 

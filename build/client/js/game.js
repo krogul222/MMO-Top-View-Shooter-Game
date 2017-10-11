@@ -45,6 +45,7 @@ socket.on('update', function (data) {
                     p.spriteAnimCounter = 0;
                 }
             }
+            gui.draw();
         }
         for (let i = 0, length = data.bullet.length; i < length; i++) {
             let pack = data.bullet[i];
@@ -64,14 +65,18 @@ setInterval(function () {
     }
     ctx.clearRect(0, 0, WIDTH, HEIGHT);
     for (let i in PlayerClient_1.PlayerClient.list) {
-        if (PlayerClient_1.PlayerClient.list[i].moving || PlayerClient_1.PlayerClient.list[i].attackStarted) {
-            if (PlayerClient_1.PlayerClient.list[i].reload)
+        if (PlayerClient_1.PlayerClient.list[i].moving) {
+            PlayerClient_1.PlayerClient.list[i].walkSpriteAnimCounter += 1;
+        }
+        if (PlayerClient_1.PlayerClient.list[i].attackStarted) {
+            if (PlayerClient_1.PlayerClient.list[i].reload) {
                 if (PlayerClient_1.PlayerClient.list[i].weapon == "pistol")
-                    PlayerClient_1.PlayerClient.list[i].spriteAnimCounter += 1;
+                    PlayerClient_1.PlayerClient.list[i].bodySpriteAnimCounter += 1;
                 else
-                    PlayerClient_1.PlayerClient.list[i].spriteAnimCounter += 0.5;
+                    PlayerClient_1.PlayerClient.list[i].bodySpriteAnimCounter += 0.5;
+            }
             else
-                PlayerClient_1.PlayerClient.list[i].spriteAnimCounter += 1;
+                PlayerClient_1.PlayerClient.list[i].bodySpriteAnimCounter += 1;
         }
         PlayerClient_1.PlayerClient.list[i].draw();
     }

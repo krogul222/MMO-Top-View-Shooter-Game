@@ -24,7 +24,6 @@
 <script src='/client/js/Entities.js'></script>
 <script src='/client/js/WeaponCollection.js'></script>
 <script src='/client/js/Inventory.js'></script>
-<script src='/client/js/GUI.js'></script>
 <script src="/client/js/soundmanager2.js"></script>
 <script>
     var socket = io();   
@@ -71,50 +70,19 @@
     //game
 </script>
 <script src="/client/js/images.js"></script>
-<script>
-  
-    
-    let canvas = document.getElementById("canvas");
-    let canvasui = document.getElementById("canvasui");
-    
-    let ctxui = canvasui.getContext("2d");
-    var ctx = canvas.getContext("2d");
-    
-    let gui = new GUI({ctx: ctxui, width: WIDTH, height: HEIGHTUI});
-    
-    let resizeCanvas = function(){
-        WIDTH = window.innerWidth - 4;
-        HEIGHT = window.innerHeight - 48-HEIGHTUI;
-        
-        canvas.width = WIDTH;
-        canvas.height = HEIGHT;
-        
-        canvasui.width = WIDTH;
-        canvasui.height = HEIGHTUI;
-        
-        ctx.font = '30px Arial';
-        ctx.mozImageSmoothingEnabled = false;
-        ctx.msImageSmoothingEnabled = false;
-        ctx.imageSmoothingEnabled = false;
-        
-        ctxui.font = '30px Arial';
-        ctxui.mozImageSmoothingEnabled = false;
-        ctxui.msImageSmoothingEnabled = false;
-        ctxui.imageSmoothingEnabled = false;
-        
-        gui.resize(canvasui.width, canvasui.height);
-    }
-    
-    resizeCanvas();
-    
-    window.addEventListener('resize', function(){
-        resizeCanvas();
-    });
-    
 
-   // gui.draw();
-    </script>
-   <script src="/client/js/bundle.js"></script>
+<script>
+let canvas = document.getElementById("canvas");
+let canvasui = document.getElementById("canvasui");
+
+let ctxui = canvasui.getContext("2d");
+var ctx = canvas.getContext("2d");
+
+var gui;
+
+</script>
+<script src="/client/js/b.entry.js"></script>
+<script src="/client/js/a.entry.js"></script>
 
     <script>
     
