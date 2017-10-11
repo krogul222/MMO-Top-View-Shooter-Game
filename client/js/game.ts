@@ -1,4 +1,5 @@
-import { PlayerClient } from './Entities/Player';
+import { PlayerClient } from "./Entities/PlayerClient";
+import { BulletClient } from "./Entities/BulletClient";
 
 declare var ctx;
 declare const WIDTH;
@@ -16,6 +17,10 @@ socket.on('init', function(data){
    for(let i = 0, length = data.player.length; i < length; i++){
        new PlayerClient(data.player[i]);
    } 
+
+   for(let i = 0, length = data.bullet.length; i < length; i++){
+        new BulletClient(data.bullet[i]);  
+    } 
 });
 
 
@@ -24,12 +29,11 @@ socket.on('update', function(data){
        let pack = data.player[i];
        let p = PlayerClient.list[pack.id];
        if(p){
-           if(pack.x !== undefined){
-               p.x = pack.x;
+           if(pack.position !== undefined){
+               p.position.x = pack.position.x;
+               p.position.y = pack.position.y;
            } 
-           if(pack.y !== undefined){
-               p.y = pack.y;
-           }
+
            if(pack.hp !== undefined){
                p.hp = pack.hp;
            }
@@ -46,10 +50,29 @@ socket.on('update', function(data){
                } else{
                    p.reload = false;
                }
-           }
+            }
+
+            if(pack.attackStarted !== undefined){
+               // console.log("Attack started " + pack.attackStarted);
+                if(pack.attackStarted){
+                    p.attackStarted = true;
+                    p.spriteAnimCounter = 0;
+                }
+            }
            
         //gui.draw()
        }
+
+       for(let i = 0, length = data.bullet.length; i < length ; i++){
+        let pack = data.bullet[i];
+        let b = BulletClient.list[pack.id];
+        if(b){
+            if(pack.position !== undefined){
+                b.position.x = pack.position.x;
+                b.position.y = pack.position.y;
+            } 
+        }
+    }
    } 
     
 });
@@ -75,7 +98,11 @@ setInterval(function(){
                 PlayerClient.list[i].spriteAnimCounter += 1;
         }
         PlayerClient.list[i].draw();
-    } 
+    }
+    
+    for(let i in BulletClient.list){
+        BulletClient.list[i].draw();
+    }    
 }, 40);
 
 
@@ -116,6 +143,7 @@ document.onkeyup = function(event){
 }
 
 document.onmousedown = function(event){
+   // console.log("Left click PRESSED");
     socket.emit('keyPress', {inputId:'attack', state:true});
 }
 document.onmouseup = function(event){

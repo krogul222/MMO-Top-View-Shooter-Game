@@ -5,7 +5,7 @@ class GameMap {
         this._width = _width;
         this._height = _height;
         this.isPositionWall = (position) => {
-            return 2;
+            return 0;
         };
     }
     get width() { return this._width; }

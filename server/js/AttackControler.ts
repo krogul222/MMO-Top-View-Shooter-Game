@@ -6,25 +6,28 @@ import { Enemy } from './Entities/Enemy';
 import { Point, Velocity } from './GeometryAndPhysics';
 import { Bullet } from './Entities/Bullet';
 import { WeaponType } from './enums';
+import { WeaponTypes } from './WeaponTypes';
 
 export class AttackController {
     private _melee: boolean = true;
     private _attackStarted: boolean = false;
     private _reloadCounter: Counter = new Counter(25);
     private _attackCounter: Counter = new Counter(25);
-    private _activeWeapon: SingleWeapon = new SingleWeapon( {weapon: WeaponType.knife, ammo: 1 }); 
+    private _activeWeapon: SingleWeapon;
     private _weaponCollection = new WeaponCollection();
     private _pressingAttack: boolean = false;
 
 
     constructor (private parent: Actor, param) {
+        this._activeWeapon = new SingleWeapon({weapon: "0", ammo: "50", parent: this.parent});
         if(param.atkSpd) this._attackCounter.setInc(param.atkSpd);
+        this.equip(WeaponType.shotgun);
+        this.attackCounter.activate();
     }
 
     update = () => {
         this._reloadCounter.setInc(this._activeWeapon.reloadSpd);
         this._attackCounter.setInc(this._activeWeapon.attackSpd);
-
         if(this._reloadCounter.resetIfMax()){
             this._reloadCounter.deactivate();
             this._activeWeapon.reload();
@@ -32,15 +35,20 @@ export class AttackController {
 
         this._reloadCounter.count();
         this._attackCounter.count();
+
+        this.performAttack();
     }
 
     performAttack = () => {
-        if ( !this._reloadCounter.isActive() && this._attackCounter.resetIfMax() && this._pressingAttack) {
-            this._attackStarted = true;
-
-            this._melee = (this._activeWeapon.ammo > 0) ? this._melee : true;
-            
-            this._melee ? this.closeAttack(this.parent.movementController.aimAngle) : this.distanceAttack();
+       // console.log(!this._reloadCounter.isActive() +" "+this.attackCounter.value +this._attackCounter.resetIfMax()+ this._pressingAttack);
+        if ( !this._reloadCounter.isActive() && this._pressingAttack) {
+            if(this._attackCounter.resetIfMax()){
+                this._attackStarted = true;
+                console.log(this._activeWeapon.ammo);
+                console.log(this._melee);
+                this._melee = (this._activeWeapon.ammo > 0) ? this._melee : true;
+                this._melee ? this.closeAttack(this.parent.movementController.aimAngle) : this.distanceAttack();   
+            }
         }
     }
 
@@ -63,22 +71,31 @@ export class AttackController {
     }
 
     distanceAttack = () => {
+        console.log("Distance attack:")
         if(this._weaponCollection.shoot(this._activeWeapon.weapon,1)){
+            console.log("Shoot");
             let shootSpeed = this._activeWeapon.shootSpeed;
             let aimAngle = this.parent.movementController.aimAngle;
             let attackRadius = this._activeWeapon.attackRadius;
 
-            this.shootBullet(this.parent.movementController.aimAngle, shootSpeed, shootSpeed);
+            this.shootBullet(this.parent.movementController.aimAngle, shootSpeed);
 
             for(let i = 0; i < attackRadius; i++){
-                this.shootBullet(aimAngle+(i+1)*2, shootSpeed, shootSpeed);
-                this.shootBullet(aimAngle-(i+1)*2, shootSpeed, shootSpeed);
+                this.shootBullet(aimAngle+(i+1)*2, shootSpeed);
+                this.shootBullet(aimAngle-(i+1)*2, shootSpeed);
 
             }
         }
     }
 
-    shootBullet = (aimAngle, shootSpeedX, shootSpeedY) => {
+    equip = (weapon: WeaponType) => {
+        this.activeWeapon.equip(weapon);
+        let weaponProperties: WeaponTypes =  WeaponTypes.list[weapon];
+        this._melee = weaponProperties.attackMelee;
+    }
+
+    shootBullet = (aimAngle, shootSpeed) => {
+        //console.log(aimAngle + " " + shootSpeedX + " " + shootSpeedY);
         new Bullet({
             parent: this.parent.id,
             combatType: this.parent.type,
@@ -88,7 +105,7 @@ export class AttackController {
             img: 'bullet',
             width: 8,
             height: 8, 
-            speed: new Velocity(shootSpeedX, shootSpeedY)
+            shootspeed: shootSpeed
         });
     }
 

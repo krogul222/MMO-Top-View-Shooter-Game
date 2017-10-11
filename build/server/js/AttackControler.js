@@ -4,6 +4,7 @@ const Counter_1 = require("./Counter");
 const GeometryAndPhysics_1 = require("./GeometryAndPhysics");
 const Bullet_1 = require("./Entities/Bullet");
 const enums_1 = require("./enums");
+const WeaponTypes_1 = require("./WeaponTypes");
 class AttackController {
     constructor(parent, param) {
         this.parent = parent;
@@ -11,7 +12,6 @@ class AttackController {
         this._attackStarted = false;
         this._reloadCounter = new Counter_1.Counter(25);
         this._attackCounter = new Counter_1.Counter(25);
-        this._activeWeapon = new WeaponCollection_1.SingleWeapon(enums_1.WeaponType.knife, 1);
         this._weaponCollection = new WeaponCollection_1.WeaponCollection();
         this._pressingAttack = false;
         this.update = () => {
@@ -23,12 +23,17 @@ class AttackController {
             }
             this._reloadCounter.count();
             this._attackCounter.count();
+            this.performAttack();
         };
         this.performAttack = () => {
-            if (!this._reloadCounter.isActive() && this._attackCounter.resetIfMax() && this._pressingAttack) {
-                this._attackStarted = true;
-                this._melee = (this._activeWeapon.ammo > 0) ? this._melee : true;
-                this._melee ? this.closeAttack(this.parent.movementController.aimAngle) : this.distanceAttack();
+            if (!this._reloadCounter.isActive() && this._pressingAttack) {
+                if (this._attackCounter.resetIfMax()) {
+                    this._attackStarted = true;
+                    console.log(this._activeWeapon.ammo);
+                    console.log(this._melee);
+                    this._melee = (this._activeWeapon.ammo > 0) ? this._melee : true;
+                    this._melee ? this.closeAttack(this.parent.movementController.aimAngle) : this.distanceAttack();
+                }
             }
         };
         this.closeAttack = (aimAngle) => (this.parent.type == 'player') ? this.attackCloseByPlayer(aimAngle) : this.attackCloseByEnemy(aimAngle);
@@ -49,18 +54,25 @@ class AttackController {
             }
         };
         this.distanceAttack = () => {
+            console.log("Distance attack:");
             if (this._weaponCollection.shoot(this._activeWeapon.weapon, 1)) {
+                console.log("Shoot");
                 let shootSpeed = this._activeWeapon.shootSpeed;
                 let aimAngle = this.parent.movementController.aimAngle;
                 let attackRadius = this._activeWeapon.attackRadius;
-                this.shootBullet(this.parent.movementController.aimAngle, shootSpeed, shootSpeed);
+                this.shootBullet(this.parent.movementController.aimAngle, shootSpeed);
                 for (let i = 0; i < attackRadius; i++) {
-                    this.shootBullet(aimAngle + (i + 1) * 2, shootSpeed, shootSpeed);
-                    this.shootBullet(aimAngle - (i + 1) * 2, shootSpeed, shootSpeed);
+                    this.shootBullet(aimAngle + (i + 1) * 2, shootSpeed);
+                    this.shootBullet(aimAngle - (i + 1) * 2, shootSpeed);
                 }
             }
         };
-        this.shootBullet = (aimAngle, shootSpeedX, shootSpeedY) => {
+        this.equip = (weapon) => {
+            this.activeWeapon.equip(weapon);
+            let weaponProperties = WeaponTypes_1.WeaponTypes.list[weapon];
+            this._melee = weaponProperties.attackMelee;
+        };
+        this.shootBullet = (aimAngle, shootSpeed) => {
             new Bullet_1.Bullet({
                 parent: this.parent.id,
                 combatType: this.parent.type,
@@ -70,7 +82,7 @@ class AttackController {
                 img: 'bullet',
                 width: 8,
                 height: 8,
-                speed: new GeometryAndPhysics_1.Velocity(shootSpeedX, shootSpeedY)
+                shootspeed: shootSpeed
             });
         };
         this.getDamage = () => {
@@ -78,8 +90,11 @@ class AttackController {
             damage = (this._melee) ? this._activeWeapon.meleeDmg : this._activeWeapon.shootDmg;
             return damage;
         };
+        this._activeWeapon = new WeaponCollection_1.SingleWeapon({ weapon: "0", ammo: "50", parent: this.parent });
         if (param.atkSpd)
             this._attackCounter.setInc(param.atkSpd);
+        this.equip(enums_1.WeaponType.shotgun);
+        this.attackCounter.activate();
     }
     get melee() { return this._melee; }
     get pressingAttack() { return this._pressingAttack; }

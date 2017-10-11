@@ -18,26 +18,34 @@ export class Bullet extends Entity{
     private timer: number = 0;
     private toRemove: boolean = false;
     private mapController: MapController;
+    private id: number;
 
     private hitCategory: number = 0;
     private hitEntityCategory: string = "";
     private hitEntityId: number = -1;
 
     constructor(param) {
-        super(param);
+        super(Bullet.updateParam(param));
         this.mapController = new MapController(null);
         this.combatType = param.combatType ? param.combatType : this.combatType;
         this.angle = param.angle ? param.angle : this.angle;
-        this.spdX = param.spd ? Math.cos(this.angle/180*Math.PI) * param.spd : Math.cos(this.angle/180*Math.PI);
-        this.spdY = param.spd ? Math.sin(this.angle/180*Math.PI) * param.spd : Math.sin(this.angle/180*Math.PI);
+        if(param.shootspeed !== undefined){
+            this.spdX = param.shootspeed ? Math.cos(this.angle/180*Math.PI) * param.shootspeed : Math.cos(this.angle/180*Math.PI);
+            this.spdY = param.shootspeed ? Math.sin(this.angle/180*Math.PI) * param.shootspeed : Math.sin(this.angle/180*Math.PI);
+        }
+        this.setSpdX(this.spdX);
+        this.setSpdY(this.spdY);
+        
         this.parent = param.parent ? param.parent : -1;
         
         initPack.bullet.push(this.getInitPack());
-        Bullet.list[param.id] = this;
+        console.log("New Bullet "+ this.position.x+ " "+this.position.y);
+        Bullet.list[this.id] = this;
     }
 
     update = () => {
-        super.update();
+        this.updatePosition();
+        console.log("Bullet "+ this.position.x+ " "+this.position.y);
         if(this.timer++ > 100) this.toRemove = true;
     
         switch(this.combatType){
@@ -138,6 +146,11 @@ export class Bullet extends Entity{
             bullets.push(Bullet.list[i].getInitPack());
         }
         return bullets;
+    }
+
+    static updateParam = (param) => {
+        param.id = Math.random();
+        return param;
     }
 
     static list = {};

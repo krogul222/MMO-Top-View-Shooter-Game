@@ -68,26 +68,28 @@
 /***/ (function(module, exports, __webpack_require__) {
 
 Object.defineProperty(exports, "__esModule", { value: true });
-const Player_1 = __webpack_require__(1);
+const PlayerClient_1 = __webpack_require__(1);
+const BulletClient_1 = __webpack_require__(3);
 exports.selfId = 0;
 socket.on('init', function (data) {
     if (data.selfId) {
         exports.selfId = data.selfId;
     }
     for (let i = 0, length = data.player.length; i < length; i++) {
-        new Player_1.PlayerClient(data.player[i]);
+        new PlayerClient_1.PlayerClient(data.player[i]);
+    }
+    for (let i = 0, length = data.bullet.length; i < length; i++) {
+        new BulletClient_1.BulletClient(data.bullet[i]);
     }
 });
 socket.on('update', function (data) {
     for (let i = 0, length = data.player.length; i < length; i++) {
         let pack = data.player[i];
-        let p = Player_1.PlayerClient.list[pack.id];
+        let p = PlayerClient_1.PlayerClient.list[pack.id];
         if (p) {
-            if (pack.x !== undefined) {
-                p.x = pack.x;
-            }
-            if (pack.y !== undefined) {
-                p.y = pack.y;
+            if (pack.position !== undefined) {
+                p.position.x = pack.position.x;
+                p.position.y = pack.position.y;
             }
             if (pack.hp !== undefined) {
                 p.hp = pack.hp;
@@ -106,6 +108,22 @@ socket.on('update', function (data) {
                     p.reload = false;
                 }
             }
+            if (pack.attackStarted !== undefined) {
+                if (pack.attackStarted) {
+                    p.attackStarted = true;
+                    p.spriteAnimCounter = 0;
+                }
+            }
+        }
+        for (let i = 0, length = data.bullet.length; i < length; i++) {
+            let pack = data.bullet[i];
+            let b = BulletClient_1.BulletClient.list[pack.id];
+            if (b) {
+                if (pack.position !== undefined) {
+                    b.position.x = pack.position.x;
+                    b.position.y = pack.position.y;
+                }
+            }
         }
     }
 });
@@ -114,17 +132,20 @@ setInterval(function () {
         return;
     }
     ctx.clearRect(0, 0, WIDTH, HEIGHT);
-    for (let i in Player_1.PlayerClient.list) {
-        if (Player_1.PlayerClient.list[i].moving || Player_1.PlayerClient.list[i].attackStarted) {
-            if (Player_1.PlayerClient.list[i].reload)
-                if (Player_1.PlayerClient.list[i].weapon == "pistol")
-                    Player_1.PlayerClient.list[i].spriteAnimCounter += 1;
+    for (let i in PlayerClient_1.PlayerClient.list) {
+        if (PlayerClient_1.PlayerClient.list[i].moving || PlayerClient_1.PlayerClient.list[i].attackStarted) {
+            if (PlayerClient_1.PlayerClient.list[i].reload)
+                if (PlayerClient_1.PlayerClient.list[i].weapon == "pistol")
+                    PlayerClient_1.PlayerClient.list[i].spriteAnimCounter += 1;
                 else
-                    Player_1.PlayerClient.list[i].spriteAnimCounter += 0.5;
+                    PlayerClient_1.PlayerClient.list[i].spriteAnimCounter += 0.5;
             else
-                Player_1.PlayerClient.list[i].spriteAnimCounter += 1;
+                PlayerClient_1.PlayerClient.list[i].spriteAnimCounter += 1;
         }
-        Player_1.PlayerClient.list[i].draw();
+        PlayerClient_1.PlayerClient.list[i].draw();
+    }
+    for (let i in BulletClient_1.BulletClient.list) {
+        BulletClient_1.BulletClient.list[i].draw();
     }
 }, 40);
 document.onkeydown = function (event) {
@@ -174,7 +195,7 @@ document.onmousemove = function (event) {
     mouseY = event.clientY;
     let angle = Math.atan2(y, x) / Math.PI * 180;
     if (exports.selfId) {
-        let player = Player_1.PlayerClient.list[exports.selfId];
+        let player = PlayerClient_1.PlayerClient.list[exports.selfId];
         player.aimAngle = angle;
     }
     socket.emit('keyPress', { inputId: 'mouseAngle', state: angle });
@@ -191,10 +212,11 @@ const game_1 = __webpack_require__(0);
 class PlayerClient {
     constructor(initPack) {
         this.id = -1;
-        this._position = new GeometryAndPhysics_1.Point(250, 250);
+        this.position = new GeometryAndPhysics_1.Point(250, 250);
         this.width = 0;
         this.height = 0;
-        this.img = Img["player" + "knife"];
+        this.img = Img["player" + "pistol"];
+        this.imgMeleeAttack = Img["playerknifemeeleattack"];
         this.hp = 1;
         this.hpMax = 1;
         this.map = "forest";
@@ -204,6 +226,7 @@ class PlayerClient {
         this.spriteAnimCounter = 0;
         this.moving = false;
         this.reload = false;
+        this.weapon = "pistol";
         this.draw = () => {
             if (PlayerClient.list[game_1.selfId].map !== this.map) {
                 return;
@@ -212,10 +235,11 @@ class PlayerClient {
             let spriteColumns = 20;
             let hpWidth = 30 * this.hp / this.hpMax;
             let mainPlayer = PlayerClient.list[game_1.selfId];
-            let mainPlayerx = mainPlayer._position.x;
-            let mainPlayery = mainPlayer._position.y;
-            let px = this._position.x;
-            let py = this._position.y;
+            let mainPlayerx = mainPlayer.position.x;
+            let mainPlayery = mainPlayer.position.y;
+            let px = this.position.x;
+            let py = this.position.y;
+            console.log("Player position: " + px + " " + py);
             let x = px - (mainPlayerx - WIDTH / 2);
             x = x - (mouseX - WIDTH / 2) / CAMERA_BOX_ADJUSTMENT;
             let y = py - (mainPlayery - HEIGHT / 2);
@@ -226,14 +250,19 @@ class PlayerClient {
             let walkingMod = Math.floor(this.spriteAnimCounter) % spriteColumns;
             this.drawWalk(spriteColumns, spriteRows, aimAngle, 0, walkingMod, x, y);
             if (this.attackStarted && this.attackMelee) {
+                spriteColumns = 15;
+                this.drawMeleeAttackBody(spriteColumns, spriteRows, aimAngle, 0, walkingMod, x, y);
             }
             else {
                 if (this.reload) {
+                    this.drawNormalBodyWithGun(spriteColumns, spriteRows, aimAngle, 0, walkingMod, x, y);
                 }
                 else {
                     this.drawNormalBodyWithGun(spriteColumns, spriteRows, aimAngle, 0, walkingMod, x, y);
                 }
             }
+            ctx.fillStyle = 'red';
+            ctx.fillRect(x - hpWidth / 2, y - 40, hpWidth, 4);
         };
         this.inWhichDirection = (aimAngle) => {
             let directionMod = 3;
@@ -247,6 +276,29 @@ class PlayerClient {
                 directionMod = 0;
             }
             return directionMod;
+        };
+        this.drawMeleeAttackBody = (spriteColumns, spriteRows, aimAngle, directionMod, walkingMod, x, y) => {
+            let correction = 1.3;
+            let correctionWidth = 1;
+            let correctionHeight = 1;
+            if (this.weapon == "pistol") {
+                correction = 1.1;
+            }
+            if (this.weapon == "shotgun") {
+                correction = 1.4;
+            }
+            let frameWidth = this.imgMeleeAttack.width / spriteColumns;
+            let frameHeight = this.imgMeleeAttack.height / spriteRows;
+            ctx.save();
+            ctx.translate(x - (this.width * correctionWidth) * correction / 2, y - this.height * correction / 2);
+            ctx.translate((this.width) * correction / 2, this.height * correction / 2);
+            ctx.rotate(aimAngle * Math.PI / 180);
+            ctx.drawImage(this.imgMeleeAttack, walkingMod * frameWidth, directionMod * frameHeight, frameWidth, frameHeight, -this.width * correction / 2, -this.height * correction / 2, (this.width) * correction, this.height * correction);
+            ctx.restore();
+            if (this.spriteAnimCounter % spriteColumns >= (spriteColumns - 1)) {
+                this.spriteAnimCounter = 0;
+                this.attackStarted = false;
+            }
         };
         this.drawNormalBodyWithGun = (spriteColumns, spriteRows, aimAngle, directionMod, walkingMod, x, y) => {
             let frameWidth = this.img.width / spriteColumns;
@@ -271,13 +323,16 @@ class PlayerClient {
         if (initPack.id)
             this.id = initPack.id;
         if (initPack.position)
-            this._position = initPack.position;
+            this.position = initPack.position;
         if (initPack.width)
             this.width = initPack.width;
         if (initPack.height)
             this.height = initPack.height;
-        if (initPack.weapon)
+        if (initPack.weapon) {
             this.img = Img["player" + initPack.weapon];
+            this.weapon = initPack.weapon;
+            this.imgMeleeAttack = Img["player" + initPack.weapon + "meeleattack"];
+        }
         if (initPack.hp)
             this.hp = initPack.hp;
         if (initPack.hpMax)
@@ -354,6 +409,53 @@ class Velocity {
     }
 }
 exports.Velocity = Velocity;
+
+
+/***/ }),
+/* 3 */
+/***/ (function(module, exports, __webpack_require__) {
+
+Object.defineProperty(exports, "__esModule", { value: true });
+const GeometryAndPhysics_1 = __webpack_require__(2);
+const game_1 = __webpack_require__(0);
+const PlayerClient_1 = __webpack_require__(1);
+class BulletClient {
+    constructor(initPack) {
+        this.id = -1;
+        this.position = new GeometryAndPhysics_1.Point(250, 250);
+        this.map = "forest";
+        this.img = Img["bullet"];
+        this.width = 32;
+        this.height = 32;
+        this.hitCategory = 1;
+        this.draw = () => {
+            if (PlayerClient_1.PlayerClient.list[game_1.selfId].map !== this.map) {
+                return;
+            }
+            let bx = this.position.x;
+            let by = this.position.y;
+            let mainPlayer = PlayerClient_1.PlayerClient.list[game_1.selfId];
+            let mainPlayerx = mainPlayer.position.x;
+            let mainPlayery = mainPlayer.position.y;
+            let x = bx - (mainPlayerx - WIDTH / 2);
+            x = x - (mouseX - WIDTH / 2) / CAMERA_BOX_ADJUSTMENT;
+            let y = by - (mainPlayery - HEIGHT / 2);
+            y = y - (mouseY - HEIGHT / 2) / CAMERA_BOX_ADJUSTMENT;
+            console.log("Bullet " + y + " " + x);
+            ctx.drawImage(this.img, 0, 0, this.img.width, this.img.height, x - this.width / 2, y - this.height / 2, this.width, this.height);
+        };
+        this.id = (initPack.id !== undefined) ? initPack.id : -1;
+        this.position = (initPack.position !== undefined) ? initPack.position : new GeometryAndPhysics_1.Point(250, 250);
+        this.width = (initPack.width !== undefined) ? initPack.width : 32;
+        this.height = (initPack.height !== undefined) ? initPack.height : 32;
+        this.hitCategory = (initPack.hitCategory !== undefined) ? initPack.hitCategory : 1;
+        this.img = (initPack.img !== undefined) ? Img[initPack.img] : Img["bullet"];
+        this.map = (initPack.map !== undefined) ? initPack.map : "forest";
+        BulletClient.list[this.id] = this;
+    }
+}
+BulletClient.list = {};
+exports.BulletClient = BulletClient;
 
 
 /***/ })

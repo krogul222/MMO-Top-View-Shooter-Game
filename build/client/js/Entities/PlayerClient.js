@@ -4,7 +4,7 @@ const game_1 = require("../game");
 class PlayerClient {
     constructor(initPack) {
         this.id = -1;
-        this._position = new GeometryAndPhysics_1.Point(250, 250);
+        this.position = new GeometryAndPhysics_1.Point(250, 250);
         this.width = 0;
         this.height = 0;
         this.img = Img["player" + "pistol"];
@@ -27,10 +27,11 @@ class PlayerClient {
             let spriteColumns = 20;
             let hpWidth = 30 * this.hp / this.hpMax;
             let mainPlayer = PlayerClient.list[game_1.selfId];
-            let mainPlayerx = mainPlayer._position.x;
-            let mainPlayery = mainPlayer._position.y;
-            let px = this._position.x;
-            let py = this._position.y;
+            let mainPlayerx = mainPlayer.position.x;
+            let mainPlayery = mainPlayer.position.y;
+            let px = this.position.x;
+            let py = this.position.y;
+            console.log("Player position: " + px + " " + py);
             let x = px - (mainPlayerx - WIDTH / 2);
             x = x - (mouseX - WIDTH / 2) / CAMERA_BOX_ADJUSTMENT;
             let y = py - (mainPlayery - HEIGHT / 2);
@@ -114,7 +115,7 @@ class PlayerClient {
         if (initPack.id)
             this.id = initPack.id;
         if (initPack.position)
-            this._position = initPack.position;
+            this.position = initPack.position;
         if (initPack.width)
             this.width = initPack.width;
         if (initPack.height)
@@ -141,4 +142,4 @@ class PlayerClient {
 }
 PlayerClient.list = {};
 exports.PlayerClient = PlayerClient;
-//# sourceMappingURL=Player.js.map
+//# sourceMappingURL=PlayerClient.js.map

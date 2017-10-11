@@ -24,7 +24,7 @@ export class Player extends Actor {
             height: this.height,
             moving: this.movementController.moving,
             aimAngle: this.movementController.aimAngle,
-            weapon: this.attackController.activeWeapon.weapon,
+            weapon: this.attackController.activeWeapon.name,
             attackStarted: this.attackController.attackStarted,
             attackMelee: this.attackController.melee,
             ammo: this.attackController.activeWeapon.ammo,
@@ -43,7 +43,7 @@ export class Player extends Actor {
             moving: this.movementController.moving,
             aimAngle: this.movementController.aimAngle,
             attackStarted: attackStartedTmp,
-            weapon: this.attackController.activeWeapon.weapon,
+            weapon: this.attackController.activeWeapon.name,
             attackMelee: this.attackController.melee,
             ammo: this.attackController.activeWeapon.ammo,
             ammoInGun: this.attackController.activeWeapon.ammoInGun,
@@ -76,7 +76,6 @@ export class Player extends Actor {
             if(data.inputId == 'right') player.movementController.pressingRight = data.state;
             if(data.inputId == 'up') player.movementController.pressingUp = data.state;
             if(data.inputId == 'down') player.movementController.pressingDown = data.state;
-
             if(data.inputId == 'attack') player.attackController.pressingAttack = data.state;
             if(data.inputId == 'mouseAngle') player.movementController.aimAngle = data.state;
         });
