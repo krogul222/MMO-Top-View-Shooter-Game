@@ -1,7 +1,13 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 const PlayerClient_1 = require("./Entities/PlayerClient");
 const BulletClient_1 = require("./Entities/BulletClient");
+const Inventory_1 = require("../../server/js/Inventory");
 exports.selfId = 0;
+exports.inventory = new Inventory_1.Inventory(socket, false, 0);
+socket.on('updateInventory', function (items) {
+    exports.inventory.items = items;
+    exports.inventory.refreshRender();
+});
 socket.on('init', function (data) {
     if (data.selfId) {
         exports.selfId = data.selfId;
@@ -24,6 +30,11 @@ socket.on('update', function (data) {
             }
             if (pack.hp !== undefined) {
                 p.hp = pack.hp;
+            }
+            if (pack.weapon !== undefined) {
+                p.weapon = pack.weapon;
+                p.img = Img["player" + pack.weapon];
+                p.imgMeleeAttack = Img["player" + pack.weapon + "meeleattack"];
             }
             if (pack.attackMelee !== undefined) {
                 p.attackMelee = pack.attackMelee;

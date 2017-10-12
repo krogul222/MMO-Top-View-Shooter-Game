@@ -21,7 +21,7 @@ export class AttackController {
     constructor (private parent: Actor, param) {
         this._activeWeapon = new SingleWeapon({weapon: "0", ammo: "20", parent: this.parent});
         if(param.atkSpd) this._attackCounter.setInc(param.atkSpd);
-        this.equip(WeaponType.pistol);
+        this.equip(WeaponType.knife);
         this.attackCounter.activate();
     }
 

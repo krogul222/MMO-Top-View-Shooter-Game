@@ -23,7 +23,7 @@
 <script src='/client/js/jquery-3.2.1.min.js'></script>
 <script src='/client/js/Entities.js'></script>
 <script src='/client/js/WeaponCollection.js'></script>
-<script src='/client/js/Inventory.js'></script>
+
 <script src="/client/js/soundmanager2.js"></script>
 <script>
     var socket = io();   
@@ -58,17 +58,6 @@
 
 <script src="/client/js/login.js"></script>
 <script src="/client/js/chat.js"></script>
-<script>
-        
-    let inventory = new Inventory(socket, false);
-    
-    socket.on('updateInventory', function(items){
-       inventory.items = items;
-        inventory.refreshRender();
-    });
-    
-    //game
-</script>
 <script src="/client/js/images.js"></script>
 
 <script>

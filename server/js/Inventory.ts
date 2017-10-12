@@ -1,3 +1,4 @@
+import { Actor } from './Entities/Actor';
 import { Player } from './Entities/Player';
 import { Item } from "./Item";
 
@@ -5,18 +6,23 @@ export class Inventory {
     items: any[] = [];
     socket: any = 0;
     server: boolean = false;
-    owner: string = ""; 
+    owner: Actor; 
 
-    constructor() {
+    constructor(socket, server, owner) {
+        this.socket = socket ? socket : 0;
+        this.server = server ? server : false;
+        this.owner = owner ? owner : 0;
+
         if(this.server && this.socket){
+            let currentInventory: Inventory = this;
             this.socket.on("useItem", function(itemId){
-                if(!this.hasItem(itemId,1)){
+                if(!currentInventory.hasItem(itemId,1)){
                     console.log("Cheater!");
                     return;
                 }
                     
                 let item = Item.list[itemId];
-                item.event(Player.list[this.socket.id]);
+                item.event(Player.list[currentInventory.socket.id]);
             });
         }   
     }
@@ -24,7 +30,7 @@ export class Inventory {
     addItem = (id,amount) => {
 		for(var i = 0 ; i < this.items.length; i++){
 			if(this.items[i].id === id){
-				this.items[i].amount += amount;
+                this.items[i].amount += amount;
                 Item.list[id].add(this.owner, amount);
 				this.refreshRender();
 				return;
@@ -85,9 +91,8 @@ export class Inventory {
         let inventory = document.getElementById("inventory");
         inventory.innerHTML = "";
         
-        let addButton = function(data){
+        let addButton = function(data, socket){
             let item = Item.list[data.id];
-            let socket = this.socket;
             let button = document.createElement('button');
             button.onclick = function(){
                 socket.emit("useItem", item.id);
@@ -98,7 +103,7 @@ export class Inventory {
 
 		for(let i = 0 ; i < this.items.length; i++){
 			let item = Item.list[this.items[i].id];
-			addButton(this.items[i]);
+			addButton(this.items[i], this.socket);
 		}     
 	}    
 }

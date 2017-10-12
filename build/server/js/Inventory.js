@@ -1,6 +1,6 @@
 Object.defineProperty(exports, "__esModule", { value: true });
-const Item_1 = require("../../server/js/Item");
-const Player_1 = require("../../server/js/Entities/Player");
+const Player_1 = require("./Entities/Player");
+const Item_1 = require("./Item");
 class Inventory {
     constructor(socket, server, owner) {
         this.items = [];
@@ -62,9 +62,8 @@ class Inventory {
             }
             let inventory = document.getElementById("inventory");
             inventory.innerHTML = "";
-            let addButton = function (data) {
+            let addButton = function (data, socket) {
                 let item = Item_1.Item.list[data.id];
-                let socket = this.socket;
                 let button = document.createElement('button');
                 button.onclick = function () {
                     socket.emit("useItem", item.id);
@@ -74,20 +73,21 @@ class Inventory {
             };
             for (let i = 0; i < this.items.length; i++) {
                 let item = Item_1.Item.list[this.items[i].id];
-                addButton(this.items[i]);
+                addButton(this.items[i], this.socket);
             }
         };
         this.socket = socket ? socket : 0;
         this.server = server ? server : false;
         this.owner = owner ? owner : 0;
         if (this.server && this.socket) {
+            let currentInventory = this;
             this.socket.on("useItem", function (itemId) {
-                if (!this.hasItem(itemId, 1)) {
+                if (!currentInventory.hasItem(itemId, 1)) {
                     console.log("Cheater!");
                     return;
                 }
                 let item = Item_1.Item.list[itemId];
-                item.event(Player_1.Player.list[this.socket.id]);
+                item.event(Player_1.Player.list[currentInventory.socket.id]);
             });
         }
     }

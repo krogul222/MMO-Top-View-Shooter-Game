@@ -93,7 +93,7 @@ class AttackController {
         this._activeWeapon = new WeaponCollection_1.SingleWeapon({ weapon: "0", ammo: "20", parent: this.parent });
         if (param.atkSpd)
             this._attackCounter.setInc(param.atkSpd);
-        this.equip(enums_1.WeaponType.pistol);
+        this.equip(enums_1.WeaponType.knife);
         this.attackCounter.activate();
     }
     get melee() { return this._melee; }

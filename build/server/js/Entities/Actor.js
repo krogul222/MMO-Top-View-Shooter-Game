@@ -1,4 +1,5 @@
 Object.defineProperty(exports, "__esModule", { value: true });
+const Inventory_1 = require("./../Inventory");
 const LifeAndBodyController_1 = require("./../LifeAndBodyController");
 const MapControler_1 = require("./../MapControler");
 const Entity_1 = require("./Entity");
@@ -52,6 +53,7 @@ class Actor extends Entity_1.Entity {
         this.attackController = new AttackControler_1.AttackController(this, param);
         this.movementController = new MovementController_1.MovementController(this, param);
         this.mapController = new MapControler_1.MapController(param);
+        this.inventory = new Inventory_1.Inventory(param.socket, true, this);
     }
 }
 exports.Actor = Actor;

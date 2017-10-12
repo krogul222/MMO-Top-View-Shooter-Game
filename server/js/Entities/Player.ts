@@ -4,6 +4,7 @@ import { Bullet } from './Bullet';
 import { Actor } from "./Actor";
 import { Point } from './../GeometryAndPhysics';
 import { Pack } from '../Pack';
+import { WeaponType } from '../enums';
 
 export class Player extends Actor {
 
@@ -11,13 +12,19 @@ export class Player extends Actor {
         super(param);
         initPack.player.push(this.getInitPack());
         Player.list[param.id] = this;
+        this.inventory.addItem(WeaponType.knife,1);
+        this.inventory.addItem(WeaponType.pistol,1);
+        this.inventory.addItem(WeaponType.shotgun,1);
+        this.inventory.addItem(WeaponType.rifle,1);
+        this.inventory.addItem("medicalkit",4);  
+        this.inventory.useItem(WeaponType.knife);
     } 
 
     getInitPack = () => {
         return {
             id: this.id,
             position: this.position,
-            hp: this.lifeAndBodyController.hp,
+            hp: 12,
             hpMax: this.lifeAndBodyController.hpMax,
             map: this.map,
             width: this.width,

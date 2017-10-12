@@ -1,7 +1,8 @@
 import { SingleWeapon } from './../../server/js/WeaponCollection';
 import { PlayerClient } from './Entities/PlayerClient';
-import { selfId } from './game';
+import { selfId, inventory } from './game';
 import { WeaponTypes } from '../../server/js/WeaponTypes';
+
 export class GUI {
     width: number;
     height: number;
@@ -26,6 +27,7 @@ export class GUI {
             this.drawWeapon();
             this.drawAmmo();
             this.drawFace();
+            this.drawItems();
             this.ctx.fillText('Hit points: '+PlayerClient.list[selfId].hp + '/'+PlayerClient.list[selfId].hpMax, 0, 0.6*this.height);
         }
     }
@@ -48,6 +50,15 @@ export class GUI {
                 
                 this.ctx.fillText(' x'+PlayerClient.list[selfId].ammo+"  "+PlayerClient.list[selfId].ammoInGun+"/", 11*(this.width-0.8*this.height)/32+0.4*this.height, (this.height)/2+10);
             }   
+        }
+    }
+
+    drawItems = () => {
+        if(PlayerClient.list[selfId]){
+            this.ctx.drawImage(Img["medicalkit"], 0, 0, Img["medicalkit"].width, Img["medicalkit"].height, 3*(this.width-0.8*this.height)/4, (this.height-0.8*this.height)/2, 0.8*this.height, 0.8*this.height);
+            
+            this.ctx.fillText(' x'+inventory.getItemAmount("medicalkit"), 3*(this.width-0.8*this.height)/4+0.8*this.height, (this.height)/2+10);
+            
         }
     }
 

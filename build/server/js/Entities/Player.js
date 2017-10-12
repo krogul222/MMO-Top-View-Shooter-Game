@@ -4,6 +4,7 @@ const Enemy_1 = require("./Enemy");
 const Bullet_1 = require("./Bullet");
 const Actor_1 = require("./Actor");
 const GeometryAndPhysics_1 = require("./../GeometryAndPhysics");
+const enums_1 = require("../enums");
 class Player extends Actor_1.Actor {
     constructor(param) {
         super(param);
@@ -11,7 +12,7 @@ class Player extends Actor_1.Actor {
             return {
                 id: this.id,
                 position: this.position,
-                hp: this.lifeAndBodyController.hp,
+                hp: 12,
                 hpMax: this.lifeAndBodyController.hpMax,
                 map: this.map,
                 width: this.width,
@@ -57,6 +58,12 @@ class Player extends Actor_1.Actor {
         };
         globalVariables_1.initPack.player.push(this.getInitPack());
         Player.list[param.id] = this;
+        this.inventory.addItem(enums_1.WeaponType.knife, 1);
+        this.inventory.addItem(enums_1.WeaponType.pistol, 1);
+        this.inventory.addItem(enums_1.WeaponType.shotgun, 1);
+        this.inventory.addItem(enums_1.WeaponType.rifle, 1);
+        this.inventory.addItem("medicalkit", 4);
+        this.inventory.useItem(enums_1.WeaponType.knife);
     }
 }
 Player.onConnect = (socket) => {

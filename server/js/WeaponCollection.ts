@@ -23,7 +23,10 @@ export class WeaponCollection {
             
         }
 
-        addWeapon = (id,amount) => {
+        removeWeapon = (id: WeaponType,amount) => {
+        }
+
+        addWeapon = (id: WeaponType,amount) => {
             for(var i = 0 ; i < this.weapons.length; i++){
                 if(this.weapons[i].id === id){
                     this.weapons[i].amount += amount;
@@ -91,6 +94,7 @@ export class SingleWeapon {
                 if(weaponFromBank.weapon == weapon) {
                     this._weapon = weapon;
                     this.name = weaponFromBank.name;
+                    console.log("Weapon equiped "+this._weapon+this.name);
                    // this._ammo = weaponFromBank.ammo;
                  /*   this.attackRadius = weaponFromBank.attackRadius;
                     this.attackSpd = weaponFromBank.attackSpd;

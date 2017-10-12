@@ -1,3 +1,4 @@
+import { Inventory } from './../Inventory';
 import { LifeAndBodyController } from './../LifeAndBodyController';
 import { MapController } from './../MapControler';
 import { Entity } from './Entity';
@@ -14,6 +15,7 @@ export class Actor extends Entity {
     attackController: AttackController;
     movementController: MovementController;
     mapController: MapController;
+    inventory: Inventory;
 
     constructor(param) {
          super(param);
@@ -21,6 +23,7 @@ export class Actor extends Entity {
          this.attackController = new AttackController(this, param);
          this.movementController = new MovementController(this, param);
          this.mapController = new MapController(param);
+         this.inventory = new Inventory(param.socket, true, this);
         }
 
 	update = () => {

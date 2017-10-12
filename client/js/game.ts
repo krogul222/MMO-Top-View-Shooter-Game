@@ -1,6 +1,7 @@
 import { GUI } from './GUI';
 import { PlayerClient } from "./Entities/PlayerClient";
 import { BulletClient } from "./Entities/BulletClient";
+import { Inventory } from '../../server/js/Inventory';
 
 declare var ctx;
 declare const WIDTH;
@@ -11,6 +12,14 @@ declare var mouseY: any;
 declare var gui: GUI;
 
 export var selfId: number = 0;
+
+
+export let inventory = new Inventory(socket, false, 0);
+
+socket.on('updateInventory', function(items){
+   inventory.items = items;
+    inventory.refreshRender();
+});
 
 socket.on('init', function(data){
     if(data.selfId){
@@ -29,7 +38,7 @@ socket.on('init', function(data){
 socket.on('update', function(data){
    for(let i = 0, length = data.player.length; i < length ; i++){
        let pack = data.player[i];
-       let p = PlayerClient.list[pack.id];
+       let p:PlayerClient = PlayerClient.list[pack.id];
        if(p){
            if(pack.position !== undefined){
                p.position.x = pack.position.x;
@@ -39,6 +48,12 @@ socket.on('update', function(data){
            if(pack.hp !== undefined){
                p.hp = pack.hp;
            }
+
+           if(pack.weapon !== undefined){
+            p.weapon = pack.weapon
+            p.img = Img["player"+pack.weapon];
+            p.imgMeleeAttack = Img["player" + pack.weapon + "meeleattack"];
+            }
 
            if(pack.attackMelee !== undefined){
             p.attackMelee = pack.attackMelee;

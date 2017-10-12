@@ -11,6 +11,8 @@ class WeaponCollection {
         };
         this.choosePrevWeaponWithAmmo = () => {
         };
+        this.removeWeapon = (id, amount) => {
+        };
         this.addWeapon = (id, amount) => {
             for (var i = 0; i < this.weapons.length; i++) {
                 if (this.weapons[i].id === id) {
@@ -46,6 +48,7 @@ class SingleWeapon {
                 if (weaponFromBank.weapon == weapon) {
                     this._weapon = weapon;
                     this.name = weaponFromBank.name;
+                    console.log("Weapon equiped " + this._weapon + this.name);
                     break;
                 }
             }

@@ -1,71 +1,69 @@
+import { Actor } from './Entities/Actor';
+import { WeaponType } from './enums';
 export class Item {
 
-    constructor(private id: string, private name: string, private add: any, private remove: any, private event: any, private info: any) {
+    constructor(private id: any, private name: string, private event: any, private add: any, private remove: any, private info: any) {
         Item.list[this.id] = this;
     }
 
     static list = {};
 }
 
-new Item("medicalkit","Medical Kit",function(player){
-	
-    if((player.hp+player.hpMax/2) < player.hpMax){
-        player.hp += player.hpMax/2;
-    } else{
-        player.hp = player.hpMax;
-    }
+new Item("medicalkit","Medical Kit",function(player: Actor){
+    
+    player.lifeAndBodyController.heal(10);
     
 	player.inventory.removeItem("medicalkit",1);
 }, function(actor, amount){}, function(actor, amount){}, function(actor){
     return "";
 });
 
-new Item("pistol","Pistol",function(actor){
-	//Weapon.list["pistol"].equip(actor);
-},function(actor, amount){
-    actor.weaponCollection.addWeapon("pistol", amount);
-}, function(actor, amount){
-    actor.weaponCollection.removeWeapon("pistol", amount);
-}, function(actor){
-    return "Ammo: "+actor.weaponCollection.getWeaponAmmo("pistol");
+new Item(WeaponType.pistol,"Pistol",function(actor: Actor){
+    actor.attackController.equip(WeaponType.pistol);
+},function(actor: Actor, amount: number){
+    actor.attackController.weaponCollection.addWeapon(WeaponType.pistol, amount);
+}, function(actor: Actor, amount: number){
+    actor.attackController.weaponCollection.removeWeapon(WeaponType.pistol, amount);
+}, function(actor: Actor){
+    //return "Ammo: "+actor.weaponCollection.getWeaponAmmo("pistol");
 });
 
-new Item("knife","Knife",function(actor){
-   // Weapon.list["knife"].equip(actor);
-}, function(actor, amount){
-    actor.weaponCollection.addWeapon("knife",amount);
-}, function(actor, amount){
-    actor.weaponCollection.removeWeapon("knife", amount);
-}, function(actor){
-    return "";
+new Item(WeaponType.knife,"Knife",function(actor){
+    actor.attackController.equip(WeaponType.knife);
+},function(actor: Actor, amount: number){
+    actor.attackController.weaponCollection.addWeapon(WeaponType.knife, amount);
+}, function(actor: Actor, amount: number){
+    actor.attackController.weaponCollection.removeWeapon(WeaponType.knife, amount);
+}, function(actor: Actor){
+    //return "Ammo: "+actor.weaponCollection.getWeaponAmmo("pistol");
 });
 
-new Item("shotgun","Shotgun",function(actor){
-	//Weapon.list["shotgun"].equip(actor);
-}, function(actor, amount){
-    actor.weaponCollection.addWeapon("shotgun",amount);
-}, function(actor, amount){
-    actor.weaponCollection.removeWeapon("shotgun", amount);
-}, function(actor){
-    return "Ammo: "+actor.weaponCollection.getWeaponAmmo("shotgun");
+new Item(WeaponType.shotgun,"Shotgun",function(actor){
+    actor.attackController.equip(WeaponType.shotgun);
+},function(actor: Actor, amount: number){
+    actor.attackController.weaponCollection.addWeapon(WeaponType.shotgun, amount);
+}, function(actor: Actor, amount: number){
+    actor.attackController.weaponCollection.removeWeapon(WeaponType.shotgun, amount);
+}, function(actor: Actor){
+    //return "Ammo: "+actor.weaponCollection.getWeaponAmmo("pistol");
 });
 
-new Item("rifle","Rifle",function(actor){
-	//Weapon.list["rifle"].equip(actor);
-}, function(actor, amount){
-    actor.weaponCollection.addWeapon("rifle",amount);
-}, function(actor, amount){
-    actor.weaponCollection.removeWeapon("rifle", amount);
-}, function(actor){
-    return "Ammo: "+actor.weaponCollection.getWeaponAmmo("rifle");
+new Item(WeaponType.rifle,"Rifle",function(actor){
+    actor.attackController.equip(WeaponType.rifle);
+},function(actor: Actor, amount: number){
+    actor.attackController.weaponCollection.addWeapon(WeaponType.rifle, amount);
+}, function(actor: Actor, amount: number){
+    actor.attackController.weaponCollection.removeWeapon(WeaponType.rifle, amount);
+}, function(actor: Actor){
+    //return "Ammo: "+actor.weaponCollection.getWeaponAmmo("pistol");
 });
 
-new Item("claws","Claws",function(actor){
-    //Weapon.list["claws"].equip(actor);
-}, function(actor, amount){
-    actor.weaponCollection.addWeapon("claws",amount);
-}, function(actor, amount){
-    actor.weaponCollection.removeWeapon("claws", amount);
-}, function(actor){
-    return "";
+new Item(WeaponType.claws,"Claws",function(actor){
+    actor.attackController.equip(WeaponType.claws);
+},function(actor: Actor, amount: number){
+    actor.attackController.weaponCollection.addWeapon(WeaponType.claws, amount);
+}, function(actor: Actor, amount: number){
+    actor.attackController.weaponCollection.removeWeapon(WeaponType.claws, amount);
+}, function(actor: Actor){
+    //return "Ammo: "+actor.weaponCollection.getWeaponAmmo("pistol");
 });

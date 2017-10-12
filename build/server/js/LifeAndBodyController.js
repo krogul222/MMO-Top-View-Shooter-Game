@@ -4,6 +4,9 @@ class LifeAndBodyController {
         this.parent = parent;
         this._hp = 30;
         this._hpMax = 30;
+        this.heal = (hp) => {
+            this._hp = (this._hp + hp > this._hpMax) ? (this._hpMax) : (this._hp + hp);
+        };
         this.wasHit = (damage) => {
             this._hp = this._hp - damage;
             this._hp = (this._hp >= 0) ? this._hp : 0;
