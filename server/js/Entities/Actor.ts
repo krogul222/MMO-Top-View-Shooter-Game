@@ -32,8 +32,8 @@ export class Actor extends Entity {
         this.updatePosition();
 	}
 
-    getClosestPlayer = () => {
-        let distance = 10000;
+    getClosestPlayer = (distance: number, angleLimit: number)  => {
+      /*  let distance = 10000;
         let index: string = "0";
         for(let i in Player.list){
             if(distance > this.getDistance(Player.list[i])){
@@ -41,11 +41,38 @@ export class Actor extends Entity {
                 index = i; 
             }
         }
-    return Player.list[index];
+    return Player.list[index];*/
+
+    let closestEnemyIndex: string = "0";
+    let closestEnemyDistance: number = 100000;
+    let pangle = this.movementController.aimAngle;
+    pangle = (pangle < 0) ? pangle + 360 : pangle;
+
+    for(let i in Player.list) {
+        let enemy = Player.list[i]; 
+        if(enemy !== this){   
+            let angle = calculateAngleBetweenEntities(this, enemy);
+            let maxDistance = Math.sqrt(enemy.width*enemy.width/4 +enemy.height*enemy.height/4) + distance;
+            let distanceFromEnemy = this.getDistance(enemy);
+
+            if(distanceFromEnemy < maxDistance){
+                if((angle < (pangle + angleLimit)) && (angle > pangle - angleLimit)){
+                    if(closestEnemyDistance > distanceFromEnemy){
+                        closestEnemyDistance = distanceFromEnemy;
+                        closestEnemyIndex = i; 
+                    }
+                }
+            }
+        }
+    }
+   
+    if(closestEnemyIndex == "-1") return null;
+
+    return Player.list[closestEnemyIndex];    
     }
 
     getClosestEnemy = (distance: number, angleLimit: number) => {
-        let closestEnemyIndex: string = "0";
+        let closestEnemyIndex: string = "-1";
         let closestEnemyDistance: number = 100000;
         let pangle = this.movementController.aimAngle;
         pangle = (pangle < 0) ? pangle + 360 : pangle;
@@ -66,8 +93,29 @@ export class Actor extends Entity {
             }
         }
        
+        if(closestEnemyIndex == "-1") return null;
+
         return Enemy.list[closestEnemyIndex];
     }
 
+    getClosestPlayerorEnemy = (distance: number, angleLimit: number) => {
+        let enemy: Enemy = this.getClosestEnemy(distance, angleLimit);
+        let player: Player = this.getClosestPlayer(distance, angleLimit);
+
+        if(this.getDistance(enemy) < this.getDistance(player)){
+            if(enemy !== null){
+                return enemy;
+            } else{
+                return null;
+            }
+        } else{
+            if(player !== null){
+                return player;
+            } else{
+                return null;
+            }
+        }
+    
+    }
     onDeath = () => {}
 }

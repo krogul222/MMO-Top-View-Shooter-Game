@@ -13,10 +13,14 @@ class Entity {
         this._img = "";
         this.updatePosition = () => this._position.changePosition(this._speed.x, this._speed.y);
         this.update = () => this.updatePosition();
-        this.getDistance = (entity) => { return this._position.getDistance(entity.position); };
+        this.getDistance = (entity) => {
+            if (entity == null)
+                return 10000000;
+            return this._position.getDistance(entity.position);
+        };
         this.testCollision = (entity) => {
-            let pos1 = new GeometryAndPhysics_1.Point(this._position.x + (this._width / 2), this._position.y + (this._height / 2));
-            let pos2 = new GeometryAndPhysics_1.Point(entity._position.x + (entity._width / 2), entity._position.y + (entity._height / 2));
+            let pos1 = new GeometryAndPhysics_1.Point(this._position.x - (this._width / 4), this._position.y - (this._height / 4));
+            let pos2 = new GeometryAndPhysics_1.Point(entity._position.x - (entity._width / 4), entity._position.y - (entity._height / 4));
             let rect1 = new GeometryAndPhysics_1.Rectangle(pos1, new GeometryAndPhysics_1.Size(this._width / 2, this._height / 2));
             let rect2 = new GeometryAndPhysics_1.Rectangle(pos2, new GeometryAndPhysics_1.Size(entity._width / 2, entity._height / 2));
             return GeometryAndPhysics_1.testCollisionRectRect(rect1, rect2);

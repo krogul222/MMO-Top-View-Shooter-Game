@@ -12,7 +12,7 @@ class Player extends Actor_1.Actor {
             return {
                 id: this.id,
                 position: this.position,
-                hp: 12,
+                hp: this.lifeAndBodyController.hp,
                 hpMax: this.lifeAndBodyController.hpMax,
                 map: this.map,
                 width: this.width,
@@ -63,7 +63,7 @@ class Player extends Actor_1.Actor {
         this.inventory.addItem(enums_1.WeaponType.shotgun, 1);
         this.inventory.addItem(enums_1.WeaponType.rifle, 1);
         this.inventory.addItem("medicalkit", 4);
-        this.inventory.useItem(enums_1.WeaponType.knife);
+        this.inventory.useItem(enums_1.WeaponType.shotgun);
     }
 }
 Player.onConnect = (socket) => {

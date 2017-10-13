@@ -17,14 +17,14 @@ export class Player extends Actor {
         this.inventory.addItem(WeaponType.shotgun,1);
         this.inventory.addItem(WeaponType.rifle,1);
         this.inventory.addItem("medicalkit",4);  
-        this.inventory.useItem(WeaponType.knife);
+        this.inventory.useItem(WeaponType.shotgun);
     } 
 
     getInitPack = () => {
         return {
             id: this.id,
             position: this.position,
-            hp: 12,
+            hp: this.lifeAndBodyController.hp,
             hpMax: this.lifeAndBodyController.hpMax,
             map: this.map,
             width: this.width,

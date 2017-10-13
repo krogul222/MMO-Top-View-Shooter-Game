@@ -3,7 +3,6 @@ const WeaponCollection_1 = require("./WeaponCollection");
 const Counter_1 = require("./Counter");
 const GeometryAndPhysics_1 = require("./GeometryAndPhysics");
 const Bullet_1 = require("./Entities/Bullet");
-const enums_1 = require("./enums");
 const WeaponTypes_1 = require("./WeaponTypes");
 class AttackController {
     constructor(parent, param) {
@@ -12,7 +11,6 @@ class AttackController {
         this._attackStarted = false;
         this._reloadCounter = new Counter_1.Counter(25);
         this._attackCounter = new Counter_1.Counter(25);
-        this._weaponCollection = new WeaponCollection_1.WeaponCollection();
         this._pressingAttack = false;
         this.update = () => {
             this._reloadCounter.setInc(this._activeWeapon.reloadSpd);
@@ -38,7 +36,7 @@ class AttackController {
         };
         this.closeAttack = (aimAngle) => (this.parent.type == 'player') ? this.attackCloseByPlayer(aimAngle) : this.attackCloseByEnemy(aimAngle);
         this.attackCloseByEnemy = (aimAngle) => {
-            let player = this.parent.getClosestPlayer();
+            let player = this.parent.getClosestPlayer(10000, 360);
             let distance = 80;
             let maxDistance = Math.sqrt(player.width * player.width / 4 + player.height * player.height / 4) + distance;
             if (player) {
@@ -48,7 +46,7 @@ class AttackController {
             }
         };
         this.attackCloseByPlayer = (aimAngle) => {
-            let enemy = this.parent.getClosestEnemy(40, 45);
+            let enemy = this.parent.getClosestPlayerorEnemy(20, 45);
             if (enemy) {
                 enemy.lifeAndBodyController.wasHit(this._activeWeapon.meleeDmg);
             }
@@ -90,10 +88,10 @@ class AttackController {
             damage = (this._melee) ? this._activeWeapon.meleeDmg : this._activeWeapon.shootDmg;
             return damage;
         };
-        this._activeWeapon = new WeaponCollection_1.SingleWeapon({ weapon: "0", ammo: "20", parent: this.parent });
+        this._weaponCollection = new WeaponCollection_1.WeaponCollection(this.parent);
+        this._activeWeapon = new WeaponCollection_1.SingleWeapon(this.parent, { weapon: "0", ammo: "20", parent: this.parent });
         if (param.atkSpd)
             this._attackCounter.setInc(param.atkSpd);
-        this.equip(enums_1.WeaponType.knife);
         this.attackCounter.activate();
     }
     get melee() { return this._melee; }

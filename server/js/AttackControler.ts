@@ -14,14 +14,15 @@ export class AttackController {
     private _reloadCounter: Counter = new Counter(25);
     private _attackCounter: Counter = new Counter(25);
     private _activeWeapon: SingleWeapon;
-    private _weaponCollection = new WeaponCollection();
+    private _weaponCollection: WeaponCollection;
     private _pressingAttack: boolean = false;
 
 
     constructor (private parent: Actor, param) {
-        this._activeWeapon = new SingleWeapon({weapon: "0", ammo: "20", parent: this.parent});
+        this._weaponCollection = new WeaponCollection(this.parent);
+        this._activeWeapon = new SingleWeapon(this.parent, {weapon: "0", ammo: "20", parent: this.parent});
         if(param.atkSpd) this._attackCounter.setInc(param.atkSpd);
-        this.equip(WeaponType.knife);
+        //this.equip(WeaponType.knife);
         this.attackCounter.activate();
     }
 
@@ -55,7 +56,7 @@ export class AttackController {
     closeAttack = (aimAngle) => (this.parent.type == 'player') ? this.attackCloseByPlayer(aimAngle) : this.attackCloseByEnemy(aimAngle);
 
     attackCloseByEnemy = (aimAngle) => {
-        let player: Player = this.parent.getClosestPlayer();
+        let player: Player = this.parent.getClosestPlayer(10000, 360);
         let distance = 80;
         let maxDistance = Math.sqrt(player.width*player.width/4+player.height*player.height/4) + distance;
 
@@ -66,7 +67,7 @@ export class AttackController {
     }
 
     attackCloseByPlayer = (aimAngle) => {
-        let enemy: Enemy = this.parent.getClosestEnemy(40, 45);
+        let enemy: Actor = this.parent.getClosestPlayerorEnemy(20, 45);
         if(enemy) { enemy.lifeAndBodyController.wasHit( this._activeWeapon.meleeDmg); }
     }
 

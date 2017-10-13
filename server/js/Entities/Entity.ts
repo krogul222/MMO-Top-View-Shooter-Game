@@ -30,11 +30,15 @@ export class Entity {
     
     update = () => this.updatePosition();
 
-    getDistance = (entity: Entity) => {return this._position.getDistance(entity.position);}
+    getDistance = (entity: Entity) => { 
+        if(entity == null) return 10000000;
+        return this._position.getDistance(entity.position);
+    }
 
     testCollision = (entity: Entity) => {
-        let pos1 = new Point(this._position.x + (this._width/2), this._position.y + (this._height/2));
-        let pos2 = new Point(entity._position.x + (entity._width/2), entity._position.y + (entity._height/2));
+
+        let pos1 = new Point(this._position.x - (this._width/4), this._position.y - (this._height/4));
+        let pos2 = new Point(entity._position.x - (entity._width/4), entity._position.y - (entity._height/4));
         
         let rect1 = new Rectangle(pos1, new Size(this._width/2, this._height/2));
         let rect2 = new Rectangle(pos2, new Size(entity._width/2, entity._height/2));

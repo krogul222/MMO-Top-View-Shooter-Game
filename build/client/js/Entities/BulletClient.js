@@ -26,6 +26,8 @@ class BulletClient {
             y = y - (mouseY - HEIGHT / 2) / CAMERA_BOX_ADJUSTMENT;
             ctx.drawImage(this.img, 0, 0, this.img.width, this.img.height, x - this.width / 2, y - this.height / 2, this.width, this.height);
         };
+        this.hit = (category, entityCategory, entityId) => {
+        };
         this.id = (initPack.id !== undefined) ? initPack.id : -1;
         this.position = (initPack.position !== undefined) ? initPack.position : new GeometryAndPhysics_1.Point(250, 250);
         this.width = (initPack.width !== undefined) ? initPack.width : 32;

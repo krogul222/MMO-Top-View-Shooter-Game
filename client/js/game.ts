@@ -103,6 +103,24 @@ socket.on('update', function(data){
     
 });
 
+socket.on('remove', function(data){
+    for(let i = 0, length = data.player.length; i < length; i++){
+        delete PlayerClient.list[data.player[i]];
+        //soundManager.play('death');
+    } 
+    for(let i = 0, length = data.bullet.length; i < length; i++){
+        if(BulletClient.list[data.bullet[i].id]){
+             BulletClient.list[data.bullet[i].id].hit(data.bullet[i].hitCategory, data.bullet[i].hitEntityCategory,data.bullet[i].hitEntityId);
+        }
+        delete BulletClient.list[data.bullet[i].id];
+    } 
+ /*   for(let i = 0, length = data.enemy.length; i < length; i++){
+        delete Enemy.list[data.enemy[i]];
+    } 
+    for(let i = 0, length = data.upgrade.length; i < length; i++){
+        delete Upgrade.list[data.upgrade[i]];
+    } */
+ });
 
 setInterval(function(){
     if(!selfId){

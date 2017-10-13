@@ -76,6 +76,17 @@ socket.on('update', function (data) {
         }
     }
 });
+socket.on('remove', function (data) {
+    for (let i = 0, length = data.player.length; i < length; i++) {
+        delete PlayerClient_1.PlayerClient.list[data.player[i]];
+    }
+    for (let i = 0, length = data.bullet.length; i < length; i++) {
+        if (BulletClient_1.BulletClient.list[data.bullet[i].id]) {
+            BulletClient_1.BulletClient.list[data.bullet[i].id].hit(data.bullet[i].hitCategory, data.bullet[i].hitEntityCategory, data.bullet[i].hitEntityId);
+        }
+        delete BulletClient_1.BulletClient.list[data.bullet[i].id];
+    }
+});
 setInterval(function () {
     if (!exports.selfId) {
         return;

@@ -34,6 +34,7 @@ class Bullet extends Entity_1.Entity {
                     for (let key in Player_1.Player.list) {
                         if (Player_1.Player.list[key].id !== this.parent) {
                             let enemyPlayer = Player_1.Player.list[key];
+                            console.log("Checking");
                             if (this.testCollision(enemyPlayer)) {
                                 this.toRemove = true;
                                 enemyPlayer.lifeAndBodyController.wasHit(player.attackController.getDamage());

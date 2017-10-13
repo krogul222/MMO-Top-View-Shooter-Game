@@ -53,5 +53,9 @@ export class BulletClient {
         ctx.drawImage(this.img, 0, 0, this.img.width, this.img.height, x - this.width/2, y - this.height/2, this.width, this.height);
     }
 
+    hit = (category, entityCategory, entityId) => {
+
+    }
+
     static list = {};
 }

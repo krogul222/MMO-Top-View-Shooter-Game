@@ -230,6 +230,17 @@ socket.on('update', function (data) {
         }
     }
 });
+socket.on('remove', function (data) {
+    for (let i = 0, length = data.player.length; i < length; i++) {
+        delete PlayerClient_1.PlayerClient.list[data.player[i]];
+    }
+    for (let i = 0, length = data.bullet.length; i < length; i++) {
+        if (BulletClient_1.BulletClient.list[data.bullet[i].id]) {
+            BulletClient_1.BulletClient.list[data.bullet[i].id].hit(data.bullet[i].hitCategory, data.bullet[i].hitEntityCategory, data.bullet[i].hitEntityId);
+        }
+        delete BulletClient_1.BulletClient.list[data.bullet[i].id];
+    }
+});
 setInterval(function () {
     if (!exports.selfId) {
         return;
@@ -327,7 +338,7 @@ class Player extends Actor_1.Actor {
             return {
                 id: this.id,
                 position: this.position,
-                hp: this.lifeAndBodyController.hp,
+                hp: 12,
                 hpMax: this.lifeAndBodyController.hpMax,
                 map: this.map,
                 width: this.width,
@@ -1320,6 +1331,8 @@ class BulletClient {
             y = y - (mouseY - HEIGHT / 2) / CAMERA_BOX_ADJUSTMENT;
             ctx.drawImage(this.img, 0, 0, this.img.width, this.img.height, x - this.width / 2, y - this.height / 2, this.width, this.height);
         };
+        this.hit = (category, entityCategory, entityId) => {
+        };
         this.id = (initPack.id !== undefined) ? initPack.id : -1;
         this.position = (initPack.position !== undefined) ? initPack.position : new GeometryAndPhysics_1.Point(250, 250);
         this.width = (initPack.width !== undefined) ? initPack.width : 32;
@@ -1382,6 +1395,9 @@ class LifeAndBodyController {
         this.parent = parent;
         this._hp = 30;
         this._hpMax = 30;
+        this.heal = (hp) => {
+            this._hp = (this._hp + hp > this._hpMax) ? (this._hpMax) : (this._hp + hp);
+        };
         this.wasHit = (damage) => {
             this._hp = this._hp - damage;
             this._hp = (this._hp >= 0) ? this._hp : 0;
@@ -1715,12 +1731,7 @@ class Item {
 Item.list = {};
 exports.Item = Item;
 new Item("medicalkit", "Medical Kit", function (player) {
-    if ((player.hp + player.hpMax / 2) < player.hpMax) {
-        player.hp += player.hpMax / 2;
-    }
-    else {
-        player.hp = player.hpMax;
-    }
+    player.lifeAndBodyController.heal(10);
     player.inventory.removeItem("medicalkit", 1);
 }, function (actor, amount) { }, function (actor, amount) { }, function (actor) {
     return "";

@@ -29,14 +29,14 @@ class WeaponTypes {
 }
 WeaponTypes.getWeaponParameters = (weapon) => {
     for (let i in WeaponTypes.list) {
+        console.log(weapon + " " + WeaponTypes.list[i].weapon);
         let weaponFromBank = WeaponTypes.list[i];
         if (weaponFromBank.weapon == weapon) {
+            console.log("YES");
             return weaponFromBank;
         }
-        else {
-            return WeaponTypes.list[0];
-        }
     }
+    return WeaponTypes.list[0];
 };
 WeaponTypes.list = {};
 exports.WeaponTypes = WeaponTypes;

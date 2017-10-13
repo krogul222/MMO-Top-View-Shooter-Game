@@ -16,19 +16,33 @@ class Actor extends Entity_1.Entity {
             this.attackController.update();
             this.updatePosition();
         };
-        this.getClosestPlayer = () => {
-            let distance = 10000;
-            let index = "0";
+        this.getClosestPlayer = (distance, angleLimit) => {
+            let closestEnemyIndex = "0";
+            let closestEnemyDistance = 100000;
+            let pangle = this.movementController.aimAngle;
+            pangle = (pangle < 0) ? pangle + 360 : pangle;
             for (let i in Player_1.Player.list) {
-                if (distance > this.getDistance(Player_1.Player.list[i])) {
-                    distance = this.getDistance(Player_1.Player.list[i]);
-                    index = i;
+                let enemy = Player_1.Player.list[i];
+                if (enemy !== this) {
+                    let angle = GeometryAndPhysics_1.calculateAngleBetweenEntities(this, enemy);
+                    let maxDistance = Math.sqrt(enemy.width * enemy.width / 4 + enemy.height * enemy.height / 4) + distance;
+                    let distanceFromEnemy = this.getDistance(enemy);
+                    if (distanceFromEnemy < maxDistance) {
+                        if ((angle < (pangle + angleLimit)) && (angle > pangle - angleLimit)) {
+                            if (closestEnemyDistance > distanceFromEnemy) {
+                                closestEnemyDistance = distanceFromEnemy;
+                                closestEnemyIndex = i;
+                            }
+                        }
+                    }
                 }
             }
-            return Player_1.Player.list[index];
+            if (closestEnemyIndex == "-1")
+                return null;
+            return Player_1.Player.list[closestEnemyIndex];
         };
         this.getClosestEnemy = (distance, angleLimit) => {
-            let closestEnemyIndex = "0";
+            let closestEnemyIndex = "-1";
             let closestEnemyDistance = 100000;
             let pangle = this.movementController.aimAngle;
             pangle = (pangle < 0) ? pangle + 360 : pangle;
@@ -46,7 +60,29 @@ class Actor extends Entity_1.Entity {
                     }
                 }
             }
+            if (closestEnemyIndex == "-1")
+                return null;
             return Enemy_1.Enemy.list[closestEnemyIndex];
+        };
+        this.getClosestPlayerorEnemy = (distance, angleLimit) => {
+            let enemy = this.getClosestEnemy(distance, angleLimit);
+            let player = this.getClosestPlayer(distance, angleLimit);
+            if (this.getDistance(enemy) < this.getDistance(player)) {
+                if (enemy !== null) {
+                    return enemy;
+                }
+                else {
+                    return null;
+                }
+            }
+            else {
+                if (player !== null) {
+                    return player;
+                }
+                else {
+                    return null;
+                }
+            }
         };
         this.onDeath = () => { };
         this.lifeAndBodyController = new LifeAndBodyController_1.LifeAndBodyController(this, param);
