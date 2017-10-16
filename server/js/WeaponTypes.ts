@@ -10,6 +10,7 @@ export class WeaponTypes {
     attackSpd: number = 30;
     attackMelee: boolean = true;
     reloadSpd: number = 30;
+    recoil: boolean = false;
     _weapon: WeaponType;
     maxSpd: number = 8;
     reloadAmmo: number = 0; 
@@ -25,6 +26,7 @@ export class WeaponTypes {
         this.shootSpeed = (param.shootSpeed !== undefined) ? param.shootSpeed : 0;
         this.reloadAmmo = (param.reloadAmmo !== undefined) ? param.reloadAmmo : 0;
         this.reloadSpd = (param.reloadSpd !== undefined) ? param.reloadSpd : 0;
+        this.recoil = (param.recoil !== undefined) ? param.recoil : false;
         this.name = (param.name !== undefined) ? param.name : "knife";
 
         WeaponTypes.list[param.weapon] = this;
@@ -36,13 +38,24 @@ export class WeaponTypes {
         
         for(let i in WeaponTypes.list){
             console.log(weapon + " " +WeaponTypes.list[i].weapon);
-            let weaponFromBank: WeaponTypes = WeaponTypes.list[i]
+            let weaponFromBank: WeaponTypes = WeaponTypes.list[i];
             if(weaponFromBank.weapon == weapon){
                 console.log("YES");
                 return weaponFromBank;
             }
         }
         return WeaponTypes.list[0];
+    }
+
+    static getWeaponIdbyName = (name: string) => {
+        for(let i in WeaponTypes.list){
+            let weaponFromBank: WeaponTypes = WeaponTypes.list[i]
+            if(weaponFromBank.name == name){
+                return weaponFromBank.weapon;
+            }
+        }
+
+        return WeaponType.knife;
     }
 
     static list = {};

@@ -9,6 +9,7 @@ class PlayerClient {
         this.height = 0;
         this.img = Img["player" + "pistol"];
         this.imgMeleeAttack = Img["playerknifemeeleattack"];
+        this.imgReload = Img["playerpistolreload"];
         this.hp = 1;
         this.hpMax = 1;
         this.map = "forest";
@@ -52,8 +53,10 @@ class PlayerClient {
             }
             else {
                 if (this.reload) {
+                    if (this.weapon == "pistol")
+                        spriteColumns = 15;
                     walkingMod = Math.floor(this.bodySpriteAnimCounter) % spriteColumns;
-                    this.drawNormalBodyWithGun(spriteColumns, spriteRows, aimAngle, 0, walkingMod, x, y);
+                    this.drawReloadBodyWithGun(spriteColumns, spriteRows, aimAngle, 0, walkingMod, x, y);
                 }
                 else {
                     this.drawNormalBodyWithGun(spriteColumns, spriteRows, aimAngle, 0, walkingMod, x, y);
@@ -108,6 +111,16 @@ class PlayerClient {
             ctx.drawImage(this.img, walkingMod * frameWidth, directionMod * frameHeight, frameWidth, frameHeight, -this.width / 2, -this.height / 2, this.width, this.height);
             ctx.restore();
         };
+        this.drawReloadBodyWithGun = (spriteColumns, spriteRows, aimAngle, directionMod, walkingMod, x, y) => {
+            let frameWidth = this.imgReload.width / spriteColumns;
+            let frameHeight = this.imgReload.height / spriteRows;
+            ctx.save();
+            ctx.translate(x - this.width / 2, y - this.height / 2);
+            ctx.translate(this.width / 2, this.height / 2);
+            ctx.rotate(aimAngle * Math.PI / 180);
+            ctx.drawImage(this.imgReload, walkingMod * frameWidth, directionMod * frameHeight, frameWidth, frameHeight, -this.width / 2, -this.height / 2, this.width, this.height);
+            ctx.restore();
+        };
         this.drawWalk = (spriteColumns, spriteRows, aimAngle, directionMod, walkingMod, x, y) => {
             let frameWidth = Img["walk"].width / spriteColumns;
             let frameHeight = Img["walk"].height / spriteRows;
@@ -115,6 +128,7 @@ class PlayerClient {
             ctx.translate(x - this.width / 4, y - this.height / 4);
             ctx.translate(this.width / 4, this.height / 4);
             ctx.rotate(aimAngle * Math.PI / 180);
+            console.log("WALK MODE: " + walkingMod);
             ctx.drawImage(Img["walk"], walkingMod * frameWidth, directionMod * frameHeight, frameWidth, frameHeight, -this.width / 4, -this.height / 4, this.width / 2, this.height / 2);
             ctx.restore();
         };
@@ -130,6 +144,7 @@ class PlayerClient {
             this.img = Img["player" + initPack.weapon];
             this.weapon = initPack.weapon;
             this.imgMeleeAttack = Img["player" + initPack.weapon + "meeleattack"];
+            this.imgReload = Img["player" + initPack.weapon + "reload"];
         }
         if (initPack.hp)
             this.hp = initPack.hp;

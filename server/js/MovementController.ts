@@ -63,6 +63,8 @@ export class MovementController {
         //Recoil implementation
 
         if (this._recoilCounter.isActive() && !this._recoilCounter.resetIfMax()){
+            console.log("RECOIL");
+            this._recoilCounter.count();
             if(map.isPositionWall(downBumper) || map.isPositionWall(upBumper) || map.isPositionWall(leftBumper) || map.isPositionWall(rightBumper) ){
                 this._recoilCounter.deactivate();
                 this._recoilCounter.reset();

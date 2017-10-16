@@ -48,7 +48,7 @@ export class GUI {
             if(Img[PlayerClient.list[selfId].weapon+"ammo"]){
                 this.ctx.drawImage(Img[PlayerClient.list[selfId].weapon+"ammo"], 0, 0, Img[PlayerClient.list[selfId].weapon+"ammo"].width, Img[PlayerClient.list[selfId].weapon+"ammo"].height, 11*(this.width-0.8*this.height)/32, (this.height-0.4*this.height)/2, 0.4*this.height, 0.4*this.height); 
                 
-                this.ctx.fillText(' x'+PlayerClient.list[selfId].ammo+"  "+PlayerClient.list[selfId].ammoInGun+"/", 11*(this.width-0.8*this.height)/32+0.4*this.height, (this.height)/2+10);
+                this.ctx.fillText(' x'+PlayerClient.list[selfId].ammo+"  "+PlayerClient.list[selfId].ammoInGun+"/"+WeaponTypes.list[WeaponTypes.getWeaponIdbyName(PlayerClient.list[selfId].weapon)].reloadAmmo, 11*(this.width-0.8*this.height)/32+0.4*this.height, (this.height)/2+10);
             }   
         }
     }

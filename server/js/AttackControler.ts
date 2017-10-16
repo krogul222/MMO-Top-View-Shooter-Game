@@ -11,7 +11,7 @@ import { WeaponTypes } from './WeaponTypes';
 export class AttackController {
     private _melee: boolean = true;
     private _attackStarted: boolean = false;
-    private _reloadCounter: Counter = new Counter(25);
+    private _reloadCounter: Counter = new Counter(50);
     private _attackCounter: Counter = new Counter(25);
     private _activeWeapon: SingleWeapon;
     private _weaponCollection: WeaponCollection;
@@ -47,7 +47,7 @@ export class AttackController {
                 this._attackStarted = true;
                 console.log(this._activeWeapon.ammo);
                 console.log(this._melee);
-                this._melee = (this._activeWeapon.ammo > 0) ? this._melee : true;
+                this._melee = (this._activeWeapon._ammoInGun > 0) ? this._melee : true;
                 this._melee ? this.closeAttack(this.parent.movementController.aimAngle) : this.distanceAttack();   
             }
         }

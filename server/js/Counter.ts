@@ -18,7 +18,10 @@ export class Counter {
 
     get value() { return this._value };
 
-    activate = () => this.active = true;
+    activate = () =>{
+        this.active = true;
+        this._value = 0;
+    } 
 
     deactivate = () => this.active = false;
 

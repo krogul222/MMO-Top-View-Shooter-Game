@@ -53,6 +53,7 @@ socket.on('update', function(data){
             p.weapon = pack.weapon
             p.img = Img["player"+pack.weapon];
             p.imgMeleeAttack = Img["player" + pack.weapon + "meeleattack"];
+            p.imgReload = Img["player" + pack.weapon + "reload"];
             }
 
            if(pack.attackMelee !== undefined){
@@ -68,6 +69,10 @@ socket.on('update', function(data){
 
            if(pack.ammo !== undefined){
             p.ammo = pack.ammo;
+            }
+            
+            if(pack.ammoInGun !== undefined){
+                p.ammoInGun = pack.ammoInGun;
             } 
 
            if(pack.reload !== undefined){
@@ -82,7 +87,7 @@ socket.on('update', function(data){
                // console.log("Attack started " + pack.attackStarted);
                 if(pack.attackStarted){
                     p.attackStarted = true;
-                    p.spriteAnimCounter = 0;
+                    p.bodySpriteAnimCounter = 0;
                 }
             }
            
@@ -133,7 +138,6 @@ setInterval(function(){
     //drawAmmo();
     for(let i in PlayerClient.list){
         if(PlayerClient.list[i].moving){
-
             PlayerClient.list[i].walkSpriteAnimCounter += 1;
         }
 

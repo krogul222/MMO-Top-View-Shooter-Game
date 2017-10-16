@@ -1,6 +1,7 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 const PlayerClient_1 = require("./Entities/PlayerClient");
 const game_1 = require("./game");
+const WeaponTypes_1 = require("../../server/js/WeaponTypes");
 class GUI {
     constructor(param) {
         this.draw = () => {
@@ -31,7 +32,7 @@ class GUI {
             if (PlayerClient_1.PlayerClient.list[game_1.selfId]) {
                 if (Img[PlayerClient_1.PlayerClient.list[game_1.selfId].weapon + "ammo"]) {
                     this.ctx.drawImage(Img[PlayerClient_1.PlayerClient.list[game_1.selfId].weapon + "ammo"], 0, 0, Img[PlayerClient_1.PlayerClient.list[game_1.selfId].weapon + "ammo"].width, Img[PlayerClient_1.PlayerClient.list[game_1.selfId].weapon + "ammo"].height, 11 * (this.width - 0.8 * this.height) / 32, (this.height - 0.4 * this.height) / 2, 0.4 * this.height, 0.4 * this.height);
-                    this.ctx.fillText(' x' + PlayerClient_1.PlayerClient.list[game_1.selfId].ammo + "  " + PlayerClient_1.PlayerClient.list[game_1.selfId].ammoInGun + "/", 11 * (this.width - 0.8 * this.height) / 32 + 0.4 * this.height, (this.height) / 2 + 10);
+                    this.ctx.fillText(' x' + PlayerClient_1.PlayerClient.list[game_1.selfId].ammo + "  " + PlayerClient_1.PlayerClient.list[game_1.selfId].ammoInGun + "/" + WeaponTypes_1.WeaponTypes.list[WeaponTypes_1.WeaponTypes.getWeaponIdbyName(PlayerClient_1.PlayerClient.list[game_1.selfId].weapon)].reloadAmmo, 11 * (this.width - 0.8 * this.height) / 32 + 0.4 * this.height, (this.height) / 2 + 10);
                 }
             }
         };

@@ -10,9 +10,7 @@ export class Item {
 }
 
 new Item("medicalkit","Medical Kit",function(player: Actor){
-    
     player.lifeAndBodyController.heal(10);
-    
 	player.inventory.removeItem("medicalkit",1);
 }, function(actor, amount){}, function(actor, amount){}, function(actor){
     return "";

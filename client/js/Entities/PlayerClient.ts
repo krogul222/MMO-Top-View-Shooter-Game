@@ -16,6 +16,7 @@ export class PlayerClient{
     public height: number = 0;
     public img: any = Img["player"+"pistol"];
     public imgMeleeAttack = Img["playerknifemeeleattack"];
+    public imgReload = Img["playerpistolreload"];
     public hp: number = 1;
     public hpMax: number = 1;
     public map = "forest";
@@ -39,6 +40,7 @@ export class PlayerClient{
             this.img = Img["player"+initPack.weapon];
             this.weapon = initPack.weapon;
             this.imgMeleeAttack = Img["player"+initPack.weapon+"meeleattack"];
+            this.imgReload = Img["player"+initPack.weapon+"reload"];
         }
         if(initPack.hp) this.hp = initPack.hp;
         if(initPack.hpMax) this.hpMax = initPack.hpMax;
@@ -78,7 +80,7 @@ export class PlayerClient{
         aimAngle = (aimAngle < 0) ? (360 + aimAngle) : aimAngle;
         let directionMod: number = this.inWhichDirection(aimAngle);
         let walkingMod = Math.floor(this.walkSpriteAnimCounter) % spriteColumns;
-        console.log("Walking mod "+walkingMod);
+        //console.log("Walking mod "+walkingMod);
         this.drawWalk(spriteColumns, spriteRows, aimAngle, 0, walkingMod, x, y);
 
         if(this.attackStarted && this.attackMelee){
@@ -87,8 +89,9 @@ export class PlayerClient{
             this.drawMeleeAttackBody(spriteColumns, spriteRows, aimAngle, 0, walkingMod, x, y);
         } else {
             if(this.reload){
+                if(this.weapon == "pistol") spriteColumns = 15;
                 walkingMod = Math.floor(this.bodySpriteAnimCounter) % spriteColumns;
-                this.drawNormalBodyWithGun(spriteColumns, spriteRows, aimAngle, 0, walkingMod, x, y);
+                this.drawReloadBodyWithGun(spriteColumns, spriteRows, aimAngle, 0, walkingMod, x, y);
             } else {
                 this.drawNormalBodyWithGun(spriteColumns, spriteRows, aimAngle, 0, walkingMod, x, y);
             }
@@ -162,6 +165,23 @@ export class PlayerClient{
         ctx.restore();
     }
 
+
+    drawReloadBodyWithGun = (spriteColumns, spriteRows, aimAngle, directionMod, walkingMod, x, y) => {
+
+        let frameWidth = this.imgReload.width/spriteColumns;
+        let frameHeight = this.imgReload.height/spriteRows;
+
+        // the alternative is to untranslate & unrotate after drawing
+        ctx.save();
+        ctx.translate(x - this.width/2,y - this.height/2);
+        ctx.translate(this.width/2, this.height/2); 
+        ctx.rotate(aimAngle*Math.PI/180)
+
+        ctx.drawImage(this.imgReload, walkingMod*frameWidth, directionMod*frameHeight, frameWidth, frameHeight, -this.width/2,-this.height/2, this.width, this.height);
+
+        ctx.restore();
+    }
+
     drawWalk = (spriteColumns, spriteRows, aimAngle, directionMod, walkingMod, x, y) => {
         let frameWidth = Img["walk"].width/spriteColumns;
         let frameHeight = Img["walk"].height/spriteRows;        
@@ -170,7 +190,7 @@ export class PlayerClient{
         ctx.translate(x - this.width/4,y - this.height/4);
         ctx.translate(this.width/4, this.height/4); 
         ctx.rotate(aimAngle*Math.PI/180)
-        
+        console.log("WALK MODE: "+ walkingMod);
         ctx.drawImage(Img["walk"], walkingMod*frameWidth, directionMod*frameHeight, frameWidth, frameHeight, -this.width/4,-this.height/4, this.width/2, this.height/2);
         
         ctx.restore();   

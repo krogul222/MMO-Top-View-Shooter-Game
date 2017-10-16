@@ -35,6 +35,7 @@ socket.on('update', function (data) {
                 p.weapon = pack.weapon;
                 p.img = Img["player" + pack.weapon];
                 p.imgMeleeAttack = Img["player" + pack.weapon + "meeleattack"];
+                p.imgReload = Img["player" + pack.weapon + "reload"];
             }
             if (pack.attackMelee !== undefined) {
                 p.attackMelee = pack.attackMelee;
@@ -48,6 +49,9 @@ socket.on('update', function (data) {
             if (pack.ammo !== undefined) {
                 p.ammo = pack.ammo;
             }
+            if (pack.ammoInGun !== undefined) {
+                p.ammoInGun = pack.ammoInGun;
+            }
             if (pack.reload !== undefined) {
                 if (pack.reload) {
                     p.reload = true;
@@ -59,7 +63,7 @@ socket.on('update', function (data) {
             if (pack.attackStarted !== undefined) {
                 if (pack.attackStarted) {
                     p.attackStarted = true;
-                    p.spriteAnimCounter = 0;
+                    p.bodySpriteAnimCounter = 0;
                 }
             }
             gui.draw();

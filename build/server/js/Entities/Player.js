@@ -102,6 +102,18 @@ Player.onConnect = (socket) => {
             player.attackController.pressingAttack = data.state;
         if (data.inputId == 'mouseAngle')
             player.movementController.aimAngle = data.state;
+        if (data.inputId == 'heal')
+            player.inventory.useItem("medicalkit");
+        if (data.inputId == '1')
+            player.attackController.weaponCollection.changeWeapon(enums_1.WeaponType.knife);
+        if (data.inputId == '2')
+            player.attackController.weaponCollection.changeWeapon(enums_1.WeaponType.pistol);
+        if (data.inputId == '3')
+            player.attackController.weaponCollection.changeWeapon(enums_1.WeaponType.shotgun);
+        if (data.inputId == '4')
+            player.attackController.weaponCollection.changeWeapon(enums_1.WeaponType.rifle);
+        if (data.inputId == 'space')
+            player.attackController.weaponCollection.chooseNextWeaponWithAmmo();
     });
     socket.emit('init', { player: Player.getAllInitPack(), bullet: Bullet_1.Bullet.getAllInitPack(), enemy: Enemy_1.Enemy.getAllInitPack(), selfId: socket.id });
 };

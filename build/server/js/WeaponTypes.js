@@ -10,6 +10,7 @@ class WeaponTypes {
         this.attackSpd = 30;
         this.attackMelee = true;
         this.reloadSpd = 30;
+        this.recoil = false;
         this.maxSpd = 8;
         this.reloadAmmo = 0;
         this._weapon = (param.weapon !== undefined) ? param.weapon : enums_1.WeaponType.knife;
@@ -22,6 +23,7 @@ class WeaponTypes {
         this.shootSpeed = (param.shootSpeed !== undefined) ? param.shootSpeed : 0;
         this.reloadAmmo = (param.reloadAmmo !== undefined) ? param.reloadAmmo : 0;
         this.reloadSpd = (param.reloadSpd !== undefined) ? param.reloadSpd : 0;
+        this.recoil = (param.recoil !== undefined) ? param.recoil : false;
         this.name = (param.name !== undefined) ? param.name : "knife";
         WeaponTypes.list[param.weapon] = this;
     }
@@ -37,6 +39,15 @@ WeaponTypes.getWeaponParameters = (weapon) => {
         }
     }
     return WeaponTypes.list[0];
+};
+WeaponTypes.getWeaponIdbyName = (name) => {
+    for (let i in WeaponTypes.list) {
+        let weaponFromBank = WeaponTypes.list[i];
+        if (weaponFromBank.name == name) {
+            return weaponFromBank.weapon;
+        }
+    }
+    return enums_1.WeaponType.knife;
 };
 WeaponTypes.list = {};
 exports.WeaponTypes = WeaponTypes;

@@ -124,6 +124,16 @@ exports.Velocity = Velocity;
 
 /***/ }),
 /* 1 */
+/***/ (function(module, exports, __webpack_require__) {
+
+Object.defineProperty(exports, "__esModule", { value: true });
+const Pack_1 = __webpack_require__(15);
+exports.initPack = new Pack_1.Pack();
+exports.removePack = new Pack_1.Pack();
+
+
+/***/ }),
+/* 2 */
 /***/ (function(module, exports) {
 
 Object.defineProperty(exports, "__esModule", { value: true });
@@ -139,23 +149,13 @@ var WeaponType;
 
 
 /***/ }),
-/* 2 */
-/***/ (function(module, exports, __webpack_require__) {
-
-Object.defineProperty(exports, "__esModule", { value: true });
-const Pack_1 = __webpack_require__(15);
-exports.initPack = new Pack_1.Pack();
-exports.removePack = new Pack_1.Pack();
-
-
-/***/ }),
 /* 3 */
 /***/ (function(module, exports, __webpack_require__) {
 
 Object.defineProperty(exports, "__esModule", { value: true });
 const PlayerClient_1 = __webpack_require__(7);
 const BulletClient_1 = __webpack_require__(14);
-const Inventory_1 = __webpack_require__(8);
+const Inventory_1 = __webpack_require__(9);
 exports.selfId = 0;
 exports.inventory = new Inventory_1.Inventory(socket, false, 0);
 socket.on('updateInventory', function (items) {
@@ -189,6 +189,7 @@ socket.on('update', function (data) {
                 p.weapon = pack.weapon;
                 p.img = Img["player" + pack.weapon];
                 p.imgMeleeAttack = Img["player" + pack.weapon + "meeleattack"];
+                p.imgReload = Img["player" + pack.weapon + "reload"];
             }
             if (pack.attackMelee !== undefined) {
                 p.attackMelee = pack.attackMelee;
@@ -202,6 +203,9 @@ socket.on('update', function (data) {
             if (pack.ammo !== undefined) {
                 p.ammo = pack.ammo;
             }
+            if (pack.ammoInGun !== undefined) {
+                p.ammoInGun = pack.ammoInGun;
+            }
             if (pack.reload !== undefined) {
                 if (pack.reload) {
                     p.reload = true;
@@ -213,7 +217,7 @@ socket.on('update', function (data) {
             if (pack.attackStarted !== undefined) {
                 if (pack.attackStarted) {
                     p.attackStarted = true;
-                    p.spriteAnimCounter = 0;
+                    p.bodySpriteAnimCounter = 0;
                 }
             }
             gui.draw();
@@ -325,12 +329,12 @@ document.onmousemove = function (event) {
 /***/ (function(module, exports, __webpack_require__) {
 
 Object.defineProperty(exports, "__esModule", { value: true });
-const globalVariables_1 = __webpack_require__(2);
+const globalVariables_1 = __webpack_require__(1);
 const Enemy_1 = __webpack_require__(5);
 const Bullet_1 = __webpack_require__(13);
-const Actor_1 = __webpack_require__(9);
+const Actor_1 = __webpack_require__(10);
 const GeometryAndPhysics_1 = __webpack_require__(0);
-const enums_1 = __webpack_require__(1);
+const enums_1 = __webpack_require__(2);
 class Player extends Actor_1.Actor {
     constructor(param) {
         super(param);
@@ -338,7 +342,7 @@ class Player extends Actor_1.Actor {
             return {
                 id: this.id,
                 position: this.position,
-                hp: 12,
+                hp: this.lifeAndBodyController.hp,
                 hpMax: this.lifeAndBodyController.hpMax,
                 map: this.map,
                 width: this.width,
@@ -389,7 +393,7 @@ class Player extends Actor_1.Actor {
         this.inventory.addItem(enums_1.WeaponType.shotgun, 1);
         this.inventory.addItem(enums_1.WeaponType.rifle, 1);
         this.inventory.addItem("medicalkit", 4);
-        this.inventory.useItem(enums_1.WeaponType.knife);
+        this.inventory.useItem(enums_1.WeaponType.shotgun);
     }
 }
 Player.onConnect = (socket) => {
@@ -428,6 +432,18 @@ Player.onConnect = (socket) => {
             player.attackController.pressingAttack = data.state;
         if (data.inputId == 'mouseAngle')
             player.movementController.aimAngle = data.state;
+        if (data.inputId == 'heal')
+            player.inventory.useItem("medicalkit");
+        if (data.inputId == '1')
+            player.attackController.weaponCollection.changeWeapon(enums_1.WeaponType.knife);
+        if (data.inputId == '2')
+            player.attackController.weaponCollection.changeWeapon(enums_1.WeaponType.pistol);
+        if (data.inputId == '3')
+            player.attackController.weaponCollection.changeWeapon(enums_1.WeaponType.shotgun);
+        if (data.inputId == '4')
+            player.attackController.weaponCollection.changeWeapon(enums_1.WeaponType.rifle);
+        if (data.inputId == 'space')
+            player.attackController.weaponCollection.chooseNextWeaponWithAmmo();
     });
     socket.emit('init', { player: Player.getAllInitPack(), bullet: Bullet_1.Bullet.getAllInitPack(), enemy: Enemy_1.Enemy.getAllInitPack(), selfId: socket.id });
 };
@@ -461,9 +477,9 @@ exports.Player = Player;
 
 Object.defineProperty(exports, "__esModule", { value: true });
 const MapControler_1 = __webpack_require__(6);
-const Actor_1 = __webpack_require__(9);
+const Actor_1 = __webpack_require__(10);
 const GeometryAndPhysics_1 = __webpack_require__(0);
-const globalVariables_1 = __webpack_require__(2);
+const globalVariables_1 = __webpack_require__(1);
 class Enemy extends Actor_1.Actor {
     constructor(param) {
         super(param);
@@ -657,6 +673,7 @@ class PlayerClient {
         this.height = 0;
         this.img = Img["player" + "pistol"];
         this.imgMeleeAttack = Img["playerknifemeeleattack"];
+        this.imgReload = Img["playerpistolreload"];
         this.hp = 1;
         this.hpMax = 1;
         this.map = "forest";
@@ -700,8 +717,10 @@ class PlayerClient {
             }
             else {
                 if (this.reload) {
+                    if (this.weapon == "pistol")
+                        spriteColumns = 15;
                     walkingMod = Math.floor(this.bodySpriteAnimCounter) % spriteColumns;
-                    this.drawNormalBodyWithGun(spriteColumns, spriteRows, aimAngle, 0, walkingMod, x, y);
+                    this.drawReloadBodyWithGun(spriteColumns, spriteRows, aimAngle, 0, walkingMod, x, y);
                 }
                 else {
                     this.drawNormalBodyWithGun(spriteColumns, spriteRows, aimAngle, 0, walkingMod, x, y);
@@ -756,6 +775,16 @@ class PlayerClient {
             ctx.drawImage(this.img, walkingMod * frameWidth, directionMod * frameHeight, frameWidth, frameHeight, -this.width / 2, -this.height / 2, this.width, this.height);
             ctx.restore();
         };
+        this.drawReloadBodyWithGun = (spriteColumns, spriteRows, aimAngle, directionMod, walkingMod, x, y) => {
+            let frameWidth = this.imgReload.width / spriteColumns;
+            let frameHeight = this.imgReload.height / spriteRows;
+            ctx.save();
+            ctx.translate(x - this.width / 2, y - this.height / 2);
+            ctx.translate(this.width / 2, this.height / 2);
+            ctx.rotate(aimAngle * Math.PI / 180);
+            ctx.drawImage(this.imgReload, walkingMod * frameWidth, directionMod * frameHeight, frameWidth, frameHeight, -this.width / 2, -this.height / 2, this.width, this.height);
+            ctx.restore();
+        };
         this.drawWalk = (spriteColumns, spriteRows, aimAngle, directionMod, walkingMod, x, y) => {
             let frameWidth = Img["walk"].width / spriteColumns;
             let frameHeight = Img["walk"].height / spriteRows;
@@ -763,6 +792,7 @@ class PlayerClient {
             ctx.translate(x - this.width / 4, y - this.height / 4);
             ctx.translate(this.width / 4, this.height / 4);
             ctx.rotate(aimAngle * Math.PI / 180);
+            console.log("WALK MODE: " + walkingMod);
             ctx.drawImage(Img["walk"], walkingMod * frameWidth, directionMod * frameHeight, frameWidth, frameHeight, -this.width / 4, -this.height / 4, this.width / 2, this.height / 2);
             ctx.restore();
         };
@@ -778,6 +808,7 @@ class PlayerClient {
             this.img = Img["player" + initPack.weapon];
             this.weapon = initPack.weapon;
             this.imgMeleeAttack = Img["player" + initPack.weapon + "meeleattack"];
+            this.imgReload = Img["player" + initPack.weapon + "reload"];
         }
         if (initPack.hp)
             this.hp = initPack.hp;
@@ -804,6 +835,122 @@ exports.PlayerClient = PlayerClient;
 
 /***/ }),
 /* 8 */
+/***/ (function(module, exports, __webpack_require__) {
+
+Object.defineProperty(exports, "__esModule", { value: true });
+const enums_1 = __webpack_require__(2);
+class WeaponTypes {
+    constructor(param) {
+        this.name = "";
+        this.meleeDmg = 0;
+        this.shootDmg = 0;
+        this.shootSpeed = 0;
+        this.attackRadius = 0;
+        this.attackSpd = 30;
+        this.attackMelee = true;
+        this.reloadSpd = 30;
+        this.recoil = false;
+        this.maxSpd = 8;
+        this.reloadAmmo = 0;
+        this._weapon = (param.weapon !== undefined) ? param.weapon : enums_1.WeaponType.knife;
+        this.attackRadius = (param.attackRadius !== undefined) ? param.attackRadius : 0;
+        this.attackSpd = (param.attackSpd !== undefined) ? param.attackSpd : 0;
+        this.attackMelee = (param.attackMelee !== undefined) ? param.attackMelee : true;
+        this.shootDmg = (param.shootDmg !== undefined) ? param.shootDmg : 0;
+        this.meleeDmg = (param.meleeDmg !== undefined) ? param.meleeDmg : 0;
+        this.maxSpd = (param.maxSpd !== undefined) ? param.maxSpd : 8;
+        this.shootSpeed = (param.shootSpeed !== undefined) ? param.shootSpeed : 0;
+        this.reloadAmmo = (param.reloadAmmo !== undefined) ? param.reloadAmmo : 0;
+        this.reloadSpd = (param.reloadSpd !== undefined) ? param.reloadSpd : 0;
+        this.recoil = (param.recoil !== undefined) ? param.recoil : false;
+        this.name = (param.name !== undefined) ? param.name : "knife";
+        WeaponTypes.list[param.weapon] = this;
+    }
+    get weapon() { return this._weapon; }
+}
+WeaponTypes.getWeaponParameters = (weapon) => {
+    for (let i in WeaponTypes.list) {
+        console.log(weapon + " " + WeaponTypes.list[i].weapon);
+        let weaponFromBank = WeaponTypes.list[i];
+        if (weaponFromBank.weapon == weapon) {
+            console.log("YES");
+            return weaponFromBank;
+        }
+    }
+    return WeaponTypes.list[0];
+};
+WeaponTypes.getWeaponIdbyName = (name) => {
+    for (let i in WeaponTypes.list) {
+        let weaponFromBank = WeaponTypes.list[i];
+        if (weaponFromBank.name == name) {
+            return weaponFromBank.weapon;
+        }
+    }
+    return enums_1.WeaponType.knife;
+};
+WeaponTypes.list = {};
+exports.WeaponTypes = WeaponTypes;
+new WeaponTypes({ weapon: enums_1.WeaponType.pistol, name: "pistol",
+    attackRadius: 0,
+    attackSpd: 4,
+    attackMelee: false,
+    shootDmg: 2,
+    meleeDmg: 2,
+    maxSpd: 10,
+    shootSpeed: 20,
+    reloadAmmo: 6,
+    reloadSpd: 5,
+    recoil: false
+});
+new WeaponTypes({ weapon: enums_1.WeaponType.shotgun, name: "shotgun",
+    attackRadius: 3,
+    attackSpd: 2,
+    attackMelee: false,
+    shootDmg: 3,
+    meleeDmg: 4,
+    maxSpd: 8,
+    shootSpeed: 15,
+    reloadAmmo: 2,
+    reloadSpd: 2,
+    recoil: false
+});
+new WeaponTypes({ weapon: enums_1.WeaponType.knife, name: "knife",
+    attackRadius: 0,
+    attackSpd: 3,
+    attackMelee: true,
+    shootDmg: 0,
+    meleeDmg: 8,
+    maxSpd: 11,
+    reloadAmmo: 0,
+    reloadSpd: 0,
+    recoil: false
+});
+new WeaponTypes({ weapon: enums_1.WeaponType.rifle, name: "rifle",
+    attackRadius: 0,
+    attackSpd: 1,
+    attackMelee: false,
+    shootDmg: 15,
+    meleeDmg: 4,
+    maxSpd: 8,
+    shootSpeed: 30,
+    reloadAmmo: 1,
+    reloadSpd: 2,
+    recoil: true
+});
+new WeaponTypes({ weapon: enums_1.WeaponType.claws, name: "claws",
+    attackRadius: 0,
+    attackSpd: 3,
+    attackMelee: true,
+    shootDmg: 0,
+    meleeDmg: 5,
+    reloadAmmo: 0,
+    reloadSpd: 0,
+    recoil: false
+});
+
+
+/***/ }),
+/* 9 */
 /***/ (function(module, exports, __webpack_require__) {
 
 Object.defineProperty(exports, "__esModule", { value: true });
@@ -904,14 +1051,14 @@ exports.Inventory = Inventory;
 
 
 /***/ }),
-/* 9 */
+/* 10 */
 /***/ (function(module, exports, __webpack_require__) {
 
 Object.defineProperty(exports, "__esModule", { value: true });
-const Inventory_1 = __webpack_require__(8);
+const Inventory_1 = __webpack_require__(9);
 const LifeAndBodyController_1 = __webpack_require__(17);
 const MapControler_1 = __webpack_require__(6);
-const Entity_1 = __webpack_require__(10);
+const Entity_1 = __webpack_require__(11);
 const Player_1 = __webpack_require__(4);
 const Enemy_1 = __webpack_require__(5);
 const AttackControler_1 = __webpack_require__(18);
@@ -925,19 +1072,33 @@ class Actor extends Entity_1.Entity {
             this.attackController.update();
             this.updatePosition();
         };
-        this.getClosestPlayer = () => {
-            let distance = 10000;
-            let index = "0";
+        this.getClosestPlayer = (distance, angleLimit) => {
+            let closestEnemyIndex = "0";
+            let closestEnemyDistance = 100000;
+            let pangle = this.movementController.aimAngle;
+            pangle = (pangle < 0) ? pangle + 360 : pangle;
             for (let i in Player_1.Player.list) {
-                if (distance > this.getDistance(Player_1.Player.list[i])) {
-                    distance = this.getDistance(Player_1.Player.list[i]);
-                    index = i;
+                let enemy = Player_1.Player.list[i];
+                if (enemy !== this) {
+                    let angle = GeometryAndPhysics_1.calculateAngleBetweenEntities(this, enemy);
+                    let maxDistance = Math.sqrt(enemy.width * enemy.width / 4 + enemy.height * enemy.height / 4) + distance;
+                    let distanceFromEnemy = this.getDistance(enemy);
+                    if (distanceFromEnemy < maxDistance) {
+                        if ((angle < (pangle + angleLimit)) && (angle > pangle - angleLimit)) {
+                            if (closestEnemyDistance > distanceFromEnemy) {
+                                closestEnemyDistance = distanceFromEnemy;
+                                closestEnemyIndex = i;
+                            }
+                        }
+                    }
                 }
             }
-            return Player_1.Player.list[index];
+            if (closestEnemyIndex == "-1")
+                return null;
+            return Player_1.Player.list[closestEnemyIndex];
         };
         this.getClosestEnemy = (distance, angleLimit) => {
-            let closestEnemyIndex = "0";
+            let closestEnemyIndex = "-1";
             let closestEnemyDistance = 100000;
             let pangle = this.movementController.aimAngle;
             pangle = (pangle < 0) ? pangle + 360 : pangle;
@@ -955,7 +1116,29 @@ class Actor extends Entity_1.Entity {
                     }
                 }
             }
+            if (closestEnemyIndex == "-1")
+                return null;
             return Enemy_1.Enemy.list[closestEnemyIndex];
+        };
+        this.getClosestPlayerorEnemy = (distance, angleLimit) => {
+            let enemy = this.getClosestEnemy(distance, angleLimit);
+            let player = this.getClosestPlayer(distance, angleLimit);
+            if (this.getDistance(enemy) < this.getDistance(player)) {
+                if (enemy !== null) {
+                    return enemy;
+                }
+                else {
+                    return null;
+                }
+            }
+            else {
+                if (player !== null) {
+                    return player;
+                }
+                else {
+                    return null;
+                }
+            }
         };
         this.onDeath = () => { };
         this.lifeAndBodyController = new LifeAndBodyController_1.LifeAndBodyController(this, param);
@@ -969,12 +1152,12 @@ exports.Actor = Actor;
 
 
 /***/ }),
-/* 10 */
+/* 11 */
 /***/ (function(module, exports, __webpack_require__) {
 
 Object.defineProperty(exports, "__esModule", { value: true });
 const GeometryAndPhysics_1 = __webpack_require__(0);
-const globalVariables_1 = __webpack_require__(2);
+const globalVariables_1 = __webpack_require__(1);
 class Entity {
     constructor(param) {
         this._position = new GeometryAndPhysics_1.Point(250, 250);
@@ -987,10 +1170,14 @@ class Entity {
         this._img = "";
         this.updatePosition = () => this._position.changePosition(this._speed.x, this._speed.y);
         this.update = () => this.updatePosition();
-        this.getDistance = (entity) => { return this._position.getDistance(entity.position); };
+        this.getDistance = (entity) => {
+            if (entity == null)
+                return 10000000;
+            return this._position.getDistance(entity.position);
+        };
         this.testCollision = (entity) => {
-            let pos1 = new GeometryAndPhysics_1.Point(this._position.x + (this._width / 2), this._position.y + (this._height / 2));
-            let pos2 = new GeometryAndPhysics_1.Point(entity._position.x + (entity._width / 2), entity._position.y + (entity._height / 2));
+            let pos1 = new GeometryAndPhysics_1.Point(this._position.x - (this._width / 4), this._position.y - (this._height / 4));
+            let pos2 = new GeometryAndPhysics_1.Point(entity._position.x - (entity._width / 4), entity._position.y - (entity._height / 4));
             let rect1 = new GeometryAndPhysics_1.Rectangle(pos1, new GeometryAndPhysics_1.Size(this._width / 2, this._height / 2));
             let rect2 = new GeometryAndPhysics_1.Rectangle(pos2, new GeometryAndPhysics_1.Size(entity._width / 2, entity._height / 2));
             return GeometryAndPhysics_1.testCollisionRectRect(rect1, rect2);
@@ -1026,111 +1213,6 @@ exports.Entity = Entity;
 
 
 /***/ }),
-/* 11 */
-/***/ (function(module, exports, __webpack_require__) {
-
-Object.defineProperty(exports, "__esModule", { value: true });
-const enums_1 = __webpack_require__(1);
-class WeaponTypes {
-    constructor(param) {
-        this.name = "";
-        this.meleeDmg = 0;
-        this.shootDmg = 0;
-        this.shootSpeed = 0;
-        this.attackRadius = 0;
-        this.attackSpd = 30;
-        this.attackMelee = true;
-        this.reloadSpd = 30;
-        this.maxSpd = 8;
-        this.reloadAmmo = 0;
-        this._weapon = (param.weapon !== undefined) ? param.weapon : enums_1.WeaponType.knife;
-        this.attackRadius = (param.attackRadius !== undefined) ? param.attackRadius : 0;
-        this.attackSpd = (param.attackSpd !== undefined) ? param.attackSpd : 0;
-        this.attackMelee = (param.attackMelee !== undefined) ? param.attackMelee : true;
-        this.shootDmg = (param.shootDmg !== undefined) ? param.shootDmg : 0;
-        this.meleeDmg = (param.meleeDmg !== undefined) ? param.meleeDmg : 0;
-        this.maxSpd = (param.maxSpd !== undefined) ? param.maxSpd : 8;
-        this.shootSpeed = (param.shootSpeed !== undefined) ? param.shootSpeed : 0;
-        this.reloadAmmo = (param.reloadAmmo !== undefined) ? param.reloadAmmo : 0;
-        this.reloadSpd = (param.reloadSpd !== undefined) ? param.reloadSpd : 0;
-        this.name = (param.name !== undefined) ? param.name : "knife";
-        WeaponTypes.list[param.weapon] = this;
-    }
-    get weapon() { return this._weapon; }
-}
-WeaponTypes.getWeaponParameters = (weapon) => {
-    for (let i in WeaponTypes.list) {
-        let weaponFromBank = WeaponTypes.list[i];
-        if (weaponFromBank.weapon == weapon) {
-            return weaponFromBank;
-        }
-        else {
-            return WeaponTypes.list[0];
-        }
-    }
-};
-WeaponTypes.list = {};
-exports.WeaponTypes = WeaponTypes;
-new WeaponTypes({ weapon: enums_1.WeaponType.pistol, name: "pistol",
-    attackRadius: 0,
-    attackSpd: 4,
-    attackMelee: false,
-    shootDmg: 2,
-    meleeDmg: 2,
-    maxSpd: 10,
-    shootSpeed: 20,
-    reloadAmmo: 6,
-    reloadSpd: 5,
-    recoil: false
-});
-new WeaponTypes({ weapon: enums_1.WeaponType.shotgun, name: "shotgun",
-    attackRadius: 3,
-    attackSpd: 2,
-    attackMelee: false,
-    shootDmg: 3,
-    meleeDmg: 4,
-    maxSpd: 8,
-    shootSpeed: 15,
-    reloadAmmo: 2,
-    reloadSpd: 2,
-    recoil: false
-});
-new WeaponTypes({ weapon: enums_1.WeaponType.knife, name: "knife",
-    attackRadius: 0,
-    attackSpd: 3,
-    attackMelee: true,
-    shootDmg: 0,
-    meleeDmg: 8,
-    maxSpd: 11,
-    reloadAmmo: 0,
-    reloadSpd: 0,
-    recoil: false
-});
-new WeaponTypes({ weapon: enums_1.WeaponType.rifle, name: "rifle",
-    attackRadius: 0,
-    attackSpd: 1,
-    attackMelee: false,
-    shootDmg: 15,
-    meleeDmg: 4,
-    maxSpd: 8,
-    shootSpeed: 30,
-    reloadAmmo: 1,
-    reloadSpd: 2,
-    recoil: true
-});
-new WeaponTypes({ weapon: enums_1.WeaponType.claws, name: "claws",
-    attackRadius: 0,
-    attackSpd: 3,
-    attackMelee: true,
-    shootDmg: 0,
-    meleeDmg: 5,
-    reloadAmmo: 0,
-    reloadSpd: 0,
-    recoil: false
-});
-
-
-/***/ }),
 /* 12 */
 /***/ (function(module, exports) {
 
@@ -1153,7 +1235,10 @@ class Counter {
         };
         this.setInc = (inc) => this.inc = inc;
         this.reset = () => this._value = 0;
-        this.activate = () => this.active = true;
+        this.activate = () => {
+            this.active = true;
+            this._value = 0;
+        };
         this.deactivate = () => this.active = false;
         this.isActive = () => { return this.active; };
     }
@@ -1171,8 +1256,8 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const MapControler_1 = __webpack_require__(6);
 const Enemy_1 = __webpack_require__(5);
 const Player_1 = __webpack_require__(4);
-const Entity_1 = __webpack_require__(10);
-const globalVariables_1 = __webpack_require__(2);
+const Entity_1 = __webpack_require__(11);
+const globalVariables_1 = __webpack_require__(1);
 class Bullet extends Entity_1.Entity {
     constructor(param) {
         super(Bullet.updateParam(param));
@@ -1426,16 +1511,14 @@ const WeaponCollection_1 = __webpack_require__(19);
 const Counter_1 = __webpack_require__(12);
 const GeometryAndPhysics_1 = __webpack_require__(0);
 const Bullet_1 = __webpack_require__(13);
-const enums_1 = __webpack_require__(1);
-const WeaponTypes_1 = __webpack_require__(11);
+const WeaponTypes_1 = __webpack_require__(8);
 class AttackController {
     constructor(parent, param) {
         this.parent = parent;
         this._melee = true;
         this._attackStarted = false;
-        this._reloadCounter = new Counter_1.Counter(25);
+        this._reloadCounter = new Counter_1.Counter(50);
         this._attackCounter = new Counter_1.Counter(25);
-        this._weaponCollection = new WeaponCollection_1.WeaponCollection();
         this._pressingAttack = false;
         this.update = () => {
             this._reloadCounter.setInc(this._activeWeapon.reloadSpd);
@@ -1454,14 +1537,14 @@ class AttackController {
                     this._attackStarted = true;
                     console.log(this._activeWeapon.ammo);
                     console.log(this._melee);
-                    this._melee = (this._activeWeapon.ammo > 0) ? this._melee : true;
+                    this._melee = (this._activeWeapon._ammoInGun > 0) ? this._melee : true;
                     this._melee ? this.closeAttack(this.parent.movementController.aimAngle) : this.distanceAttack();
                 }
             }
         };
         this.closeAttack = (aimAngle) => (this.parent.type == 'player') ? this.attackCloseByPlayer(aimAngle) : this.attackCloseByEnemy(aimAngle);
         this.attackCloseByEnemy = (aimAngle) => {
-            let player = this.parent.getClosestPlayer();
+            let player = this.parent.getClosestPlayer(10000, 360);
             let distance = 80;
             let maxDistance = Math.sqrt(player.width * player.width / 4 + player.height * player.height / 4) + distance;
             if (player) {
@@ -1471,7 +1554,7 @@ class AttackController {
             }
         };
         this.attackCloseByPlayer = (aimAngle) => {
-            let enemy = this.parent.getClosestEnemy(40, 45);
+            let enemy = this.parent.getClosestPlayerorEnemy(20, 45);
             if (enemy) {
                 enemy.lifeAndBodyController.wasHit(this._activeWeapon.meleeDmg);
             }
@@ -1513,10 +1596,10 @@ class AttackController {
             damage = (this._melee) ? this._activeWeapon.meleeDmg : this._activeWeapon.shootDmg;
             return damage;
         };
-        this._activeWeapon = new WeaponCollection_1.SingleWeapon({ weapon: "0", ammo: "20", parent: this.parent });
+        this._weaponCollection = new WeaponCollection_1.WeaponCollection(this.parent);
+        this._activeWeapon = new WeaponCollection_1.SingleWeapon(this.parent, { weapon: "0", ammo: "20", parent: this.parent });
         if (param.atkSpd)
             this._attackCounter.setInc(param.atkSpd);
-        this.equip(enums_1.WeaponType.knife);
         this.attackCounter.activate();
     }
     get melee() { return this._melee; }
@@ -1537,66 +1620,147 @@ exports.AttackController = AttackController;
 /***/ (function(module, exports, __webpack_require__) {
 
 Object.defineProperty(exports, "__esModule", { value: true });
-const WeaponTypes_1 = __webpack_require__(11);
-const enums_1 = __webpack_require__(1);
+const WeaponTypes_1 = __webpack_require__(8);
+const enums_1 = __webpack_require__(2);
 class WeaponCollection {
-    constructor() {
+    constructor(owner) {
         this.weapons = [];
         this.shoot = (id, bullets) => {
             return true;
         };
         this.chooseNextWeaponWithAmmo = () => {
+            if (!this.owner.attackController.reloadCounter.isActive()) {
+                let inc = 1;
+                for (let i = 0; i < this.weapons.length; i++) {
+                    if (this.weapons[i].id === this.owner.attackController.activeWeapon.weapon) {
+                        while (i + inc < this.weapons.length) {
+                            if (this.weapons[i + inc].ammo > 0) {
+                                this.owner.attackController.equip(this.weapons[i + inc].id);
+                                return;
+                            }
+                            else {
+                                inc++;
+                            }
+                        }
+                        inc = 0;
+                        while (inc < i) {
+                            if (this.weapons[inc].ammo > 0) {
+                                this.owner.attackController.equip(this.weapons[inc].id);
+                                return;
+                            }
+                            else {
+                                inc++;
+                            }
+                        }
+                        return;
+                    }
+                }
+            }
         };
         this.choosePrevWeaponWithAmmo = () => {
         };
+        this.decAmmo = (id, amount) => {
+            for (let i = 0; i < this.weapons.length; i++) {
+                if (this.weapons[i].id === id) {
+                    this.weapons[i].ammoInGun = (this.weapons[i].ammoInGun > amount) ? this.weapons[i].ammoInGun - amount : 0;
+                }
+            }
+        };
+        this.reload = (id) => {
+            for (let i = 0; i < this.weapons.length; i++) {
+                if (this.weapons[i].id === id) {
+                    this.weapons[i].ammoInGun = (this.weapons[i].ammo > WeaponTypes_1.WeaponTypes.list[id].reloadAmmo) ? WeaponTypes_1.WeaponTypes.list[id].reloadAmmo : this.weapons[i].ammo;
+                    this.weapons[i].ammo = this.weapons[i].ammo - this.weapons[i].ammoInGun;
+                }
+            }
+        };
         this.removeWeapon = (id, amount) => {
         };
-        this.addWeapon = (id, amount) => {
+        this.hasWeapon = (id, amount) => {
             for (var i = 0; i < this.weapons.length; i++) {
+                if (this.weapons[i].id === id) {
+                    return this.weapons[i].amount >= amount;
+                }
+            }
+            return false;
+        };
+        this.changeWeapon = (id) => {
+            if (this.hasWeapon(id, 1) && !this.owner.attackController.reloadCounter.isActive()) {
+                this.owner.attackController.equip(id);
+            }
+        };
+        this.addWeapon = (id, amount) => {
+            for (let i = 0; i < this.weapons.length; i++) {
                 if (this.weapons[i].id === id) {
                     this.weapons[i].amount += amount;
                     return;
                 }
             }
-            this.weapons.push({ id: id, amount: amount, ammo: 50, reload: WeaponTypes_1.WeaponTypes.list[id].reload });
+            this.weapons.push({ id: id, amount: amount, ammo: 10, ammoInGun: WeaponTypes_1.WeaponTypes.list[id].reloadAmmo });
             console.log("Weapon " + id + " added");
         };
-        this.equip = () => {
-        };
+        this.owner = owner;
     }
 }
 exports.WeaponCollection = WeaponCollection;
 class SingleWeapon {
-    constructor(param) {
-        this.ammoInGun = 30;
+    constructor(parent, param) {
+        this.parent = parent;
+        this._ammoInGun = 30;
         this.name = "";
         this.reload = () => {
+            this.parent.attackController.weaponCollection.reload(this._weapon);
+            this._ammoInGun = (this._ammo > WeaponTypes_1.WeaponTypes.list[this._weapon].reloadAmmo) ? WeaponTypes_1.WeaponTypes.list[this._weapon].reloadAmmo : this._ammo;
+            this._ammo = this._ammo - this._ammoInGun;
+        };
+        this.decAmmo = (amount) => {
+            this._ammoInGun = (this._ammoInGun - amount >= 0) ? this._ammoInGun - amount : 0;
+            this.parent.attackController.weaponCollection.decAmmo(this._weapon, amount);
         };
         this.shoot = (bullets) => {
-            if (bullets <= this._ammo) {
-                this._ammo -= bullets;
-                console.log("Ammo " + this._ammo);
+            if (bullets <= this._ammoInGun) {
+                if (this._ammoInGun - bullets >= 0) {
+                    this.decAmmo(bullets);
+                }
+                else {
+                    this.parent.attackController.reloadCounter.activate();
+                    return false;
+                }
+                if (this._ammoInGun == 0)
+                    this.parent.attackController.reloadCounter.activate();
+                if (WeaponTypes_1.WeaponTypes.list[this.weapon].recoil)
+                    this.parent.movementController.recoilCounter.activate();
                 return true;
             }
             return false;
         };
         this.equip = (weapon) => {
-            for (let i in WeaponTypes_1.WeaponTypes.list) {
-                let weaponFromBank = WeaponTypes_1.WeaponTypes.list[i];
-                if (weaponFromBank.weapon == weapon) {
+            let weaponCollection = this.parent.attackController.weaponCollection;
+            for (let i = 0; i < weaponCollection.weapons.length; i++) {
+                if (weaponCollection.weapons[i].id === weapon) {
+                    let weaponProperties = WeaponTypes_1.WeaponTypes.getWeaponParameters(weapon);
                     this._weapon = weapon;
-                    this.name = weaponFromBank.name;
-                    console.log("Weapon equiped " + this._weapon + this.name);
-                    break;
+                    this.name = weaponProperties.name;
+                    this._ammo = weaponCollection.weapons[i].ammo;
+                    this._ammoInGun = weaponCollection.weapons[i].ammoInGun;
+                    console.log("WEAPON AMMO " + this._ammo + " " + this._ammoInGun);
                 }
             }
         };
-        this._weapon = (param.weapon !== undefined) ? param.weapon : enums_1.WeaponType.knife;
+        if (param.weapon !== undefined) {
+            this._weapon = param.weapon;
+            let weaponParameters = WeaponTypes_1.WeaponTypes.getWeaponParameters(this._weapon);
+            this._ammoInGun = weaponParameters.reloadAmmo;
+        }
+        else {
+            this._weapon = enums_1.WeaponType.knife;
+        }
         this._ammo = (param.ammo !== undefined) ? param.ammo : 8;
         this.name = (param.name !== undefined) ? param.name : "knife";
     }
     get ammo() { return this._ammo; }
     get weapon() { return this._weapon; }
+    get ammoInGun() { return this._ammoInGun; }
     get reloadSpd() { return WeaponTypes_1.WeaponTypes.list[this._weapon].reloadSpd; }
     get attackSpd() { return WeaponTypes_1.WeaponTypes.list[this._weapon].attackSpd; }
     get attackRadius() { return WeaponTypes_1.WeaponTypes.list[this._weapon].attackRadius; }
@@ -1659,6 +1823,8 @@ class MovementController {
                 speedY = this._pressingUp ? -this._maxSpdY : speedY;
             }
             if (this._recoilCounter.isActive() && !this._recoilCounter.resetIfMax()) {
+                console.log("RECOIL");
+                this._recoilCounter.count();
                 if (map.isPositionWall(downBumper) || map.isPositionWall(upBumper) || map.isPositionWall(leftBumper) || map.isPositionWall(rightBumper)) {
                     this._recoilCounter.deactivate();
                     this._recoilCounter.reset();
@@ -1716,7 +1882,7 @@ exports.MovementController = MovementController;
 /***/ (function(module, exports, __webpack_require__) {
 
 Object.defineProperty(exports, "__esModule", { value: true });
-const enums_1 = __webpack_require__(1);
+const enums_1 = __webpack_require__(2);
 class Item {
     constructor(id, name, event, add, remove, info) {
         this.id = id;

@@ -8,10 +8,65 @@ class WeaponCollection {
             return true;
         };
         this.chooseNextWeaponWithAmmo = () => {
+            if (!this.owner.attackController.reloadCounter.isActive()) {
+                let inc = 1;
+                for (let i = 0; i < this.weapons.length; i++) {
+                    if (this.weapons[i].id === this.owner.attackController.activeWeapon.weapon) {
+                        while (i + inc < this.weapons.length) {
+                            if (this.weapons[i + inc].ammo > 0) {
+                                this.owner.attackController.equip(this.weapons[i + inc].id);
+                                return;
+                            }
+                            else {
+                                inc++;
+                            }
+                        }
+                        inc = 0;
+                        while (inc < i) {
+                            if (this.weapons[inc].ammo > 0) {
+                                this.owner.attackController.equip(this.weapons[inc].id);
+                                return;
+                            }
+                            else {
+                                inc++;
+                            }
+                        }
+                        return;
+                    }
+                }
+            }
         };
         this.choosePrevWeaponWithAmmo = () => {
         };
+        this.decAmmo = (id, amount) => {
+            for (let i = 0; i < this.weapons.length; i++) {
+                if (this.weapons[i].id === id) {
+                    this.weapons[i].ammoInGun = (this.weapons[i].ammoInGun > amount) ? this.weapons[i].ammoInGun - amount : 0;
+                }
+            }
+        };
+        this.reload = (id) => {
+            for (let i = 0; i < this.weapons.length; i++) {
+                if (this.weapons[i].id === id) {
+                    this.weapons[i].ammoInGun = (this.weapons[i].ammo > WeaponTypes_1.WeaponTypes.list[id].reloadAmmo) ? WeaponTypes_1.WeaponTypes.list[id].reloadAmmo : this.weapons[i].ammo;
+                    this.weapons[i].ammo = this.weapons[i].ammo - this.weapons[i].ammoInGun;
+                }
+            }
+        };
         this.removeWeapon = (id, amount) => {
+        };
+        this.hasWeapon = (id, amount) => {
+            for (var i = 0; i < this.weapons.length; i++) {
+                if (this.weapons[i].id === id) {
+                    return this.weapons[i].amount >= amount;
+                }
+            }
+            return false;
+        };
+        this.changeWeapon = (id) => {
+            if (this.hasWeapon(id, 1) && !this.owner.attackController.reloadCounter.isActive()) {
+                this.owner.attackController.equip(id);
+            }
         };
         this.addWeapon = (id, amount) => {
             for (let i = 0; i < this.weapons.length; i++) {
@@ -20,7 +75,7 @@ class WeaponCollection {
                     return;
                 }
             }
-            this.weapons.push({ id: id, amount: amount, ammo: 50, ammoInGun: WeaponTypes_1.WeaponTypes.list[id].reloadAmmo });
+            this.weapons.push({ id: id, amount: amount, ammo: 10, ammoInGun: WeaponTypes_1.WeaponTypes.list[id].reloadAmmo });
             console.log("Weapon " + id + " added");
         };
         this.owner = owner;
@@ -33,11 +88,27 @@ class SingleWeapon {
         this._ammoInGun = 30;
         this.name = "";
         this.reload = () => {
+            this.parent.attackController.weaponCollection.reload(this._weapon);
+            this._ammoInGun = (this._ammo > WeaponTypes_1.WeaponTypes.list[this._weapon].reloadAmmo) ? WeaponTypes_1.WeaponTypes.list[this._weapon].reloadAmmo : this._ammo;
+            this._ammo = this._ammo - this._ammoInGun;
+        };
+        this.decAmmo = (amount) => {
+            this._ammoInGun = (this._ammoInGun - amount >= 0) ? this._ammoInGun - amount : 0;
+            this.parent.attackController.weaponCollection.decAmmo(this._weapon, amount);
         };
         this.shoot = (bullets) => {
-            if (bullets <= this._ammo) {
-                this._ammo -= bullets;
-                console.log("Ammo " + this._ammo);
+            if (bullets <= this._ammoInGun) {
+                if (this._ammoInGun - bullets >= 0) {
+                    this.decAmmo(bullets);
+                }
+                else {
+                    this.parent.attackController.reloadCounter.activate();
+                    return false;
+                }
+                if (this._ammoInGun == 0)
+                    this.parent.attackController.reloadCounter.activate();
+                if (WeaponTypes_1.WeaponTypes.list[this.weapon].recoil)
+                    this.parent.movementController.recoilCounter.activate();
                 return true;
             }
             return false;
@@ -49,9 +120,9 @@ class SingleWeapon {
                     let weaponProperties = WeaponTypes_1.WeaponTypes.getWeaponParameters(weapon);
                     this._weapon = weapon;
                     this.name = weaponProperties.name;
-                    console.log("WEAPON " + this.name + this._weapon);
                     this._ammo = weaponCollection.weapons[i].ammo;
                     this._ammoInGun = weaponCollection.weapons[i].ammoInGun;
+                    console.log("WEAPON AMMO " + this._ammo + " " + this._ammoInGun);
                 }
             }
         };

@@ -9,7 +9,7 @@ class AttackController {
         this.parent = parent;
         this._melee = true;
         this._attackStarted = false;
-        this._reloadCounter = new Counter_1.Counter(25);
+        this._reloadCounter = new Counter_1.Counter(50);
         this._attackCounter = new Counter_1.Counter(25);
         this._pressingAttack = false;
         this.update = () => {
@@ -29,7 +29,7 @@ class AttackController {
                     this._attackStarted = true;
                     console.log(this._activeWeapon.ammo);
                     console.log(this._melee);
-                    this._melee = (this._activeWeapon.ammo > 0) ? this._melee : true;
+                    this._melee = (this._activeWeapon._ammoInGun > 0) ? this._melee : true;
                     this._melee ? this.closeAttack(this.parent.movementController.aimAngle) : this.distanceAttack();
                 }
             }

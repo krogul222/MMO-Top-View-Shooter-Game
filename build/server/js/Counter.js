@@ -17,7 +17,10 @@ class Counter {
         };
         this.setInc = (inc) => this.inc = inc;
         this.reset = () => this._value = 0;
-        this.activate = () => this.active = true;
+        this.activate = () => {
+            this.active = true;
+            this._value = 0;
+        };
         this.deactivate = () => this.active = false;
         this.isActive = () => { return this.active; };
     }
