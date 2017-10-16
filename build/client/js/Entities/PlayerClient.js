@@ -44,7 +44,6 @@ class PlayerClient {
             aimAngle = (aimAngle < 0) ? (360 + aimAngle) : aimAngle;
             let directionMod = this.inWhichDirection(aimAngle);
             let walkingMod = Math.floor(this.walkSpriteAnimCounter) % spriteColumns;
-            console.log("Walking mod " + walkingMod);
             this.drawWalk(spriteColumns, spriteRows, aimAngle, 0, walkingMod, x, y);
             if (this.attackStarted && this.attackMelee) {
                 spriteColumns = 15;

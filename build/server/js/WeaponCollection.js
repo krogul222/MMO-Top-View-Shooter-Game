@@ -13,7 +13,7 @@ class WeaponCollection {
                 for (let i = 0; i < this.weapons.length; i++) {
                     if (this.weapons[i].id === this.owner.attackController.activeWeapon.weapon) {
                         while (i + inc < this.weapons.length) {
-                            if (this.weapons[i + inc].ammo > 0) {
+                            if (this.weapons[i + inc].ammoInGun > 0) {
                                 this.owner.attackController.equip(this.weapons[i + inc].id);
                                 return;
                             }
@@ -23,7 +23,7 @@ class WeaponCollection {
                         }
                         inc = 0;
                         while (inc < i) {
-                            if (this.weapons[inc].ammo > 0) {
+                            if (this.weapons[inc].ammoInGun > 0) {
                                 this.owner.attackController.equip(this.weapons[inc].id);
                                 return;
                             }
