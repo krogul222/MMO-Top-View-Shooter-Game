@@ -4,6 +4,7 @@ import { Actor } from './Actor';
 import { Pack } from '../Pack';
 import { Point } from '../GeometryAndPhysics';
 import { initPack, removePack } from '../globalVariables';
+import { WeaponType } from '../enums';
 
 export class Enemy extends Actor {
 
@@ -11,19 +12,23 @@ export class Enemy extends Actor {
     private kind: string = "";
 
     static globalMapControler = new MapController(null); 
+    public superUpdate;
 
     constructor(param) {
         super(param);
         Enemy.list[param.id] = this;
-        initPack.enemy.push(this.getInitPack());
         if(param.kind) this.kind = param.kind;
         this.attackController.pressingAttack = true;
+
+        this.giveWeapons();
+
+        initPack.enemy.push(this.getInitPack());
     } 
 
-    update = () => {
-        super.update();
+    extendedUpdate = () => {
+        this.update();
         
-        let player: Player = this.getClosestPlayer();
+        let player: Player = this.getClosestPlayer(10000, 360);
 
         let diffX = 0;
         let diffY = 0;
@@ -51,8 +56,8 @@ export class Enemy extends Actor {
 		this.movementController.pressingRight = diffX > safeDistance;
 		this.movementController.pressingLeft = diffX < -safeDistance;
 		this.movementController.pressingDown = diffY > safeDistance;
-		this.movementController.pressingUp = diffY < -safeDistance;
-	}
+        this.movementController.pressingUp = diffY < -safeDistance; 
+    }
 
     updateAttack = (player: Player, diffX: number, diffY: number) => {
         if(this.attackController.melee){
@@ -106,12 +111,39 @@ export class Enemy extends Actor {
         };
     }   
 
+    giveWeapons = () => {
+        if(this.kind == 'zombie'){
+            this.inventory.addItem(WeaponType.claws,1);
+            this.inventory.useItem(WeaponType.claws);
+        }
+            
+        if(this.kind == 'scorpion'){
+            this.inventory.addItem(WeaponType.pistol,1);
+            this.inventory.addItem(WeaponType.shotgun,1);
+            this.inventory.addItem(WeaponType.rifle,1);
+                
+            this.attackController.weaponCollection.setWeaponAmmo(WeaponType.shotgun, 10);
+            this.attackController.weaponCollection.setWeaponAmmo(WeaponType.pistol, 20);
+            this.attackController.weaponCollection.setWeaponAmmo(WeaponType.rifle, 5);
+                
+            if(Math.random()<0.6){
+                this.inventory.useItem(WeaponType.pistol);
+            } else{
+                if(Math.random()< 0.5){
+                    this.inventory.useItem(WeaponType.shotgun);
+                } else{
+                    this.inventory.useItem(WeaponType.rifle);
+                }
+            }
+        }
+    }
+
     static update = () => {
         let pack: any[] =[];
         
         for(let i in Enemy.list){
             let enemy = Enemy.list[i];
-            enemy.update();
+            enemy.extendedUpdate();
             if(enemy.toRemove){
                 delete Enemy.list[i];
                 Enemy.randomlyGenerate('forest');
@@ -151,6 +183,7 @@ export class Enemy extends Actor {
         let id = Math.random();
         let enemy: Enemy;
         if(Math.random()<0.5){
+            console.log("SCORPION");
             enemy = new Enemy({
                 id: id,
                 position: position,
@@ -161,8 +194,11 @@ export class Enemy extends Actor {
                 map: choosenMap,
                 img: 'scorpion',
                 type:'enemy',
-                kind:'scorpion'});
+                kind:'scorpion',
+                maxSpdX: 3,
+                maxSpdY: 3});
         } else{
+            console.log("ZOMBIE");
             enemy = new Enemy({
                 id: id,
                 position: position,
@@ -174,7 +210,8 @@ export class Enemy extends Actor {
                 img: 'zombie',
                 type:'enemy',
                 kind:'zombie',
-                maxSpd: 11
+                maxSpdX: 7,
+                maxSpdY: 7
             });
         }
     }

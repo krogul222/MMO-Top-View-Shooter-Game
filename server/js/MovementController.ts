@@ -15,8 +15,8 @@ export class MovementController {
     collisionBounds = {Up: -16, Down: 32, Left: -10, Right: 10};
 
     constructor (private parent: Actor, param) {
-        this._maxSpdX = param.maxSpdX ? param.maxSpdX : 10;
-        this._maxSpdY = param.maxSpdY ? param.maxSpdY : 10;
+        this._maxSpdX = (param.maxSpdX !== undefined) ? param.maxSpdX : 10;
+        this._maxSpdY = (param.maxSpdY !== undefined)  ? param.maxSpdY : 10;
     }
 
     updateSpd = () => {

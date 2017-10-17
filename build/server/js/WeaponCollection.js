@@ -38,6 +38,13 @@ class WeaponCollection {
         };
         this.choosePrevWeaponWithAmmo = () => {
         };
+        this.setWeaponAmmo = (id, ammo) => {
+            for (let i = 0; i < this.weapons.length; i++) {
+                if (this.weapons[i].id === id) {
+                    this.weapons[i].ammo = ammo;
+                }
+            }
+        };
         this.decAmmo = (id, amount) => {
             for (let i = 0; i < this.weapons.length; i++) {
                 if (this.weapons[i].id === id) {

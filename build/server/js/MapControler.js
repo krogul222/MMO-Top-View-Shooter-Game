@@ -10,7 +10,7 @@ class MapController {
                 }
             }
         };
-        this.maps.push(new GameMap_1.GameMap("forest", 1000, 1000));
+        this.maps.push(new GameMap_1.GameMap("forest", 1280, 1280));
     }
 }
 exports.MapController = MapController;

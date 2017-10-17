@@ -13,6 +13,6 @@ export class MapController {
     }
 
     constructor(param) {
-        this.maps.push(new GameMap("forest", 1000 , 1000));
+        this.maps.push(new GameMap("forest", 1280, 1280));
     }
 }

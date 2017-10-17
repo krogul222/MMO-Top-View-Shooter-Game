@@ -3,14 +3,15 @@ const MapControler_1 = require("./../MapControler");
 const Actor_1 = require("./Actor");
 const GeometryAndPhysics_1 = require("../GeometryAndPhysics");
 const globalVariables_1 = require("../globalVariables");
+const enums_1 = require("../enums");
 class Enemy extends Actor_1.Actor {
     constructor(param) {
         super(param);
         this.toRemove = false;
         this.kind = "";
-        this.update = () => {
-            super.update();
-            let player = this.getClosestPlayer();
+        this.extendedUpdate = () => {
+            this.update();
+            let player = this.getClosestPlayer(10000, 360);
             let diffX = 0;
             let diffY = 0;
             if (player) {
@@ -79,11 +80,37 @@ class Enemy extends Actor_1.Actor {
                 reload: this.attackController.reloadCounter.isActive()
             };
         };
+        this.giveWeapons = () => {
+            if (this.kind == 'zombie') {
+                this.inventory.addItem(enums_1.WeaponType.claws, 1);
+                this.inventory.useItem(enums_1.WeaponType.claws);
+            }
+            if (this.kind == 'scorpion') {
+                this.inventory.addItem(enums_1.WeaponType.pistol, 1);
+                this.inventory.addItem(enums_1.WeaponType.shotgun, 1);
+                this.inventory.addItem(enums_1.WeaponType.rifle, 1);
+                this.attackController.weaponCollection.setWeaponAmmo(enums_1.WeaponType.shotgun, 10);
+                this.attackController.weaponCollection.setWeaponAmmo(enums_1.WeaponType.pistol, 20);
+                this.attackController.weaponCollection.setWeaponAmmo(enums_1.WeaponType.rifle, 5);
+                if (Math.random() < 0.6) {
+                    this.inventory.useItem(enums_1.WeaponType.pistol);
+                }
+                else {
+                    if (Math.random() < 0.5) {
+                        this.inventory.useItem(enums_1.WeaponType.shotgun);
+                    }
+                    else {
+                        this.inventory.useItem(enums_1.WeaponType.rifle);
+                    }
+                }
+            }
+        };
         Enemy.list[param.id] = this;
-        globalVariables_1.initPack.enemy.push(this.getInitPack());
         if (param.kind)
             this.kind = param.kind;
         this.attackController.pressingAttack = true;
+        this.giveWeapons();
+        globalVariables_1.initPack.enemy.push(this.getInitPack());
     }
 }
 Enemy.globalMapControler = new MapControler_1.MapController(null);
@@ -91,7 +118,7 @@ Enemy.update = () => {
     let pack = [];
     for (let i in Enemy.list) {
         let enemy = Enemy.list[i];
-        enemy.update();
+        enemy.extendedUpdate();
         if (enemy.toRemove) {
             delete Enemy.list[i];
             Enemy.randomlyGenerate('forest');
@@ -126,6 +153,7 @@ Enemy.randomlyGenerate = function (choosenMap) {
     let id = Math.random();
     let enemy;
     if (Math.random() < 0.5) {
+        console.log("SCORPION");
         enemy = new Enemy({
             id: id,
             position: position,
@@ -136,10 +164,13 @@ Enemy.randomlyGenerate = function (choosenMap) {
             map: choosenMap,
             img: 'scorpion',
             type: 'enemy',
-            kind: 'scorpion'
+            kind: 'scorpion',
+            maxSpdX: 3,
+            maxSpdY: 3
         });
     }
     else {
+        console.log("ZOMBIE");
         enemy = new Enemy({
             id: id,
             position: position,
@@ -151,7 +182,8 @@ Enemy.randomlyGenerate = function (choosenMap) {
             img: 'zombie',
             type: 'enemy',
             kind: 'zombie',
-            maxSpd: 11
+            maxSpdX: 7,
+            maxSpdY: 7
         });
     }
 };

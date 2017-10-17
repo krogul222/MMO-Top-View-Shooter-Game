@@ -71,8 +71,8 @@ class MovementController {
             this.parent.position.y = (this.parent.position.y < this.parent.height / 2) ? this.parent.height / 2 : this.parent.position.y;
             this.parent.position.y = (this.parent.position.y > map.height - this.parent.height / 2) ? map.height - this.parent.height / 2 : this.parent.position.y;
         };
-        this._maxSpdX = param.maxSpdX ? param.maxSpdX : 10;
-        this._maxSpdY = param.maxSpdY ? param.maxSpdY : 10;
+        this._maxSpdX = (param.maxSpdX !== undefined) ? param.maxSpdX : 10;
+        this._maxSpdY = (param.maxSpdY !== undefined) ? param.maxSpdY : 10;
     }
     get pressingLeft() { return this._pressingLeft; }
     get pressingRight() { return this._pressingRight; }

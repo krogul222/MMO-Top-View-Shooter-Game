@@ -12,13 +12,25 @@ export class Player extends Actor {
         super(param);
         initPack.player.push(this.getInitPack());
         Player.list[param.id] = this;
+        this.giveItems();
+        Enemy.randomlyGenerate(this.map);
+        Enemy.randomlyGenerate(this.map);
+        Enemy.randomlyGenerate(this.map);
+        Enemy.randomlyGenerate(this.map);
+    } 
+
+    giveItems = () => {
         this.inventory.addItem(WeaponType.knife,1);
         this.inventory.addItem(WeaponType.pistol,1);
         this.inventory.addItem(WeaponType.shotgun,1);
         this.inventory.addItem(WeaponType.rifle,1);
+        this.attackController.weaponCollection.setWeaponAmmo(WeaponType.shotgun, 100);
+        this.attackController.weaponCollection.setWeaponAmmo(WeaponType.pistol, 200);
+        this.attackController.weaponCollection.setWeaponAmmo(WeaponType.rifle, 100);
+
         this.inventory.addItem("medicalkit",4);  
         this.inventory.useItem(WeaponType.shotgun);
-    } 
+    }
 
     getInitPack = () => {
         return {

@@ -58,7 +58,6 @@ export class GUI {
             this.ctx.drawImage(Img["medicalkit"], 0, 0, Img["medicalkit"].width, Img["medicalkit"].height, 3*(this.width-0.8*this.height)/4, (this.height-0.8*this.height)/2, 0.8*this.height, 0.8*this.height);
             
             this.ctx.fillText(' x'+inventory.getItemAmount("medicalkit"), 3*(this.width-0.8*this.height)/4+0.8*this.height, (this.height)/2+10);
-            
         }
     }
 

@@ -1,7 +1,9 @@
+import { MapClient } from './MapClient';
 import { GUI } from './GUI';
 import { PlayerClient } from "./Entities/PlayerClient";
 import { BulletClient } from "./Entities/BulletClient";
 import { Inventory } from '../../server/js/Inventory';
+import { EnemyClient } from './Entities/EnemyClient';
 
 declare var ctx;
 declare const WIDTH;
@@ -15,6 +17,8 @@ export var selfId: number = 0;
 
 
 export let inventory = new Inventory(socket, false, 0);
+
+let currentMap = new MapClient();
 
 socket.on('updateInventory', function(items){
    inventory.items = items;
@@ -31,6 +35,10 @@ socket.on('init', function(data){
 
    for(let i = 0, length = data.bullet.length; i < length; i++){
         new BulletClient(data.bullet[i]);  
+    } 
+
+    for(let i = 0, length = data.enemy.length; i < length; i++){
+        new EnemyClient(data.enemy[i]);  
     } 
 });
 
@@ -91,10 +99,57 @@ socket.on('update', function(data){
                 }
             }
            
-        gui.draw();
        }
 
-       for(let i = 0, length = data.bullet.length; i < length ; i++){
+    for(let i = 0, length = data.enemy.length; i < length ; i++){
+        let pack = data.enemy[i];
+        let p:EnemyClient = EnemyClient.list[pack.id];
+        if(p){
+            if(pack.position !== undefined){
+                p.position.x = pack.position.x;
+                p.position.y = pack.position.y;
+            } 
+ 
+            if(pack.hp !== undefined){
+                p.hp = pack.hp;
+            }
+ 
+            if(pack.weapon !== undefined){
+             p.weapon = pack.weapon
+             }
+ 
+            if(pack.attackMelee !== undefined){
+             p.attackMelee = pack.attackMelee;
+             }
+ 
+            if(pack.moving !== undefined){
+                p.moving = pack.moving;
+            } 
+            if(pack.aimAngle !== undefined){
+                p.aimAngle = pack.aimAngle;
+            } 
+ 
+            if(pack.reload !== undefined){
+                if(pack.reload){
+                    p.reload = true;
+                } else{
+                    p.reload = false;
+                }
+             }
+ 
+             if(pack.attackStarted !== undefined){
+                // console.log("Attack started " + pack.attackStarted);
+                 if(pack.attackStarted){
+                     p.attackStarted = true;
+                     p.spriteAnimCounter = 0;
+                 }
+             }
+            
+
+        }
+    }
+
+    for(let i = 0, length = data.bullet.length; i < length ; i++){
         let pack = data.bullet[i];
         let b = BulletClient.list[pack.id];
         if(b){
@@ -104,6 +159,8 @@ socket.on('update', function(data){
             } 
         }
     }
+
+    gui.draw();
    } 
     
 });
@@ -119,9 +176,10 @@ socket.on('remove', function(data){
         }
         delete BulletClient.list[data.bullet[i].id];
     } 
- /*   for(let i = 0, length = data.enemy.length; i < length; i++){
-        delete Enemy.list[data.enemy[i]];
+    for(let i = 0, length = data.enemy.length; i < length; i++){
+        delete EnemyClient.list[data.enemy[i]];
     } 
+    /*
     for(let i = 0, length = data.upgrade.length; i < length; i++){
         delete Upgrade.list[data.upgrade[i]];
     } */
@@ -133,9 +191,8 @@ setInterval(function(){
     }
     
     ctx.clearRect(0,0,WIDTH,HEIGHT);
-   // currentMap.draw();
-  //  drawScore();
-    //drawAmmo();
+    currentMap.draw();
+
     for(let i in PlayerClient.list){
         if(PlayerClient.list[i].moving){
             PlayerClient.list[i].walkSpriteAnimCounter += 1;
@@ -156,7 +213,19 @@ setInterval(function(){
     
     for(let i in BulletClient.list){
         BulletClient.list[i].draw();
-    }    
+    }  
+    
+    for(let i in EnemyClient.list){
+        if(EnemyClient.list[i].moving || EnemyClient.list[i].attackStarted){
+            if(EnemyClient.list[i].attackStarted){
+                EnemyClient.list[i].spriteAnimCounter += 0.8;
+            } else{
+                EnemyClient.list[i].spriteAnimCounter += 0.4;
+            }
+
+        }
+        EnemyClient.list[i].draw();
+    }
 }, 40);
 
 

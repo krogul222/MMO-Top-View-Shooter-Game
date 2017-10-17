@@ -1,9 +1,12 @@
 Object.defineProperty(exports, "__esModule", { value: true });
+const MapClient_1 = require("./MapClient");
 const PlayerClient_1 = require("./Entities/PlayerClient");
 const BulletClient_1 = require("./Entities/BulletClient");
 const Inventory_1 = require("../../server/js/Inventory");
+const EnemyClient_1 = require("./Entities/EnemyClient");
 exports.selfId = 0;
 exports.inventory = new Inventory_1.Inventory(socket, false, 0);
+let currentMap = new MapClient_1.MapClient();
 socket.on('updateInventory', function (items) {
     exports.inventory.items = items;
     exports.inventory.refreshRender();
@@ -17,6 +20,9 @@ socket.on('init', function (data) {
     }
     for (let i = 0, length = data.bullet.length; i < length; i++) {
         new BulletClient_1.BulletClient(data.bullet[i]);
+    }
+    for (let i = 0, length = data.enemy.length; i < length; i++) {
+        new EnemyClient_1.EnemyClient(data.enemy[i]);
     }
 });
 socket.on('update', function (data) {
@@ -66,7 +72,45 @@ socket.on('update', function (data) {
                     p.bodySpriteAnimCounter = 0;
                 }
             }
-            gui.draw();
+        }
+        for (let i = 0, length = data.enemy.length; i < length; i++) {
+            let pack = data.enemy[i];
+            let p = EnemyClient_1.EnemyClient.list[pack.id];
+            if (p) {
+                if (pack.position !== undefined) {
+                    p.position.x = pack.position.x;
+                    p.position.y = pack.position.y;
+                }
+                if (pack.hp !== undefined) {
+                    p.hp = pack.hp;
+                }
+                if (pack.weapon !== undefined) {
+                    p.weapon = pack.weapon;
+                }
+                if (pack.attackMelee !== undefined) {
+                    p.attackMelee = pack.attackMelee;
+                }
+                if (pack.moving !== undefined) {
+                    p.moving = pack.moving;
+                }
+                if (pack.aimAngle !== undefined) {
+                    p.aimAngle = pack.aimAngle;
+                }
+                if (pack.reload !== undefined) {
+                    if (pack.reload) {
+                        p.reload = true;
+                    }
+                    else {
+                        p.reload = false;
+                    }
+                }
+                if (pack.attackStarted !== undefined) {
+                    if (pack.attackStarted) {
+                        p.attackStarted = true;
+                        p.spriteAnimCounter = 0;
+                    }
+                }
+            }
         }
         for (let i = 0, length = data.bullet.length; i < length; i++) {
             let pack = data.bullet[i];
@@ -78,6 +122,7 @@ socket.on('update', function (data) {
                 }
             }
         }
+        gui.draw();
     }
 });
 socket.on('remove', function (data) {
@@ -90,12 +135,16 @@ socket.on('remove', function (data) {
         }
         delete BulletClient_1.BulletClient.list[data.bullet[i].id];
     }
+    for (let i = 0, length = data.enemy.length; i < length; i++) {
+        delete EnemyClient_1.EnemyClient.list[data.enemy[i]];
+    }
 });
 setInterval(function () {
     if (!exports.selfId) {
         return;
     }
     ctx.clearRect(0, 0, WIDTH, HEIGHT);
+    currentMap.draw();
     for (let i in PlayerClient_1.PlayerClient.list) {
         if (PlayerClient_1.PlayerClient.list[i].moving) {
             PlayerClient_1.PlayerClient.list[i].walkSpriteAnimCounter += 1;
@@ -114,6 +163,17 @@ setInterval(function () {
     }
     for (let i in BulletClient_1.BulletClient.list) {
         BulletClient_1.BulletClient.list[i].draw();
+    }
+    for (let i in EnemyClient_1.EnemyClient.list) {
+        if (EnemyClient_1.EnemyClient.list[i].moving || EnemyClient_1.EnemyClient.list[i].attackStarted) {
+            if (EnemyClient_1.EnemyClient.list[i].attackStarted) {
+                EnemyClient_1.EnemyClient.list[i].spriteAnimCounter += 0.8;
+            }
+            else {
+                EnemyClient_1.EnemyClient.list[i].spriteAnimCounter += 0.4;
+            }
+        }
+        EnemyClient_1.EnemyClient.list[i].draw();
     }
 }, 40);
 document.onkeydown = function (event) {

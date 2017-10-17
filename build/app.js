@@ -87,7 +87,7 @@ setInterval(function () {
     let pack = {
         player: Player_1.Player.update(),
         bullet: Bullet_1.Bullet.update(),
-        enemy: Enemy_1.Enemy.update(),
+        enemy: Enemy_1.Enemy.update()
     };
     frameCount++;
     for (let i in SOCKET_LIST) {

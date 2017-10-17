@@ -60,7 +60,7 @@
 /******/ 	__webpack_require__.p = "/dist/";
 /******/
 /******/ 	// Load entry module and return exports
-/******/ 	return __webpack_require__(__webpack_require__.s = 3);
+/******/ 	return __webpack_require__(__webpack_require__.s = 1);
 /******/ })
 /************************************************************************/
 /******/ ([
@@ -127,37 +127,14 @@ exports.Velocity = Velocity;
 /***/ (function(module, exports, __webpack_require__) {
 
 Object.defineProperty(exports, "__esModule", { value: true });
-const Pack_1 = __webpack_require__(15);
-exports.initPack = new Pack_1.Pack();
-exports.removePack = new Pack_1.Pack();
-
-
-/***/ }),
-/* 2 */
-/***/ (function(module, exports) {
-
-Object.defineProperty(exports, "__esModule", { value: true });
-var WeaponType;
-(function (WeaponType) {
-    WeaponType[WeaponType["knife"] = 0] = "knife";
-    WeaponType[WeaponType["pistol"] = 1] = "pistol";
-    WeaponType[WeaponType["shotgun"] = 2] = "shotgun";
-    WeaponType[WeaponType["rifle"] = 3] = "rifle";
-    WeaponType[WeaponType["claws"] = 20] = "claws";
-})(WeaponType = exports.WeaponType || (exports.WeaponType = {}));
-;
-
-
-/***/ }),
-/* 3 */
-/***/ (function(module, exports, __webpack_require__) {
-
-Object.defineProperty(exports, "__esModule", { value: true });
-const PlayerClient_1 = __webpack_require__(7);
-const BulletClient_1 = __webpack_require__(14);
+const MapClient_1 = __webpack_require__(14);
+const PlayerClient_1 = __webpack_require__(3);
+const BulletClient_1 = __webpack_require__(15);
 const Inventory_1 = __webpack_require__(9);
+const EnemyClient_1 = __webpack_require__(23);
 exports.selfId = 0;
 exports.inventory = new Inventory_1.Inventory(socket, false, 0);
+let currentMap = new MapClient_1.MapClient();
 socket.on('updateInventory', function (items) {
     exports.inventory.items = items;
     exports.inventory.refreshRender();
@@ -171,6 +148,9 @@ socket.on('init', function (data) {
     }
     for (let i = 0, length = data.bullet.length; i < length; i++) {
         new BulletClient_1.BulletClient(data.bullet[i]);
+    }
+    for (let i = 0, length = data.enemy.length; i < length; i++) {
+        new EnemyClient_1.EnemyClient(data.enemy[i]);
     }
 });
 socket.on('update', function (data) {
@@ -220,7 +200,45 @@ socket.on('update', function (data) {
                     p.bodySpriteAnimCounter = 0;
                 }
             }
-            gui.draw();
+        }
+        for (let i = 0, length = data.enemy.length; i < length; i++) {
+            let pack = data.enemy[i];
+            let p = EnemyClient_1.EnemyClient.list[pack.id];
+            if (p) {
+                if (pack.position !== undefined) {
+                    p.position.x = pack.position.x;
+                    p.position.y = pack.position.y;
+                }
+                if (pack.hp !== undefined) {
+                    p.hp = pack.hp;
+                }
+                if (pack.weapon !== undefined) {
+                    p.weapon = pack.weapon;
+                }
+                if (pack.attackMelee !== undefined) {
+                    p.attackMelee = pack.attackMelee;
+                }
+                if (pack.moving !== undefined) {
+                    p.moving = pack.moving;
+                }
+                if (pack.aimAngle !== undefined) {
+                    p.aimAngle = pack.aimAngle;
+                }
+                if (pack.reload !== undefined) {
+                    if (pack.reload) {
+                        p.reload = true;
+                    }
+                    else {
+                        p.reload = false;
+                    }
+                }
+                if (pack.attackStarted !== undefined) {
+                    if (pack.attackStarted) {
+                        p.attackStarted = true;
+                        p.spriteAnimCounter = 0;
+                    }
+                }
+            }
         }
         for (let i = 0, length = data.bullet.length; i < length; i++) {
             let pack = data.bullet[i];
@@ -232,6 +250,7 @@ socket.on('update', function (data) {
                 }
             }
         }
+        gui.draw();
     }
 });
 socket.on('remove', function (data) {
@@ -244,12 +263,16 @@ socket.on('remove', function (data) {
         }
         delete BulletClient_1.BulletClient.list[data.bullet[i].id];
     }
+    for (let i = 0, length = data.enemy.length; i < length; i++) {
+        delete EnemyClient_1.EnemyClient.list[data.enemy[i]];
+    }
 });
 setInterval(function () {
     if (!exports.selfId) {
         return;
     }
     ctx.clearRect(0, 0, WIDTH, HEIGHT);
+    currentMap.draw();
     for (let i in PlayerClient_1.PlayerClient.list) {
         if (PlayerClient_1.PlayerClient.list[i].moving) {
             PlayerClient_1.PlayerClient.list[i].walkSpriteAnimCounter += 1;
@@ -268,6 +291,17 @@ setInterval(function () {
     }
     for (let i in BulletClient_1.BulletClient.list) {
         BulletClient_1.BulletClient.list[i].draw();
+    }
+    for (let i in EnemyClient_1.EnemyClient.list) {
+        if (EnemyClient_1.EnemyClient.list[i].moving || EnemyClient_1.EnemyClient.list[i].attackStarted) {
+            if (EnemyClient_1.EnemyClient.list[i].attackStarted) {
+                EnemyClient_1.EnemyClient.list[i].spriteAnimCounter += 0.8;
+            }
+            else {
+                EnemyClient_1.EnemyClient.list[i].spriteAnimCounter += 0.4;
+            }
+        }
+        EnemyClient_1.EnemyClient.list[i].draw();
     }
 }, 40);
 document.onkeydown = function (event) {
@@ -325,346 +359,28 @@ document.onmousemove = function (event) {
 
 
 /***/ }),
-/* 4 */
-/***/ (function(module, exports, __webpack_require__) {
+/* 2 */
+/***/ (function(module, exports) {
 
 Object.defineProperty(exports, "__esModule", { value: true });
-const globalVariables_1 = __webpack_require__(1);
-const Enemy_1 = __webpack_require__(5);
-const Bullet_1 = __webpack_require__(13);
-const Actor_1 = __webpack_require__(10);
-const GeometryAndPhysics_1 = __webpack_require__(0);
-const enums_1 = __webpack_require__(2);
-class Player extends Actor_1.Actor {
-    constructor(param) {
-        super(param);
-        this.getInitPack = () => {
-            return {
-                id: this.id,
-                position: this.position,
-                hp: this.lifeAndBodyController.hp,
-                hpMax: this.lifeAndBodyController.hpMax,
-                map: this.map,
-                width: this.width,
-                height: this.height,
-                moving: this.movementController.moving,
-                aimAngle: this.movementController.aimAngle,
-                weapon: this.attackController.activeWeapon.name,
-                attackStarted: this.attackController.attackStarted,
-                attackMelee: this.attackController.melee,
-                ammo: this.attackController.activeWeapon.ammo,
-                ammoInGun: this.attackController.activeWeapon.ammoInGun
-            };
-        };
-        this.getUpdatePack = () => {
-            let attackStartedTmp = this.attackController.attackStarted;
-            this.attackController.attackStarted = false;
-            return {
-                id: this.id,
-                position: this.position,
-                hp: this.lifeAndBodyController.hp,
-                moving: this.movementController.moving,
-                aimAngle: this.movementController.aimAngle,
-                attackStarted: attackStartedTmp,
-                weapon: this.attackController.activeWeapon.name,
-                attackMelee: this.attackController.melee,
-                ammo: this.attackController.activeWeapon.ammo,
-                ammoInGun: this.attackController.activeWeapon.ammoInGun,
-                reload: this.attackController.reloadCounter.isActive()
-            };
-        };
-        this.onDeath = () => {
-            this.lifeAndBodyController.reset();
-            let map = this.mapController.getMap(this.map);
-            let x = Math.random() * map.width;
-            let y = Math.random() * map.height;
-            let position = new GeometryAndPhysics_1.Point(x, y);
-            while (map.isPositionWall(position)) {
-                x = Math.random() * map.width;
-                y = Math.random() * map.height;
-                position.changePosition(x, y);
-            }
-            this.setPosition(position);
-        };
-        globalVariables_1.initPack.player.push(this.getInitPack());
-        Player.list[param.id] = this;
-        this.inventory.addItem(enums_1.WeaponType.knife, 1);
-        this.inventory.addItem(enums_1.WeaponType.pistol, 1);
-        this.inventory.addItem(enums_1.WeaponType.shotgun, 1);
-        this.inventory.addItem(enums_1.WeaponType.rifle, 1);
-        this.inventory.addItem("medicalkit", 4);
-        this.inventory.useItem(enums_1.WeaponType.shotgun);
-    }
-}
-Player.onConnect = (socket) => {
-    let map = 'forest';
-    let player = new Player({
-        id: socket.id,
-        maxSpdX: 12,
-        maxSpdY: 12,
-        map: map,
-        img: 'player',
-        atkSpd: 7,
-        width: 50,
-        height: 50,
-        type: "player",
-        hp: 40,
-        socket: socket
-    });
-    socket.on('changeWeapon', function (data) {
-        if (data.state == 'next') {
-            player.attackController.weaponCollection.chooseNextWeaponWithAmmo();
-        }
-        if (data.state == 'prev') {
-            player.attackController.weaponCollection.choosePrevWeaponWithAmmo();
-        }
-    });
-    socket.on('keyPress', function (data) {
-        if (data.inputId == 'left')
-            player.movementController.pressingLeft = data.state;
-        if (data.inputId == 'right')
-            player.movementController.pressingRight = data.state;
-        if (data.inputId == 'up')
-            player.movementController.pressingUp = data.state;
-        if (data.inputId == 'down')
-            player.movementController.pressingDown = data.state;
-        if (data.inputId == 'attack')
-            player.attackController.pressingAttack = data.state;
-        if (data.inputId == 'mouseAngle')
-            player.movementController.aimAngle = data.state;
-        if (data.inputId == 'heal')
-            player.inventory.useItem("medicalkit");
-        if (data.inputId == '1')
-            player.attackController.weaponCollection.changeWeapon(enums_1.WeaponType.knife);
-        if (data.inputId == '2')
-            player.attackController.weaponCollection.changeWeapon(enums_1.WeaponType.pistol);
-        if (data.inputId == '3')
-            player.attackController.weaponCollection.changeWeapon(enums_1.WeaponType.shotgun);
-        if (data.inputId == '4')
-            player.attackController.weaponCollection.changeWeapon(enums_1.WeaponType.rifle);
-        if (data.inputId == 'space')
-            player.attackController.weaponCollection.chooseNextWeaponWithAmmo();
-    });
-    socket.emit('init', { player: Player.getAllInitPack(), bullet: Bullet_1.Bullet.getAllInitPack(), enemy: Enemy_1.Enemy.getAllInitPack(), selfId: socket.id });
-};
-Player.getAllInitPack = () => {
-    let players = [];
-    for (let i in Player.list) {
-        players.push(Player.list[i].getInitPack());
-    }
-    return players;
-};
-Player.onDisconnect = (socket) => {
-    delete Player.list[socket.id];
-    globalVariables_1.removePack.player.push(socket.id);
-};
-Player.update = () => {
-    let pack = [];
-    for (let i in Player.list) {
-        let player = Player.list[i];
-        player.update();
-        pack.push(player.getUpdatePack());
-    }
-    return pack;
-};
-Player.list = {};
-exports.Player = Player;
+var WeaponType;
+(function (WeaponType) {
+    WeaponType[WeaponType["knife"] = 0] = "knife";
+    WeaponType[WeaponType["pistol"] = 1] = "pistol";
+    WeaponType[WeaponType["shotgun"] = 2] = "shotgun";
+    WeaponType[WeaponType["rifle"] = 3] = "rifle";
+    WeaponType[WeaponType["claws"] = 20] = "claws";
+})(WeaponType = exports.WeaponType || (exports.WeaponType = {}));
+;
 
 
 /***/ }),
-/* 5 */
-/***/ (function(module, exports, __webpack_require__) {
-
-Object.defineProperty(exports, "__esModule", { value: true });
-const MapControler_1 = __webpack_require__(6);
-const Actor_1 = __webpack_require__(10);
-const GeometryAndPhysics_1 = __webpack_require__(0);
-const globalVariables_1 = __webpack_require__(1);
-class Enemy extends Actor_1.Actor {
-    constructor(param) {
-        super(param);
-        this.toRemove = false;
-        this.kind = "";
-        this.update = () => {
-            super.update();
-            let player = this.getClosestPlayer();
-            let diffX = 0;
-            let diffY = 0;
-            if (player) {
-                diffX = player.position.x - this.position.x;
-                diffY = player.position.y - this.position.y;
-            }
-            this.updateAim(player, diffX, diffY);
-            this.updateKeyPress(player, diffX, diffY);
-            this.updateAttack(player, diffX, diffY);
-        };
-        this.updateAim = (player, diffX, diffY) => {
-            this.movementController.aimAngle = Math.atan2(diffY, diffX) / Math.PI * 180;
-        };
-        this.updateKeyPress = (player, diffX, diffY) => {
-            let safeDistance = 20;
-            safeDistance = (this.attackController.melee) ? 30 : 100;
-            this.movementController.pressingRight = diffX > safeDistance;
-            this.movementController.pressingLeft = diffX < -safeDistance;
-            this.movementController.pressingDown = diffY > safeDistance;
-            this.movementController.pressingUp = diffY < -safeDistance;
-        };
-        this.updateAttack = (player, diffX, diffY) => {
-            if (this.attackController.melee) {
-                if (Math.sqrt(diffX * diffX + diffY * diffY) < 50)
-                    this.attackController.performAttack();
-            }
-            else {
-                if (Math.sqrt(diffX * diffX + diffY * diffY) < 500)
-                    this.attackController.performAttack();
-            }
-        };
-        this.onDeath = () => {
-            this.toRemove = true;
-        };
-        this.getInitPack = () => {
-            return {
-                id: this.id,
-                position: this.position,
-                hp: this.lifeAndBodyController.hp,
-                hpMax: this.lifeAndBodyController.hpMax,
-                map: this.map,
-                img: this.img,
-                width: this.width,
-                height: this.height,
-                moving: this.movementController.moving,
-                aimAngle: this.movementController.aimAngle,
-                kind: this.kind,
-                attackStarted: this.attackController.attackStarted,
-                weapon: this.attackController.activeWeapon.weapon,
-                attackMeele: this.attackController.melee,
-                reload: this.attackController.reloadCounter.isActive()
-            };
-        };
-        this.getUpdatePack = () => {
-            let attackStartedTmp = this.attackController.attackStarted;
-            this.attackController.attackStarted = false;
-            return {
-                id: this.id,
-                position: this.position,
-                hp: this.lifeAndBodyController.hp,
-                moving: this.movementController.moving,
-                aimAngle: this.movementController.aimAngle,
-                attackStarted: attackStartedTmp,
-                weapon: this.attackController.activeWeapon.weapon,
-                attackMeele: this.attackController.melee,
-                reload: this.attackController.reloadCounter.isActive()
-            };
-        };
-        Enemy.list[param.id] = this;
-        globalVariables_1.initPack.enemy.push(this.getInitPack());
-        if (param.kind)
-            this.kind = param.kind;
-        this.attackController.pressingAttack = true;
-    }
-}
-Enemy.globalMapControler = new MapControler_1.MapController(null);
-Enemy.update = () => {
-    let pack = [];
-    for (let i in Enemy.list) {
-        let enemy = Enemy.list[i];
-        enemy.update();
-        if (enemy.toRemove) {
-            delete Enemy.list[i];
-            Enemy.randomlyGenerate('forest');
-            globalVariables_1.removePack.enemy.push(enemy.id);
-        }
-        else {
-            pack.push(enemy.getUpdatePack());
-        }
-    }
-    return pack;
-};
-Enemy.getAllInitPack = function () {
-    let enemies = [];
-    for (let i in Enemy.list) {
-        enemies.push(Enemy.list[i].getInitPack());
-    }
-    return enemies;
-};
-Enemy.randomlyGenerate = function (choosenMap) {
-    let map = Enemy.globalMapControler.getMap(choosenMap);
-    let x = Math.random() * map.width;
-    let y = Math.random() * map.height;
-    let position = new GeometryAndPhysics_1.Point(x, y);
-    while (map.isPositionWall(position)) {
-        x = Math.random() * map.width;
-        y = Math.random() * map.height;
-        position.changePosition(x, y);
-    }
-    let difficulty = 1 + Math.round(Math.random() * 2) * 0.5;
-    let height = 48 * difficulty;
-    let width = 48 * difficulty;
-    let id = Math.random();
-    let enemy;
-    if (Math.random() < 0.5) {
-        enemy = new Enemy({
-            id: id,
-            position: position,
-            width: width,
-            height: height,
-            hp: 15 * difficulty,
-            atkSpd: 0.8 * difficulty,
-            map: choosenMap,
-            img: 'scorpion',
-            type: 'enemy',
-            kind: 'scorpion'
-        });
-    }
-    else {
-        enemy = new Enemy({
-            id: id,
-            position: position,
-            width: width,
-            height: height,
-            hp: 5 * difficulty,
-            atkSpd: 0.4 * difficulty,
-            map: choosenMap,
-            img: 'zombie',
-            type: 'enemy',
-            kind: 'zombie',
-            maxSpd: 11
-        });
-    }
-};
-Enemy.list = {};
-exports.Enemy = Enemy;
-
-
-/***/ }),
-/* 6 */
-/***/ (function(module, exports, __webpack_require__) {
-
-Object.defineProperty(exports, "__esModule", { value: true });
-const GameMap_1 = __webpack_require__(16);
-class MapController {
-    constructor(param) {
-        this.maps = [];
-        this.getMap = (map) => {
-            for (let i = 0; i < this.maps.length; i++) {
-                if (map == this.maps[i].name) {
-                    return this.maps[i];
-                }
-            }
-        };
-        this.maps.push(new GameMap_1.GameMap("forest", 1000, 1000));
-    }
-}
-exports.MapController = MapController;
-
-
-/***/ }),
-/* 7 */
+/* 3 */
 /***/ (function(module, exports, __webpack_require__) {
 
 Object.defineProperty(exports, "__esModule", { value: true });
 const GeometryAndPhysics_1 = __webpack_require__(0);
-const game_1 = __webpack_require__(3);
+const game_1 = __webpack_require__(1);
 class PlayerClient {
     constructor(initPack) {
         this.id = -1;
@@ -708,7 +424,6 @@ class PlayerClient {
             aimAngle = (aimAngle < 0) ? (360 + aimAngle) : aimAngle;
             let directionMod = this.inWhichDirection(aimAngle);
             let walkingMod = Math.floor(this.walkSpriteAnimCounter) % spriteColumns;
-            console.log("Walking mod " + walkingMod);
             this.drawWalk(spriteColumns, spriteRows, aimAngle, 0, walkingMod, x, y);
             if (this.attackStarted && this.attackMelee) {
                 spriteColumns = 15;
@@ -834,6 +549,386 @@ exports.PlayerClient = PlayerClient;
 
 
 /***/ }),
+/* 4 */
+/***/ (function(module, exports, __webpack_require__) {
+
+Object.defineProperty(exports, "__esModule", { value: true });
+const Pack_1 = __webpack_require__(16);
+exports.initPack = new Pack_1.Pack();
+exports.removePack = new Pack_1.Pack();
+
+
+/***/ }),
+/* 5 */
+/***/ (function(module, exports, __webpack_require__) {
+
+Object.defineProperty(exports, "__esModule", { value: true });
+const globalVariables_1 = __webpack_require__(4);
+const Enemy_1 = __webpack_require__(6);
+const Bullet_1 = __webpack_require__(13);
+const Actor_1 = __webpack_require__(10);
+const GeometryAndPhysics_1 = __webpack_require__(0);
+const enums_1 = __webpack_require__(2);
+class Player extends Actor_1.Actor {
+    constructor(param) {
+        super(param);
+        this.getInitPack = () => {
+            return {
+                id: this.id,
+                position: this.position,
+                hp: this.lifeAndBodyController.hp,
+                hpMax: this.lifeAndBodyController.hpMax,
+                map: this.map,
+                width: this.width,
+                height: this.height,
+                moving: this.movementController.moving,
+                aimAngle: this.movementController.aimAngle,
+                weapon: this.attackController.activeWeapon.name,
+                attackStarted: this.attackController.attackStarted,
+                attackMelee: this.attackController.melee,
+                ammo: this.attackController.activeWeapon.ammo,
+                ammoInGun: this.attackController.activeWeapon.ammoInGun
+            };
+        };
+        this.getUpdatePack = () => {
+            let attackStartedTmp = this.attackController.attackStarted;
+            this.attackController.attackStarted = false;
+            return {
+                id: this.id,
+                position: this.position,
+                hp: this.lifeAndBodyController.hp,
+                moving: this.movementController.moving,
+                aimAngle: this.movementController.aimAngle,
+                attackStarted: attackStartedTmp,
+                weapon: this.attackController.activeWeapon.name,
+                attackMelee: this.attackController.melee,
+                ammo: this.attackController.activeWeapon.ammo,
+                ammoInGun: this.attackController.activeWeapon.ammoInGun,
+                reload: this.attackController.reloadCounter.isActive()
+            };
+        };
+        this.onDeath = () => {
+            this.lifeAndBodyController.reset();
+            let map = this.mapController.getMap(this.map);
+            let x = Math.random() * map.width;
+            let y = Math.random() * map.height;
+            let position = new GeometryAndPhysics_1.Point(x, y);
+            while (map.isPositionWall(position)) {
+                x = Math.random() * map.width;
+                y = Math.random() * map.height;
+                position.changePosition(x, y);
+            }
+            this.setPosition(position);
+        };
+        globalVariables_1.initPack.player.push(this.getInitPack());
+        Player.list[param.id] = this;
+        this.inventory.addItem(enums_1.WeaponType.knife, 1);
+        this.inventory.addItem(enums_1.WeaponType.pistol, 1);
+        this.inventory.addItem(enums_1.WeaponType.shotgun, 1);
+        this.inventory.addItem(enums_1.WeaponType.rifle, 1);
+        this.inventory.addItem("medicalkit", 4);
+        this.inventory.useItem(enums_1.WeaponType.shotgun);
+        Enemy_1.Enemy.randomlyGenerate(this.map);
+        Enemy_1.Enemy.randomlyGenerate(this.map);
+        Enemy_1.Enemy.randomlyGenerate(this.map);
+        Enemy_1.Enemy.randomlyGenerate(this.map);
+    }
+}
+Player.onConnect = (socket) => {
+    let map = 'forest';
+    let player = new Player({
+        id: socket.id,
+        maxSpdX: 12,
+        maxSpdY: 12,
+        map: map,
+        img: 'player',
+        atkSpd: 7,
+        width: 50,
+        height: 50,
+        type: "player",
+        hp: 40,
+        socket: socket
+    });
+    socket.on('changeWeapon', function (data) {
+        if (data.state == 'next') {
+            player.attackController.weaponCollection.chooseNextWeaponWithAmmo();
+        }
+        if (data.state == 'prev') {
+            player.attackController.weaponCollection.choosePrevWeaponWithAmmo();
+        }
+    });
+    socket.on('keyPress', function (data) {
+        if (data.inputId == 'left')
+            player.movementController.pressingLeft = data.state;
+        if (data.inputId == 'right')
+            player.movementController.pressingRight = data.state;
+        if (data.inputId == 'up')
+            player.movementController.pressingUp = data.state;
+        if (data.inputId == 'down')
+            player.movementController.pressingDown = data.state;
+        if (data.inputId == 'attack')
+            player.attackController.pressingAttack = data.state;
+        if (data.inputId == 'mouseAngle')
+            player.movementController.aimAngle = data.state;
+        if (data.inputId == 'heal')
+            player.inventory.useItem("medicalkit");
+        if (data.inputId == '1')
+            player.attackController.weaponCollection.changeWeapon(enums_1.WeaponType.knife);
+        if (data.inputId == '2')
+            player.attackController.weaponCollection.changeWeapon(enums_1.WeaponType.pistol);
+        if (data.inputId == '3')
+            player.attackController.weaponCollection.changeWeapon(enums_1.WeaponType.shotgun);
+        if (data.inputId == '4')
+            player.attackController.weaponCollection.changeWeapon(enums_1.WeaponType.rifle);
+        if (data.inputId == 'space')
+            player.attackController.weaponCollection.chooseNextWeaponWithAmmo();
+    });
+    socket.emit('init', { player: Player.getAllInitPack(), bullet: Bullet_1.Bullet.getAllInitPack(), enemy: Enemy_1.Enemy.getAllInitPack(), selfId: socket.id });
+};
+Player.getAllInitPack = () => {
+    let players = [];
+    for (let i in Player.list) {
+        players.push(Player.list[i].getInitPack());
+    }
+    return players;
+};
+Player.onDisconnect = (socket) => {
+    delete Player.list[socket.id];
+    globalVariables_1.removePack.player.push(socket.id);
+};
+Player.update = () => {
+    let pack = [];
+    for (let i in Player.list) {
+        let player = Player.list[i];
+        player.update();
+        pack.push(player.getUpdatePack());
+    }
+    return pack;
+};
+Player.list = {};
+exports.Player = Player;
+
+
+/***/ }),
+/* 6 */
+/***/ (function(module, exports, __webpack_require__) {
+
+Object.defineProperty(exports, "__esModule", { value: true });
+const MapControler_1 = __webpack_require__(7);
+const Actor_1 = __webpack_require__(10);
+const GeometryAndPhysics_1 = __webpack_require__(0);
+const globalVariables_1 = __webpack_require__(4);
+const enums_1 = __webpack_require__(2);
+class Enemy extends Actor_1.Actor {
+    constructor(param) {
+        super(param);
+        this.toRemove = false;
+        this.kind = "";
+        this.extendedUpdate = () => {
+            this.update();
+            let player = this.getClosestPlayer(10000, 360);
+            let diffX = 0;
+            let diffY = 0;
+            if (player) {
+                diffX = player.position.x - this.position.x;
+                diffY = player.position.y - this.position.y;
+            }
+            this.updateAim(player, diffX, diffY);
+            this.updateKeyPress(player, diffX, diffY);
+            this.updateAttack(player, diffX, diffY);
+        };
+        this.updateAim = (player, diffX, diffY) => {
+            this.movementController.aimAngle = Math.atan2(diffY, diffX) / Math.PI * 180;
+        };
+        this.updateKeyPress = (player, diffX, diffY) => {
+            let safeDistance = 20;
+            safeDistance = (this.attackController.melee) ? 30 : 100;
+            this.movementController.pressingRight = diffX > safeDistance;
+            this.movementController.pressingLeft = diffX < -safeDistance;
+            this.movementController.pressingDown = diffY > safeDistance;
+            this.movementController.pressingUp = diffY < -safeDistance;
+        };
+        this.updateAttack = (player, diffX, diffY) => {
+            if (this.attackController.melee) {
+                if (Math.sqrt(diffX * diffX + diffY * diffY) < 50)
+                    this.attackController.performAttack();
+            }
+            else {
+                if (Math.sqrt(diffX * diffX + diffY * diffY) < 500)
+                    this.attackController.performAttack();
+            }
+        };
+        this.onDeath = () => {
+            this.toRemove = true;
+        };
+        this.getInitPack = () => {
+            return {
+                id: this.id,
+                position: this.position,
+                hp: this.lifeAndBodyController.hp,
+                hpMax: this.lifeAndBodyController.hpMax,
+                map: this.map,
+                img: this.img,
+                width: this.width,
+                height: this.height,
+                moving: this.movementController.moving,
+                aimAngle: this.movementController.aimAngle,
+                kind: this.kind,
+                attackStarted: this.attackController.attackStarted,
+                weapon: this.attackController.activeWeapon.weapon,
+                attackMeele: this.attackController.melee,
+                reload: this.attackController.reloadCounter.isActive()
+            };
+        };
+        this.getUpdatePack = () => {
+            let attackStartedTmp = this.attackController.attackStarted;
+            this.attackController.attackStarted = false;
+            return {
+                id: this.id,
+                position: this.position,
+                hp: this.lifeAndBodyController.hp,
+                moving: this.movementController.moving,
+                aimAngle: this.movementController.aimAngle,
+                attackStarted: attackStartedTmp,
+                weapon: this.attackController.activeWeapon.weapon,
+                attackMeele: this.attackController.melee,
+                reload: this.attackController.reloadCounter.isActive()
+            };
+        };
+        this.giveWeapons = () => {
+            if (this.kind == 'zombie') {
+                this.inventory.addItem(enums_1.WeaponType.claws, 1);
+                this.inventory.useItem(enums_1.WeaponType.claws);
+            }
+            if (this.kind == 'scorpion') {
+                this.inventory.addItem(enums_1.WeaponType.pistol, 1);
+                this.inventory.addItem(enums_1.WeaponType.shotgun, 1);
+                this.inventory.addItem(enums_1.WeaponType.rifle, 1);
+                this.attackController.weaponCollection.setWeaponAmmo(enums_1.WeaponType.shotgun, 10);
+                this.attackController.weaponCollection.setWeaponAmmo(enums_1.WeaponType.pistol, 20);
+                this.attackController.weaponCollection.setWeaponAmmo(enums_1.WeaponType.rifle, 5);
+                if (Math.random() < 0.6) {
+                    this.inventory.useItem(enums_1.WeaponType.pistol);
+                }
+                else {
+                    if (Math.random() < 0.5) {
+                        this.inventory.useItem(enums_1.WeaponType.shotgun);
+                    }
+                    else {
+                        this.inventory.useItem(enums_1.WeaponType.rifle);
+                    }
+                }
+            }
+        };
+        Enemy.list[param.id] = this;
+        if (param.kind)
+            this.kind = param.kind;
+        this.attackController.pressingAttack = true;
+        this.giveWeapons();
+        globalVariables_1.initPack.enemy.push(this.getInitPack());
+    }
+}
+Enemy.globalMapControler = new MapControler_1.MapController(null);
+Enemy.update = () => {
+    let pack = [];
+    for (let i in Enemy.list) {
+        let enemy = Enemy.list[i];
+        enemy.extendedUpdate();
+        if (enemy.toRemove) {
+            delete Enemy.list[i];
+            Enemy.randomlyGenerate('forest');
+            globalVariables_1.removePack.enemy.push(enemy.id);
+        }
+        else {
+            pack.push(enemy.getUpdatePack());
+        }
+    }
+    return pack;
+};
+Enemy.getAllInitPack = function () {
+    let enemies = [];
+    for (let i in Enemy.list) {
+        enemies.push(Enemy.list[i].getInitPack());
+    }
+    return enemies;
+};
+Enemy.randomlyGenerate = function (choosenMap) {
+    let map = Enemy.globalMapControler.getMap(choosenMap);
+    let x = Math.random() * map.width;
+    let y = Math.random() * map.height;
+    let position = new GeometryAndPhysics_1.Point(x, y);
+    while (map.isPositionWall(position)) {
+        x = Math.random() * map.width;
+        y = Math.random() * map.height;
+        position.changePosition(x, y);
+    }
+    let difficulty = 1 + Math.round(Math.random() * 2) * 0.5;
+    let height = 48 * difficulty;
+    let width = 48 * difficulty;
+    let id = Math.random();
+    let enemy;
+    if (Math.random() < 0.5) {
+        console.log("SCORPION");
+        enemy = new Enemy({
+            id: id,
+            position: position,
+            width: width,
+            height: height,
+            hp: 15 * difficulty,
+            atkSpd: 0.8 * difficulty,
+            map: choosenMap,
+            img: 'scorpion',
+            type: 'enemy',
+            kind: 'scorpion',
+            maxSpdX: 3,
+            maxSpdY: 3
+        });
+    }
+    else {
+        console.log("ZOMBIE");
+        enemy = new Enemy({
+            id: id,
+            position: position,
+            width: width,
+            height: height,
+            hp: 5 * difficulty,
+            atkSpd: 0.4 * difficulty,
+            map: choosenMap,
+            img: 'zombie',
+            type: 'enemy',
+            kind: 'zombie',
+            maxSpdX: 7,
+            maxSpdY: 7
+        });
+    }
+};
+Enemy.list = {};
+exports.Enemy = Enemy;
+
+
+/***/ }),
+/* 7 */
+/***/ (function(module, exports, __webpack_require__) {
+
+Object.defineProperty(exports, "__esModule", { value: true });
+const GameMap_1 = __webpack_require__(17);
+class MapController {
+    constructor(param) {
+        this.maps = [];
+        this.getMap = (map) => {
+            for (let i = 0; i < this.maps.length; i++) {
+                if (map == this.maps[i].name) {
+                    return this.maps[i];
+                }
+            }
+        };
+        this.maps.push(new GameMap_1.GameMap("forest", 1000, 1000));
+    }
+}
+exports.MapController = MapController;
+
+
+/***/ }),
 /* 8 */
 /***/ (function(module, exports, __webpack_require__) {
 
@@ -954,8 +1049,8 @@ new WeaponTypes({ weapon: enums_1.WeaponType.claws, name: "claws",
 /***/ (function(module, exports, __webpack_require__) {
 
 Object.defineProperty(exports, "__esModule", { value: true });
-const Player_1 = __webpack_require__(4);
-const Item_1 = __webpack_require__(21);
+const Player_1 = __webpack_require__(5);
+const Item_1 = __webpack_require__(22);
 class Inventory {
     constructor(socket, server, owner) {
         this.items = [];
@@ -1056,13 +1151,13 @@ exports.Inventory = Inventory;
 
 Object.defineProperty(exports, "__esModule", { value: true });
 const Inventory_1 = __webpack_require__(9);
-const LifeAndBodyController_1 = __webpack_require__(17);
-const MapControler_1 = __webpack_require__(6);
+const LifeAndBodyController_1 = __webpack_require__(18);
+const MapControler_1 = __webpack_require__(7);
 const Entity_1 = __webpack_require__(11);
-const Player_1 = __webpack_require__(4);
-const Enemy_1 = __webpack_require__(5);
-const AttackControler_1 = __webpack_require__(18);
-const MovementController_1 = __webpack_require__(20);
+const Player_1 = __webpack_require__(5);
+const Enemy_1 = __webpack_require__(6);
+const AttackControler_1 = __webpack_require__(19);
+const MovementController_1 = __webpack_require__(21);
 const GeometryAndPhysics_1 = __webpack_require__(0);
 class Actor extends Entity_1.Entity {
     constructor(param) {
@@ -1157,7 +1252,7 @@ exports.Actor = Actor;
 
 Object.defineProperty(exports, "__esModule", { value: true });
 const GeometryAndPhysics_1 = __webpack_require__(0);
-const globalVariables_1 = __webpack_require__(1);
+const globalVariables_1 = __webpack_require__(4);
 class Entity {
     constructor(param) {
         this._position = new GeometryAndPhysics_1.Point(250, 250);
@@ -1253,11 +1348,11 @@ exports.Counter = Counter;
 /***/ (function(module, exports, __webpack_require__) {
 
 Object.defineProperty(exports, "__esModule", { value: true });
-const MapControler_1 = __webpack_require__(6);
-const Enemy_1 = __webpack_require__(5);
-const Player_1 = __webpack_require__(4);
+const MapControler_1 = __webpack_require__(7);
+const Enemy_1 = __webpack_require__(6);
+const Player_1 = __webpack_require__(5);
 const Entity_1 = __webpack_require__(11);
-const globalVariables_1 = __webpack_require__(1);
+const globalVariables_1 = __webpack_require__(4);
 class Bullet extends Entity_1.Entity {
     constructor(param) {
         super(Bullet.updateParam(param));
@@ -1389,9 +1484,37 @@ exports.Bullet = Bullet;
 /***/ (function(module, exports, __webpack_require__) {
 
 Object.defineProperty(exports, "__esModule", { value: true });
+const PlayerClient_1 = __webpack_require__(3);
+const game_1 = __webpack_require__(1);
+class MapClient {
+    constructor() {
+        this.image = new Image();
+        this.draw = () => {
+            let mainPlayer = PlayerClient_1.PlayerClient.list[game_1.selfId];
+            let mainPlayerx = mainPlayer.position.x;
+            let mainPlayery = mainPlayer.position.y;
+            if (!this.image.src) {
+                this.image.src = '/client/img/' + mainPlayer.map + '.png';
+            }
+            let x = WIDTH / 2 - mainPlayerx;
+            x = x - (mouseX - WIDTH / 2) / CAMERA_BOX_ADJUSTMENT;
+            let y = HEIGHT / 2 - mainPlayery;
+            y = y - (mouseY - HEIGHT / 2) / CAMERA_BOX_ADJUSTMENT;
+            ctx.drawImage(this.image, 0, 0, this.image.width, this.image.height, x, y, this.image.width * 2, this.image.height * 2);
+        };
+    }
+}
+exports.MapClient = MapClient;
+
+
+/***/ }),
+/* 15 */
+/***/ (function(module, exports, __webpack_require__) {
+
+Object.defineProperty(exports, "__esModule", { value: true });
 const GeometryAndPhysics_1 = __webpack_require__(0);
-const game_1 = __webpack_require__(3);
-const PlayerClient_1 = __webpack_require__(7);
+const game_1 = __webpack_require__(1);
+const PlayerClient_1 = __webpack_require__(3);
 class BulletClient {
     constructor(initPack) {
         this.id = -1;
@@ -1433,7 +1556,7 @@ exports.BulletClient = BulletClient;
 
 
 /***/ }),
-/* 15 */
+/* 16 */
 /***/ (function(module, exports) {
 
 Object.defineProperty(exports, "__esModule", { value: true });
@@ -1450,7 +1573,7 @@ exports.Pack = Pack;
 
 
 /***/ }),
-/* 16 */
+/* 17 */
 /***/ (function(module, exports) {
 
 Object.defineProperty(exports, "__esModule", { value: true });
@@ -1471,7 +1594,7 @@ exports.GameMap = GameMap;
 
 
 /***/ }),
-/* 17 */
+/* 18 */
 /***/ (function(module, exports) {
 
 Object.defineProperty(exports, "__esModule", { value: true });
@@ -1503,11 +1626,11 @@ exports.LifeAndBodyController = LifeAndBodyController;
 
 
 /***/ }),
-/* 18 */
+/* 19 */
 /***/ (function(module, exports, __webpack_require__) {
 
 Object.defineProperty(exports, "__esModule", { value: true });
-const WeaponCollection_1 = __webpack_require__(19);
+const WeaponCollection_1 = __webpack_require__(20);
 const Counter_1 = __webpack_require__(12);
 const GeometryAndPhysics_1 = __webpack_require__(0);
 const Bullet_1 = __webpack_require__(13);
@@ -1616,7 +1739,7 @@ exports.AttackController = AttackController;
 
 
 /***/ }),
-/* 19 */
+/* 20 */
 /***/ (function(module, exports, __webpack_require__) {
 
 Object.defineProperty(exports, "__esModule", { value: true });
@@ -1634,7 +1757,7 @@ class WeaponCollection {
                 for (let i = 0; i < this.weapons.length; i++) {
                     if (this.weapons[i].id === this.owner.attackController.activeWeapon.weapon) {
                         while (i + inc < this.weapons.length) {
-                            if (this.weapons[i + inc].ammo > 0) {
+                            if (this.weapons[i + inc].ammoInGun > 0) {
                                 this.owner.attackController.equip(this.weapons[i + inc].id);
                                 return;
                             }
@@ -1644,7 +1767,7 @@ class WeaponCollection {
                         }
                         inc = 0;
                         while (inc < i) {
-                            if (this.weapons[inc].ammo > 0) {
+                            if (this.weapons[inc].ammoInGun > 0) {
                                 this.owner.attackController.equip(this.weapons[inc].id);
                                 return;
                             }
@@ -1658,6 +1781,13 @@ class WeaponCollection {
             }
         };
         this.choosePrevWeaponWithAmmo = () => {
+        };
+        this.setWeaponAmmo = (id, ammo) => {
+            for (let i = 0; i < this.weapons.length; i++) {
+                if (this.weapons[i].id === id) {
+                    this.weapons[i].ammo = ammo;
+                }
+            }
         };
         this.decAmmo = (id, amount) => {
             for (let i = 0; i < this.weapons.length; i++) {
@@ -1772,7 +1902,7 @@ exports.SingleWeapon = SingleWeapon;
 
 
 /***/ }),
-/* 20 */
+/* 21 */
 /***/ (function(module, exports, __webpack_require__) {
 
 Object.defineProperty(exports, "__esModule", { value: true });
@@ -1848,8 +1978,8 @@ class MovementController {
             this.parent.position.y = (this.parent.position.y < this.parent.height / 2) ? this.parent.height / 2 : this.parent.position.y;
             this.parent.position.y = (this.parent.position.y > map.height - this.parent.height / 2) ? map.height - this.parent.height / 2 : this.parent.position.y;
         };
-        this._maxSpdX = param.maxSpdX ? param.maxSpdX : 10;
-        this._maxSpdY = param.maxSpdY ? param.maxSpdY : 10;
+        this._maxSpdX = (param.maxSpdX !== undefined) ? param.maxSpdX : 10;
+        this._maxSpdY = (param.maxSpdY !== undefined) ? param.maxSpdY : 10;
     }
     get pressingLeft() { return this._pressingLeft; }
     get pressingRight() { return this._pressingRight; }
@@ -1878,7 +2008,7 @@ exports.MovementController = MovementController;
 
 
 /***/ }),
-/* 21 */
+/* 22 */
 /***/ (function(module, exports, __webpack_require__) {
 
 Object.defineProperty(exports, "__esModule", { value: true });
@@ -1942,6 +2072,142 @@ new Item(enums_1.WeaponType.claws, "Claws", function (actor) {
     actor.attackController.weaponCollection.removeWeapon(enums_1.WeaponType.claws, amount);
 }, function (actor) {
 });
+
+
+/***/ }),
+/* 23 */
+/***/ (function(module, exports, __webpack_require__) {
+
+Object.defineProperty(exports, "__esModule", { value: true });
+const PlayerClient_1 = __webpack_require__(3);
+const GeometryAndPhysics_1 = __webpack_require__(0);
+const game_1 = __webpack_require__(1);
+class EnemyClient {
+    constructor(initPack) {
+        this.id = -1;
+        this.position = new GeometryAndPhysics_1.Point(250, 250);
+        this.width = 0;
+        this.height = 0;
+        this.img = Img["zombie"];
+        this.kind = "zombie";
+        this.hp = 1;
+        this.hpMax = 1;
+        this.map = "forest";
+        this.aimAngle = 0;
+        this.attackStarted = false;
+        this.attackMelee = false;
+        this.spriteAnimCounter = 0;
+        this.moving = false;
+        this.reload = false;
+        this.weapon = "pistol";
+        this.draw = () => {
+            if (PlayerClient_1.PlayerClient.list[game_1.selfId].map !== this.map) {
+                return;
+            }
+            let hpWidth = 30 * this.hp / this.hpMax;
+            let mainPlayer = PlayerClient_1.PlayerClient.list[game_1.selfId];
+            let mainPlayerx = mainPlayer.position.x;
+            let mainPlayery = mainPlayer.position.y;
+            let ex = this.position.x;
+            let ey = this.position.y;
+            let x = ex - (mainPlayerx - WIDTH / 2);
+            x = x - (mouseX - WIDTH / 2) / CAMERA_BOX_ADJUSTMENT;
+            let y = ey - (mainPlayery - HEIGHT / 2);
+            y = y - (mouseY - HEIGHT / 2) / CAMERA_BOX_ADJUSTMENT;
+            let frameWidth = this.img.width / 6;
+            let frameHeight = this.img.height / 4;
+            let aimAngle = this.aimAngle;
+            if (aimAngle < 0) {
+                aimAngle = 360 + aimAngle;
+            }
+            let directionMod = 3;
+            if (aimAngle >= 45 && aimAngle < 135) {
+                directionMod = 2;
+            }
+            else if (aimAngle >= 135 && aimAngle < 225) {
+                directionMod = 1;
+            }
+            else if (aimAngle >= 225 && aimAngle < 315) {
+                directionMod = 0;
+            }
+            let walkingMod = Math.floor(this.spriteAnimCounter) % 6;
+            if (this.kind == 'zombie') {
+                this.drawTopViewSprite(x, y, aimAngle);
+            }
+            else {
+                walkingMod = Math.floor(this.spriteAnimCounter) % 6;
+                ctx.drawImage(this.img, walkingMod * frameWidth, directionMod * frameHeight, frameWidth, frameHeight, x - this.width / 2, y - this.height / 2, this.width, this.height);
+            }
+            ctx.fillStyle = 'red';
+            ctx.fillRect(x - hpWidth / 2, y - 40, hpWidth, 4);
+        };
+        this.drawTopViewSprite = (x, y, aimAngle) => {
+            if (this.attackStarted) {
+                this.drawTopViewSpriteAttack(x, y, aimAngle);
+            }
+            else {
+                this.drawTopViewSpriteWalk(x, y, aimAngle);
+            }
+        };
+        this.drawTopViewSpriteAttack = (x, y, aimAngle) => {
+            let spriteColumns = framesAttack[this.kind];
+            let spriteRows = 1;
+            let walkingMod = Math.floor(this.spriteAnimCounter) % spriteColumns;
+            let frameWidth = Img[this.kind + 'attack'].width / spriteColumns;
+            let frameHeight = Img[this.kind + 'attack'].height / spriteRows;
+            ctx.save();
+            ctx.translate(x - (this.width) / 2, y - this.height / 2);
+            ctx.translate((this.width) / 2, this.height / 2);
+            ctx.rotate(aimAngle * Math.PI / 180);
+            ctx.drawImage(Img[this.kind + 'attack'], walkingMod * frameWidth, 0, frameWidth, frameHeight, -this.width / 2, -this.height / 2, (this.width), this.height);
+            ctx.restore();
+            if (this.spriteAnimCounter % spriteColumns >= (spriteColumns - 1)) {
+                this.spriteAnimCounter = 0;
+                this.attackStarted = false;
+            }
+        };
+        this.drawTopViewSpriteWalk = (x, y, aimAngle) => {
+            let frameWidth = this.img.width / framesMove[this.kind];
+            let frameHeight = this.img.height;
+            ctx.save();
+            ctx.translate(x - this.width / 2, y - this.height / 2);
+            ctx.translate(this.width / 2, this.height / 2);
+            ctx.rotate(aimAngle * Math.PI / 180);
+            let walkingMod = Math.floor(this.spriteAnimCounter) % framesMove[this.kind];
+            ctx.drawImage(this.img, walkingMod * frameWidth, 0, frameWidth, frameHeight, -this.width / 2, -this.height / 2, this.width, this.height);
+            ctx.restore();
+        };
+        if (initPack.id)
+            this.id = initPack.id;
+        if (initPack.position)
+            this.position = initPack.position;
+        if (initPack.width)
+            this.width = initPack.width;
+        if (initPack.height)
+            this.height = initPack.height;
+        if (initPack.weapon)
+            this.weapon = initPack.weapon;
+        if (initPack.img)
+            this.img = Img[initPack.img];
+        if (initPack.hp)
+            this.hp = initPack.hp;
+        if (initPack.hpMax)
+            this.hpMax = initPack.hpMax;
+        if (initPack.aimAngle)
+            this.aimAngle = initPack.aimAngle;
+        if (initPack.moving)
+            this.moving = initPack.moving;
+        if (initPack.attackStarted)
+            this.attackStarted = initPack.attackStarted;
+        if (initPack.attackMelee)
+            this.attackMelee = initPack.attackMelee;
+        if (initPack.kind)
+            this.kind = initPack.kind;
+        EnemyClient.list[initPack.id] = this;
+    }
+}
+EnemyClient.list = {};
+exports.EnemyClient = EnemyClient;
 
 
 /***/ })

@@ -8,6 +8,17 @@ const enums_1 = require("../enums");
 class Player extends Actor_1.Actor {
     constructor(param) {
         super(param);
+        this.giveItems = () => {
+            this.inventory.addItem(enums_1.WeaponType.knife, 1);
+            this.inventory.addItem(enums_1.WeaponType.pistol, 1);
+            this.inventory.addItem(enums_1.WeaponType.shotgun, 1);
+            this.inventory.addItem(enums_1.WeaponType.rifle, 1);
+            this.attackController.weaponCollection.setWeaponAmmo(enums_1.WeaponType.shotgun, 100);
+            this.attackController.weaponCollection.setWeaponAmmo(enums_1.WeaponType.pistol, 200);
+            this.attackController.weaponCollection.setWeaponAmmo(enums_1.WeaponType.rifle, 100);
+            this.inventory.addItem("medicalkit", 4);
+            this.inventory.useItem(enums_1.WeaponType.shotgun);
+        };
         this.getInitPack = () => {
             return {
                 id: this.id,
@@ -58,12 +69,11 @@ class Player extends Actor_1.Actor {
         };
         globalVariables_1.initPack.player.push(this.getInitPack());
         Player.list[param.id] = this;
-        this.inventory.addItem(enums_1.WeaponType.knife, 1);
-        this.inventory.addItem(enums_1.WeaponType.pistol, 1);
-        this.inventory.addItem(enums_1.WeaponType.shotgun, 1);
-        this.inventory.addItem(enums_1.WeaponType.rifle, 1);
-        this.inventory.addItem("medicalkit", 4);
-        this.inventory.useItem(enums_1.WeaponType.shotgun);
+        this.giveItems();
+        Enemy_1.Enemy.randomlyGenerate(this.map);
+        Enemy_1.Enemy.randomlyGenerate(this.map);
+        Enemy_1.Enemy.randomlyGenerate(this.map);
+        Enemy_1.Enemy.randomlyGenerate(this.map);
     }
 }
 Player.onConnect = (socket) => {

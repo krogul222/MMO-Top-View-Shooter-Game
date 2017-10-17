@@ -33,15 +33,6 @@ export class Actor extends Entity {
 	}
 
     getClosestPlayer = (distance: number, angleLimit: number)  => {
-      /*  let distance = 10000;
-        let index: string = "0";
-        for(let i in Player.list){
-            if(distance > this.getDistance(Player.list[i])){
-                distance = this.getDistance(Player.list[i]);
-                index = i; 
-            }
-        }
-    return Player.list[index];*/
 
     let closestEnemyIndex: string = "0";
     let closestEnemyDistance: number = 100000;
