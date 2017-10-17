@@ -19,7 +19,7 @@ var listener = server.listen(process.env.PORT || 2000, function () {
 console.log("Server started.");
 const SOCKET_LIST = {};
 const TILE_SIZE = 32;
-let frameCount = 0;
+exports.frameCount = 0;
 const DEBUG = true;
 let isValidPassword = (data, cb) => {
     db.account.find({ username: data.username, password: data.password }, function (err, res) {
@@ -89,7 +89,7 @@ setInterval(function () {
         bullet: Bullet_1.Bullet.update(),
         enemy: Enemy_1.Enemy.update()
     };
-    frameCount++;
+    exports.frameCount++;
     for (let i in SOCKET_LIST) {
         let socket = SOCKET_LIST[i];
         socket.emit('init', packs.initPack);

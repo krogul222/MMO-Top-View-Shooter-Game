@@ -60,6 +60,14 @@ export class WeaponCollection {
             }
         }
 
+        addWeaponAmmo = (id: WeaponType, ammo) => {
+            for(let i = 0 ; i < this.weapons.length; i++){
+                if(this.weapons[i].id === id){
+                    this.weapons[i].ammo = this.weapons[i].ammo + ammo;
+                }
+            }
+        }
+
         decAmmo = (id: WeaponType, amount: number) => {
             for(let i = 0 ; i < this.weapons.length; i++){
                 if(this.weapons[i].id === id){

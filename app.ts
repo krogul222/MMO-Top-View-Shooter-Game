@@ -25,7 +25,7 @@ console.log("Server started.");
 
 const SOCKET_LIST = {};
 const TILE_SIZE = 32;
-let frameCount = 0;
+export let frameCount = 0;
 
 const DEBUG = true;
 
