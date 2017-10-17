@@ -8,6 +8,12 @@ export class GameMap {
     constructor(private _name: string, private _width: number, private _height: number) {}
 
     isPositionWall = (position: Point) =>{
+
+        if(position.x < 0 || position.x >= this.width)
+            return 1;
+        if(position.y < 0 || position.y >= this.height)
+            return 1;
+        
         return 0;    
     }
 

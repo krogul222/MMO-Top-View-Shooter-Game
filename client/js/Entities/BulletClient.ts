@@ -1,7 +1,9 @@
+import { EnemyClient } from './EnemyClient';
 import { initPack } from './../../../server/js/globalVariables';
 import { Point } from './../../../server/js/GeometryAndPhysics';
 import { selfId } from '../game';
 import { PlayerClient } from './PlayerClient';
+import { ExplosionClient } from './ExplosionClient';
 
 declare var mouseX: any;
 declare var mouseY: any;
@@ -54,6 +56,37 @@ export class BulletClient {
     }
 
     hit = (category, entityCategory, entityId) => {
+
+        let x = this.position.x;
+        let y = this.position.y;
+        
+        if(entityCategory == "player"){
+            if(PlayerClient.list[entityId]){
+                x = PlayerClient.list[entityId].x + (1-Math.round(2*Math.random())) * Math.floor(Math.random()*PlayerClient.list[entityId].width/4);
+                y = PlayerClient.list[entityId].y + (1-Math.round(2*Math.random())) *Math.floor(Math.random()*PlayerClient.list[entityId].height/4);
+                
+                //soundManager.play('pain');
+            }
+        }   
+            
+        if(entityCategory == "enemy"){
+            if(EnemyClient.list[entityId]){
+                x = EnemyClient.list[entityId].x + (1-Math.round(2*Math.random())) *Math.floor(Math.random()*EnemyClient.list[entityId].width/4);
+                y = EnemyClient.list[entityId].y + (1-Math.round(2*Math.random())) *Math.floor(Math.random()*EnemyClient.list[entityId].height/4);
+                
+                if(Math.random()<0.5){
+                   // soundManager.play('squishy1');
+                } else{
+                    //soundManager.play('squishy2');
+                }
+            }
+        }           
+
+        if(category == 1){
+            new ExplosionClient({position: this.position, map: this.map, img: "blood", width: 48, height: 48, category: category, spriteRows: 1, spriteColumns: 6});
+        } else if(category == 2){
+            new ExplosionClient({position: this.position, map: this.map, img: "explosion1", width: 64, height: 64, category: category, spriteRows: 4, spriteColumns: 10});
+        }
 
     }
 

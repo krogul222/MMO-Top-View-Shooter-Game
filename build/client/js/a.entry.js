@@ -127,11 +127,12 @@ exports.Velocity = Velocity;
 /***/ (function(module, exports, __webpack_require__) {
 
 Object.defineProperty(exports, "__esModule", { value: true });
-const MapClient_1 = __webpack_require__(14);
-const PlayerClient_1 = __webpack_require__(3);
-const BulletClient_1 = __webpack_require__(15);
-const Inventory_1 = __webpack_require__(9);
-const EnemyClient_1 = __webpack_require__(23);
+const MapClient_1 = __webpack_require__(16);
+const PlayerClient_1 = __webpack_require__(2);
+const BulletClient_1 = __webpack_require__(17);
+const Inventory_1 = __webpack_require__(11);
+const EnemyClient_1 = __webpack_require__(9);
+const ExplosionClient_1 = __webpack_require__(10);
 exports.selfId = 0;
 exports.inventory = new Inventory_1.Inventory(socket, false, 0);
 let currentMap = new MapClient_1.MapClient();
@@ -303,6 +304,15 @@ setInterval(function () {
         }
         EnemyClient_1.EnemyClient.list[i].draw();
     }
+    for (let i in ExplosionClient_1.ExplosionClient.list) {
+        ExplosionClient_1.ExplosionClient.list[i].spriteAnimCounter += 0.4;
+        if (ExplosionClient_1.ExplosionClient.list[i].isCompleted()) {
+            delete ExplosionClient_1.ExplosionClient.list[i];
+        }
+        else {
+            ExplosionClient_1.ExplosionClient.list[i].draw();
+        }
+    }
 }, 40);
 document.onkeydown = function (event) {
     if (event.keyCode === 68)
@@ -360,22 +370,6 @@ document.onmousemove = function (event) {
 
 /***/ }),
 /* 2 */
-/***/ (function(module, exports) {
-
-Object.defineProperty(exports, "__esModule", { value: true });
-var WeaponType;
-(function (WeaponType) {
-    WeaponType[WeaponType["knife"] = 0] = "knife";
-    WeaponType[WeaponType["pistol"] = 1] = "pistol";
-    WeaponType[WeaponType["shotgun"] = 2] = "shotgun";
-    WeaponType[WeaponType["rifle"] = 3] = "rifle";
-    WeaponType[WeaponType["claws"] = 20] = "claws";
-})(WeaponType = exports.WeaponType || (exports.WeaponType = {}));
-;
-
-
-/***/ }),
-/* 3 */
 /***/ (function(module, exports, __webpack_require__) {
 
 Object.defineProperty(exports, "__esModule", { value: true });
@@ -549,11 +543,27 @@ exports.PlayerClient = PlayerClient;
 
 
 /***/ }),
+/* 3 */
+/***/ (function(module, exports) {
+
+Object.defineProperty(exports, "__esModule", { value: true });
+var WeaponType;
+(function (WeaponType) {
+    WeaponType[WeaponType["knife"] = 0] = "knife";
+    WeaponType[WeaponType["pistol"] = 1] = "pistol";
+    WeaponType[WeaponType["shotgun"] = 2] = "shotgun";
+    WeaponType[WeaponType["rifle"] = 3] = "rifle";
+    WeaponType[WeaponType["claws"] = 20] = "claws";
+})(WeaponType = exports.WeaponType || (exports.WeaponType = {}));
+;
+
+
+/***/ }),
 /* 4 */
 /***/ (function(module, exports, __webpack_require__) {
 
 Object.defineProperty(exports, "__esModule", { value: true });
-const Pack_1 = __webpack_require__(16);
+const Pack_1 = __webpack_require__(18);
 exports.initPack = new Pack_1.Pack();
 exports.removePack = new Pack_1.Pack();
 
@@ -565,13 +575,24 @@ exports.removePack = new Pack_1.Pack();
 Object.defineProperty(exports, "__esModule", { value: true });
 const globalVariables_1 = __webpack_require__(4);
 const Enemy_1 = __webpack_require__(6);
-const Bullet_1 = __webpack_require__(13);
-const Actor_1 = __webpack_require__(10);
+const Bullet_1 = __webpack_require__(15);
+const Actor_1 = __webpack_require__(12);
 const GeometryAndPhysics_1 = __webpack_require__(0);
-const enums_1 = __webpack_require__(2);
+const enums_1 = __webpack_require__(3);
 class Player extends Actor_1.Actor {
     constructor(param) {
         super(param);
+        this.giveItems = () => {
+            this.inventory.addItem(enums_1.WeaponType.knife, 1);
+            this.inventory.addItem(enums_1.WeaponType.pistol, 1);
+            this.inventory.addItem(enums_1.WeaponType.shotgun, 1);
+            this.inventory.addItem(enums_1.WeaponType.rifle, 1);
+            this.attackController.weaponCollection.setWeaponAmmo(enums_1.WeaponType.shotgun, 100);
+            this.attackController.weaponCollection.setWeaponAmmo(enums_1.WeaponType.pistol, 200);
+            this.attackController.weaponCollection.setWeaponAmmo(enums_1.WeaponType.rifle, 100);
+            this.inventory.addItem("medicalkit", 4);
+            this.inventory.useItem(enums_1.WeaponType.shotgun);
+        };
         this.getInitPack = () => {
             return {
                 id: this.id,
@@ -622,12 +643,7 @@ class Player extends Actor_1.Actor {
         };
         globalVariables_1.initPack.player.push(this.getInitPack());
         Player.list[param.id] = this;
-        this.inventory.addItem(enums_1.WeaponType.knife, 1);
-        this.inventory.addItem(enums_1.WeaponType.pistol, 1);
-        this.inventory.addItem(enums_1.WeaponType.shotgun, 1);
-        this.inventory.addItem(enums_1.WeaponType.rifle, 1);
-        this.inventory.addItem("medicalkit", 4);
-        this.inventory.useItem(enums_1.WeaponType.shotgun);
+        this.giveItems();
         Enemy_1.Enemy.randomlyGenerate(this.map);
         Enemy_1.Enemy.randomlyGenerate(this.map);
         Enemy_1.Enemy.randomlyGenerate(this.map);
@@ -715,10 +731,10 @@ exports.Player = Player;
 
 Object.defineProperty(exports, "__esModule", { value: true });
 const MapControler_1 = __webpack_require__(7);
-const Actor_1 = __webpack_require__(10);
+const Actor_1 = __webpack_require__(12);
 const GeometryAndPhysics_1 = __webpack_require__(0);
 const globalVariables_1 = __webpack_require__(4);
-const enums_1 = __webpack_require__(2);
+const enums_1 = __webpack_require__(3);
 class Enemy extends Actor_1.Actor {
     constructor(param) {
         super(param);
@@ -911,7 +927,7 @@ exports.Enemy = Enemy;
 /***/ (function(module, exports, __webpack_require__) {
 
 Object.defineProperty(exports, "__esModule", { value: true });
-const GameMap_1 = __webpack_require__(17);
+const GameMap_1 = __webpack_require__(19);
 class MapController {
     constructor(param) {
         this.maps = [];
@@ -922,7 +938,7 @@ class MapController {
                 }
             }
         };
-        this.maps.push(new GameMap_1.GameMap("forest", 1000, 1000));
+        this.maps.push(new GameMap_1.GameMap("forest", 1280, 1280));
     }
 }
 exports.MapController = MapController;
@@ -933,7 +949,7 @@ exports.MapController = MapController;
 /***/ (function(module, exports, __webpack_require__) {
 
 Object.defineProperty(exports, "__esModule", { value: true });
-const enums_1 = __webpack_require__(2);
+const enums_1 = __webpack_require__(3);
 class WeaponTypes {
     constructor(param) {
         this.name = "";
@@ -1049,8 +1065,201 @@ new WeaponTypes({ weapon: enums_1.WeaponType.claws, name: "claws",
 /***/ (function(module, exports, __webpack_require__) {
 
 Object.defineProperty(exports, "__esModule", { value: true });
+const PlayerClient_1 = __webpack_require__(2);
+const GeometryAndPhysics_1 = __webpack_require__(0);
+const game_1 = __webpack_require__(1);
+class EnemyClient {
+    constructor(initPack) {
+        this.id = -1;
+        this.position = new GeometryAndPhysics_1.Point(250, 250);
+        this.width = 0;
+        this.height = 0;
+        this.img = Img["zombie"];
+        this.kind = "zombie";
+        this.hp = 1;
+        this.hpMax = 1;
+        this.map = "forest";
+        this.aimAngle = 0;
+        this.attackStarted = false;
+        this.attackMelee = false;
+        this.spriteAnimCounter = 0;
+        this.moving = false;
+        this.reload = false;
+        this.weapon = "pistol";
+        this.draw = () => {
+            if (PlayerClient_1.PlayerClient.list[game_1.selfId].map !== this.map) {
+                return;
+            }
+            let hpWidth = 30 * this.hp / this.hpMax;
+            let mainPlayer = PlayerClient_1.PlayerClient.list[game_1.selfId];
+            let mainPlayerx = mainPlayer.position.x;
+            let mainPlayery = mainPlayer.position.y;
+            let ex = this.position.x;
+            let ey = this.position.y;
+            let x = ex - (mainPlayerx - WIDTH / 2);
+            x = x - (mouseX - WIDTH / 2) / CAMERA_BOX_ADJUSTMENT;
+            let y = ey - (mainPlayery - HEIGHT / 2);
+            y = y - (mouseY - HEIGHT / 2) / CAMERA_BOX_ADJUSTMENT;
+            let frameWidth = this.img.width / 6;
+            let frameHeight = this.img.height / 4;
+            let aimAngle = this.aimAngle;
+            if (aimAngle < 0) {
+                aimAngle = 360 + aimAngle;
+            }
+            let directionMod = 3;
+            if (aimAngle >= 45 && aimAngle < 135) {
+                directionMod = 2;
+            }
+            else if (aimAngle >= 135 && aimAngle < 225) {
+                directionMod = 1;
+            }
+            else if (aimAngle >= 225 && aimAngle < 315) {
+                directionMod = 0;
+            }
+            let walkingMod = Math.floor(this.spriteAnimCounter) % 6;
+            if (this.kind == 'zombie') {
+                this.drawTopViewSprite(x, y, aimAngle);
+            }
+            else {
+                walkingMod = Math.floor(this.spriteAnimCounter) % 6;
+                ctx.drawImage(this.img, walkingMod * frameWidth, directionMod * frameHeight, frameWidth, frameHeight, x - this.width / 2, y - this.height / 2, this.width, this.height);
+            }
+            ctx.fillStyle = 'red';
+            ctx.fillRect(x - hpWidth / 2, y - 40, hpWidth, 4);
+        };
+        this.drawTopViewSprite = (x, y, aimAngle) => {
+            if (this.attackStarted) {
+                this.drawTopViewSpriteAttack(x, y, aimAngle);
+            }
+            else {
+                this.drawTopViewSpriteWalk(x, y, aimAngle);
+            }
+        };
+        this.drawTopViewSpriteAttack = (x, y, aimAngle) => {
+            let spriteColumns = framesAttack[this.kind];
+            let spriteRows = 1;
+            let walkingMod = Math.floor(this.spriteAnimCounter) % spriteColumns;
+            let frameWidth = Img[this.kind + 'attack'].width / spriteColumns;
+            let frameHeight = Img[this.kind + 'attack'].height / spriteRows;
+            ctx.save();
+            ctx.translate(x - (this.width) / 2, y - this.height / 2);
+            ctx.translate((this.width) / 2, this.height / 2);
+            ctx.rotate(aimAngle * Math.PI / 180);
+            ctx.drawImage(Img[this.kind + 'attack'], walkingMod * frameWidth, 0, frameWidth, frameHeight, -this.width / 2, -this.height / 2, (this.width), this.height);
+            ctx.restore();
+            if (this.spriteAnimCounter % spriteColumns >= (spriteColumns - 1)) {
+                this.spriteAnimCounter = 0;
+                this.attackStarted = false;
+            }
+        };
+        this.drawTopViewSpriteWalk = (x, y, aimAngle) => {
+            let frameWidth = this.img.width / framesMove[this.kind];
+            let frameHeight = this.img.height;
+            ctx.save();
+            ctx.translate(x - this.width / 2, y - this.height / 2);
+            ctx.translate(this.width / 2, this.height / 2);
+            ctx.rotate(aimAngle * Math.PI / 180);
+            let walkingMod = Math.floor(this.spriteAnimCounter) % framesMove[this.kind];
+            ctx.drawImage(this.img, walkingMod * frameWidth, 0, frameWidth, frameHeight, -this.width / 2, -this.height / 2, this.width, this.height);
+            ctx.restore();
+        };
+        if (initPack.id)
+            this.id = initPack.id;
+        if (initPack.position)
+            this.position = initPack.position;
+        if (initPack.width)
+            this.width = initPack.width;
+        if (initPack.height)
+            this.height = initPack.height;
+        if (initPack.weapon)
+            this.weapon = initPack.weapon;
+        if (initPack.img)
+            this.img = Img[initPack.img];
+        if (initPack.hp)
+            this.hp = initPack.hp;
+        if (initPack.hpMax)
+            this.hpMax = initPack.hpMax;
+        if (initPack.aimAngle)
+            this.aimAngle = initPack.aimAngle;
+        if (initPack.moving)
+            this.moving = initPack.moving;
+        if (initPack.attackStarted)
+            this.attackStarted = initPack.attackStarted;
+        if (initPack.attackMelee)
+            this.attackMelee = initPack.attackMelee;
+        if (initPack.kind)
+            this.kind = initPack.kind;
+        EnemyClient.list[initPack.id] = this;
+    }
+}
+EnemyClient.list = {};
+exports.EnemyClient = EnemyClient;
+
+
+/***/ }),
+/* 10 */
+/***/ (function(module, exports, __webpack_require__) {
+
+Object.defineProperty(exports, "__esModule", { value: true });
+const GeometryAndPhysics_1 = __webpack_require__(0);
+const PlayerClient_1 = __webpack_require__(2);
+const game_1 = __webpack_require__(1);
+class ExplosionClient {
+    constructor(param) {
+        this.id = Math.random();
+        this.position = new GeometryAndPhysics_1.Point(0, 0);
+        this.width = 32;
+        this.height = 32;
+        this.spriteAnimCounter = 0;
+        this.draw = () => {
+            if (PlayerClient_1.PlayerClient.list[game_1.selfId].map !== this.map) {
+                return;
+            }
+            let frameWidth = this.img.width / this.animColumns;
+            let frameHeight = this.img.height / this.animRows;
+            let mainPlayer = PlayerClient_1.PlayerClient.list[game_1.selfId];
+            let mainPlayerx = mainPlayer.position.x;
+            let mainPlayery = mainPlayer.position.y;
+            let ex = this.position.x;
+            let ey = this.position.y;
+            let x = ex - (mainPlayerx - WIDTH / 2);
+            x = x - (mouseX - WIDTH / 2) / CAMERA_BOX_ADJUSTMENT;
+            let y = ey - (mainPlayery - HEIGHT / 2);
+            y = y - (mouseY - HEIGHT / 2) / CAMERA_BOX_ADJUSTMENT;
+            x -= this.width / 2;
+            y -= this.height / 2;
+            let spriteColumn = Math.floor(this.spriteAnimCounter) % this.animColumns;
+            let spriteRow = Math.floor(this.spriteAnimCounter / this.animColumns);
+            ctx.drawImage(this.img, frameWidth * spriteColumn, frameHeight * spriteRow, frameWidth, frameHeight, x, y, this.width, this.height);
+        };
+        this.isCompleted = () => {
+            if (this.spriteAnimCounter > (this.animRows * this.animColumns))
+                return true;
+            else
+                return false;
+        };
+        this.position = param.position ? param.position : this.position;
+        this.width = param.width ? param.width : this.width;
+        this.height = param.height ? param.height : this.height;
+        this.map = param.map ? param.map : this.map;
+        this.img = param.img ? Img[param.img] : this.img;
+        this.category = param.category ? param.category : this.category;
+        this.animRows = param.spriteRows ? param.spriteRows : this.animRows;
+        this.animColumns = param.spriteColumns ? param.spriteColumns : this.animColumns;
+        ExplosionClient.list[this.id] = this;
+    }
+}
+ExplosionClient.list = {};
+exports.ExplosionClient = ExplosionClient;
+
+
+/***/ }),
+/* 11 */
+/***/ (function(module, exports, __webpack_require__) {
+
+Object.defineProperty(exports, "__esModule", { value: true });
 const Player_1 = __webpack_require__(5);
-const Item_1 = __webpack_require__(22);
+const Item_1 = __webpack_require__(24);
 class Inventory {
     constructor(socket, server, owner) {
         this.items = [];
@@ -1146,18 +1355,18 @@ exports.Inventory = Inventory;
 
 
 /***/ }),
-/* 10 */
+/* 12 */
 /***/ (function(module, exports, __webpack_require__) {
 
 Object.defineProperty(exports, "__esModule", { value: true });
-const Inventory_1 = __webpack_require__(9);
-const LifeAndBodyController_1 = __webpack_require__(18);
+const Inventory_1 = __webpack_require__(11);
+const LifeAndBodyController_1 = __webpack_require__(20);
 const MapControler_1 = __webpack_require__(7);
-const Entity_1 = __webpack_require__(11);
+const Entity_1 = __webpack_require__(13);
 const Player_1 = __webpack_require__(5);
 const Enemy_1 = __webpack_require__(6);
-const AttackControler_1 = __webpack_require__(19);
-const MovementController_1 = __webpack_require__(21);
+const AttackControler_1 = __webpack_require__(21);
+const MovementController_1 = __webpack_require__(23);
 const GeometryAndPhysics_1 = __webpack_require__(0);
 class Actor extends Entity_1.Entity {
     constructor(param) {
@@ -1247,7 +1456,7 @@ exports.Actor = Actor;
 
 
 /***/ }),
-/* 11 */
+/* 13 */
 /***/ (function(module, exports, __webpack_require__) {
 
 Object.defineProperty(exports, "__esModule", { value: true });
@@ -1308,7 +1517,7 @@ exports.Entity = Entity;
 
 
 /***/ }),
-/* 12 */
+/* 14 */
 /***/ (function(module, exports) {
 
 Object.defineProperty(exports, "__esModule", { value: true });
@@ -1344,14 +1553,14 @@ exports.Counter = Counter;
 
 
 /***/ }),
-/* 13 */
+/* 15 */
 /***/ (function(module, exports, __webpack_require__) {
 
 Object.defineProperty(exports, "__esModule", { value: true });
 const MapControler_1 = __webpack_require__(7);
 const Enemy_1 = __webpack_require__(6);
 const Player_1 = __webpack_require__(5);
-const Entity_1 = __webpack_require__(11);
+const Entity_1 = __webpack_require__(13);
 const globalVariables_1 = __webpack_require__(4);
 class Bullet extends Entity_1.Entity {
     constructor(param) {
@@ -1480,11 +1689,11 @@ exports.Bullet = Bullet;
 
 
 /***/ }),
-/* 14 */
+/* 16 */
 /***/ (function(module, exports, __webpack_require__) {
 
 Object.defineProperty(exports, "__esModule", { value: true });
-const PlayerClient_1 = __webpack_require__(3);
+const PlayerClient_1 = __webpack_require__(2);
 const game_1 = __webpack_require__(1);
 class MapClient {
     constructor() {
@@ -1508,13 +1717,15 @@ exports.MapClient = MapClient;
 
 
 /***/ }),
-/* 15 */
+/* 17 */
 /***/ (function(module, exports, __webpack_require__) {
 
 Object.defineProperty(exports, "__esModule", { value: true });
+const EnemyClient_1 = __webpack_require__(9);
 const GeometryAndPhysics_1 = __webpack_require__(0);
 const game_1 = __webpack_require__(1);
-const PlayerClient_1 = __webpack_require__(3);
+const PlayerClient_1 = __webpack_require__(2);
+const ExplosionClient_1 = __webpack_require__(10);
 class BulletClient {
     constructor(initPack) {
         this.id = -1;
@@ -1540,6 +1751,30 @@ class BulletClient {
             ctx.drawImage(this.img, 0, 0, this.img.width, this.img.height, x - this.width / 2, y - this.height / 2, this.width, this.height);
         };
         this.hit = (category, entityCategory, entityId) => {
+            let x = this.position.x;
+            let y = this.position.y;
+            if (entityCategory == "player") {
+                if (PlayerClient_1.PlayerClient.list[entityId]) {
+                    x = PlayerClient_1.PlayerClient.list[entityId].x + (1 - Math.round(2 * Math.random())) * Math.floor(Math.random() * PlayerClient_1.PlayerClient.list[entityId].width / 4);
+                    y = PlayerClient_1.PlayerClient.list[entityId].y + (1 - Math.round(2 * Math.random())) * Math.floor(Math.random() * PlayerClient_1.PlayerClient.list[entityId].height / 4);
+                }
+            }
+            if (entityCategory == "enemy") {
+                if (EnemyClient_1.EnemyClient.list[entityId]) {
+                    x = EnemyClient_1.EnemyClient.list[entityId].x + (1 - Math.round(2 * Math.random())) * Math.floor(Math.random() * EnemyClient_1.EnemyClient.list[entityId].width / 4);
+                    y = EnemyClient_1.EnemyClient.list[entityId].y + (1 - Math.round(2 * Math.random())) * Math.floor(Math.random() * EnemyClient_1.EnemyClient.list[entityId].height / 4);
+                    if (Math.random() < 0.5) {
+                    }
+                    else {
+                    }
+                }
+            }
+            if (category == 1) {
+                new ExplosionClient_1.ExplosionClient({ position: this.position, map: this.map, img: "blood", width: 48, height: 48, category: category, spriteRows: 1, spriteColumns: 6 });
+            }
+            else if (category == 2) {
+                new ExplosionClient_1.ExplosionClient({ position: this.position, map: this.map, img: "explosion1", width: 64, height: 64, category: category, spriteRows: 4, spriteColumns: 10 });
+            }
         };
         this.id = (initPack.id !== undefined) ? initPack.id : -1;
         this.position = (initPack.position !== undefined) ? initPack.position : new GeometryAndPhysics_1.Point(250, 250);
@@ -1556,7 +1791,7 @@ exports.BulletClient = BulletClient;
 
 
 /***/ }),
-/* 16 */
+/* 18 */
 /***/ (function(module, exports) {
 
 Object.defineProperty(exports, "__esModule", { value: true });
@@ -1573,7 +1808,7 @@ exports.Pack = Pack;
 
 
 /***/ }),
-/* 17 */
+/* 19 */
 /***/ (function(module, exports) {
 
 Object.defineProperty(exports, "__esModule", { value: true });
@@ -1594,7 +1829,7 @@ exports.GameMap = GameMap;
 
 
 /***/ }),
-/* 18 */
+/* 20 */
 /***/ (function(module, exports) {
 
 Object.defineProperty(exports, "__esModule", { value: true });
@@ -1626,14 +1861,14 @@ exports.LifeAndBodyController = LifeAndBodyController;
 
 
 /***/ }),
-/* 19 */
+/* 21 */
 /***/ (function(module, exports, __webpack_require__) {
 
 Object.defineProperty(exports, "__esModule", { value: true });
-const WeaponCollection_1 = __webpack_require__(20);
-const Counter_1 = __webpack_require__(12);
+const WeaponCollection_1 = __webpack_require__(22);
+const Counter_1 = __webpack_require__(14);
 const GeometryAndPhysics_1 = __webpack_require__(0);
-const Bullet_1 = __webpack_require__(13);
+const Bullet_1 = __webpack_require__(15);
 const WeaponTypes_1 = __webpack_require__(8);
 class AttackController {
     constructor(parent, param) {
@@ -1739,12 +1974,12 @@ exports.AttackController = AttackController;
 
 
 /***/ }),
-/* 20 */
+/* 22 */
 /***/ (function(module, exports, __webpack_require__) {
 
 Object.defineProperty(exports, "__esModule", { value: true });
 const WeaponTypes_1 = __webpack_require__(8);
-const enums_1 = __webpack_require__(2);
+const enums_1 = __webpack_require__(3);
 class WeaponCollection {
     constructor(owner) {
         this.weapons = [];
@@ -1902,11 +2137,11 @@ exports.SingleWeapon = SingleWeapon;
 
 
 /***/ }),
-/* 21 */
+/* 23 */
 /***/ (function(module, exports, __webpack_require__) {
 
 Object.defineProperty(exports, "__esModule", { value: true });
-const Counter_1 = __webpack_require__(12);
+const Counter_1 = __webpack_require__(14);
 const GeometryAndPhysics_1 = __webpack_require__(0);
 class MovementController {
     constructor(parent, param) {
@@ -2008,11 +2243,11 @@ exports.MovementController = MovementController;
 
 
 /***/ }),
-/* 22 */
+/* 24 */
 /***/ (function(module, exports, __webpack_require__) {
 
 Object.defineProperty(exports, "__esModule", { value: true });
-const enums_1 = __webpack_require__(2);
+const enums_1 = __webpack_require__(3);
 class Item {
     constructor(id, name, event, add, remove, info) {
         this.id = id;
@@ -2072,142 +2307,6 @@ new Item(enums_1.WeaponType.claws, "Claws", function (actor) {
     actor.attackController.weaponCollection.removeWeapon(enums_1.WeaponType.claws, amount);
 }, function (actor) {
 });
-
-
-/***/ }),
-/* 23 */
-/***/ (function(module, exports, __webpack_require__) {
-
-Object.defineProperty(exports, "__esModule", { value: true });
-const PlayerClient_1 = __webpack_require__(3);
-const GeometryAndPhysics_1 = __webpack_require__(0);
-const game_1 = __webpack_require__(1);
-class EnemyClient {
-    constructor(initPack) {
-        this.id = -1;
-        this.position = new GeometryAndPhysics_1.Point(250, 250);
-        this.width = 0;
-        this.height = 0;
-        this.img = Img["zombie"];
-        this.kind = "zombie";
-        this.hp = 1;
-        this.hpMax = 1;
-        this.map = "forest";
-        this.aimAngle = 0;
-        this.attackStarted = false;
-        this.attackMelee = false;
-        this.spriteAnimCounter = 0;
-        this.moving = false;
-        this.reload = false;
-        this.weapon = "pistol";
-        this.draw = () => {
-            if (PlayerClient_1.PlayerClient.list[game_1.selfId].map !== this.map) {
-                return;
-            }
-            let hpWidth = 30 * this.hp / this.hpMax;
-            let mainPlayer = PlayerClient_1.PlayerClient.list[game_1.selfId];
-            let mainPlayerx = mainPlayer.position.x;
-            let mainPlayery = mainPlayer.position.y;
-            let ex = this.position.x;
-            let ey = this.position.y;
-            let x = ex - (mainPlayerx - WIDTH / 2);
-            x = x - (mouseX - WIDTH / 2) / CAMERA_BOX_ADJUSTMENT;
-            let y = ey - (mainPlayery - HEIGHT / 2);
-            y = y - (mouseY - HEIGHT / 2) / CAMERA_BOX_ADJUSTMENT;
-            let frameWidth = this.img.width / 6;
-            let frameHeight = this.img.height / 4;
-            let aimAngle = this.aimAngle;
-            if (aimAngle < 0) {
-                aimAngle = 360 + aimAngle;
-            }
-            let directionMod = 3;
-            if (aimAngle >= 45 && aimAngle < 135) {
-                directionMod = 2;
-            }
-            else if (aimAngle >= 135 && aimAngle < 225) {
-                directionMod = 1;
-            }
-            else if (aimAngle >= 225 && aimAngle < 315) {
-                directionMod = 0;
-            }
-            let walkingMod = Math.floor(this.spriteAnimCounter) % 6;
-            if (this.kind == 'zombie') {
-                this.drawTopViewSprite(x, y, aimAngle);
-            }
-            else {
-                walkingMod = Math.floor(this.spriteAnimCounter) % 6;
-                ctx.drawImage(this.img, walkingMod * frameWidth, directionMod * frameHeight, frameWidth, frameHeight, x - this.width / 2, y - this.height / 2, this.width, this.height);
-            }
-            ctx.fillStyle = 'red';
-            ctx.fillRect(x - hpWidth / 2, y - 40, hpWidth, 4);
-        };
-        this.drawTopViewSprite = (x, y, aimAngle) => {
-            if (this.attackStarted) {
-                this.drawTopViewSpriteAttack(x, y, aimAngle);
-            }
-            else {
-                this.drawTopViewSpriteWalk(x, y, aimAngle);
-            }
-        };
-        this.drawTopViewSpriteAttack = (x, y, aimAngle) => {
-            let spriteColumns = framesAttack[this.kind];
-            let spriteRows = 1;
-            let walkingMod = Math.floor(this.spriteAnimCounter) % spriteColumns;
-            let frameWidth = Img[this.kind + 'attack'].width / spriteColumns;
-            let frameHeight = Img[this.kind + 'attack'].height / spriteRows;
-            ctx.save();
-            ctx.translate(x - (this.width) / 2, y - this.height / 2);
-            ctx.translate((this.width) / 2, this.height / 2);
-            ctx.rotate(aimAngle * Math.PI / 180);
-            ctx.drawImage(Img[this.kind + 'attack'], walkingMod * frameWidth, 0, frameWidth, frameHeight, -this.width / 2, -this.height / 2, (this.width), this.height);
-            ctx.restore();
-            if (this.spriteAnimCounter % spriteColumns >= (spriteColumns - 1)) {
-                this.spriteAnimCounter = 0;
-                this.attackStarted = false;
-            }
-        };
-        this.drawTopViewSpriteWalk = (x, y, aimAngle) => {
-            let frameWidth = this.img.width / framesMove[this.kind];
-            let frameHeight = this.img.height;
-            ctx.save();
-            ctx.translate(x - this.width / 2, y - this.height / 2);
-            ctx.translate(this.width / 2, this.height / 2);
-            ctx.rotate(aimAngle * Math.PI / 180);
-            let walkingMod = Math.floor(this.spriteAnimCounter) % framesMove[this.kind];
-            ctx.drawImage(this.img, walkingMod * frameWidth, 0, frameWidth, frameHeight, -this.width / 2, -this.height / 2, this.width, this.height);
-            ctx.restore();
-        };
-        if (initPack.id)
-            this.id = initPack.id;
-        if (initPack.position)
-            this.position = initPack.position;
-        if (initPack.width)
-            this.width = initPack.width;
-        if (initPack.height)
-            this.height = initPack.height;
-        if (initPack.weapon)
-            this.weapon = initPack.weapon;
-        if (initPack.img)
-            this.img = Img[initPack.img];
-        if (initPack.hp)
-            this.hp = initPack.hp;
-        if (initPack.hpMax)
-            this.hpMax = initPack.hpMax;
-        if (initPack.aimAngle)
-            this.aimAngle = initPack.aimAngle;
-        if (initPack.moving)
-            this.moving = initPack.moving;
-        if (initPack.attackStarted)
-            this.attackStarted = initPack.attackStarted;
-        if (initPack.attackMelee)
-            this.attackMelee = initPack.attackMelee;
-        if (initPack.kind)
-            this.kind = initPack.kind;
-        EnemyClient.list[initPack.id] = this;
-    }
-}
-EnemyClient.list = {};
-exports.EnemyClient = EnemyClient;
 
 
 /***/ })

@@ -4,6 +4,7 @@ const PlayerClient_1 = require("./Entities/PlayerClient");
 const BulletClient_1 = require("./Entities/BulletClient");
 const Inventory_1 = require("../../server/js/Inventory");
 const EnemyClient_1 = require("./Entities/EnemyClient");
+const ExplosionClient_1 = require("./Entities/ExplosionClient");
 exports.selfId = 0;
 exports.inventory = new Inventory_1.Inventory(socket, false, 0);
 let currentMap = new MapClient_1.MapClient();
@@ -174,6 +175,15 @@ setInterval(function () {
             }
         }
         EnemyClient_1.EnemyClient.list[i].draw();
+    }
+    for (let i in ExplosionClient_1.ExplosionClient.list) {
+        ExplosionClient_1.ExplosionClient.list[i].spriteAnimCounter += 0.4;
+        if (ExplosionClient_1.ExplosionClient.list[i].isCompleted()) {
+            delete ExplosionClient_1.ExplosionClient.list[i];
+        }
+        else {
+            ExplosionClient_1.ExplosionClient.list[i].draw();
+        }
     }
 }, 40);
 document.onkeydown = function (event) {

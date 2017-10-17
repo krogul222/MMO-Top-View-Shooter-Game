@@ -5,6 +5,10 @@ class GameMap {
         this._width = _width;
         this._height = _height;
         this.isPositionWall = (position) => {
+            if (position.x < 0 || position.x >= this.width)
+                return 1;
+            if (position.y < 0 || position.y >= this.height)
+                return 1;
             return 0;
         };
     }

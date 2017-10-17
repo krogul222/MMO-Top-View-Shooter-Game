@@ -4,6 +4,7 @@ import { PlayerClient } from "./Entities/PlayerClient";
 import { BulletClient } from "./Entities/BulletClient";
 import { Inventory } from '../../server/js/Inventory';
 import { EnemyClient } from './Entities/EnemyClient';
+import { ExplosionClient } from './Entities/ExplosionClient';
 
 declare var ctx;
 declare const WIDTH;
@@ -226,6 +227,18 @@ setInterval(function(){
         }
         EnemyClient.list[i].draw();
     }
+
+    for(let i in ExplosionClient.list){
+        ExplosionClient.list[i].spriteAnimCounter += 0.4;
+    
+        if(ExplosionClient.list[i].isCompleted()){
+            delete ExplosionClient.list[i];
+        }
+        else{
+            ExplosionClient.list[i].draw();
+        } 
+    }
+
 }, 40);
 
 

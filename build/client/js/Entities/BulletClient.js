@@ -1,7 +1,9 @@
 Object.defineProperty(exports, "__esModule", { value: true });
+const EnemyClient_1 = require("./EnemyClient");
 const GeometryAndPhysics_1 = require("./../../../server/js/GeometryAndPhysics");
 const game_1 = require("../game");
 const PlayerClient_1 = require("./PlayerClient");
+const ExplosionClient_1 = require("./ExplosionClient");
 class BulletClient {
     constructor(initPack) {
         this.id = -1;
@@ -27,6 +29,30 @@ class BulletClient {
             ctx.drawImage(this.img, 0, 0, this.img.width, this.img.height, x - this.width / 2, y - this.height / 2, this.width, this.height);
         };
         this.hit = (category, entityCategory, entityId) => {
+            let x = this.position.x;
+            let y = this.position.y;
+            if (entityCategory == "player") {
+                if (PlayerClient_1.PlayerClient.list[entityId]) {
+                    x = PlayerClient_1.PlayerClient.list[entityId].x + (1 - Math.round(2 * Math.random())) * Math.floor(Math.random() * PlayerClient_1.PlayerClient.list[entityId].width / 4);
+                    y = PlayerClient_1.PlayerClient.list[entityId].y + (1 - Math.round(2 * Math.random())) * Math.floor(Math.random() * PlayerClient_1.PlayerClient.list[entityId].height / 4);
+                }
+            }
+            if (entityCategory == "enemy") {
+                if (EnemyClient_1.EnemyClient.list[entityId]) {
+                    x = EnemyClient_1.EnemyClient.list[entityId].x + (1 - Math.round(2 * Math.random())) * Math.floor(Math.random() * EnemyClient_1.EnemyClient.list[entityId].width / 4);
+                    y = EnemyClient_1.EnemyClient.list[entityId].y + (1 - Math.round(2 * Math.random())) * Math.floor(Math.random() * EnemyClient_1.EnemyClient.list[entityId].height / 4);
+                    if (Math.random() < 0.5) {
+                    }
+                    else {
+                    }
+                }
+            }
+            if (category == 1) {
+                new ExplosionClient_1.ExplosionClient({ position: this.position, map: this.map, img: "blood", width: 48, height: 48, category: category, spriteRows: 1, spriteColumns: 6 });
+            }
+            else if (category == 2) {
+                new ExplosionClient_1.ExplosionClient({ position: this.position, map: this.map, img: "explosion1", width: 64, height: 64, category: category, spriteRows: 4, spriteColumns: 10 });
+            }
         };
         this.id = (initPack.id !== undefined) ? initPack.id : -1;
         this.position = (initPack.position !== undefined) ? initPack.position : new GeometryAndPhysics_1.Point(250, 250);
