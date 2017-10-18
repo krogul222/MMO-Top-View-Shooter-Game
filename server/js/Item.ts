@@ -1,5 +1,5 @@
 import { Actor } from './Entities/Actor';
-import { WeaponType } from './enums';
+import { WeaponType, ItemType } from './enums';
 export class Item {
 
     constructor(private id: any, private name: string, private event: any, private add: any, private remove: any, private info: any) {
@@ -9,9 +9,9 @@ export class Item {
     static list = {};
 }
 
-new Item("medicalkit","Medical Kit",function(player: Actor){
+new Item(ItemType.medicalkit,"Medical Kit",function(player: Actor){
     player.lifeAndBodyController.heal(10);
-	player.inventory.removeItem("medicalkit",1);
+	player.inventory.removeItem(ItemType.medicalkit,1);
 }, function(actor, amount){}, function(actor, amount){}, function(actor){
     return "";
 });

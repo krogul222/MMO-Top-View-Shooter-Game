@@ -127,9 +127,10 @@ exports.Velocity = Velocity;
 /***/ (function(module, exports, __webpack_require__) {
 
 Object.defineProperty(exports, "__esModule", { value: true });
-const MapClient_1 = __webpack_require__(16);
+const UpgradeClient_1 = __webpack_require__(16);
+const MapClient_1 = __webpack_require__(17);
 const PlayerClient_1 = __webpack_require__(2);
-const BulletClient_1 = __webpack_require__(17);
+const BulletClient_1 = __webpack_require__(18);
 const Inventory_1 = __webpack_require__(11);
 const EnemyClient_1 = __webpack_require__(9);
 const ExplosionClient_1 = __webpack_require__(10);
@@ -152,6 +153,11 @@ socket.on('init', function (data) {
     }
     for (let i = 0, length = data.enemy.length; i < length; i++) {
         new EnemyClient_1.EnemyClient(data.enemy[i]);
+    }
+    if (data.upgrade !== undefined) {
+        for (let i = 0, length = data.upgrade.length; i < length; i++) {
+            new UpgradeClient_1.UpgradeClient(data.upgrade[i]);
+        }
     }
 });
 socket.on('update', function (data) {
@@ -202,57 +208,57 @@ socket.on('update', function (data) {
                 }
             }
         }
-        for (let i = 0, length = data.enemy.length; i < length; i++) {
-            let pack = data.enemy[i];
-            let p = EnemyClient_1.EnemyClient.list[pack.id];
-            if (p) {
-                if (pack.position !== undefined) {
-                    p.position.x = pack.position.x;
-                    p.position.y = pack.position.y;
-                }
-                if (pack.hp !== undefined) {
-                    p.hp = pack.hp;
-                }
-                if (pack.weapon !== undefined) {
-                    p.weapon = pack.weapon;
-                }
-                if (pack.attackMelee !== undefined) {
-                    p.attackMelee = pack.attackMelee;
-                }
-                if (pack.moving !== undefined) {
-                    p.moving = pack.moving;
-                }
-                if (pack.aimAngle !== undefined) {
-                    p.aimAngle = pack.aimAngle;
-                }
-                if (pack.reload !== undefined) {
-                    if (pack.reload) {
-                        p.reload = true;
-                    }
-                    else {
-                        p.reload = false;
-                    }
-                }
-                if (pack.attackStarted !== undefined) {
-                    if (pack.attackStarted) {
-                        p.attackStarted = true;
-                        p.spriteAnimCounter = 0;
-                    }
-                }
-            }
-        }
-        for (let i = 0, length = data.bullet.length; i < length; i++) {
-            let pack = data.bullet[i];
-            let b = BulletClient_1.BulletClient.list[pack.id];
-            if (b) {
-                if (pack.position !== undefined) {
-                    b.position.x = pack.position.x;
-                    b.position.y = pack.position.y;
-                }
-            }
-        }
-        gui.draw();
     }
+    for (let i = 0, length = data.enemy.length; i < length; i++) {
+        let pack = data.enemy[i];
+        let p = EnemyClient_1.EnemyClient.list[pack.id];
+        if (p) {
+            if (pack.position !== undefined) {
+                p.position.x = pack.position.x;
+                p.position.y = pack.position.y;
+            }
+            if (pack.hp !== undefined) {
+                p.hp = pack.hp;
+            }
+            if (pack.weapon !== undefined) {
+                p.weapon = pack.weapon;
+            }
+            if (pack.attackMelee !== undefined) {
+                p.attackMelee = pack.attackMelee;
+            }
+            if (pack.moving !== undefined) {
+                p.moving = pack.moving;
+            }
+            if (pack.aimAngle !== undefined) {
+                p.aimAngle = pack.aimAngle;
+            }
+            if (pack.reload !== undefined) {
+                if (pack.reload) {
+                    p.reload = true;
+                }
+                else {
+                    p.reload = false;
+                }
+            }
+            if (pack.attackStarted !== undefined) {
+                if (pack.attackStarted) {
+                    p.attackStarted = true;
+                    p.spriteAnimCounter = 0;
+                }
+            }
+        }
+    }
+    for (let i = 0, length = data.bullet.length; i < length; i++) {
+        let pack = data.bullet[i];
+        let b = BulletClient_1.BulletClient.list[pack.id];
+        if (b) {
+            if (pack.position !== undefined) {
+                b.position.x = pack.position.x;
+                b.position.y = pack.position.y;
+            }
+        }
+    }
+    gui.draw();
 });
 socket.on('remove', function (data) {
     for (let i = 0, length = data.player.length; i < length; i++) {
@@ -266,6 +272,9 @@ socket.on('remove', function (data) {
     }
     for (let i = 0, length = data.enemy.length; i < length; i++) {
         delete EnemyClient_1.EnemyClient.list[data.enemy[i]];
+    }
+    for (let i = 0, length = data.upgrade.length; i < length; i++) {
+        delete UpgradeClient_1.UpgradeClient.list[data.upgrade[i]];
     }
 });
 setInterval(function () {
@@ -292,6 +301,9 @@ setInterval(function () {
     }
     for (let i in BulletClient_1.BulletClient.list) {
         BulletClient_1.BulletClient.list[i].draw();
+    }
+    for (let i in UpgradeClient_1.UpgradeClient.list) {
+        UpgradeClient_1.UpgradeClient.list[i].draw();
     }
     for (let i in EnemyClient_1.EnemyClient.list) {
         if (EnemyClient_1.EnemyClient.list[i].moving || EnemyClient_1.EnemyClient.list[i].attackStarted) {
@@ -556,6 +568,40 @@ var WeaponType;
     WeaponType[WeaponType["claws"] = 20] = "claws";
 })(WeaponType = exports.WeaponType || (exports.WeaponType = {}));
 ;
+var WeaponAmmoType;
+(function (WeaponAmmoType) {
+    WeaponAmmoType[WeaponAmmoType["pistol"] = 1001] = "pistol";
+    WeaponAmmoType[WeaponAmmoType["shotgun"] = 1002] = "shotgun";
+    WeaponAmmoType[WeaponAmmoType["rifle"] = 1003] = "rifle";
+})(WeaponAmmoType = exports.WeaponAmmoType || (exports.WeaponAmmoType = {}));
+;
+var ItemType;
+(function (ItemType) {
+    ItemType[ItemType["knife"] = 0] = "knife";
+    ItemType[ItemType["pistol"] = 1] = "pistol";
+    ItemType[ItemType["shotgun"] = 2] = "shotgun";
+    ItemType[ItemType["rifle"] = 3] = "rifle";
+    ItemType[ItemType["medicalkit"] = 101] = "medicalkit";
+})(ItemType = exports.ItemType || (exports.ItemType = {}));
+;
+var UpgradeCategory;
+(function (UpgradeCategory) {
+    UpgradeCategory[UpgradeCategory["item"] = 0] = "item";
+    UpgradeCategory[UpgradeCategory["ammo"] = 1] = "ammo";
+})(UpgradeCategory = exports.UpgradeCategory || (exports.UpgradeCategory = {}));
+function randomEnum(myEnum) {
+    const enumValues = Object.keys(myEnum)
+        .map(n => Number.parseInt(n))
+        .filter(n => !Number.isNaN(n));
+    const randomIndex = getRandomInt(0, enumValues.length);
+    return enumValues[randomIndex];
+}
+exports.randomEnum = randomEnum;
+function getRandomInt(min, max) {
+    min = Math.ceil(min);
+    max = Math.floor(max);
+    return Math.floor(Math.random() * (max - min)) + min;
+}
 
 
 /***/ }),
@@ -563,7 +609,7 @@ var WeaponType;
 /***/ (function(module, exports, __webpack_require__) {
 
 Object.defineProperty(exports, "__esModule", { value: true });
-const Pack_1 = __webpack_require__(18);
+const Pack_1 = __webpack_require__(19);
 exports.initPack = new Pack_1.Pack();
 exports.removePack = new Pack_1.Pack();
 
@@ -583,14 +629,14 @@ class Player extends Actor_1.Actor {
     constructor(param) {
         super(param);
         this.giveItems = () => {
-            this.inventory.addItem(enums_1.WeaponType.knife, 1);
-            this.inventory.addItem(enums_1.WeaponType.pistol, 1);
-            this.inventory.addItem(enums_1.WeaponType.shotgun, 1);
-            this.inventory.addItem(enums_1.WeaponType.rifle, 1);
+            this.inventory.addItem(enums_1.ItemType.knife, 1);
+            this.inventory.addItem(enums_1.ItemType.pistol, 1);
+            this.inventory.addItem(enums_1.ItemType.shotgun, 1);
+            this.inventory.addItem(enums_1.ItemType.rifle, 1);
             this.attackController.weaponCollection.setWeaponAmmo(enums_1.WeaponType.shotgun, 100);
             this.attackController.weaponCollection.setWeaponAmmo(enums_1.WeaponType.pistol, 200);
             this.attackController.weaponCollection.setWeaponAmmo(enums_1.WeaponType.rifle, 100);
-            this.inventory.addItem("medicalkit", 4);
+            this.inventory.addItem(enums_1.ItemType.medicalkit, 4);
             this.inventory.useItem(enums_1.WeaponType.shotgun);
         };
         this.getInitPack = () => {
@@ -687,7 +733,7 @@ Player.onConnect = (socket) => {
         if (data.inputId == 'mouseAngle')
             player.movementController.aimAngle = data.state;
         if (data.inputId == 'heal')
-            player.inventory.useItem("medicalkit");
+            player.inventory.useItem(enums_1.ItemType.medicalkit);
         if (data.inputId == '1')
             player.attackController.weaponCollection.changeWeapon(enums_1.WeaponType.knife);
         if (data.inputId == '2')
@@ -884,7 +930,6 @@ Enemy.randomlyGenerate = function (choosenMap) {
     let id = Math.random();
     let enemy;
     if (Math.random() < 0.5) {
-        console.log("SCORPION");
         enemy = new Enemy({
             id: id,
             position: position,
@@ -901,7 +946,6 @@ Enemy.randomlyGenerate = function (choosenMap) {
         });
     }
     else {
-        console.log("ZOMBIE");
         enemy = new Enemy({
             id: id,
             position: position,
@@ -927,7 +971,7 @@ exports.Enemy = Enemy;
 /***/ (function(module, exports, __webpack_require__) {
 
 Object.defineProperty(exports, "__esModule", { value: true });
-const GameMap_1 = __webpack_require__(19);
+const GameMap_1 = __webpack_require__(20);
 class MapController {
     constructor(param) {
         this.maps = [];
@@ -981,10 +1025,8 @@ class WeaponTypes {
 }
 WeaponTypes.getWeaponParameters = (weapon) => {
     for (let i in WeaponTypes.list) {
-        console.log(weapon + " " + WeaponTypes.list[i].weapon);
         let weaponFromBank = WeaponTypes.list[i];
         if (weaponFromBank.weapon == weapon) {
-            console.log("YES");
             return weaponFromBank;
         }
     }
@@ -1259,7 +1301,7 @@ exports.ExplosionClient = ExplosionClient;
 
 Object.defineProperty(exports, "__esModule", { value: true });
 const Player_1 = __webpack_require__(5);
-const Item_1 = __webpack_require__(24);
+const Item_1 = __webpack_require__(25);
 class Inventory {
     constructor(socket, server, owner) {
         this.items = [];
@@ -1360,13 +1402,13 @@ exports.Inventory = Inventory;
 
 Object.defineProperty(exports, "__esModule", { value: true });
 const Inventory_1 = __webpack_require__(11);
-const LifeAndBodyController_1 = __webpack_require__(20);
+const LifeAndBodyController_1 = __webpack_require__(21);
 const MapControler_1 = __webpack_require__(7);
 const Entity_1 = __webpack_require__(13);
 const Player_1 = __webpack_require__(5);
 const Enemy_1 = __webpack_require__(6);
-const AttackControler_1 = __webpack_require__(21);
-const MovementController_1 = __webpack_require__(23);
+const AttackControler_1 = __webpack_require__(22);
+const MovementController_1 = __webpack_require__(24);
 const GeometryAndPhysics_1 = __webpack_require__(0);
 class Actor extends Entity_1.Entity {
     constructor(param) {
@@ -1693,6 +1735,50 @@ exports.Bullet = Bullet;
 /***/ (function(module, exports, __webpack_require__) {
 
 Object.defineProperty(exports, "__esModule", { value: true });
+const GeometryAndPhysics_1 = __webpack_require__(0);
+const PlayerClient_1 = __webpack_require__(2);
+const game_1 = __webpack_require__(1);
+class UpgradeClient {
+    constructor(param) {
+        this.position = new GeometryAndPhysics_1.Point(0, 0);
+        this.id = -1;
+        this.draw = () => {
+            if (PlayerClient_1.PlayerClient.list[game_1.selfId].map !== this.map) {
+                return;
+            }
+            let mainPlayer = PlayerClient_1.PlayerClient.list[game_1.selfId];
+            let mainPlayerx = mainPlayer.position.x;
+            let mainPlayery = mainPlayer.position.y;
+            let ex = this.position.x;
+            let ey = this.position.y;
+            let x = ex - (mainPlayerx - WIDTH / 2);
+            x = x - (mouseX - WIDTH / 2) / CAMERA_BOX_ADJUSTMENT;
+            let y = ey - (mainPlayery - HEIGHT / 2);
+            y = y - (mouseY - HEIGHT / 2) / CAMERA_BOX_ADJUSTMENT;
+            x -= this.width / 2;
+            y -= this.height / 2;
+            ctx.drawImage(this.img, 0, 0, this.img.width, this.img.height, x, y, this.width, this.height);
+        };
+        this.id = param.id ? param.id : this.id;
+        this.position = param.position ? param.position : this.position;
+        this.width = param.width ? param.width : this.width;
+        this.height = param.height ? param.height : this.height;
+        this.map = param.map ? param.map : this.map;
+        this.img = param.img ? Img[param.img] : Img[this.img];
+        this.category = param.category ? param.category : this.category;
+        this.kind = param.kind ? param.kind : this.kind;
+        UpgradeClient.list[this.id] = this;
+    }
+}
+UpgradeClient.list = {};
+exports.UpgradeClient = UpgradeClient;
+
+
+/***/ }),
+/* 17 */
+/***/ (function(module, exports, __webpack_require__) {
+
+Object.defineProperty(exports, "__esModule", { value: true });
 const PlayerClient_1 = __webpack_require__(2);
 const game_1 = __webpack_require__(1);
 class MapClient {
@@ -1717,7 +1803,7 @@ exports.MapClient = MapClient;
 
 
 /***/ }),
-/* 17 */
+/* 18 */
 /***/ (function(module, exports, __webpack_require__) {
 
 Object.defineProperty(exports, "__esModule", { value: true });
@@ -1791,7 +1877,7 @@ exports.BulletClient = BulletClient;
 
 
 /***/ }),
-/* 18 */
+/* 19 */
 /***/ (function(module, exports) {
 
 Object.defineProperty(exports, "__esModule", { value: true });
@@ -1808,7 +1894,7 @@ exports.Pack = Pack;
 
 
 /***/ }),
-/* 19 */
+/* 20 */
 /***/ (function(module, exports) {
 
 Object.defineProperty(exports, "__esModule", { value: true });
@@ -1818,6 +1904,10 @@ class GameMap {
         this._width = _width;
         this._height = _height;
         this.isPositionWall = (position) => {
+            if (position.x < 0 || position.x >= this.width)
+                return 1;
+            if (position.y < 0 || position.y >= this.height)
+                return 1;
             return 0;
         };
     }
@@ -1829,7 +1919,7 @@ exports.GameMap = GameMap;
 
 
 /***/ }),
-/* 20 */
+/* 21 */
 /***/ (function(module, exports) {
 
 Object.defineProperty(exports, "__esModule", { value: true });
@@ -1861,11 +1951,11 @@ exports.LifeAndBodyController = LifeAndBodyController;
 
 
 /***/ }),
-/* 21 */
+/* 22 */
 /***/ (function(module, exports, __webpack_require__) {
 
 Object.defineProperty(exports, "__esModule", { value: true });
-const WeaponCollection_1 = __webpack_require__(22);
+const WeaponCollection_1 = __webpack_require__(23);
 const Counter_1 = __webpack_require__(14);
 const GeometryAndPhysics_1 = __webpack_require__(0);
 const Bullet_1 = __webpack_require__(15);
@@ -1893,8 +1983,6 @@ class AttackController {
             if (!this._reloadCounter.isActive() && this._pressingAttack) {
                 if (this._attackCounter.resetIfMax()) {
                     this._attackStarted = true;
-                    console.log(this._activeWeapon.ammo);
-                    console.log(this._melee);
                     this._melee = (this._activeWeapon._ammoInGun > 0) ? this._melee : true;
                     this._melee ? this.closeAttack(this.parent.movementController.aimAngle) : this.distanceAttack();
                 }
@@ -1918,9 +2006,7 @@ class AttackController {
             }
         };
         this.distanceAttack = () => {
-            console.log("Distance attack:");
             if (this._activeWeapon.shoot(1)) {
-                console.log("Shoot");
                 let shootSpeed = this._activeWeapon.shootSpeed;
                 let aimAngle = this.parent.movementController.aimAngle;
                 let attackRadius = this._activeWeapon.attackRadius;
@@ -1974,7 +2060,7 @@ exports.AttackController = AttackController;
 
 
 /***/ }),
-/* 22 */
+/* 23 */
 /***/ (function(module, exports, __webpack_require__) {
 
 Object.defineProperty(exports, "__esModule", { value: true });
@@ -2024,6 +2110,13 @@ class WeaponCollection {
                 }
             }
         };
+        this.addWeaponAmmo = (id, ammo) => {
+            for (let i = 0; i < this.weapons.length; i++) {
+                if (this.weapons[i].id === id) {
+                    this.weapons[i].ammo = this.weapons[i].ammo + ammo;
+                }
+            }
+        };
         this.decAmmo = (id, amount) => {
             for (let i = 0; i < this.weapons.length; i++) {
                 if (this.weapons[i].id === id) {
@@ -2062,7 +2155,6 @@ class WeaponCollection {
                 }
             }
             this.weapons.push({ id: id, amount: amount, ammo: 10, ammoInGun: WeaponTypes_1.WeaponTypes.list[id].reloadAmmo });
-            console.log("Weapon " + id + " added");
         };
         this.owner = owner;
     }
@@ -2108,7 +2200,6 @@ class SingleWeapon {
                     this.name = weaponProperties.name;
                     this._ammo = weaponCollection.weapons[i].ammo;
                     this._ammoInGun = weaponCollection.weapons[i].ammoInGun;
-                    console.log("WEAPON AMMO " + this._ammo + " " + this._ammoInGun);
                 }
             }
         };
@@ -2137,7 +2228,7 @@ exports.SingleWeapon = SingleWeapon;
 
 
 /***/ }),
-/* 23 */
+/* 24 */
 /***/ (function(module, exports, __webpack_require__) {
 
 Object.defineProperty(exports, "__esModule", { value: true });
@@ -2243,7 +2334,7 @@ exports.MovementController = MovementController;
 
 
 /***/ }),
-/* 24 */
+/* 25 */
 /***/ (function(module, exports, __webpack_require__) {
 
 Object.defineProperty(exports, "__esModule", { value: true });
@@ -2261,9 +2352,9 @@ class Item {
 }
 Item.list = {};
 exports.Item = Item;
-new Item("medicalkit", "Medical Kit", function (player) {
+new Item(enums_1.ItemType.medicalkit, "Medical Kit", function (player) {
     player.lifeAndBodyController.heal(10);
-    player.inventory.removeItem("medicalkit", 1);
+    player.inventory.removeItem(enums_1.ItemType.medicalkit, 1);
 }, function (actor, amount) { }, function (actor, amount) { }, function (actor) {
     return "";
 });

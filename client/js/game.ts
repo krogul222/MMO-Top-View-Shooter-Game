@@ -1,3 +1,4 @@
+import { UpgradeClient } from './Entities/UpgradeClient';
 import { MapClient } from './MapClient';
 import { GUI } from './GUI';
 import { PlayerClient } from "./Entities/PlayerClient";
@@ -41,6 +42,13 @@ socket.on('init', function(data){
     for(let i = 0, length = data.enemy.length; i < length; i++){
         new EnemyClient(data.enemy[i]);  
     } 
+
+    if(data.upgrade !== undefined){
+        for(let i = 0, length = data.upgrade.length; i < length; i++){
+            new UpgradeClient(data.upgrade[i]);  
+        } 
+    }
+
 });
 
 
@@ -101,6 +109,7 @@ socket.on('update', function(data){
             }
            
        }
+    }
 
     for(let i = 0, length = data.enemy.length; i < length ; i++){
         let pack = data.enemy[i];
@@ -162,7 +171,6 @@ socket.on('update', function(data){
     }
 
     gui.draw();
-   } 
     
 });
 
@@ -180,10 +188,10 @@ socket.on('remove', function(data){
     for(let i = 0, length = data.enemy.length; i < length; i++){
         delete EnemyClient.list[data.enemy[i]];
     } 
-    /*
+    
     for(let i = 0, length = data.upgrade.length; i < length; i++){
-        delete Upgrade.list[data.upgrade[i]];
-    } */
+        delete UpgradeClient.list[data.upgrade[i]];
+    } 
  });
 
 setInterval(function(){
@@ -215,6 +223,10 @@ setInterval(function(){
     for(let i in BulletClient.list){
         BulletClient.list[i].draw();
     }  
+
+    for(let i in UpgradeClient.list){
+        UpgradeClient.list[i].draw();
+    }
     
     for(let i in EnemyClient.list){
         if(EnemyClient.list[i].moving || EnemyClient.list[i].attackStarted){

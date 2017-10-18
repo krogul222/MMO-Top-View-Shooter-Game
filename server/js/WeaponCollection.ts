@@ -56,6 +56,12 @@ export class WeaponCollection {
             for(let i = 0 ; i < this.weapons.length; i++){
                 if(this.weapons[i].id === id){
                     this.weapons[i].ammo = ammo;
+                    if(this.owner.attackController.activeWeapon.weapon == id){
+                        if(this.owner.attackController.activeWeapon.ammo == 0 && ammo > 0){
+                            this.owner.attackController.reloadCounter.activate();
+                        } 
+                        this.owner.attackController.activeWeapon.updateAmmo();
+                    }
                 }
             }
         }
@@ -64,6 +70,12 @@ export class WeaponCollection {
             for(let i = 0 ; i < this.weapons.length; i++){
                 if(this.weapons[i].id === id){
                     this.weapons[i].ammo = this.weapons[i].ammo + ammo;
+                    if(this.owner.attackController.activeWeapon.weapon == id){
+                        if(this.owner.attackController.activeWeapon.ammo == 0 && ammo > 0){
+                            this.owner.attackController.reloadCounter.activate();
+                        } 
+                        this.owner.attackController.activeWeapon.updateAmmo();
+                    }
                 }
             }
         }
@@ -111,7 +123,6 @@ export class WeaponCollection {
                 }
             }
             this.weapons.push({id:id,amount:amount, ammo: 10, ammoInGun: WeaponTypes.list[id].reloadAmmo});
-            console.log("Weapon " +id+" added");
             //self.refreshRender();
         }
     }
@@ -151,6 +162,16 @@ export class SingleWeapon {
             this.parent.attackController.weaponCollection.decAmmo(this._weapon, amount);
         }
 
+        updateAmmo = () => {
+            let weaponCollection: WeaponCollection = this.parent.attackController.weaponCollection;
+            
+            for(let i = 0 ; i < weaponCollection.weapons.length; i++){
+                if(weaponCollection.weapons[i].id === this.weapon){
+                    this._ammo = weaponCollection.weapons[i].ammo;
+                }
+            }
+        }
+
         shoot = (bullets) => {
             if(bullets <= this._ammoInGun){
 
@@ -165,10 +186,6 @@ export class SingleWeapon {
                         
                         if(WeaponTypes.list[this.weapon].recoil) this.parent.movementController.recoilCounter.activate();
 
-                            
-
-                       /* owner.recoil = Weapon.list[self.weapons[i].id].recoil;
-                        owner.recoilCounter = 0;*/
                         return true;
                     }
             return false;
@@ -184,30 +201,8 @@ export class SingleWeapon {
                     this.name = weaponProperties.name;
                     this._ammo = weaponCollection.weapons[i].ammo;
                     this._ammoInGun = weaponCollection.weapons[i].ammoInGun;
-                    console.log("WEAPON AMMO " + this._ammo+ " " +this._ammoInGun );
                 }
             }
-            
-          /*  for(let i in WeaponTypes.list){
-                let weaponFromBank: WeaponTypes = WeaponTypes.list[i];
-                if(weaponFromBank.weapon == weapon) {
-                    this._weapon = weapon;
-                    this.name = weaponFromBank.name;
-                    this.
-                    console.log("Weapon equiped "+this._weapon+this.name);
-                    this._ammo = weaponFromBank.ammo;
-                   this.attackRadius = weaponFromBank.attackRadius;
-                    this.attackSpd = weaponFromBank.attackSpd;
-                    this.attackMelee = weaponFromBank.attackMelee;
-                    this.shootDmg = weaponFromBank.shootDmg;
-                    this.meleeDmg = weaponFromBank.meleeDmg;
-                    this.maxSpd = weaponFromBank.maxSpd;
-                    this.shootSpeed = weaponFromBank.shootSpeed;
-                    this.reloadAmmo = weaponFromBank.reloadAmmo;
-                    this.reloadSpd = weaponFromBank.reloadSpd;
-                    break;
-                }
-            }*/
         }
 
         get reloadSpd() { return WeaponTypes.list[this._weapon].reloadSpd; }

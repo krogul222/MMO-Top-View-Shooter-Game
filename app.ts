@@ -103,8 +103,8 @@ setInterval(function(){
     let pack = {
         player: Player.update(),
         bullet: Bullet.update(),
-        enemy: Enemy.update()
-        //upgrade: Upgrade.update()
+        enemy: Enemy.update(),
+        upgrade: Upgrade.update()
     }
     
     frameCount++;

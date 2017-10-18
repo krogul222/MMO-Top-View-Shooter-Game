@@ -3,6 +3,7 @@ const Player_1 = require("./server/js/Entities/Player");
 const Entity_1 = require("./server/js/Entities/Entity");
 const Bullet_1 = require("./server/js/Entities/Bullet");
 const Enemy_1 = require("./server/js/Entities/Enemy");
+const Upgrade_1 = require("./server/js/Entities/Upgrade");
 var express = require('express');
 var mongojs = require('mongojs');
 var db = mongojs('mongodb://buka:buka123@ds123193.mlab.com:23193/brykiet', ['account', 'progress']);
@@ -87,7 +88,8 @@ setInterval(function () {
     let pack = {
         player: Player_1.Player.update(),
         bullet: Bullet_1.Bullet.update(),
-        enemy: Enemy_1.Enemy.update()
+        enemy: Enemy_1.Enemy.update(),
+        upgrade: Upgrade_1.Upgrade.update()
     };
     exports.frameCount++;
     for (let i in SOCKET_LIST) {

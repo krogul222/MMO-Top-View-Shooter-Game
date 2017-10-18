@@ -13,9 +13,9 @@ class Item {
 }
 Item.list = {};
 exports.Item = Item;
-new Item("medicalkit", "Medical Kit", function (player) {
+new Item(enums_1.ItemType.medicalkit, "Medical Kit", function (player) {
     player.lifeAndBodyController.heal(10);
-    player.inventory.removeItem("medicalkit", 1);
+    player.inventory.removeItem(enums_1.ItemType.medicalkit, 1);
 }, function (actor, amount) { }, function (actor, amount) { }, function (actor) {
     return "";
 });

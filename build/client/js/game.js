@@ -1,4 +1,5 @@
 Object.defineProperty(exports, "__esModule", { value: true });
+const UpgradeClient_1 = require("./Entities/UpgradeClient");
 const MapClient_1 = require("./MapClient");
 const PlayerClient_1 = require("./Entities/PlayerClient");
 const BulletClient_1 = require("./Entities/BulletClient");
@@ -24,6 +25,11 @@ socket.on('init', function (data) {
     }
     for (let i = 0, length = data.enemy.length; i < length; i++) {
         new EnemyClient_1.EnemyClient(data.enemy[i]);
+    }
+    if (data.upgrade !== undefined) {
+        for (let i = 0, length = data.upgrade.length; i < length; i++) {
+            new UpgradeClient_1.UpgradeClient(data.upgrade[i]);
+        }
     }
 });
 socket.on('update', function (data) {
@@ -74,57 +80,57 @@ socket.on('update', function (data) {
                 }
             }
         }
-        for (let i = 0, length = data.enemy.length; i < length; i++) {
-            let pack = data.enemy[i];
-            let p = EnemyClient_1.EnemyClient.list[pack.id];
-            if (p) {
-                if (pack.position !== undefined) {
-                    p.position.x = pack.position.x;
-                    p.position.y = pack.position.y;
-                }
-                if (pack.hp !== undefined) {
-                    p.hp = pack.hp;
-                }
-                if (pack.weapon !== undefined) {
-                    p.weapon = pack.weapon;
-                }
-                if (pack.attackMelee !== undefined) {
-                    p.attackMelee = pack.attackMelee;
-                }
-                if (pack.moving !== undefined) {
-                    p.moving = pack.moving;
-                }
-                if (pack.aimAngle !== undefined) {
-                    p.aimAngle = pack.aimAngle;
-                }
-                if (pack.reload !== undefined) {
-                    if (pack.reload) {
-                        p.reload = true;
-                    }
-                    else {
-                        p.reload = false;
-                    }
-                }
-                if (pack.attackStarted !== undefined) {
-                    if (pack.attackStarted) {
-                        p.attackStarted = true;
-                        p.spriteAnimCounter = 0;
-                    }
-                }
-            }
-        }
-        for (let i = 0, length = data.bullet.length; i < length; i++) {
-            let pack = data.bullet[i];
-            let b = BulletClient_1.BulletClient.list[pack.id];
-            if (b) {
-                if (pack.position !== undefined) {
-                    b.position.x = pack.position.x;
-                    b.position.y = pack.position.y;
-                }
-            }
-        }
-        gui.draw();
     }
+    for (let i = 0, length = data.enemy.length; i < length; i++) {
+        let pack = data.enemy[i];
+        let p = EnemyClient_1.EnemyClient.list[pack.id];
+        if (p) {
+            if (pack.position !== undefined) {
+                p.position.x = pack.position.x;
+                p.position.y = pack.position.y;
+            }
+            if (pack.hp !== undefined) {
+                p.hp = pack.hp;
+            }
+            if (pack.weapon !== undefined) {
+                p.weapon = pack.weapon;
+            }
+            if (pack.attackMelee !== undefined) {
+                p.attackMelee = pack.attackMelee;
+            }
+            if (pack.moving !== undefined) {
+                p.moving = pack.moving;
+            }
+            if (pack.aimAngle !== undefined) {
+                p.aimAngle = pack.aimAngle;
+            }
+            if (pack.reload !== undefined) {
+                if (pack.reload) {
+                    p.reload = true;
+                }
+                else {
+                    p.reload = false;
+                }
+            }
+            if (pack.attackStarted !== undefined) {
+                if (pack.attackStarted) {
+                    p.attackStarted = true;
+                    p.spriteAnimCounter = 0;
+                }
+            }
+        }
+    }
+    for (let i = 0, length = data.bullet.length; i < length; i++) {
+        let pack = data.bullet[i];
+        let b = BulletClient_1.BulletClient.list[pack.id];
+        if (b) {
+            if (pack.position !== undefined) {
+                b.position.x = pack.position.x;
+                b.position.y = pack.position.y;
+            }
+        }
+    }
+    gui.draw();
 });
 socket.on('remove', function (data) {
     for (let i = 0, length = data.player.length; i < length; i++) {
@@ -138,6 +144,9 @@ socket.on('remove', function (data) {
     }
     for (let i = 0, length = data.enemy.length; i < length; i++) {
         delete EnemyClient_1.EnemyClient.list[data.enemy[i]];
+    }
+    for (let i = 0, length = data.upgrade.length; i < length; i++) {
+        delete UpgradeClient_1.UpgradeClient.list[data.upgrade[i]];
     }
 });
 setInterval(function () {
@@ -164,6 +173,9 @@ setInterval(function () {
     }
     for (let i in BulletClient_1.BulletClient.list) {
         BulletClient_1.BulletClient.list[i].draw();
+    }
+    for (let i in UpgradeClient_1.UpgradeClient.list) {
+        UpgradeClient_1.UpgradeClient.list[i].draw();
     }
     for (let i in EnemyClient_1.EnemyClient.list) {
         if (EnemyClient_1.EnemyClient.list[i].moving || EnemyClient_1.EnemyClient.list[i].attackStarted) {

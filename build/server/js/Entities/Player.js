@@ -9,15 +9,8 @@ class Player extends Actor_1.Actor {
     constructor(param) {
         super(param);
         this.giveItems = () => {
-            this.inventory.addItem(enums_1.WeaponType.knife, 1);
-            this.inventory.addItem(enums_1.WeaponType.pistol, 1);
-            this.inventory.addItem(enums_1.WeaponType.shotgun, 1);
-            this.inventory.addItem(enums_1.WeaponType.rifle, 1);
-            this.attackController.weaponCollection.setWeaponAmmo(enums_1.WeaponType.shotgun, 100);
-            this.attackController.weaponCollection.setWeaponAmmo(enums_1.WeaponType.pistol, 200);
-            this.attackController.weaponCollection.setWeaponAmmo(enums_1.WeaponType.rifle, 100);
-            this.inventory.addItem("medicalkit", 4);
-            this.inventory.useItem(enums_1.WeaponType.shotgun);
+            this.inventory.addItem(enums_1.ItemType.knife, 1);
+            this.inventory.useItem(enums_1.WeaponType.knife);
         };
         this.getInitPack = () => {
             return {
@@ -113,7 +106,7 @@ Player.onConnect = (socket) => {
         if (data.inputId == 'mouseAngle')
             player.movementController.aimAngle = data.state;
         if (data.inputId == 'heal')
-            player.inventory.useItem("medicalkit");
+            player.inventory.useItem(enums_1.ItemType.medicalkit);
         if (data.inputId == '1')
             player.attackController.weaponCollection.changeWeapon(enums_1.WeaponType.knife);
         if (data.inputId == '2')

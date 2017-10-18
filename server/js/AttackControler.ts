@@ -41,13 +41,10 @@ export class AttackController {
     }
 
     performAttack = () => {
-       // console.log(!this._reloadCounter.isActive() +" "+this.attackCounter.value +this._attackCounter.resetIfMax()+ this._pressingAttack);
         if ( !this._reloadCounter.isActive() && this._pressingAttack) {
             if(this._attackCounter.resetIfMax()){
                 this._attackStarted = true;
-                console.log(this._activeWeapon.ammo);
-                console.log(this._melee);
-                this._melee = (this._activeWeapon._ammoInGun > 0) ? this._melee : true;
+                this._melee = (this._activeWeapon._ammoInGun > 0) ? WeaponTypes.getWeaponParameters(this._activeWeapon.weapon).attackMelee : true;
                 this._melee ? this.closeAttack(this.parent.movementController.aimAngle) : this.distanceAttack();   
             }
         }
@@ -72,9 +69,7 @@ export class AttackController {
     }
 
     distanceAttack = () => {
-        console.log("Distance attack:")
         if(this._activeWeapon.shoot(1)){
-            console.log("Shoot");
             let shootSpeed = this._activeWeapon.shootSpeed;
             let aimAngle = this.parent.movementController.aimAngle;
             let attackRadius = this._activeWeapon.attackRadius;
@@ -96,7 +91,6 @@ export class AttackController {
     }
 
     shootBullet = (aimAngle, shootSpeed) => {
-        //console.log(aimAngle + " " + shootSpeedX + " " + shootSpeedY);
         new Bullet({
             parent: this.parent.id,
             combatType: this.parent.type,

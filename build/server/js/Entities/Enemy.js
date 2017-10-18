@@ -153,7 +153,6 @@ Enemy.randomlyGenerate = function (choosenMap) {
     let id = Math.random();
     let enemy;
     if (Math.random() < 0.5) {
-        console.log("SCORPION");
         enemy = new Enemy({
             id: id,
             position: position,
@@ -170,7 +169,6 @@ Enemy.randomlyGenerate = function (choosenMap) {
         });
     }
     else {
-        console.log("ZOMBIE");
         enemy = new Enemy({
             id: id,
             position: position,

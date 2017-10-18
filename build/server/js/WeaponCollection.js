@@ -42,6 +42,12 @@ class WeaponCollection {
             for (let i = 0; i < this.weapons.length; i++) {
                 if (this.weapons[i].id === id) {
                     this.weapons[i].ammo = ammo;
+                    if (this.owner.attackController.activeWeapon.weapon == id) {
+                        if (this.owner.attackController.activeWeapon.ammo == 0 && ammo > 0) {
+                            this.owner.attackController.reloadCounter.activate();
+                        }
+                        this.owner.attackController.activeWeapon.updateAmmo();
+                    }
                 }
             }
         };
@@ -49,6 +55,12 @@ class WeaponCollection {
             for (let i = 0; i < this.weapons.length; i++) {
                 if (this.weapons[i].id === id) {
                     this.weapons[i].ammo = this.weapons[i].ammo + ammo;
+                    if (this.owner.attackController.activeWeapon.weapon == id) {
+                        if (this.owner.attackController.activeWeapon.ammo == 0 && ammo > 0) {
+                            this.owner.attackController.reloadCounter.activate();
+                        }
+                        this.owner.attackController.activeWeapon.updateAmmo();
+                    }
                 }
             }
         };
@@ -90,7 +102,6 @@ class WeaponCollection {
                 }
             }
             this.weapons.push({ id: id, amount: amount, ammo: 10, ammoInGun: WeaponTypes_1.WeaponTypes.list[id].reloadAmmo });
-            console.log("Weapon " + id + " added");
         };
         this.owner = owner;
     }
@@ -109,6 +120,14 @@ class SingleWeapon {
         this.decAmmo = (amount) => {
             this._ammoInGun = (this._ammoInGun - amount >= 0) ? this._ammoInGun - amount : 0;
             this.parent.attackController.weaponCollection.decAmmo(this._weapon, amount);
+        };
+        this.updateAmmo = () => {
+            let weaponCollection = this.parent.attackController.weaponCollection;
+            for (let i = 0; i < weaponCollection.weapons.length; i++) {
+                if (weaponCollection.weapons[i].id === this.weapon) {
+                    this._ammo = weaponCollection.weapons[i].ammo;
+                }
+            }
         };
         this.shoot = (bullets) => {
             if (bullets <= this._ammoInGun) {
@@ -136,7 +155,6 @@ class SingleWeapon {
                     this.name = weaponProperties.name;
                     this._ammo = weaponCollection.weapons[i].ammo;
                     this._ammoInGun = weaponCollection.weapons[i].ammoInGun;
-                    console.log("WEAPON AMMO " + this._ammo + " " + this._ammoInGun);
                 }
             }
         };

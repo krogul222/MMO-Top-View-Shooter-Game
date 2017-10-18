@@ -4,7 +4,7 @@ import { Bullet } from './Bullet';
 import { Actor } from "./Actor";
 import { Point } from './../GeometryAndPhysics';
 import { Pack } from '../Pack';
-import { WeaponType } from '../enums';
+import { WeaponType, ItemType } from '../enums';
 
 export class Player extends Actor {
 
@@ -20,15 +20,15 @@ export class Player extends Actor {
     } 
 
     giveItems = () => {
-        this.inventory.addItem(WeaponType.knife,1);
-        this.inventory.addItem(WeaponType.pistol,1);
-        this.inventory.addItem(WeaponType.shotgun,1);
-        this.inventory.addItem(WeaponType.rifle,1);
+        this.inventory.addItem(ItemType.knife,1);
+        this.inventory.addItem(ItemType.pistol,1);
+        this.inventory.addItem(ItemType.shotgun,1);
+        this.inventory.addItem(ItemType.rifle,1);
         this.attackController.weaponCollection.setWeaponAmmo(WeaponType.shotgun, 100);
         this.attackController.weaponCollection.setWeaponAmmo(WeaponType.pistol, 200);
         this.attackController.weaponCollection.setWeaponAmmo(WeaponType.rifle, 100);
 
-        this.inventory.addItem("medicalkit",4);  
+        this.inventory.addItem(ItemType.medicalkit,4);  
         this.inventory.useItem(WeaponType.shotgun);
     }
 
@@ -54,8 +54,6 @@ export class Player extends Actor {
     getUpdatePack = () => {
         let attackStartedTmp = this.attackController.attackStarted;
         this.attackController.attackStarted = false;
-
-        //console.log("Update pack " + this.attackController.activeWeapon.ammo);
         return {
             id: this.id,
             position: this.position,
@@ -98,7 +96,7 @@ export class Player extends Actor {
             if(data.inputId == 'down') player.movementController.pressingDown = data.state;
             if(data.inputId == 'attack') player.attackController.pressingAttack = data.state;
             if(data.inputId == 'mouseAngle') player.movementController.aimAngle = data.state;
-            if(data.inputId == 'heal') player.inventory.useItem("medicalkit");
+            if(data.inputId == 'heal') player.inventory.useItem(ItemType.medicalkit);
             if(data.inputId == '1') player.attackController.weaponCollection.changeWeapon(WeaponType.knife);   
             if(data.inputId == '2') player.attackController.weaponCollection.changeWeapon(WeaponType.pistol); 
             if(data.inputId == '3') player.attackController.weaponCollection.changeWeapon(WeaponType.shotgun); 

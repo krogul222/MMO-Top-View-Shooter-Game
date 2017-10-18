@@ -183,7 +183,6 @@ export class Enemy extends Actor {
         let id = Math.random();
         let enemy: Enemy;
         if(Math.random()<0.5){
-            console.log("SCORPION");
             enemy = new Enemy({
                 id: id,
                 position: position,
@@ -198,7 +197,6 @@ export class Enemy extends Actor {
                 maxSpdX: 3,
                 maxSpdY: 3});
         } else{
-            console.log("ZOMBIE");
             enemy = new Enemy({
                 id: id,
                 position: position,

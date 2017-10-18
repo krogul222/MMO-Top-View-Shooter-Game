@@ -2,6 +2,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const PlayerClient_1 = require("./Entities/PlayerClient");
 const game_1 = require("./game");
 const WeaponTypes_1 = require("../../server/js/WeaponTypes");
+const enums_1 = require("./../../server/js/enums");
 class GUI {
     constructor(param) {
         this.draw = () => {
@@ -39,7 +40,7 @@ class GUI {
         this.drawItems = () => {
             if (PlayerClient_1.PlayerClient.list[game_1.selfId]) {
                 this.ctx.drawImage(Img["medicalkit"], 0, 0, Img["medicalkit"].width, Img["medicalkit"].height, 3 * (this.width - 0.8 * this.height) / 4, (this.height - 0.8 * this.height) / 2, 0.8 * this.height, 0.8 * this.height);
-                this.ctx.fillText(' x' + game_1.inventory.getItemAmount("medicalkit"), 3 * (this.width - 0.8 * this.height) / 4 + 0.8 * this.height, (this.height) / 2 + 10);
+                this.ctx.fillText(' x' + game_1.inventory.getItemAmount(enums_1.ItemType.medicalkit), 3 * (this.width - 0.8 * this.height) / 4 + 0.8 * this.height, (this.height) / 2 + 10);
             }
         };
         this.drawFace = () => {

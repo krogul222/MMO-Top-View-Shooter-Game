@@ -44,7 +44,6 @@ export class Bullet extends Entity{
     update = () => {
         this.updatePosition();
         if(this.timer++ > 100) this.toRemove = true;
-        //console.log(this.combatType);
         switch(this.combatType){
             case 'player': {   //bullet was shot by player
                 let player: Player= Player.list[this.parent];

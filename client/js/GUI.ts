@@ -2,6 +2,7 @@ import { SingleWeapon } from './../../server/js/WeaponCollection';
 import { PlayerClient } from './Entities/PlayerClient';
 import { selfId, inventory } from './game';
 import { WeaponTypes } from '../../server/js/WeaponTypes';
+import { ItemType } from './../../server/js/enums';
 
 export class GUI {
     width: number;
@@ -57,7 +58,7 @@ export class GUI {
         if(PlayerClient.list[selfId]){
             this.ctx.drawImage(Img["medicalkit"], 0, 0, Img["medicalkit"].width, Img["medicalkit"].height, 3*(this.width-0.8*this.height)/4, (this.height-0.8*this.height)/2, 0.8*this.height, 0.8*this.height);
             
-            this.ctx.fillText(' x'+inventory.getItemAmount("medicalkit"), 3*(this.width-0.8*this.height)/4+0.8*this.height, (this.height)/2+10);
+            this.ctx.fillText(' x'+inventory.getItemAmount(ItemType.medicalkit), 3*(this.width-0.8*this.height)/4+0.8*this.height, (this.height)/2+10);
         }
     }
 
