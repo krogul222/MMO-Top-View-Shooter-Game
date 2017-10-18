@@ -1,4 +1,6 @@
 Object.defineProperty(exports, "__esModule", { value: true });
+const game_1 = require("./game");
+const GameSoundManager_1 = require("./GameSoundManager");
 const UpgradeClient_1 = require("./Entities/UpgradeClient");
 const MapClient_1 = require("./MapClient");
 const PlayerClient_1 = require("./Entities/PlayerClient");
@@ -13,6 +15,7 @@ socket.on('updateInventory', function (items) {
     exports.inventory.items = items;
     exports.inventory.refreshRender();
 });
+exports.gameSoundManager = new GameSoundManager_1.GameSoundManager();
 socket.on('init', function (data) {
     if (data.selfId) {
         exports.selfId = data.selfId;
@@ -75,6 +78,9 @@ socket.on('update', function (data) {
             }
             if (pack.attackStarted !== undefined) {
                 if (pack.attackStarted) {
+                    if (p.reload)
+                        exports.gameSoundManager.playWeaponReload(p.weapon);
+                    exports.gameSoundManager.playWeaponAttack(p.weapon, p.attackMelee);
                     p.attackStarted = true;
                     p.bodySpriteAnimCounter = 0;
                 }
@@ -97,6 +103,7 @@ socket.on('update', function (data) {
             }
             if (pack.attackMelee !== undefined) {
                 p.attackMelee = pack.attackMelee;
+                console.log("MEEEEELEEEEEE " + p.attackMelee);
             }
             if (pack.moving !== undefined) {
                 p.moving = pack.moving;
@@ -114,6 +121,9 @@ socket.on('update', function (data) {
             }
             if (pack.attackStarted !== undefined) {
                 if (pack.attackStarted) {
+                    if (p.reload)
+                        exports.gameSoundManager.playWeaponReload(p.weapon);
+                    exports.gameSoundManager.playWeaponAttack(p.weapon, p.attackMelee);
                     p.attackStarted = true;
                     p.spriteAnimCounter = 0;
                 }
@@ -143,6 +153,7 @@ socket.on('remove', function (data) {
         delete BulletClient_1.BulletClient.list[data.bullet[i].id];
     }
     for (let i = 0, length = data.enemy.length; i < length; i++) {
+        exports.gameSoundManager.playDeath(EnemyClient_1.EnemyClient.list[data.enemy[i]].kind);
         delete EnemyClient_1.EnemyClient.list[data.enemy[i]];
     }
     for (let i = 0, length = data.upgrade.length; i < length; i++) {

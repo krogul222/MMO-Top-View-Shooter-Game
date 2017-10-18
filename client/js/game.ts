@@ -1,3 +1,5 @@
+import { gameSoundManager } from './game';
+import { GameSoundManager } from './GameSoundManager';
 import { UpgradeClient } from './Entities/UpgradeClient';
 import { MapClient } from './MapClient';
 import { GUI } from './GUI';
@@ -26,6 +28,8 @@ socket.on('updateInventory', function(items){
    inventory.items = items;
     inventory.refreshRender();
 });
+
+export let gameSoundManager = new GameSoundManager();
 
 socket.on('init', function(data){
     if(data.selfId){
@@ -101,8 +105,9 @@ socket.on('update', function(data){
             }
 
             if(pack.attackStarted !== undefined){
-               // console.log("Attack started " + pack.attackStarted);
                 if(pack.attackStarted){
+                    if(p.reload) gameSoundManager.playWeaponReload(p.weapon);
+                    gameSoundManager.playWeaponAttack(p.weapon, p.attackMelee);
                     p.attackStarted = true;
                     p.bodySpriteAnimCounter = 0;
                 }
@@ -130,6 +135,7 @@ socket.on('update', function(data){
  
             if(pack.attackMelee !== undefined){
              p.attackMelee = pack.attackMelee;
+             console.log("MEEEEELEEEEEE "+p.attackMelee);
              }
  
             if(pack.moving !== undefined){
@@ -150,6 +156,8 @@ socket.on('update', function(data){
              if(pack.attackStarted !== undefined){
                 // console.log("Attack started " + pack.attackStarted);
                  if(pack.attackStarted){
+                    if(p.reload) gameSoundManager.playWeaponReload(p.weapon);
+                    gameSoundManager.playWeaponAttack(p.weapon, p.attackMelee);
                      p.attackStarted = true;
                      p.spriteAnimCounter = 0;
                  }
@@ -186,6 +194,7 @@ socket.on('remove', function(data){
         delete BulletClient.list[data.bullet[i].id];
     } 
     for(let i = 0, length = data.enemy.length; i < length; i++){
+        gameSoundManager.playDeath(EnemyClient.list[data.enemy[i]].kind);
         delete EnemyClient.list[data.enemy[i]];
     } 
     

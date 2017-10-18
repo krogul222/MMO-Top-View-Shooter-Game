@@ -60,12 +60,13 @@ export class Enemy extends Actor {
     }
 
     updateAttack = (player: Player, diffX: number, diffY: number) => {
-        if(this.attackController.melee){
-            if(Math.sqrt(diffX*diffX+diffY*diffY)<50)
-		          this.attackController.performAttack();
-        } else{
-            if(Math.sqrt(diffX*diffX+diffY*diffY)<500)
-                this.attackController.performAttack();
+        this.attackController.pressingAttack = false;
+        if(this.attackController.melee && Math.sqrt(diffX*diffX+diffY*diffY)<50){
+		    this.attackController.pressingAttack = true;
+        } 
+        
+        if(!this.attackController.melee && Math.sqrt(diffX*diffX+diffY*diffY)<500){
+            this.attackController.pressingAttack = true;
         }
     }
 	onDeath = () => {
@@ -86,8 +87,8 @@ export class Enemy extends Actor {
            aimAngle: this.movementController.aimAngle,
            kind: this.kind,
            attackStarted: this.attackController.attackStarted,
-           weapon: this.attackController.activeWeapon.weapon,
-           attackMeele: this.attackController.melee,
+           weapon: this.attackController.activeWeapon.name,
+           attackMelee: this.attackController.melee,
            reload: this.attackController.reloadCounter.isActive()    
         };
     }
@@ -105,8 +106,8 @@ export class Enemy extends Actor {
            moving: this.movementController.moving,
            aimAngle: this.movementController.aimAngle,
            attackStarted: attackStartedTmp,
-           weapon: this.attackController.activeWeapon.weapon,
-           attackMeele: this.attackController.melee,
+           weapon: this.attackController.activeWeapon.name,
+           attackMelee: this.attackController.melee,
            reload: this.attackController.reloadCounter.isActive()    
         };
     }   

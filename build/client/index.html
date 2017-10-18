@@ -24,7 +24,7 @@
 <script src='/client/js/Entities.js'></script>
 <script src='/client/js/WeaponCollection.js'></script>
 
-<script src="/client/js/soundmanager2.js"></script>
+<script src="/client/js/soundmanager.js"></script>
 <script>
     var socket = io();   
     var WIDTH = 500;
@@ -36,24 +36,6 @@
     var mouseWheelTrigger = 2;
     const CAMERA_BOX_ADJUSTMENT = 4;
     const TILE_SIZE = 32;
-</script>
-<script>
-    soundManager.onload = function() {
-      // soundManager should be ready to use/call at this point
-      soundManager.createSound('gunshot','/client/mp3/gunshot.mp3');
-      soundManager.createSound('pistol_fire','/client/mp3/pistol_fire.mp3');
-      soundManager.createSound('shotgun_fire','/client/mp3/shotgun_fire.mp3');
-      soundManager.createSound('rifle_fire','/client/mp3/rifle_fire.mp3');
-      soundManager.createSound('knife_swing','/client/mp3/knife_swing.mp3');
-      soundManager.createSound('gun_swing','/client/mp3/gun_swing.mp3');
-      soundManager.createSound('squishy1','/client/mp3/squishy1.mp3');
-      soundManager.createSound('squishy2','/client/mp3/squishy2.mp3');
-      soundManager.createSound('pain','/client/mp3/pain.mp3');
-      soundManager.createSound('death','/client/mp3/death.mp3');
-      soundManager.createSound('shotgunreload','/client/mp3/shotgunreload.mp3');
-      soundManager.createSound('pistolreload','/client/mp3/pistolreload.mp3');
-      soundManager.createSound('riflereload','/client/mp3/riflereload.mp3');
-    }
 </script>
 
 <script src="/client/js/login.js"></script>

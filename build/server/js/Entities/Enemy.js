@@ -34,13 +34,12 @@ class Enemy extends Actor_1.Actor {
             this.movementController.pressingUp = diffY < -safeDistance;
         };
         this.updateAttack = (player, diffX, diffY) => {
-            if (this.attackController.melee) {
-                if (Math.sqrt(diffX * diffX + diffY * diffY) < 50)
-                    this.attackController.performAttack();
+            this.attackController.pressingAttack = false;
+            if (this.attackController.melee && Math.sqrt(diffX * diffX + diffY * diffY) < 50) {
+                this.attackController.pressingAttack = true;
             }
-            else {
-                if (Math.sqrt(diffX * diffX + diffY * diffY) < 500)
-                    this.attackController.performAttack();
+            if (!this.attackController.melee && Math.sqrt(diffX * diffX + diffY * diffY) < 500) {
+                this.attackController.pressingAttack = true;
             }
         };
         this.onDeath = () => {
@@ -60,8 +59,8 @@ class Enemy extends Actor_1.Actor {
                 aimAngle: this.movementController.aimAngle,
                 kind: this.kind,
                 attackStarted: this.attackController.attackStarted,
-                weapon: this.attackController.activeWeapon.weapon,
-                attackMeele: this.attackController.melee,
+                weapon: this.attackController.activeWeapon.name,
+                attackMelee: this.attackController.melee,
                 reload: this.attackController.reloadCounter.isActive()
             };
         };
@@ -75,8 +74,8 @@ class Enemy extends Actor_1.Actor {
                 moving: this.movementController.moving,
                 aimAngle: this.movementController.aimAngle,
                 attackStarted: attackStartedTmp,
-                weapon: this.attackController.activeWeapon.weapon,
-                attackMeele: this.attackController.melee,
+                weapon: this.attackController.activeWeapon.name,
+                attackMelee: this.attackController.melee,
                 reload: this.attackController.reloadCounter.isActive()
             };
         };

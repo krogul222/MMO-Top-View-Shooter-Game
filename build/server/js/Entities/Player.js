@@ -10,7 +10,14 @@ class Player extends Actor_1.Actor {
         super(param);
         this.giveItems = () => {
             this.inventory.addItem(enums_1.ItemType.knife, 1);
-            this.inventory.useItem(enums_1.WeaponType.knife);
+            this.inventory.addItem(enums_1.ItemType.pistol, 1);
+            this.inventory.addItem(enums_1.ItemType.shotgun, 1);
+            this.inventory.addItem(enums_1.ItemType.rifle, 1);
+            this.attackController.weaponCollection.setWeaponAmmo(enums_1.WeaponType.shotgun, 100);
+            this.attackController.weaponCollection.setWeaponAmmo(enums_1.WeaponType.pistol, 200);
+            this.attackController.weaponCollection.setWeaponAmmo(enums_1.WeaponType.rifle, 100);
+            this.inventory.addItem(enums_1.ItemType.medicalkit, 4);
+            this.inventory.useItem(enums_1.WeaponType.shotgun);
         };
         this.getInitPack = () => {
             return {

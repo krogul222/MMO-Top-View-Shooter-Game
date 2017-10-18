@@ -65,6 +65,7 @@ class AttackController {
             this.activeWeapon.equip(weapon);
             let weaponProperties = WeaponTypes_1.WeaponTypes.list[weapon];
             this._melee = weaponProperties.attackMelee;
+            console.log("BRON: " + weaponProperties.name + " " + "melee:" + weaponProperties.attackMelee);
         };
         this.shootBullet = (aimAngle, shootSpeed) => {
             new Bullet_1.Bullet({

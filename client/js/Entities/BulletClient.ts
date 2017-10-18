@@ -1,3 +1,4 @@
+import { gameSoundManager } from './../game';
 import { EnemyClient } from './EnemyClient';
 import { initPack } from './../../../server/js/globalVariables';
 import { Point } from './../../../server/js/GeometryAndPhysics';
@@ -64,8 +65,6 @@ export class BulletClient {
             if(PlayerClient.list[entityId]){
                 x = PlayerClient.list[entityId].x + (1-Math.round(2*Math.random())) * Math.floor(Math.random()*PlayerClient.list[entityId].width/4);
                 y = PlayerClient.list[entityId].y + (1-Math.round(2*Math.random())) *Math.floor(Math.random()*PlayerClient.list[entityId].height/4);
-                
-                //soundManager.play('pain');
             }
         }   
             
@@ -73,14 +72,10 @@ export class BulletClient {
             if(EnemyClient.list[entityId]){
                 x = EnemyClient.list[entityId].x + (1-Math.round(2*Math.random())) *Math.floor(Math.random()*EnemyClient.list[entityId].width/4);
                 y = EnemyClient.list[entityId].y + (1-Math.round(2*Math.random())) *Math.floor(Math.random()*EnemyClient.list[entityId].height/4);
-                
-                if(Math.random()<0.5){
-                   // soundManager.play('squishy1');
-                } else{
-                    //soundManager.play('squishy2');
-                }
             }
-        }           
+        }
+        
+        gameSoundManager.playHit(entityCategory);
 
         if(category == 1){
             new ExplosionClient({position: this.position, map: this.map, img: "blood", width: 48, height: 48, category: category, spriteRows: 1, spriteColumns: 6});

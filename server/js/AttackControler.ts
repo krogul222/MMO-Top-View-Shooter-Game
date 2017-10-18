@@ -88,6 +88,8 @@ export class AttackController {
         this.activeWeapon.equip(weapon);
         let weaponProperties: WeaponTypes =  WeaponTypes.list[weapon];
         this._melee = weaponProperties.attackMelee;
+
+        console.log("BRON: "+weaponProperties.name+" "+"melee:"+weaponProperties.attackMelee);
     }
 
     shootBullet = (aimAngle, shootSpeed) => {

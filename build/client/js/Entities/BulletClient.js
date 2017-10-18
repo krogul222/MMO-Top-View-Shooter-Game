@@ -1,7 +1,8 @@
 Object.defineProperty(exports, "__esModule", { value: true });
+const game_1 = require("./../game");
 const EnemyClient_1 = require("./EnemyClient");
 const GeometryAndPhysics_1 = require("./../../../server/js/GeometryAndPhysics");
-const game_1 = require("../game");
+const game_2 = require("../game");
 const PlayerClient_1 = require("./PlayerClient");
 const ExplosionClient_1 = require("./ExplosionClient");
 class BulletClient {
@@ -14,12 +15,12 @@ class BulletClient {
         this.height = 32;
         this.hitCategory = 1;
         this.draw = () => {
-            if (PlayerClient_1.PlayerClient.list[game_1.selfId].map !== this.map) {
+            if (PlayerClient_1.PlayerClient.list[game_2.selfId].map !== this.map) {
                 return;
             }
             let bx = this.position.x;
             let by = this.position.y;
-            let mainPlayer = PlayerClient_1.PlayerClient.list[game_1.selfId];
+            let mainPlayer = PlayerClient_1.PlayerClient.list[game_2.selfId];
             let mainPlayerx = mainPlayer.position.x;
             let mainPlayery = mainPlayer.position.y;
             let x = bx - (mainPlayerx - WIDTH / 2);
@@ -41,12 +42,9 @@ class BulletClient {
                 if (EnemyClient_1.EnemyClient.list[entityId]) {
                     x = EnemyClient_1.EnemyClient.list[entityId].x + (1 - Math.round(2 * Math.random())) * Math.floor(Math.random() * EnemyClient_1.EnemyClient.list[entityId].width / 4);
                     y = EnemyClient_1.EnemyClient.list[entityId].y + (1 - Math.round(2 * Math.random())) * Math.floor(Math.random() * EnemyClient_1.EnemyClient.list[entityId].height / 4);
-                    if (Math.random() < 0.5) {
-                    }
-                    else {
-                    }
                 }
             }
+            game_1.gameSoundManager.playHit(entityCategory);
             if (category == 1) {
                 new ExplosionClient_1.ExplosionClient({ position: this.position, map: this.map, img: "blood", width: 48, height: 48, category: category, spriteRows: 1, spriteColumns: 6 });
             }
