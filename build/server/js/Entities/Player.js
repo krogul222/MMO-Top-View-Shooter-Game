@@ -5,6 +5,7 @@ const Bullet_1 = require("./Bullet");
 const Actor_1 = require("./Actor");
 const GeometryAndPhysics_1 = require("./../GeometryAndPhysics");
 const enums_1 = require("../enums");
+const MapControler_1 = require("../Controllers/MapControler");
 class Player extends Actor_1.Actor {
     constructor(param) {
         super(param);
@@ -56,7 +57,7 @@ class Player extends Actor_1.Actor {
         };
         this.onDeath = () => {
             this.lifeAndBodyController.reset();
-            let map = this.mapController.getMap(this.map);
+            let map = MapControler_1.MapController.getMap(this.map);
             let x = Math.random() * map.width;
             let y = Math.random() * map.height;
             let position = new GeometryAndPhysics_1.Point(x, y);
@@ -126,6 +127,7 @@ Player.onConnect = (socket) => {
             player.attackController.weaponCollection.chooseNextWeaponWithAmmo();
     });
     socket.emit('init', { player: Player.getAllInitPack(), bullet: Bullet_1.Bullet.getAllInitPack(), enemy: Enemy_1.Enemy.getAllInitPack(), selfId: socket.id });
+    socket.emit('mapData', { maps: MapControler_1.MapController.maps });
 };
 Player.getAllInitPack = () => {
     let players = [];

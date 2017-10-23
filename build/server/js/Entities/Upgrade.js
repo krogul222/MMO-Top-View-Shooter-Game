@@ -1,6 +1,6 @@
 Object.defineProperty(exports, "__esModule", { value: true });
+const MapControler_1 = require("./../Controllers/MapControler");
 const Constants_1 = require("./../Constants");
-const MapControler_1 = require("./../MapControler");
 const Player_1 = require("./Player");
 const Entity_1 = require("./Entity");
 const globalVariables_1 = require("../globalVariables");
@@ -75,7 +75,7 @@ Upgrade.getAllInitPack = function () {
     return upgrades;
 };
 Upgrade.randomlyGenerate = (choosenMap, category = null, kind = null) => {
-    let map = Upgrade.globalMapControler.getMap(choosenMap);
+    let map = MapControler_1.MapController.getMap(choosenMap);
     let x = Math.random() * map.width;
     let y = Math.random() * map.height;
     let position = new GeometryAndPhysics_1.Point(x, y);

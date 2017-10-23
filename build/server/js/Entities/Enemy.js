@@ -1,9 +1,9 @@
 Object.defineProperty(exports, "__esModule", { value: true });
-const MapControler_1 = require("./../MapControler");
 const Actor_1 = require("./Actor");
 const GeometryAndPhysics_1 = require("../GeometryAndPhysics");
 const globalVariables_1 = require("../globalVariables");
 const enums_1 = require("../enums");
+const MapControler_1 = require("../Controllers/MapControler");
 class Enemy extends Actor_1.Actor {
     constructor(param) {
         super(param);
@@ -137,7 +137,7 @@ Enemy.getAllInitPack = function () {
     return enemies;
 };
 Enemy.randomlyGenerate = function (choosenMap) {
-    let map = Enemy.globalMapControler.getMap(choosenMap);
+    let map = MapControler_1.MapController.getMap(choosenMap);
     let x = Math.random() * map.width;
     let y = Math.random() * map.height;
     let position = new GeometryAndPhysics_1.Point(x, y);

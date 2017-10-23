@@ -1,21 +1,25 @@
 Object.defineProperty(exports, "__esModule", { value: true });
-const game_1 = require("./game");
+const MapControler_1 = require("./../../server/js/Controllers/MapControler");
 const GameSoundManager_1 = require("./GameSoundManager");
 const UpgradeClient_1 = require("./Entities/UpgradeClient");
 const MapClient_1 = require("./MapClient");
 const PlayerClient_1 = require("./Entities/PlayerClient");
 const BulletClient_1 = require("./Entities/BulletClient");
-const Inventory_1 = require("../../server/js/Inventory");
 const EnemyClient_1 = require("./Entities/EnemyClient");
 const ExplosionClient_1 = require("./Entities/ExplosionClient");
+const Inventory_1 = require("../../server/js/Inventory/Inventory");
 exports.selfId = 0;
 exports.inventory = new Inventory_1.Inventory(socket, false, 0);
-let currentMap = new MapClient_1.MapClient();
+let mapController = new MapControler_1.MapController({});
+MapControler_1.MapController.loadMaps();
+let currentMap = new MapClient_1.MapClient(MapControler_1.MapController.getMap("forest"));
 socket.on('updateInventory', function (items) {
     exports.inventory.items = items;
     exports.inventory.refreshRender();
 });
 exports.gameSoundManager = new GameSoundManager_1.GameSoundManager();
+socket.on('mapData', function (data) {
+});
 socket.on('init', function (data) {
     if (data.selfId) {
         exports.selfId = data.selfId;

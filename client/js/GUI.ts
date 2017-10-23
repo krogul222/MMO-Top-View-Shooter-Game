@@ -1,8 +1,7 @@
-import { SingleWeapon } from './../../server/js/WeaponCollection';
 import { PlayerClient } from './Entities/PlayerClient';
 import { selfId, inventory } from './game';
-import { WeaponTypes } from '../../server/js/WeaponTypes';
 import { ItemType } from './../../server/js/enums';
+import { WeaponTypes } from '../../server/js/Weapons/WeaponTypes';
 
 export class GUI {
     width: number;

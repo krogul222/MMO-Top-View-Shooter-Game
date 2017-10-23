@@ -2,6 +2,7 @@ export enum WeaponType { knife = 0, pistol = 1, shotgun = 2, rifle = 3, claws = 
 export enum WeaponAmmoType { pistol = 1001, shotgun = 1002, rifle = 1003 };
 export enum ItemType { knife = 0, pistol = 1, shotgun = 2, rifle = 3, medicalkit = 101 };
 export enum UpgradeCategory { item = 0, ammo = 1}
+export enum TerrainMaterial { grass = 0, dirt = 1 }
 
 export function randomEnum (myEnum) {
     const enumValues = Object.keys(myEnum)
@@ -13,7 +14,7 @@ export function randomEnum (myEnum) {
     return enumValues[randomIndex];
 }
 
-function getRandomInt(min, max) {
+export function getRandomInt(min, max) {
     min = Math.ceil(min);
     max = Math.floor(max);
     return Math.floor(Math.random() * (max - min)) + min; //The maximum is exclusive and the minimum is inclusive

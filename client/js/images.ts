@@ -11,6 +11,13 @@ Img.map['field'].src = '/client/img/field.png';
 Img.map['forest'] = new Image();
 Img.map['forest'].src = '/client/img/forest.png';
 
+Img.grass = new Image();
+Img.grass.src = '/client/img/MapTiles/grass.png';
+
+Img.dirt = new Image();
+Img.dirt.src = '/client/img/MapTiles/dirt.png';
+
+
 Img.pistol = new Image();
 Img.pistol.src = '/client/img/pistol.png';    
 

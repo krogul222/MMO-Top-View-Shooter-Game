@@ -1,10 +1,10 @@
-import { MapController } from './../MapControler';
 import { Player } from './Player';
 import { Actor } from './Actor';
 import { Pack } from '../Pack';
 import { Point } from '../GeometryAndPhysics';
 import { initPack, removePack } from '../globalVariables';
 import { WeaponType } from '../enums';
+import { MapController } from '../Controllers/MapControler';
 
 export class Enemy extends Actor {
 
@@ -166,7 +166,7 @@ export class Enemy extends Actor {
 
     static randomlyGenerate = function(choosenMap){
         
-        let map = Enemy.globalMapControler.getMap(choosenMap);
+        let map = MapController.getMap(choosenMap);
 
         let x = Math.random()*map.width;
         let y = Math.random()*map.height;

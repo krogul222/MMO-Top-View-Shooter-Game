@@ -1,6 +1,7 @@
+import { Actor } from './../Entities/Actor';
 import { WeaponTypes } from './WeaponTypes';
-import { Actor } from './Entities/Actor';
-import { WeaponType } from "./enums";
+import { WeaponType } from '../enums';
+
 
 export class WeaponCollection {
 

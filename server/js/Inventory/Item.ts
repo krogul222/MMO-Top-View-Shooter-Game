@@ -1,5 +1,7 @@
-import { Actor } from './Entities/Actor';
-import { WeaponType, ItemType } from './enums';
+import { Actor } from "../Entities/Actor";
+import { ItemType, WeaponType } from "../enums";
+
+
 export class Item {
 
     constructor(private id: any, private name: string, private event: any, private add: any, private remove: any, private info: any) {

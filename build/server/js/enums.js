@@ -29,6 +29,11 @@ var UpgradeCategory;
     UpgradeCategory[UpgradeCategory["item"] = 0] = "item";
     UpgradeCategory[UpgradeCategory["ammo"] = 1] = "ammo";
 })(UpgradeCategory = exports.UpgradeCategory || (exports.UpgradeCategory = {}));
+var TerrainMaterial;
+(function (TerrainMaterial) {
+    TerrainMaterial[TerrainMaterial["grass"] = 0] = "grass";
+    TerrainMaterial[TerrainMaterial["dirt"] = 1] = "dirt";
+})(TerrainMaterial = exports.TerrainMaterial || (exports.TerrainMaterial = {}));
 function randomEnum(myEnum) {
     const enumValues = Object.keys(myEnum)
         .map(n => Number.parseInt(n))
@@ -42,4 +47,5 @@ function getRandomInt(min, max) {
     max = Math.floor(max);
     return Math.floor(Math.random() * (max - min)) + min;
 }
+exports.getRandomInt = getRandomInt;
 //# sourceMappingURL=enums.js.map

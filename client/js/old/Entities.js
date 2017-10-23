@@ -316,22 +316,18 @@ let Enemy = function(initPack){
                 let spriteColumns = framesAttack[self.kind];
                 let spriteRows = 1;
                 walkingMod = Math.floor(self.spriteAnimCounter) % spriteColumns;
-                 
-                let correction = 1;
-                let correctionWidth = 1;
-                let correctionHeight = 1;
-                
+
                 frameWidth = Img[self.kind+'attack'].width/spriteColumns;
                 frameHeight = Img[self.kind+'attack'].height/spriteRows;
 
 
                 // the alternative is to untranslate & unrotate after drawing
                 ctx.save();
-                ctx.translate(x - (self.width*correctionWidth)*correction/2,y - self.height*correction/2);
-                ctx.translate((self.width)*correction/2, self.height*correction/2); 
+                ctx.translate(x - (self.width)/2,y - self.height/2);
+                ctx.translate((self.width)/2, self.height/2); 
                 ctx.rotate(aimAngle*Math.PI/180)
                 
-                ctx.drawImage(Img[self.kind+'attack'], walkingMod*frameWidth, directionMod*frameHeight, frameWidth, frameHeight, -self.width*correction/2,-self.height*correction/2, (self.width)*correction, self.height*correction);
+                ctx.drawImage(Img[self.kind+'attack'], walkingMod*frameWidth, directionMod*frameHeight, frameWidth, frameHeight, -self.width/2,-self.height/2, (self.width), self.height);
                 ctx.restore();
                 
                 if(self.spriteAnimCounter % spriteColumns >= (spriteColumns-1)){

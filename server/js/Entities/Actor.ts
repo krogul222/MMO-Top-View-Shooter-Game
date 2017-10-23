@@ -1,11 +1,12 @@
-import { Inventory } from './../Inventory';
-import { LifeAndBodyController } from './../LifeAndBodyController';
-import { MapController } from './../MapControler';
+import { Inventory } from './../Inventory/Inventory';
+import { MapController } from './../Controllers/MapControler';
+import { MovementController } from './../Controllers/MovementController';
+import { AttackController } from './../Controllers/AttackControler';
+import { LifeAndBodyController } from './../Controllers/LifeAndBodyController';
+
 import { Entity } from './Entity';
 import { Player } from './Player';
 import { Enemy } from './Enemy';
-import { AttackController } from '../AttackControler';
-import { MovementController } from '../MovementController';
 import { calculateAngleBetweenEntities } from '../GeometryAndPhysics';
 
 

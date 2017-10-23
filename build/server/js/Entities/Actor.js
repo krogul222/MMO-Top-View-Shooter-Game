@@ -1,12 +1,12 @@
 Object.defineProperty(exports, "__esModule", { value: true });
-const Inventory_1 = require("./../Inventory");
-const LifeAndBodyController_1 = require("./../LifeAndBodyController");
-const MapControler_1 = require("./../MapControler");
+const Inventory_1 = require("./../Inventory/Inventory");
+const MapControler_1 = require("./../Controllers/MapControler");
+const MovementController_1 = require("./../Controllers/MovementController");
+const AttackControler_1 = require("./../Controllers/AttackControler");
+const LifeAndBodyController_1 = require("./../Controllers/LifeAndBodyController");
 const Entity_1 = require("./Entity");
 const Player_1 = require("./Player");
 const Enemy_1 = require("./Enemy");
-const AttackControler_1 = require("../AttackControler");
-const MovementController_1 = require("../MovementController");
 const GeometryAndPhysics_1 = require("../GeometryAndPhysics");
 class Actor extends Entity_1.Entity {
     constructor(param) {

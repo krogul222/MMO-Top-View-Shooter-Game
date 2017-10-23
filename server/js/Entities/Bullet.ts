@@ -1,12 +1,10 @@
 import { Pack } from './../Pack';
-import { MapController } from './../MapControler';
-import { AttackController } from './../AttackControler';
 import { Enemy } from './Enemy';
-import { LifeAndBodyController } from './../LifeAndBodyController';
 import { Actor } from './Actor';
 import { Player } from './Player';
 import { Entity } from './Entity';
 import { initPack, removePack } from '../globalVariables';
+import { MapController } from '../Controllers/MapControler';
 
 export class Bullet extends Entity{
 
@@ -86,7 +84,7 @@ export class Bullet extends Entity{
             }
         }
 
-        let map = this.mapController.getMap(this.map);
+        let map = MapController.getMap(this.map);
         
         if(map.isPositionWall(this.position) && map.isPositionWall(this.position) !== 2){
             this.toRemove = true;

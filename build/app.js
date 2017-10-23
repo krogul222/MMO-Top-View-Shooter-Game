@@ -1,4 +1,5 @@
 Object.defineProperty(exports, "__esModule", { value: true });
+const MapControler_1 = require("./server/js/Controllers/MapControler");
 const Player_1 = require("./server/js/Entities/Player");
 const Entity_1 = require("./server/js/Entities/Entity");
 const Bullet_1 = require("./server/js/Entities/Bullet");
@@ -83,6 +84,7 @@ io.sockets.on('connection', function (socket) {
         socket.emit('evalAnswer', res);
     });
 });
+MapControler_1.MapController.loadMaps();
 setInterval(function () {
     let packs = Entity_1.Entity.getFrameUpdateData();
     let pack = {

@@ -1,4 +1,4 @@
-import { Actor } from "./Entities/Actor";
+import { Actor } from './../Entities/Actor';
 
 export class LifeAndBodyController {
     

@@ -1,8 +1,8 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 const PlayerClient_1 = require("./Entities/PlayerClient");
 const game_1 = require("./game");
-const WeaponTypes_1 = require("../../server/js/WeaponTypes");
 const enums_1 = require("./../../server/js/enums");
+const WeaponTypes_1 = require("../../server/js/Weapons/WeaponTypes");
 class GUI {
     constructor(param) {
         this.draw = () => {

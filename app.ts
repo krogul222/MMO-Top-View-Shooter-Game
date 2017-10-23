@@ -1,3 +1,4 @@
+import { MapController } from './server/js/Controllers/MapControler';
 import { Player } from './server/js/Entities/Player';
 import { Entity } from './server/js/Entities/Entity';
 import { Bullet } from './server/js/Entities/Bullet';
@@ -95,6 +96,8 @@ io.sockets.on('connection', function(socket){
         socket.emit('evalAnswer',res);
     });
 });
+
+MapController.loadMaps();
 
 setInterval(function(){
     

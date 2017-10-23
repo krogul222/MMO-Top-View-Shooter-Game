@@ -1,6 +1,6 @@
-import { Actor } from './Entities/Actor';
-import { Player } from './Entities/Player';
 import { Item } from "./Item";
+import { Actor } from "../Entities/Actor";
+import { Player } from "../Entities/Player";
 
 export class Inventory {
     items: any[] = [];

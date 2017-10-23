@@ -1,9 +1,9 @@
 Object.defineProperty(exports, "__esModule", { value: true });
-const MapControler_1 = require("./../MapControler");
 const Enemy_1 = require("./Enemy");
 const Player_1 = require("./Player");
 const Entity_1 = require("./Entity");
 const globalVariables_1 = require("../globalVariables");
+const MapControler_1 = require("../Controllers/MapControler");
 class Bullet extends Entity_1.Entity {
     constructor(param) {
         super(Bullet.updateParam(param));
@@ -56,7 +56,7 @@ class Bullet extends Entity_1.Entity {
                     break;
                 }
             }
-            let map = this.mapController.getMap(this.map);
+            let map = MapControler_1.MapController.getMap(this.map);
             if (map.isPositionWall(this.position) && map.isPositionWall(this.position) !== 2) {
                 this.toRemove = true;
                 this.hitCategory = 2;

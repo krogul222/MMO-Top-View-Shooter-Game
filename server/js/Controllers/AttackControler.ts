@@ -1,12 +1,12 @@
-import { SingleWeapon, WeaponCollection } from './WeaponCollection';
-import { Counter } from './Counter';
-import { Actor } from './Entities/Actor';
-import { Player } from './Entities/Player';
-import { Enemy } from './Entities/Enemy';
-import { Point, Velocity } from './GeometryAndPhysics';
-import { Bullet } from './Entities/Bullet';
-import { WeaponType } from './enums';
-import { WeaponTypes } from './WeaponTypes';
+import { Bullet } from './../Entities/Bullet';
+import { Actor } from './../Entities/Actor';
+import { WeaponCollection, SingleWeapon } from './../Weapons/WeaponCollection';
+import { Counter } from './../Counter';
+import { WeaponTypes } from '../Weapons/WeaponTypes';
+import { Player } from '../Entities/Player';
+import { WeaponType } from '../enums';
+import { Point } from '../GeometryAndPhysics';
+
 
 export class AttackController {
     private _melee: boolean = true;

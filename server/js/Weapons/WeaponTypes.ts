@@ -1,4 +1,5 @@
-import { WeaponType } from "./enums";
+import { WeaponType } from "../enums";
+
 
 export class WeaponTypes {
 

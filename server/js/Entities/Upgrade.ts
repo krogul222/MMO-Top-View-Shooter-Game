@@ -1,13 +1,15 @@
+import { MapController } from './../Controllers/MapControler';
 import { imageName } from './../Constants';
-import { MapController } from './../MapControler';
 import { Player } from './Player';
 import { Entity } from './Entity';
 import { initPack, removePack } from '../globalVariables';
 import { frameCount } from '../../../app';
 import { Point } from '../GeometryAndPhysics';
 import { UpgradeCategory, randomEnum, ItemType, WeaponAmmoType } from '../enums';
+import { MapController } from '../Controllers/MapControler';
 
 export class Upgrade extends Entity{
+    static MapController: any;
     private category: number = -1;
     private kind: number = -1;
     value: number = 0;
@@ -90,7 +92,7 @@ export class Upgrade extends Entity{
     }
 
     static randomlyGenerate = (choosenMap: any, category: any = null, kind: any = null) => {
-        let map = Upgrade.globalMapControler.getMap(choosenMap);
+        let map = MapController.getMap(choosenMap);
         
         let x = Math.random()*map.width;
         let y = Math.random()*map.height;

@@ -1,6 +1,9 @@
-import { Actor } from './Entities/Actor';
-import { Counter } from './Counter';
-import { Point } from './GeometryAndPhysics';
+import { MapController } from './MapControler';
+import { Actor } from './../Entities/Actor';
+import { Counter } from './../Counter';
+import { Point } from '../GeometryAndPhysics';
+
+
 export class MovementController {
     private _pressingDown: boolean = false;
 	private _pressingUp: boolean = false;
@@ -20,7 +23,7 @@ export class MovementController {
     }
 
     updateSpd = () => {
-        let map = this.parent.mapController.getMap(this.parent.map);
+        let map = MapController.getMap(this.parent.map);
         let x = this.parent.position.x;
         let y = this.parent.position.y;
 
@@ -89,7 +92,7 @@ export class MovementController {
 
     validatePosition = () => {
 
-        let map = this.parent.mapController.getMap(this.parent.map);
+        let map = MapController.getMap(this.parent.map);
 
         this.parent.position.x = (this.parent.position.x < this.parent.width/2) ? this.parent.width/2 : this.parent.position.x;
         this.parent.position.x = (this.parent.position.x > map.width-this.parent.width/2) ? map.width-this.parent.width/2 : this.parent.position.x;

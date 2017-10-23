@@ -5,6 +5,7 @@ import { Actor } from "./Actor";
 import { Point } from './../GeometryAndPhysics';
 import { Pack } from '../Pack';
 import { WeaponType, ItemType } from '../enums';
+import { MapController } from '../Controllers/MapControler';
 
 export class Player extends Actor {
 
@@ -105,13 +106,13 @@ export class Player extends Actor {
         });
 
         socket.emit('init',{player: Player.getAllInitPack(),bullet:Bullet.getAllInitPack(),enemy:Enemy.getAllInitPack(),selfId:socket.id});
-        
+        socket.emit('mapData', {maps: MapController.maps});
     }
 
     onDeath = () => {
         this.lifeAndBodyController.reset();
 
-        let map = this.mapController.getMap(this.map);
+        let map = MapController.getMap(this.map);
         let x = Math.random() * map.width; 
         let y = Math.random() * map.height; 
         let position = new Point(x, y);

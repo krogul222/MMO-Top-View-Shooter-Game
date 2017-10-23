@@ -1,13 +1,14 @@
-import { gameSoundManager } from './game';
+import { AttackController } from './../../server/js/Controllers/AttackControler';
+import { MapController } from './../../server/js/Controllers/MapControler';
 import { GameSoundManager } from './GameSoundManager';
 import { UpgradeClient } from './Entities/UpgradeClient';
 import { MapClient } from './MapClient';
 import { GUI } from './GUI';
 import { PlayerClient } from "./Entities/PlayerClient";
 import { BulletClient } from "./Entities/BulletClient";
-import { Inventory } from '../../server/js/Inventory';
 import { EnemyClient } from './Entities/EnemyClient';
 import { ExplosionClient } from './Entities/ExplosionClient';
+import { Inventory } from '../../server/js/Inventory/Inventory';
 
 declare var ctx;
 declare const WIDTH;
@@ -22,7 +23,10 @@ export var selfId: number = 0;
 
 export let inventory = new Inventory(socket, false, 0);
 
-let currentMap = new MapClient();
+let mapController: MapController = new MapController({});
+MapController.loadMaps();
+let currentMap = new MapClient(MapController.getMap("forest"));
+
 
 socket.on('updateInventory', function(items){
    inventory.items = items;
@@ -30,6 +34,16 @@ socket.on('updateInventory', function(items){
 });
 
 export let gameSoundManager = new GameSoundManager();
+
+socket.on('mapData', function(data){
+   // MapController.reloadMaps(data.maps);
+ /*   for(let i in data.maps) {
+        console.log("MAPSY "+ i+ data.maps[i].name);
+    }*/
+    //console.log("MAPPA "+ MapController.getMap("forest").name);
+    //console.log("MAPSY "+ MapController.maps + MapController.maps[0].name );
+   // currentMap.reloadMap(MapController.getMap("forest"));
+});
 
 socket.on('init', function(data){
     if(data.selfId){
