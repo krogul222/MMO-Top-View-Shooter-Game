@@ -91,6 +91,10 @@ class Point {
         this.x += x;
         this.y += y;
     }
+    updatePosition(x, y) {
+        this.x = x;
+        this.y = y;
+    }
     getDistance(point) {
         let dx = this.x - point.x;
         let dy = this.y - point.y;
@@ -159,9 +163,15 @@ var UpgradeCategory;
 })(UpgradeCategory = exports.UpgradeCategory || (exports.UpgradeCategory = {}));
 var TerrainMaterial;
 (function (TerrainMaterial) {
-    TerrainMaterial[TerrainMaterial["grass"] = 0] = "grass";
     TerrainMaterial[TerrainMaterial["dirt"] = 1] = "dirt";
+    TerrainMaterial[TerrainMaterial["water"] = 2] = "water";
+    TerrainMaterial[TerrainMaterial["stone"] = 3] = "stone";
 })(TerrainMaterial = exports.TerrainMaterial || (exports.TerrainMaterial = {}));
+var TerrainMaterialWithoutWater;
+(function (TerrainMaterialWithoutWater) {
+    TerrainMaterialWithoutWater[TerrainMaterialWithoutWater["dirt"] = 1] = "dirt";
+    TerrainMaterialWithoutWater[TerrainMaterialWithoutWater["stone"] = 3] = "stone";
+})(TerrainMaterialWithoutWater = exports.TerrainMaterialWithoutWater || (exports.TerrainMaterialWithoutWater = {}));
 function randomEnum(myEnum) {
     const enumValues = Object.keys(myEnum)
         .map(n => Number.parseInt(n))
@@ -203,11 +213,9 @@ socket.on('updateInventory', function (items) {
 });
 exports.gameSoundManager = new GameSoundManager_1.GameSoundManager();
 socket.on('mapData', function (data) {
-    MapControler_1.MapController.reloadMaps(data.maps);
-    for (let i in data.maps) {
-        console.log("MAPSY " + i + data.maps[i].name);
-    }
-    console.log("MAPPA " + MapControler_1.MapController.getMap("forest").name);
+    MapControler_1.MapController.updateMap(data);
+    if (currentMap.map.name == data.name)
+        currentMap.reloadMap(MapControler_1.MapController.getMap(data.name));
 });
 socket.on('init', function (data) {
     if (data.selfId) {
@@ -424,6 +432,9 @@ document.onkeydown = function (event) {
     else if (event.keyCode === 32) {
         socket.emit('keyPress', { inputId: 'space', state: true });
         return false;
+    }
+    else if (event.keyCode === 77) {
+        socket.emit('keyPress', { inputId: 'map', state: true, map: currentMap.map.name });
     }
 };
 document.onkeyup = function (event) {
@@ -648,6 +659,7 @@ class MapController {
     }
 }
 MapController.maps = {};
+MapController.updatePack = [];
 MapController.getMap = (map) => {
     for (let i in MapController.maps) {
         if (map == MapController.maps[i].name) {
@@ -655,9 +667,45 @@ MapController.getMap = (map) => {
         }
     }
 };
+MapController.getMapPack = (map) => {
+    for (let i in MapController.maps) {
+        if (map == MapController.maps[i].name) {
+            let gameMap = MapController.maps[i];
+            let material = "";
+            for (let i = 0; i < gameMap.size; i++) {
+                for (let j = 0; j < gameMap.size; j++) {
+                    material += gameMap.mapTiles[i][j].material + ",";
+                }
+            }
+            return { material: material, name: MapController.maps[i].name };
+        }
+    }
+};
 MapController.loadMaps = () => {
     MapController.createMap("forest", 16, 20);
     MapController.createMap("forest2", 16, 20);
+};
+MapController.updateMap = (param) => {
+    if (param !== undefined) {
+        for (let i in MapController.maps) {
+            console.log("UPDATE2");
+            if (param.name == MapController.maps[i].name) {
+                let gameMap = MapController.maps[i];
+                let str = param.material;
+                let arr = str.split(",");
+                let counter = 0;
+                console.log("Array map " + arr);
+                console.log("MAPA UPDATE: ");
+                for (let i = 0; i < gameMap.size; i++) {
+                    for (let j = 0; j < gameMap.size; j++) {
+                        gameMap.mapTiles[i][j].updateMaterial(arr[counter]);
+                        counter++;
+                        console.log(gameMap.mapTiles[i][j].material + ", ");
+                    }
+                }
+            }
+        }
+    }
 };
 MapController.createMap = (name, size, seeds) => {
     let mapTiles;
@@ -667,10 +715,18 @@ MapController.createMap = (name, size, seeds) => {
     let seedy = 0;
     let seedMaterial = [];
     let seedM = enums_1.TerrainMaterial.grass;
-    for (let i = 0; i < seeds; i++) {
+    let waterSeeds = Math.floor(seeds / 10);
+    for (let i = 0; i < seeds - waterSeeds; i++) {
         seedx = enums_1.getRandomInt(1, size);
         seedy = enums_1.getRandomInt(1, size);
-        seedM = enums_1.randomEnum(enums_1.TerrainMaterial);
+        seedM = enums_1.randomEnum(enums_1.TerrainMaterialWithoutWater);
+        seedPosition[i] = new GeometryAndPhysics_1.Point(seedx, seedy);
+        seedMaterial[i] = seedM;
+    }
+    for (let i = seeds - waterSeeds; i < seeds; i++) {
+        seedx = enums_1.getRandomInt(1, size);
+        seedy = enums_1.getRandomInt(1, size);
+        seedM = enums_1.TerrainMaterial.water;
         seedPosition[i] = new GeometryAndPhysics_1.Point(seedx, seedy);
         seedMaterial[i] = seedM;
     }
@@ -778,7 +834,7 @@ class Player extends Actor_1.Actor {
             while (map.isPositionWall(position)) {
                 x = Math.random() * map.width;
                 y = Math.random() * map.height;
-                position.changePosition(x, y);
+                position.updatePosition(x, y);
             }
             this.setPosition(position);
         };
@@ -839,9 +895,14 @@ Player.onConnect = (socket) => {
             player.attackController.weaponCollection.changeWeapon(enums_1.WeaponType.rifle);
         if (data.inputId == 'space')
             player.attackController.weaponCollection.chooseNextWeaponWithAmmo();
+        if (data.inputId == 'map') {
+            let gameMap = MapControler_1.MapController.getMap(data.map);
+            MapControler_1.MapController.createMap(data.map, gameMap.size, 20);
+            MapControler_1.MapController.updatePack.push(MapControler_1.MapController.getMapPack(data.map));
+        }
     });
     socket.emit('init', { player: Player.getAllInitPack(), bullet: Bullet_1.Bullet.getAllInitPack(), enemy: Enemy_1.Enemy.getAllInitPack(), selfId: socket.id });
-    socket.emit('mapData', { maps: MapControler_1.MapController.maps });
+    socket.emit('mapData', MapControler_1.MapController.getMapPack("forest"));
 };
 Player.getAllInitPack = () => {
     let players = [];
@@ -1014,10 +1075,10 @@ Enemy.randomlyGenerate = function (choosenMap) {
     let x = Math.random() * map.width;
     let y = Math.random() * map.height;
     let position = new GeometryAndPhysics_1.Point(x, y);
-    while (map.isPositionWall(position)) {
+    while (map.isPositionWall(position) !== 0) {
         x = Math.random() * map.width;
         y = Math.random() * map.height;
-        position.changePosition(x, y);
+        position.updatePosition(x, y);
     }
     let difficulty = 1 + Math.round(Math.random() * 2) * 0.5;
     let height = 48 * difficulty;
@@ -1805,9 +1866,10 @@ exports.Entity = Entity;
 
 /***/ }),
 /* 16 */
-/***/ (function(module, exports) {
+/***/ (function(module, exports, __webpack_require__) {
 
 Object.defineProperty(exports, "__esModule", { value: true });
+const GeometryAndPhysics_1 = __webpack_require__(0);
 class GameMap {
     constructor(_name, mapTiles) {
         this._name = _name;
@@ -1819,7 +1881,17 @@ class GameMap {
                 return 1;
             if (position.y < 0 || position.y >= this.height)
                 return 1;
-            return 0;
+            let tileX = Math.floor(position.x / (8 * 32));
+            let tileY = Math.floor(position.y / (8 * 32));
+            let inTileX = position.x - tileX * 8 * 32;
+            let inTileY = position.y - tileY * 8 * 32;
+            console.log("X = " + tileX + "   Y = " + tileY);
+            if (tileX < this._size && tileY < this._size)
+                return this.mapTiles[tileY][tileX].isPositionWall(new GeometryAndPhysics_1.Point(inTileX, inTileY));
+            else {
+                console.log("MAPTILE FAIL " + tileX + " " + tileY);
+                return 0;
+            }
         };
         this.mapTiles = [];
         this._size = mapTiles.length;
@@ -1842,14 +1914,38 @@ exports.GameMap = GameMap;
 
 /***/ }),
 /* 17 */
-/***/ (function(module, exports) {
+/***/ (function(module, exports, __webpack_require__) {
 
 Object.defineProperty(exports, "__esModule", { value: true });
+const enums_1 = __webpack_require__(1);
 class MapTile {
     constructor(_width, _height, material) {
         this._width = _width;
         this._height = _height;
+        this.updateMaterial = (material) => {
+            this._material = material;
+        };
+        this.isPositionWall = (position) => {
+            let areaX = Math.floor(position.x / 32);
+            let areaY = Math.floor(position.y / 32);
+            console.log("AX = " + areaX + "   areaY = " + areaY);
+            if (areaX < this._width && areaY < this._height) {
+                console.log(this.grid[areaY][areaX]);
+                return this.grid[areaY][areaX];
+            }
+            else {
+                console.log("MAPTILE FAIL " + areaX + " " + areaY);
+                return 0;
+            }
+        };
         this._material = material;
+        this.grid = [];
+        for (let i = 0; i < this._height; i++) {
+            this.grid[i] = [];
+            for (let j = 0; j < this._width; j++) {
+                this.grid[i][j] = (material != enums_1.TerrainMaterial.water) ? 0 : 2;
+            }
+        }
     }
     get width() { return this._width; }
     get height() { return this._height; }
@@ -1987,7 +2083,7 @@ class MapClient {
                     material = this.map.mapTiles[i][j].material;
                     imgWidth = Img[Constants_1.mapTileImageName[material]].width;
                     imgHeight = Img[Constants_1.mapTileImageName[material]].height;
-                    ctx.drawImage(Img[Constants_1.mapTileImageName[material]], 0, 0, imgWidth, imgHeight, x + imgWidth * i, y + imgHeight * j, imgWidth, imgHeight);
+                    ctx.drawImage(Img[Constants_1.mapTileImageName[material]], 0, 0, imgWidth, imgHeight, x + imgWidth * j, y + imgHeight * i, imgWidth, imgHeight);
                 }
             }
         };
@@ -2015,6 +2111,8 @@ exports.imageName[enums_1.WeaponAmmoType.shotgun] = "shotgunammo";
 exports.imageName[enums_1.WeaponAmmoType.rifle] = "rifleammo";
 exports.mapTileImageName[enums_1.TerrainMaterial.grass] = "grass";
 exports.mapTileImageName[enums_1.TerrainMaterial.dirt] = "dirt";
+exports.mapTileImageName[enums_1.TerrainMaterial.water] = "water";
+exports.mapTileImageName[enums_1.TerrainMaterial.stone] = "stone";
 
 
 /***/ }),
@@ -2322,8 +2420,8 @@ class AttackController {
         this.attackCloseByEnemy = (aimAngle) => {
             let player = this.parent.getClosestPlayer(10000, 360);
             let distance = 80;
-            let maxDistance = Math.sqrt(player.width * player.width / 4 + player.height * player.height / 4) + distance;
             if (player) {
+                let maxDistance = Math.sqrt(player.width * player.width / 4 + player.height * player.height / 4) + distance;
                 if (this.parent.getDistance(player) < maxDistance) {
                     player.lifeAndBodyController.wasHit(this._activeWeapon.meleeDmg);
                 }

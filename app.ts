@@ -18,7 +18,7 @@ app.get('/',function(request,response){
 
 app.use('/client', express.static(__dirname+'/client'));
 
-var listener = server.listen(process.env.PORT || 2000, function() {
+var listener = server.listen(process.env.PORT || 3000, function() {
   console.log('Example app listening on port ', listener.address().port);
 });
 
@@ -117,7 +117,12 @@ setInterval(function(){
             socket.emit('init',packs.initPack);
             socket.emit('update',pack);
             socket.emit('remove',packs.removePack);
+            for(let i = 0, length = MapController.updatePack.length; i < length; i++) {
+                socket.emit('mapData', MapController.updatePack[i]);
+            }
      }
+    
+    MapController.updatePack.length = 0;
     packs.initPack.player = [];
     packs.initPack.bullet = [];
     packs.initPack.enemy = [];

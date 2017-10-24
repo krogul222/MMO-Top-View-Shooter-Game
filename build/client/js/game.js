@@ -19,6 +19,9 @@ socket.on('updateInventory', function (items) {
 });
 exports.gameSoundManager = new GameSoundManager_1.GameSoundManager();
 socket.on('mapData', function (data) {
+    MapControler_1.MapController.updateMap(data);
+    if (currentMap.map.name == data.name)
+        currentMap.reloadMap(MapControler_1.MapController.getMap(data.name));
 });
 socket.on('init', function (data) {
     if (data.selfId) {
@@ -235,6 +238,9 @@ document.onkeydown = function (event) {
     else if (event.keyCode === 32) {
         socket.emit('keyPress', { inputId: 'space', state: true });
         return false;
+    }
+    else if (event.keyCode === 77) {
+        socket.emit('keyPress', { inputId: 'map', state: true, map: currentMap.map.name });
     }
 };
 document.onkeyup = function (event) {

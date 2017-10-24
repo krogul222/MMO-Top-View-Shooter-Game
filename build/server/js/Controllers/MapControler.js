@@ -12,6 +12,7 @@ class MapController {
     }
 }
 MapController.maps = {};
+MapController.updatePack = [];
 MapController.getMap = (map) => {
     for (let i in MapController.maps) {
         if (map == MapController.maps[i].name) {
@@ -19,9 +20,45 @@ MapController.getMap = (map) => {
         }
     }
 };
+MapController.getMapPack = (map) => {
+    for (let i in MapController.maps) {
+        if (map == MapController.maps[i].name) {
+            let gameMap = MapController.maps[i];
+            let material = "";
+            for (let i = 0; i < gameMap.size; i++) {
+                for (let j = 0; j < gameMap.size; j++) {
+                    material += gameMap.mapTiles[i][j].material + ",";
+                }
+            }
+            return { material: material, name: MapController.maps[i].name };
+        }
+    }
+};
 MapController.loadMaps = () => {
     MapController.createMap("forest", 16, 20);
     MapController.createMap("forest2", 16, 20);
+};
+MapController.updateMap = (param) => {
+    if (param !== undefined) {
+        for (let i in MapController.maps) {
+            console.log("UPDATE2");
+            if (param.name == MapController.maps[i].name) {
+                let gameMap = MapController.maps[i];
+                let str = param.material;
+                let arr = str.split(",");
+                let counter = 0;
+                console.log("Array map " + arr);
+                console.log("MAPA UPDATE: ");
+                for (let i = 0; i < gameMap.size; i++) {
+                    for (let j = 0; j < gameMap.size; j++) {
+                        gameMap.mapTiles[i][j].updateMaterial(arr[counter]);
+                        counter++;
+                        console.log(gameMap.mapTiles[i][j].material + ", ");
+                    }
+                }
+            }
+        }
+    }
 };
 MapController.createMap = (name, size, seeds) => {
     let mapTiles;
@@ -31,10 +68,18 @@ MapController.createMap = (name, size, seeds) => {
     let seedy = 0;
     let seedMaterial = [];
     let seedM = enums_1.TerrainMaterial.grass;
-    for (let i = 0; i < seeds; i++) {
+    let waterSeeds = Math.floor(seeds / 10);
+    for (let i = 0; i < seeds - waterSeeds; i++) {
         seedx = enums_1.getRandomInt(1, size);
         seedy = enums_1.getRandomInt(1, size);
-        seedM = enums_1.randomEnum(enums_1.TerrainMaterial);
+        seedM = enums_1.randomEnum(enums_1.TerrainMaterialWithoutWater);
+        seedPosition[i] = new GeometryAndPhysics_1.Point(seedx, seedy);
+        seedMaterial[i] = seedM;
+    }
+    for (let i = seeds - waterSeeds; i < seeds; i++) {
+        seedx = enums_1.getRandomInt(1, size);
+        seedy = enums_1.getRandomInt(1, size);
+        seedM = enums_1.TerrainMaterial.water;
         seedPosition[i] = new GeometryAndPhysics_1.Point(seedx, seedy);
         seedMaterial[i] = seedM;
     }

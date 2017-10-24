@@ -28,8 +28,23 @@ export class GameMap {
             return 1;
         if(position.y < 0 || position.y >= this.height)
             return 1;
+    
+        let tileX = Math.floor(position.x/(8*32));
+        let tileY = Math.floor(position.y/(8*32));
         
-        return 0;    
+        let inTileX = position.x - tileX*8*32;
+        let inTileY = position.y - tileY*8*32;
+
+        console.log("X = "+tileX + "   Y = "+tileY);
+
+        if(tileX < this._size && tileY < this._size )
+            return this.mapTiles[tileY][tileX].isPositionWall(new Point(inTileX, inTileY));
+        else {
+            console.log("MAPTILE FAIL "+tileX+" "+tileY);
+            return 0;
+        }
+
+      //  return 0;    
     }
 
     get width() { return this._width; }

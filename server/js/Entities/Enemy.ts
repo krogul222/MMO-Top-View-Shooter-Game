@@ -172,10 +172,10 @@ export class Enemy extends Actor {
         let y = Math.random()*map.height;
         let position = new Point(x,y);
 
-        while(map.isPositionWall(position)){
+        while(map.isPositionWall(position) !== 0){
             x = Math.random() * map.width; 
             y = Math.random() * map.height;  
-            position.changePosition(x, y);
+            position.updatePosition(x, y);
         }    
         
         let difficulty = 1+Math.round(Math.random()*2)*0.5;

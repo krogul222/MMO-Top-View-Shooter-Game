@@ -17,6 +17,11 @@ Img.grass.src = '/client/img/MapTiles/grass.png';
 Img.dirt = new Image();
 Img.dirt.src = '/client/img/MapTiles/dirt.png';
 
+Img.stone = new Image();
+Img.stone.src = '/client/img/MapTiles/stone.png';
+
+Img.water = new Image();
+Img.water.src = '/client/img/MapTiles/water.png';
 
 Img.pistol = new Image();
 Img.pistol.src = '/client/img/pistol.png';    

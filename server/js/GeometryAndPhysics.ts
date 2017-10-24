@@ -24,6 +24,11 @@ export class Point {
         this.y += y;
     }
 
+    updatePosition(x: number, y: number) {
+        this.x = x;
+        this.y = y;
+    }
+
     getDistance(point: Point) {
         let dx = this.x - point.x;
         let dy = this.y - point.y;

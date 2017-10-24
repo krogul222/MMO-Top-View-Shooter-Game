@@ -17,3 +17,5 @@ imageName[ WeaponAmmoType.rifle ] = "rifleammo";
 
 mapTileImageName[ TerrainMaterial.grass ] = "grass";
 mapTileImageName[ TerrainMaterial.dirt ] = "dirt";
+mapTileImageName[ TerrainMaterial.water ] = "water";
+mapTileImageName[ TerrainMaterial.stone ] = "stone";

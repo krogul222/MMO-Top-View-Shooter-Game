@@ -64,7 +64,7 @@ class Player extends Actor_1.Actor {
             while (map.isPositionWall(position)) {
                 x = Math.random() * map.width;
                 y = Math.random() * map.height;
-                position.changePosition(x, y);
+                position.updatePosition(x, y);
             }
             this.setPosition(position);
         };
@@ -125,9 +125,14 @@ Player.onConnect = (socket) => {
             player.attackController.weaponCollection.changeWeapon(enums_1.WeaponType.rifle);
         if (data.inputId == 'space')
             player.attackController.weaponCollection.chooseNextWeaponWithAmmo();
+        if (data.inputId == 'map') {
+            let gameMap = MapControler_1.MapController.getMap(data.map);
+            MapControler_1.MapController.createMap(data.map, gameMap.size, 20);
+            MapControler_1.MapController.updatePack.push(MapControler_1.MapController.getMapPack(data.map));
+        }
     });
     socket.emit('init', { player: Player.getAllInitPack(), bullet: Bullet_1.Bullet.getAllInitPack(), enemy: Enemy_1.Enemy.getAllInitPack(), selfId: socket.id });
-    socket.emit('mapData', { maps: MapControler_1.MapController.maps });
+    socket.emit('mapData', MapControler_1.MapController.getMapPack("forest"));
 };
 Player.getAllInitPack = () => {
     let players = [];

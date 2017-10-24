@@ -22,6 +22,10 @@ class Point {
         this.x += x;
         this.y += y;
     }
+    updatePosition(x, y) {
+        this.x = x;
+        this.y = y;
+    }
     getDistance(point) {
         let dx = this.x - point.x;
         let dy = this.y - point.y;

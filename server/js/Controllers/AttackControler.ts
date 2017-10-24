@@ -55,10 +55,11 @@ export class AttackController {
     attackCloseByEnemy = (aimAngle) => {
         let player: Player = this.parent.getClosestPlayer(10000, 360);
         let distance = 80;
-        let maxDistance = Math.sqrt(player.width*player.width/4+player.height*player.height/4) + distance;
-
         if(player){
-            if(this.parent.getDistance(player) < maxDistance){ player.lifeAndBodyController.wasHit( this._activeWeapon.meleeDmg ); }
+
+        let maxDistance = Math.sqrt(player.width*player.width/4+player.height*player.height/4) + distance;
+        if(this.parent.getDistance(player) < maxDistance){ player.lifeAndBodyController.wasHit( this._activeWeapon.meleeDmg ); }
+        
         }
 
     }

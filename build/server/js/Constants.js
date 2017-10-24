@@ -12,4 +12,6 @@ exports.imageName[enums_1.WeaponAmmoType.shotgun] = "shotgunammo";
 exports.imageName[enums_1.WeaponAmmoType.rifle] = "rifleammo";
 exports.mapTileImageName[enums_1.TerrainMaterial.grass] = "grass";
 exports.mapTileImageName[enums_1.TerrainMaterial.dirt] = "dirt";
+exports.mapTileImageName[enums_1.TerrainMaterial.water] = "water";
+exports.mapTileImageName[enums_1.TerrainMaterial.stone] = "stone";
 //# sourceMappingURL=Constants.js.map

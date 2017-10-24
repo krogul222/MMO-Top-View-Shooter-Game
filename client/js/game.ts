@@ -1,3 +1,4 @@
+import { GameMap } from './../../server/js/Map/GameMap';
 import { AttackController } from './../../server/js/Controllers/AttackControler';
 import { MapController } from './../../server/js/Controllers/MapControler';
 import { GameSoundManager } from './GameSoundManager';
@@ -36,13 +37,10 @@ socket.on('updateInventory', function(items){
 export let gameSoundManager = new GameSoundManager();
 
 socket.on('mapData', function(data){
-   // MapController.reloadMaps(data.maps);
- /*   for(let i in data.maps) {
-        console.log("MAPSY "+ i+ data.maps[i].name);
-    }*/
-    //console.log("MAPPA "+ MapController.getMap("forest").name);
-    //console.log("MAPSY "+ MapController.maps + MapController.maps[0].name );
-   // currentMap.reloadMap(MapController.getMap("forest"));
+    MapController.updateMap(data);
+    if(currentMap.map.name == data.name)
+        currentMap.reloadMap(MapController.getMap(data.name));
+
 });
 
 socket.on('init', function(data){
@@ -299,6 +297,9 @@ document.onkeydown = function(event){
     else if(event.keyCode === 32){
         socket.emit('keyPress', {inputId:'space', state:true});
         return false;
+    }
+    else if(event.keyCode === 77){
+        socket.emit('keyPress', {inputId:'map', state:true, map: currentMap.map.name});
     }
 }
 

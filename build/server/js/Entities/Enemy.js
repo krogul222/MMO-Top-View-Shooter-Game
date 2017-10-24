@@ -141,10 +141,10 @@ Enemy.randomlyGenerate = function (choosenMap) {
     let x = Math.random() * map.width;
     let y = Math.random() * map.height;
     let position = new GeometryAndPhysics_1.Point(x, y);
-    while (map.isPositionWall(position)) {
+    while (map.isPositionWall(position) !== 0) {
         x = Math.random() * map.width;
         y = Math.random() * map.height;
-        position.changePosition(x, y);
+        position.updatePosition(x, y);
     }
     let difficulty = 1 + Math.round(Math.random() * 2) * 0.5;
     let height = 48 * difficulty;

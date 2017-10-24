@@ -1,5 +1,4 @@
 Object.defineProperty(exports, "__esModule", { value: true });
-const MapControler_1 = require("./../Controllers/MapControler");
 const Constants_1 = require("./../Constants");
 const Player_1 = require("./Player");
 const Entity_1 = require("./Entity");
@@ -7,6 +6,7 @@ const globalVariables_1 = require("../globalVariables");
 const app_1 = require("../../../app");
 const GeometryAndPhysics_1 = require("../GeometryAndPhysics");
 const enums_1 = require("../enums");
+const MapControler_1 = require("../Controllers/MapControler");
 class Upgrade extends Entity_1.Entity {
     constructor(param) {
         super(Upgrade.updateParam(param));
@@ -79,10 +79,11 @@ Upgrade.randomlyGenerate = (choosenMap, category = null, kind = null) => {
     let x = Math.random() * map.width;
     let y = Math.random() * map.height;
     let position = new GeometryAndPhysics_1.Point(x, y);
-    while (map.isPositionWall(position)) {
+    while (map.isPositionWall(position) !== 0) {
         x = Math.random() * map.width;
         y = Math.random() * map.height;
-        position.changePosition(x, y);
+        console.log(position.x + " " + position.y);
+        position.updatePosition(x, y);
     }
     let height = 32;
     let width = 32;

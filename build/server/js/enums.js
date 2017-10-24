@@ -31,9 +31,15 @@ var UpgradeCategory;
 })(UpgradeCategory = exports.UpgradeCategory || (exports.UpgradeCategory = {}));
 var TerrainMaterial;
 (function (TerrainMaterial) {
-    TerrainMaterial[TerrainMaterial["grass"] = 0] = "grass";
     TerrainMaterial[TerrainMaterial["dirt"] = 1] = "dirt";
+    TerrainMaterial[TerrainMaterial["water"] = 2] = "water";
+    TerrainMaterial[TerrainMaterial["stone"] = 3] = "stone";
 })(TerrainMaterial = exports.TerrainMaterial || (exports.TerrainMaterial = {}));
+var TerrainMaterialWithoutWater;
+(function (TerrainMaterialWithoutWater) {
+    TerrainMaterialWithoutWater[TerrainMaterialWithoutWater["dirt"] = 1] = "dirt";
+    TerrainMaterialWithoutWater[TerrainMaterialWithoutWater["stone"] = 3] = "stone";
+})(TerrainMaterialWithoutWater = exports.TerrainMaterialWithoutWater || (exports.TerrainMaterialWithoutWater = {}));
 function randomEnum(myEnum) {
     const enumValues = Object.keys(myEnum)
         .map(n => Number.parseInt(n))

@@ -6,6 +6,7 @@ import { Point } from './../GeometryAndPhysics';
 import { Pack } from '../Pack';
 import { WeaponType, ItemType } from '../enums';
 import { MapController } from '../Controllers/MapControler';
+import { GameMap } from '../Map/GameMap';
 
 export class Player extends Actor {
 
@@ -103,10 +104,16 @@ export class Player extends Actor {
             if(data.inputId == '3') player.attackController.weaponCollection.changeWeapon(WeaponType.shotgun); 
             if(data.inputId == '4') player.attackController.weaponCollection.changeWeapon(WeaponType.rifle); 
             if(data.inputId == 'space') player.attackController.weaponCollection.chooseNextWeaponWithAmmo();
+            if(data.inputId == 'map'){
+                let gameMap : GameMap = MapController.getMap(data.map);
+                MapController.createMap(data.map, gameMap.size, 20);
+                MapController.updatePack.push(MapController.getMapPack(data.map));
+                //socket.emit('mapData', MapController.getMapPack(data.map));
+            } 
         });
 
         socket.emit('init',{player: Player.getAllInitPack(),bullet:Bullet.getAllInitPack(),enemy:Enemy.getAllInitPack(),selfId:socket.id});
-        socket.emit('mapData', {maps: MapController.maps});
+        socket.emit('mapData', MapController.getMapPack("forest"));
     }
 
     onDeath = () => {
@@ -120,7 +127,7 @@ export class Player extends Actor {
         while(map.isPositionWall(position)){
             x = Math.random() * map.width; 
             y = Math.random() * map.height; 
-            position.changePosition(x, y); 
+            position.updatePosition(x, y); 
         }
 
         this.setPosition(position); 

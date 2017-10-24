@@ -46,7 +46,7 @@ export class MapClient {
                 material = this.map.mapTiles[i][j].material;
                 imgWidth = Img[mapTileImageName[material]].width;
                 imgHeight = Img[mapTileImageName[material]].height;
-                ctx.drawImage(Img[mapTileImageName[material]], 0, 0, imgWidth, imgHeight, x+imgWidth*i, y+imgHeight*j, imgWidth, imgHeight);                
+                ctx.drawImage(Img[mapTileImageName[material]], 0, 0, imgWidth, imgHeight, x+imgWidth*j, y+imgHeight*i, imgWidth, imgHeight);                
             }
         }
        // ctx.drawImage(this.image, 0, 0, this.image.width, this.image.height, x, y, this.image.width*2, this.image.height*2);

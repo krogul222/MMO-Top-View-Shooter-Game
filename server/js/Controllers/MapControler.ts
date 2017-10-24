@@ -1,11 +1,11 @@
 import { GameMap } from './../Map/GameMap';
 import { MapTile } from '../Map/MapTile';
-import { TerrainMaterial, getRandomInt, randomEnum } from '../enums';
+import { TerrainMaterial, getRandomInt, randomEnum, TerrainMaterialWithoutWater } from '../enums';
 import { Point } from '../GeometryAndPhysics';
 
 export class MapController {
     static maps = {};
-
+    static updatePack: any[] = [];
     static getMap = (map) => { 
         for (let i in MapController.maps) {
             if(map == MapController.maps[i].name) {
@@ -13,6 +13,27 @@ export class MapController {
             }
         }
         
+    }
+
+    static getMapPack = (map) => {
+        for (let i in MapController.maps) {
+            if(map == MapController.maps[i].name) {
+                
+                let gameMap: GameMap = MapController.maps[i];
+
+                let material: string ="";
+
+                for(let i = 0; i < gameMap.size; i++){
+                    for(let j = 0; j < gameMap.size; j++){
+                        material +=gameMap.mapTiles[i][j].material+",";
+                    }
+                }
+
+                
+                return { material: material, name: MapController.maps[i].name}
+
+            }
+        }
     }
 
     constructor(param) {
@@ -30,6 +51,31 @@ export class MapController {
         MapController.maps = maps;
     }
 
+
+    static updateMap = (param) => {
+        if(param !== undefined){
+            for (let i in MapController.maps) {
+                console.log("UPDATE2");
+                if(param.name == MapController.maps[i].name){
+                    let gameMap: GameMap = MapController.maps[i];
+                    
+                    let str: string = param.material;
+                    let arr = str.split(",");
+                    let counter = 0;
+                    console.log("Array map "+arr);
+                    console.log("MAPA UPDATE: ")
+                    for(let i = 0; i < gameMap.size; i++){
+                        for(let j = 0; j < gameMap.size; j++){
+                            gameMap.mapTiles[i][j].updateMaterial(arr[counter]);
+                            counter++;
+                            console.log(gameMap.mapTiles[i][j].material+", ");
+                        }
+                    }
+                }
+            }
+        }
+    }
+
     static createMap = (name: string, size: number, seeds: number) => {
         let mapTiles: MapTile[][];
         
@@ -40,14 +86,24 @@ export class MapController {
         let seedMaterial: TerrainMaterial[] = [];
         let seedM: TerrainMaterial = TerrainMaterial.grass;
 
-        for(let i = 0; i < seeds; i++){
+        let waterSeeds = Math.floor(seeds/10);
+
+        for(let i = 0; i < seeds-waterSeeds; i++){
             seedx = getRandomInt(1, size);
             seedy = getRandomInt(1, size);
-            seedM = randomEnum(TerrainMaterial);
+            seedM = randomEnum(TerrainMaterialWithoutWater);
             seedPosition[i] = new Point(seedx, seedy);
             seedMaterial[i] = seedM;
         }
         
+        for(let i = seeds-waterSeeds; i < seeds; i++){
+            seedx = getRandomInt(1, size);
+            seedy = getRandomInt(1, size);
+            seedM = TerrainMaterial.water;
+            seedPosition[i] = new Point(seedx, seedy);
+            seedMaterial[i] = seedM;
+        }
+
         let distance = 10000;
         let closestSeed = 0;
 

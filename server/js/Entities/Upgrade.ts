@@ -1,4 +1,3 @@
-import { MapController } from './../Controllers/MapControler';
 import { imageName } from './../Constants';
 import { Player } from './Player';
 import { Entity } from './Entity';
@@ -98,10 +97,11 @@ export class Upgrade extends Entity{
         let y = Math.random()*map.height;
         let position = new Point(x,y);
         
-        while(map.isPositionWall(position)){
+        while(map.isPositionWall(position) !== 0){
             x = Math.random() * map.width; 
             y = Math.random() * map.height;  
-            position.changePosition(x, y);
+            console.log(position.x+" "+position.y);
+            position.updatePosition(x, y);
         }
 
         let height = 32;
