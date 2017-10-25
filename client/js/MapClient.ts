@@ -53,13 +53,6 @@ export class MapClient {
                         ctx.drawImage(Img[mapTileSideImageName[k][this.map.mapTiles[i][j].sides[k]]], 0, 0, imgWidth, imgHeight, x+imgWidth*j, y+imgHeight*i, imgWidth, imgHeight);   
                     }
                 }
-                //console.log(mapTileCornerImageName[0][this.map.mapTiles[i][j].corners[0]]);
-                for(let k = 0; k < 4; k++){
-                    if(this.map.mapTiles[i][j].corners[k] > 0){
-                        //console.log("CORNER "+mapTileCornerImageName[k][this.map.mapTiles[i][j].corners[k]]);
-                        ctx.drawImage(Img[mapTileCornerImageName[k][this.map.mapTiles[i][j].corners[k]]], 0, 0, imgWidth, imgHeight, x+imgWidth*j, y+imgHeight*i, imgWidth, imgHeight);   
-                    } 
-                }
             }
         }
        // ctx.drawImage(this.image, 0, 0, this.image.width, this.image.height, x, y, this.image.width*2, this.image.height*2);

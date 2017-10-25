@@ -33,11 +33,6 @@ class MapClient {
                             ctx.drawImage(Img[Constants_1.mapTileSideImageName[k][this.map.mapTiles[i][j].sides[k]]], 0, 0, imgWidth, imgHeight, x + imgWidth * j, y + imgHeight * i, imgWidth, imgHeight);
                         }
                     }
-                    for (let k = 0; k < 4; k++) {
-                        if (this.map.mapTiles[i][j].corners[k] > 0) {
-                            ctx.drawImage(Img[Constants_2.mapTileCornerImageName[k][this.map.mapTiles[i][j].corners[k]]], 0, 0, imgWidth, imgHeight, x + imgWidth * j, y + imgHeight * i, imgWidth, imgHeight);
-                        }
-                    }
                 }
             }
         };

@@ -23,7 +23,6 @@ export class MapController {
 
                 let material: string ="";
                 let sides: string = "";
-                let corners: string = "";
 
                 for(let i = 0; i < gameMap.size; i++){
                     for(let j = 0; j < gameMap.size; j++){
@@ -31,15 +30,13 @@ export class MapController {
 
                         for(let k = 0; k < 4; k++){
                             sides +=gameMap.mapTiles[i][j].sides[k];
-                            corners +=gameMap.mapTiles[i][j].corners[k];
                             sides += (k<3) ? "," : ";";
-                            corners += (k<3) ? "," : ";";
                         }
                     }
                 }
 
                 
-                return { material: material, name: MapController.maps[i].name, sides: sides, corners: corners}
+                return { material: material, name: MapController.maps[i].name, sides: sides}
 
             }
         }
@@ -74,28 +71,16 @@ export class MapController {
                     str = param.sides;
                     let sidesArr = str.split(";");
                     let smallsidesArr;
-                    str = param.corners;
-                   
-                    let cornersArr = str.split(";");
-                    let smallcornersArr;
 
-                   
                    // console.log("MAPA UPDATE: ")
                     for(let i = 0; i < gameMap.size; i++){
                         for(let j = 0; j < gameMap.size; j++){
                             gameMap.mapTiles[i][j].updateMaterial(materialArr[counter]);
                             str = sidesArr[counter];
                             smallsidesArr = str.split(",");
-                            str = cornersArr[counter];
-                            smallcornersArr = str.split(",");
                             counter++;
- 
-
-                            console.log("Array corners "+smallcornersArr);
                             for(let k = 0; k < 4; k++){
                                 gameMap.mapTiles[i][j].sides[k] = smallsidesArr[k];
-                                gameMap.mapTiles[i][j].corners[k] = smallcornersArr[k];
-                                console.log("Laduje:"+ smallcornersArr[k]);
                             }
                            // console.log(gameMap.mapTiles[i][j].material+", ");
                         }
@@ -191,7 +176,7 @@ export class MapController {
             }
         }
 
-        
+        /*
         for(let i = 0; i < size; i++){
             for(let j = 0; j < size; j++){
                 
@@ -220,7 +205,7 @@ export class MapController {
                 }
                 
             }
-        }
+        }*/
 
         MapController.maps[name] = (new GameMap(name, mapTiles));
     }

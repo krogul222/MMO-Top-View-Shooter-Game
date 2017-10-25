@@ -705,19 +705,16 @@ MapController.getMapPack = (map) => {
             let gameMap = MapController.maps[i];
             let material = "";
             let sides = "";
-            let corners = "";
             for (let i = 0; i < gameMap.size; i++) {
                 for (let j = 0; j < gameMap.size; j++) {
                     material += gameMap.mapTiles[i][j].material + ",";
                     for (let k = 0; k < 4; k++) {
                         sides += gameMap.mapTiles[i][j].sides[k];
-                        corners += gameMap.mapTiles[i][j].corners[k];
                         sides += (k < 3) ? "," : ";";
-                        corners += (k < 3) ? "," : ";";
                     }
                 }
             }
-            return { material: material, name: MapController.maps[i].name, sides: sides, corners: corners };
+            return { material: material, name: MapController.maps[i].name, sides: sides };
         }
     }
 };
@@ -736,22 +733,14 @@ MapController.updateMap = (param) => {
                 str = param.sides;
                 let sidesArr = str.split(";");
                 let smallsidesArr;
-                str = param.corners;
-                let cornersArr = str.split(";");
-                let smallcornersArr;
                 for (let i = 0; i < gameMap.size; i++) {
                     for (let j = 0; j < gameMap.size; j++) {
                         gameMap.mapTiles[i][j].updateMaterial(materialArr[counter]);
                         str = sidesArr[counter];
                         smallsidesArr = str.split(",");
-                        str = cornersArr[counter];
-                        smallcornersArr = str.split(",");
                         counter++;
-                        console.log("Array corners " + smallcornersArr);
                         for (let k = 0; k < 4; k++) {
                             gameMap.mapTiles[i][j].sides[k] = smallsidesArr[k];
-                            gameMap.mapTiles[i][j].corners[k] = smallcornersArr[k];
-                            console.log("Laduje:" + smallcornersArr[k]);
                         }
                     }
                 }
@@ -832,30 +821,6 @@ MapController.createMap = (name, size, seeds) => {
                     else {
                         mapTiles[i - 1][j].sides[enums_1.Orientation.down] = mapTiles[i][j].material;
                     }
-                }
-            }
-        }
-    }
-    for (let i = 0; i < size; i++) {
-        for (let j = 0; j < size; j++) {
-            if (i > 0 && j > 0) {
-                if (mapTiles[i][j - 1].sides[enums_1.Orientation.up] == mapTiles[i - 1][j].sides[enums_1.Orientation.left]) {
-                    mapTiles[i][j].corners[enums_1.CornerOrientation.LU] = mapTiles[i][j - 1].sides[enums_1.Orientation.up];
-                }
-            }
-            if (i > 0 && j < (size - 1)) {
-                if (mapTiles[i][j + 1].sides[enums_1.Orientation.up] == mapTiles[i - 1][j].sides[enums_1.Orientation.right]) {
-                    mapTiles[i][j].corners[enums_1.CornerOrientation.RU] = mapTiles[i][j + 1].sides[enums_1.Orientation.up];
-                }
-            }
-            if (i < (size - 1) && j < (size - 1)) {
-                if (mapTiles[i][j + 1].sides[enums_1.Orientation.down] == mapTiles[i + 1][j].sides[enums_1.Orientation.right]) {
-                    mapTiles[i][j].corners[enums_1.CornerOrientation.RD] = mapTiles[i][j + 1].sides[enums_1.Orientation.down];
-                }
-            }
-            if (i < (size - 1) && j > 0) {
-                if (mapTiles[i][j - 1].sides[enums_1.Orientation.down] == mapTiles[i + 1][j].sides[enums_1.Orientation.left]) {
-                    mapTiles[i][j].corners[enums_1.CornerOrientation.LD] = mapTiles[i + 1][j].sides[enums_1.Orientation.left];
                 }
             }
         }
@@ -2261,11 +2226,6 @@ class MapClient {
                     for (let k = 0; k < 4; k++) {
                         if (this.map.mapTiles[i][j].sides[k] > 0) {
                             ctx.drawImage(Img[Constants_1.mapTileSideImageName[k][this.map.mapTiles[i][j].sides[k]]], 0, 0, imgWidth, imgHeight, x + imgWidth * j, y + imgHeight * i, imgWidth, imgHeight);
-                        }
-                    }
-                    for (let k = 0; k < 4; k++) {
-                        if (this.map.mapTiles[i][j].corners[k] > 0) {
-                            ctx.drawImage(Img[Constants_2.mapTileCornerImageName[k][this.map.mapTiles[i][j].corners[k]]], 0, 0, imgWidth, imgHeight, x + imgWidth * j, y + imgHeight * i, imgWidth, imgHeight);
                         }
                     }
                 }
