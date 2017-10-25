@@ -15,11 +15,9 @@ class GameMap {
             let tileY = Math.floor(position.y / (8 * 32));
             let inTileX = position.x - tileX * 8 * 32;
             let inTileY = position.y - tileY * 8 * 32;
-            console.log("X = " + tileX + "   Y = " + tileY);
             if (tileX < this._size && tileY < this._size)
                 return this.mapTiles[tileY][tileX].isPositionWall(new GeometryAndPhysics_1.Point(inTileX, inTileY));
             else {
-                console.log("MAPTILE FAIL " + tileX + " " + tileY);
                 return 0;
             }
         };

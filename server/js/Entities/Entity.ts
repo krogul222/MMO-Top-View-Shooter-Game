@@ -1,6 +1,7 @@
 import { Point, Size, Velocity, Rectangle, testCollisionRectRect } from './../GeometryAndPhysics';
 import { Pack } from '../Pack';
 import { removePack, initPack } from '../globalVariables';
+import { GAME_SPEED_TOOLINGFACTOR } from '../Constants';
 
 export class Entity {
     private _position: Point = new Point(250, 250);
@@ -26,7 +27,7 @@ export class Entity {
         }
     }
 
-    updatePosition = () => this._position.changePosition(this._speed.x, this._speed.y);
+    updatePosition = () => this._position.changePosition(this._speed.x*GAME_SPEED_TOOLINGFACTOR, this._speed.y*GAME_SPEED_TOOLINGFACTOR);
     
     update = () => this.updatePosition();
 

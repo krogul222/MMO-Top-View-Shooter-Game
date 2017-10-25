@@ -147,7 +147,6 @@ socket.on('update', function(data){
  
             if(pack.attackMelee !== undefined){
              p.attackMelee = pack.attackMelee;
-             console.log("MEEEEELEEEEEE "+p.attackMelee);
              }
  
             if(pack.moving !== undefined){
@@ -300,6 +299,22 @@ document.onkeydown = function(event){
     }
     else if(event.keyCode === 77){
         socket.emit('keyPress', {inputId:'map', state:true, map: currentMap.map.name});
+    }
+    else if(event.keyCode === 80){
+        let elt = document.getElementById("gameDiv");
+            console.log("Requesting fullscreen for", elt);
+            if (elt.requestFullscreen) {
+              elt.requestFullscreen();
+            } else if (elt.msRequestFullscreen) {
+              elt.msRequestFullscreen();
+            } else if (elt.mozRequestFullScreen) {
+              elt.mozRequestFullScreen();
+            } else if (elt.webkitRequestFullscreen) {
+              elt.webkitRequestFullscreen();
+            } else {
+                console.error("Fullscreen not available");
+            }
+        
     }
 }
 

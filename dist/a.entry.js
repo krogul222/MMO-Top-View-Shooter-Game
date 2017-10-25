@@ -172,6 +172,20 @@ var TerrainMaterialWithoutWater;
     TerrainMaterialWithoutWater[TerrainMaterialWithoutWater["dirt"] = 1] = "dirt";
     TerrainMaterialWithoutWater[TerrainMaterialWithoutWater["stone"] = 3] = "stone";
 })(TerrainMaterialWithoutWater = exports.TerrainMaterialWithoutWater || (exports.TerrainMaterialWithoutWater = {}));
+var Orientation;
+(function (Orientation) {
+    Orientation[Orientation["up"] = 0] = "up";
+    Orientation[Orientation["right"] = 1] = "right";
+    Orientation[Orientation["down"] = 2] = "down";
+    Orientation[Orientation["left"] = 3] = "left";
+})(Orientation = exports.Orientation || (exports.Orientation = {}));
+var CornerOrientation;
+(function (CornerOrientation) {
+    CornerOrientation[CornerOrientation["RU"] = 0] = "RU";
+    CornerOrientation[CornerOrientation["RD"] = 1] = "RD";
+    CornerOrientation[CornerOrientation["LD"] = 2] = "LD";
+    CornerOrientation[CornerOrientation["LU"] = 3] = "LU";
+})(CornerOrientation = exports.CornerOrientation || (exports.CornerOrientation = {}));
 function randomEnum(myEnum) {
     const enumValues = Object.keys(myEnum)
         .map(n => Number.parseInt(n))
@@ -194,14 +208,14 @@ exports.getRandomInt = getRandomInt;
 
 Object.defineProperty(exports, "__esModule", { value: true });
 const MapControler_1 = __webpack_require__(4);
-const GameSoundManager_1 = __webpack_require__(18);
-const UpgradeClient_1 = __webpack_require__(19);
-const MapClient_1 = __webpack_require__(20);
+const GameSoundManager_1 = __webpack_require__(19);
+const UpgradeClient_1 = __webpack_require__(20);
+const MapClient_1 = __webpack_require__(21);
 const PlayerClient_1 = __webpack_require__(3);
 const BulletClient_1 = __webpack_require__(22);
-const EnemyClient_1 = __webpack_require__(9);
-const ExplosionClient_1 = __webpack_require__(10);
-const Inventory_1 = __webpack_require__(11);
+const EnemyClient_1 = __webpack_require__(10);
+const ExplosionClient_1 = __webpack_require__(11);
+const Inventory_1 = __webpack_require__(12);
 exports.selfId = 0;
 exports.inventory = new Inventory_1.Inventory(socket, false, 0);
 let mapController = new MapControler_1.MapController({});
@@ -304,7 +318,6 @@ socket.on('update', function (data) {
             }
             if (pack.attackMelee !== undefined) {
                 p.attackMelee = pack.attackMelee;
-                console.log("MEEEEELEEEEEE " + p.attackMelee);
             }
             if (pack.moving !== undefined) {
                 p.moving = pack.moving;
@@ -435,6 +448,25 @@ document.onkeydown = function (event) {
     }
     else if (event.keyCode === 77) {
         socket.emit('keyPress', { inputId: 'map', state: true, map: currentMap.map.name });
+    }
+    else if (event.keyCode === 80) {
+        let elt = document.getElementById("gameDiv");
+        console.log("Requesting fullscreen for", elt);
+        if (elt.requestFullscreen) {
+            elt.requestFullscreen();
+        }
+        else if (elt.msRequestFullscreen) {
+            elt.msRequestFullscreen();
+        }
+        else if (elt.mozRequestFullScreen) {
+            elt.mozRequestFullScreen();
+        }
+        else if (elt.webkitRequestFullscreen) {
+            elt.webkitRequestFullscreen();
+        }
+        else {
+            console.error("Fullscreen not available");
+        }
     }
 };
 document.onkeyup = function (event) {
@@ -646,8 +678,8 @@ exports.PlayerClient = PlayerClient;
 /***/ (function(module, exports, __webpack_require__) {
 
 Object.defineProperty(exports, "__esModule", { value: true });
-const GameMap_1 = __webpack_require__(16);
-const MapTile_1 = __webpack_require__(17);
+const GameMap_1 = __webpack_require__(17);
+const MapTile_1 = __webpack_require__(18);
 const enums_1 = __webpack_require__(1);
 const GeometryAndPhysics_1 = __webpack_require__(0);
 class MapController {
@@ -672,12 +704,20 @@ MapController.getMapPack = (map) => {
         if (map == MapController.maps[i].name) {
             let gameMap = MapController.maps[i];
             let material = "";
+            let sides = "";
+            let corners = "";
             for (let i = 0; i < gameMap.size; i++) {
                 for (let j = 0; j < gameMap.size; j++) {
                     material += gameMap.mapTiles[i][j].material + ",";
+                    for (let k = 0; k < 4; k++) {
+                        sides += gameMap.mapTiles[i][j].sides[k];
+                        corners += gameMap.mapTiles[i][j].corners[k];
+                        sides += (k < 3) ? "," : ";";
+                        corners += (k < 3) ? "," : ";";
+                    }
                 }
             }
-            return { material: material, name: MapController.maps[i].name };
+            return { material: material, name: MapController.maps[i].name, sides: sides, corners: corners };
         }
     }
 };
@@ -688,19 +728,31 @@ MapController.loadMaps = () => {
 MapController.updateMap = (param) => {
     if (param !== undefined) {
         for (let i in MapController.maps) {
-            console.log("UPDATE2");
             if (param.name == MapController.maps[i].name) {
                 let gameMap = MapController.maps[i];
                 let str = param.material;
-                let arr = str.split(",");
+                let materialArr = str.split(",");
                 let counter = 0;
-                console.log("Array map " + arr);
-                console.log("MAPA UPDATE: ");
+                str = param.sides;
+                let sidesArr = str.split(";");
+                let smallsidesArr;
+                str = param.corners;
+                let cornersArr = str.split(";");
+                let smallcornersArr;
                 for (let i = 0; i < gameMap.size; i++) {
                     for (let j = 0; j < gameMap.size; j++) {
-                        gameMap.mapTiles[i][j].updateMaterial(arr[counter]);
+                        gameMap.mapTiles[i][j].updateMaterial(materialArr[counter]);
+                        str = sidesArr[counter];
+                        smallsidesArr = str.split(",");
+                        str = cornersArr[counter];
+                        smallcornersArr = str.split(",");
                         counter++;
-                        console.log(gameMap.mapTiles[i][j].material + ", ");
+                        console.log("Array corners " + smallcornersArr);
+                        for (let k = 0; k < 4; k++) {
+                            gameMap.mapTiles[i][j].sides[k] = smallsidesArr[k];
+                            gameMap.mapTiles[i][j].corners[k] = smallcornersArr[k];
+                            console.log("Laduje:" + smallcornersArr[k]);
+                        }
                     }
                 }
             }
@@ -714,7 +766,7 @@ MapController.createMap = (name, size, seeds) => {
     let seedx = 0;
     let seedy = 0;
     let seedMaterial = [];
-    let seedM = enums_1.TerrainMaterial.grass;
+    let seedM = enums_1.TerrainMaterial.dirt;
     let waterSeeds = Math.floor(seeds / 10);
     for (let i = 0; i < seeds - waterSeeds; i++) {
         seedx = enums_1.getRandomInt(1, size);
@@ -744,6 +796,68 @@ MapController.createMap = (name, size, seeds) => {
                 }
             }
             mapTiles[i][j] = new MapTile_1.MapTile(8, 8, seedMaterial[closestSeed]);
+            if (j > 0) {
+                if (mapTiles[i][j].material !== mapTiles[i][j - 1].material) {
+                    mapTiles[i][j].convex = !mapTiles[i][j - 1].convex;
+                }
+                else {
+                    mapTiles[i][j].convex = mapTiles[i][j - 1].convex;
+                }
+            }
+            else {
+                if (i > 0) {
+                    if (mapTiles[i][j].material !== mapTiles[i - 1][j].material) {
+                        mapTiles[i][j].convex = !mapTiles[i - 1][j].convex;
+                    }
+                    else {
+                        mapTiles[i][j].convex = mapTiles[i - 1][j].convex;
+                    }
+                }
+            }
+            if (j > 0) {
+                if (mapTiles[i][j].material !== mapTiles[i][j - 1].material) {
+                    if (mapTiles[i][j - 1].convex) {
+                        mapTiles[i][j].sides[enums_1.Orientation.left] = mapTiles[i][j - 1].material;
+                    }
+                    else {
+                        mapTiles[i][j - 1].sides[enums_1.Orientation.right] = mapTiles[i][j].material;
+                    }
+                }
+            }
+            if (i > 0) {
+                if (mapTiles[i][j].material !== mapTiles[i - 1][j].material) {
+                    if (mapTiles[i - 1][j].convex) {
+                        mapTiles[i][j].sides[enums_1.Orientation.up] = mapTiles[i - 1][j].material;
+                    }
+                    else {
+                        mapTiles[i - 1][j].sides[enums_1.Orientation.down] = mapTiles[i][j].material;
+                    }
+                }
+            }
+        }
+    }
+    for (let i = 0; i < size; i++) {
+        for (let j = 0; j < size; j++) {
+            if (i > 0 && j > 0) {
+                if (mapTiles[i][j - 1].sides[enums_1.Orientation.up] == mapTiles[i - 1][j].sides[enums_1.Orientation.left]) {
+                    mapTiles[i][j].corners[enums_1.CornerOrientation.LU] = mapTiles[i][j - 1].sides[enums_1.Orientation.up];
+                }
+            }
+            if (i > 0 && j < (size - 1)) {
+                if (mapTiles[i][j + 1].sides[enums_1.Orientation.up] == mapTiles[i - 1][j].sides[enums_1.Orientation.right]) {
+                    mapTiles[i][j].corners[enums_1.CornerOrientation.RU] = mapTiles[i][j + 1].sides[enums_1.Orientation.up];
+                }
+            }
+            if (i < (size - 1) && j < (size - 1)) {
+                if (mapTiles[i][j + 1].sides[enums_1.Orientation.down] == mapTiles[i + 1][j].sides[enums_1.Orientation.right]) {
+                    mapTiles[i][j].corners[enums_1.CornerOrientation.RD] = mapTiles[i][j + 1].sides[enums_1.Orientation.down];
+                }
+            }
+            if (i < (size - 1) && j > 0) {
+                if (mapTiles[i][j - 1].sides[enums_1.Orientation.down] == mapTiles[i + 1][j].sides[enums_1.Orientation.left]) {
+                    mapTiles[i][j].corners[enums_1.CornerOrientation.LD] = mapTiles[i + 1][j].sides[enums_1.Orientation.left];
+                }
+            }
         }
     }
     MapController.maps[name] = (new GameMap_1.GameMap(name, mapTiles));
@@ -769,10 +883,66 @@ exports.removePack = new Pack_1.Pack();
 /***/ (function(module, exports, __webpack_require__) {
 
 Object.defineProperty(exports, "__esModule", { value: true });
+const enums_1 = __webpack_require__(1);
+exports.imageName = {};
+exports.mapTileImageName = {};
+exports.mapTileSideImageName = {};
+exports.mapTileCornerImageName = {};
+exports.GAME_SPEED_TOOLINGFACTOR = 0.75;
+exports.imageName[enums_1.ItemType.pistol] = "pistol";
+exports.imageName[enums_1.ItemType.shotgun] = "shotgun";
+exports.imageName[enums_1.ItemType.rifle] = "rifle";
+exports.imageName[enums_1.ItemType.medicalkit] = "medicalkit";
+exports.imageName[enums_1.ItemType.knife] = "knife";
+exports.imageName[enums_1.WeaponAmmoType.pistol] = "pistolammo";
+exports.imageName[enums_1.WeaponAmmoType.shotgun] = "shotgunammo";
+exports.imageName[enums_1.WeaponAmmoType.rifle] = "rifleammo";
+exports.mapTileImageName[enums_1.TerrainMaterial.dirt] = "dirt";
+exports.mapTileImageName[enums_1.TerrainMaterial.water] = "water";
+exports.mapTileImageName[enums_1.TerrainMaterial.stone] = "stone";
+exports.mapTileSideImageName[enums_1.Orientation.left] = {};
+exports.mapTileSideImageName[enums_1.Orientation.left][enums_1.TerrainMaterial.stone] = "stoneL";
+exports.mapTileSideImageName[enums_1.Orientation.left][enums_1.TerrainMaterial.dirt] = "dirtL";
+exports.mapTileSideImageName[enums_1.Orientation.left][enums_1.TerrainMaterial.water] = "waterL";
+exports.mapTileSideImageName[enums_1.Orientation.right] = {};
+exports.mapTileSideImageName[enums_1.Orientation.right][enums_1.TerrainMaterial.stone] = "stoneR";
+exports.mapTileSideImageName[enums_1.Orientation.right][enums_1.TerrainMaterial.dirt] = "dirtR";
+exports.mapTileSideImageName[enums_1.Orientation.right][enums_1.TerrainMaterial.water] = "waterR";
+exports.mapTileSideImageName[enums_1.Orientation.up] = {};
+exports.mapTileSideImageName[enums_1.Orientation.up][enums_1.TerrainMaterial.stone] = "stoneU";
+exports.mapTileSideImageName[enums_1.Orientation.up][enums_1.TerrainMaterial.dirt] = "dirtU";
+exports.mapTileSideImageName[enums_1.Orientation.up][enums_1.TerrainMaterial.water] = "waterU";
+exports.mapTileSideImageName[enums_1.Orientation.down] = {};
+exports.mapTileSideImageName[enums_1.Orientation.down][enums_1.TerrainMaterial.stone] = "stoneD";
+exports.mapTileSideImageName[enums_1.Orientation.down][enums_1.TerrainMaterial.dirt] = "dirtD";
+exports.mapTileSideImageName[enums_1.Orientation.down][enums_1.TerrainMaterial.water] = "waterD";
+exports.mapTileCornerImageName[enums_1.CornerOrientation.RU] = {};
+exports.mapTileCornerImageName[enums_1.CornerOrientation.RU][enums_1.TerrainMaterial.stone] = "stoneRU";
+exports.mapTileCornerImageName[enums_1.CornerOrientation.RU][enums_1.TerrainMaterial.dirt] = "dirtRU";
+exports.mapTileCornerImageName[enums_1.CornerOrientation.RU][enums_1.TerrainMaterial.water] = "waterRU";
+exports.mapTileCornerImageName[enums_1.CornerOrientation.RD] = {};
+exports.mapTileCornerImageName[enums_1.CornerOrientation.RD][enums_1.TerrainMaterial.stone] = "stoneRD";
+exports.mapTileCornerImageName[enums_1.CornerOrientation.RD][enums_1.TerrainMaterial.dirt] = "dirtRD";
+exports.mapTileCornerImageName[enums_1.CornerOrientation.RD][enums_1.TerrainMaterial.water] = "waterRD";
+exports.mapTileCornerImageName[enums_1.CornerOrientation.LU] = {};
+exports.mapTileCornerImageName[enums_1.CornerOrientation.LU][enums_1.TerrainMaterial.stone] = "stoneLU";
+exports.mapTileCornerImageName[enums_1.CornerOrientation.LU][enums_1.TerrainMaterial.dirt] = "dirtLU";
+exports.mapTileCornerImageName[enums_1.CornerOrientation.LU][enums_1.TerrainMaterial.water] = "waterLU";
+exports.mapTileCornerImageName[enums_1.CornerOrientation.LD] = {};
+exports.mapTileCornerImageName[enums_1.CornerOrientation.LD][enums_1.TerrainMaterial.stone] = "stoneLD";
+exports.mapTileCornerImageName[enums_1.CornerOrientation.LD][enums_1.TerrainMaterial.dirt] = "dirtLD";
+exports.mapTileCornerImageName[enums_1.CornerOrientation.LD][enums_1.TerrainMaterial.water] = "waterLD";
+
+
+/***/ }),
+/* 7 */
+/***/ (function(module, exports, __webpack_require__) {
+
+Object.defineProperty(exports, "__esModule", { value: true });
 const globalVariables_1 = __webpack_require__(5);
-const Enemy_1 = __webpack_require__(7);
-const Bullet_1 = __webpack_require__(14);
-const Actor_1 = __webpack_require__(12);
+const Enemy_1 = __webpack_require__(8);
+const Bullet_1 = __webpack_require__(15);
+const Actor_1 = __webpack_require__(13);
 const GeometryAndPhysics_1 = __webpack_require__(0);
 const enums_1 = __webpack_require__(1);
 const MapControler_1 = __webpack_require__(4);
@@ -929,11 +1099,11 @@ exports.Player = Player;
 
 
 /***/ }),
-/* 7 */
+/* 8 */
 /***/ (function(module, exports, __webpack_require__) {
 
 Object.defineProperty(exports, "__esModule", { value: true });
-const Actor_1 = __webpack_require__(12);
+const Actor_1 = __webpack_require__(13);
 const GeometryAndPhysics_1 = __webpack_require__(0);
 const globalVariables_1 = __webpack_require__(5);
 const enums_1 = __webpack_require__(1);
@@ -1123,7 +1293,7 @@ exports.Enemy = Enemy;
 
 
 /***/ }),
-/* 8 */
+/* 9 */
 /***/ (function(module, exports, __webpack_require__) {
 
 Object.defineProperty(exports, "__esModule", { value: true });
@@ -1237,7 +1407,7 @@ new WeaponTypes({ weapon: enums_1.WeaponType.claws, name: "claws",
 
 
 /***/ }),
-/* 9 */
+/* 10 */
 /***/ (function(module, exports, __webpack_require__) {
 
 Object.defineProperty(exports, "__esModule", { value: true });
@@ -1373,7 +1543,7 @@ exports.EnemyClient = EnemyClient;
 
 
 /***/ }),
-/* 10 */
+/* 11 */
 /***/ (function(module, exports, __webpack_require__) {
 
 Object.defineProperty(exports, "__esModule", { value: true });
@@ -1430,12 +1600,12 @@ exports.ExplosionClient = ExplosionClient;
 
 
 /***/ }),
-/* 11 */
+/* 12 */
 /***/ (function(module, exports, __webpack_require__) {
 
 Object.defineProperty(exports, "__esModule", { value: true });
 const Item_1 = __webpack_require__(23);
-const Player_1 = __webpack_require__(6);
+const Player_1 = __webpack_require__(7);
 class Inventory {
     constructor(socket, server, owner) {
         this.items = [];
@@ -1531,18 +1701,18 @@ exports.Inventory = Inventory;
 
 
 /***/ }),
-/* 12 */
+/* 13 */
 /***/ (function(module, exports, __webpack_require__) {
 
 Object.defineProperty(exports, "__esModule", { value: true });
-const Inventory_1 = __webpack_require__(11);
+const Inventory_1 = __webpack_require__(12);
 const MapControler_1 = __webpack_require__(4);
 const MovementController_1 = __webpack_require__(25);
 const AttackControler_1 = __webpack_require__(26);
 const LifeAndBodyController_1 = __webpack_require__(28);
-const Entity_1 = __webpack_require__(15);
-const Player_1 = __webpack_require__(6);
-const Enemy_1 = __webpack_require__(7);
+const Entity_1 = __webpack_require__(16);
+const Player_1 = __webpack_require__(7);
+const Enemy_1 = __webpack_require__(8);
 const GeometryAndPhysics_1 = __webpack_require__(0);
 class Actor extends Entity_1.Entity {
     constructor(param) {
@@ -1632,7 +1802,7 @@ exports.Actor = Actor;
 
 
 /***/ }),
-/* 13 */
+/* 14 */
 /***/ (function(module, exports) {
 
 Object.defineProperty(exports, "__esModule", { value: true });
@@ -1668,13 +1838,13 @@ exports.Counter = Counter;
 
 
 /***/ }),
-/* 14 */
+/* 15 */
 /***/ (function(module, exports, __webpack_require__) {
 
 Object.defineProperty(exports, "__esModule", { value: true });
-const Enemy_1 = __webpack_require__(7);
-const Player_1 = __webpack_require__(6);
-const Entity_1 = __webpack_require__(15);
+const Enemy_1 = __webpack_require__(8);
+const Player_1 = __webpack_require__(7);
+const Entity_1 = __webpack_require__(16);
 const globalVariables_1 = __webpack_require__(5);
 const MapControler_1 = __webpack_require__(4);
 class Bullet extends Entity_1.Entity {
@@ -1804,12 +1974,13 @@ exports.Bullet = Bullet;
 
 
 /***/ }),
-/* 15 */
+/* 16 */
 /***/ (function(module, exports, __webpack_require__) {
 
 Object.defineProperty(exports, "__esModule", { value: true });
 const GeometryAndPhysics_1 = __webpack_require__(0);
 const globalVariables_1 = __webpack_require__(5);
+const Constants_1 = __webpack_require__(6);
 class Entity {
     constructor(param) {
         this._position = new GeometryAndPhysics_1.Point(250, 250);
@@ -1820,7 +1991,7 @@ class Entity {
         this._map = "forest";
         this._type = "entity";
         this._img = "";
-        this.updatePosition = () => this._position.changePosition(this._speed.x, this._speed.y);
+        this.updatePosition = () => this._position.changePosition(this._speed.x * Constants_1.GAME_SPEED_TOOLINGFACTOR, this._speed.y * Constants_1.GAME_SPEED_TOOLINGFACTOR);
         this.update = () => this.updatePosition();
         this.getDistance = (entity) => {
             if (entity == null)
@@ -1865,7 +2036,7 @@ exports.Entity = Entity;
 
 
 /***/ }),
-/* 16 */
+/* 17 */
 /***/ (function(module, exports, __webpack_require__) {
 
 Object.defineProperty(exports, "__esModule", { value: true });
@@ -1885,11 +2056,9 @@ class GameMap {
             let tileY = Math.floor(position.y / (8 * 32));
             let inTileX = position.x - tileX * 8 * 32;
             let inTileY = position.y - tileY * 8 * 32;
-            console.log("X = " + tileX + "   Y = " + tileY);
             if (tileX < this._size && tileY < this._size)
                 return this.mapTiles[tileY][tileX].isPositionWall(new GeometryAndPhysics_1.Point(inTileX, inTileY));
             else {
-                console.log("MAPTILE FAIL " + tileX + " " + tileY);
                 return 0;
             }
         };
@@ -1913,7 +2082,7 @@ exports.GameMap = GameMap;
 
 
 /***/ }),
-/* 17 */
+/* 18 */
 /***/ (function(module, exports, __webpack_require__) {
 
 Object.defineProperty(exports, "__esModule", { value: true });
@@ -1922,19 +2091,19 @@ class MapTile {
     constructor(_width, _height, material) {
         this._width = _width;
         this._height = _height;
+        this.sides = [];
+        this.corners = [];
+        this.convex = true;
         this.updateMaterial = (material) => {
             this._material = material;
         };
         this.isPositionWall = (position) => {
             let areaX = Math.floor(position.x / 32);
             let areaY = Math.floor(position.y / 32);
-            console.log("AX = " + areaX + "   areaY = " + areaY);
             if (areaX < this._width && areaY < this._height) {
-                console.log(this.grid[areaY][areaX]);
                 return this.grid[areaY][areaX];
             }
             else {
-                console.log("MAPTILE FAIL " + areaX + " " + areaY);
                 return 0;
             }
         };
@@ -1946,6 +2115,10 @@ class MapTile {
                 this.grid[i][j] = (material != enums_1.TerrainMaterial.water) ? 0 : 2;
             }
         }
+        for (let i = 0; i < 4; i++) {
+            this.sides[i] = 0;
+            this.corners[i] = 0;
+        }
     }
     get width() { return this._width; }
     get height() { return this._height; }
@@ -1955,7 +2128,7 @@ exports.MapTile = MapTile;
 
 
 /***/ }),
-/* 18 */
+/* 19 */
 /***/ (function(module, exports) {
 
 Object.defineProperty(exports, "__esModule", { value: true });
@@ -2008,7 +2181,7 @@ exports.GameSoundManager = GameSoundManager;
 
 
 /***/ }),
-/* 19 */
+/* 20 */
 /***/ (function(module, exports, __webpack_require__) {
 
 Object.defineProperty(exports, "__esModule", { value: true });
@@ -2052,14 +2225,15 @@ exports.UpgradeClient = UpgradeClient;
 
 
 /***/ }),
-/* 20 */
+/* 21 */
 /***/ (function(module, exports, __webpack_require__) {
 
 Object.defineProperty(exports, "__esModule", { value: true });
+const Constants_1 = __webpack_require__(6);
 const PlayerClient_1 = __webpack_require__(3);
 const game_1 = __webpack_require__(2);
 const enums_1 = __webpack_require__(1);
-const Constants_1 = __webpack_require__(21);
+const Constants_2 = __webpack_require__(6);
 class MapClient {
     constructor(map) {
         this.image = new Image();
@@ -2075,15 +2249,25 @@ class MapClient {
             let y = HEIGHT / 2 - mainPlayery;
             y = y - (mouseY - HEIGHT / 2) / CAMERA_BOX_ADJUSTMENT;
             let size = this.map.size;
-            let material = enums_1.TerrainMaterial.grass;
+            let material = enums_1.TerrainMaterial.dirt;
             let imgWidth = 1;
             let imgHeight = 1;
             for (let i = 0; i < size; i++) {
                 for (let j = 0; j < size; j++) {
                     material = this.map.mapTiles[i][j].material;
-                    imgWidth = Img[Constants_1.mapTileImageName[material]].width;
-                    imgHeight = Img[Constants_1.mapTileImageName[material]].height;
-                    ctx.drawImage(Img[Constants_1.mapTileImageName[material]], 0, 0, imgWidth, imgHeight, x + imgWidth * j, y + imgHeight * i, imgWidth, imgHeight);
+                    imgWidth = Img[Constants_2.mapTileImageName[material]].width;
+                    imgHeight = Img[Constants_2.mapTileImageName[material]].height;
+                    ctx.drawImage(Img[Constants_2.mapTileImageName[material]], 0, 0, imgWidth, imgHeight, x + imgWidth * j, y + imgHeight * i, imgWidth, imgHeight);
+                    for (let k = 0; k < 4; k++) {
+                        if (this.map.mapTiles[i][j].sides[k] > 0) {
+                            ctx.drawImage(Img[Constants_1.mapTileSideImageName[k][this.map.mapTiles[i][j].sides[k]]], 0, 0, imgWidth, imgHeight, x + imgWidth * j, y + imgHeight * i, imgWidth, imgHeight);
+                        }
+                    }
+                    for (let k = 0; k < 4; k++) {
+                        if (this.map.mapTiles[i][j].corners[k] > 0) {
+                            ctx.drawImage(Img[Constants_2.mapTileCornerImageName[k][this.map.mapTiles[i][j].corners[k]]], 0, 0, imgWidth, imgHeight, x + imgWidth * j, y + imgHeight * i, imgWidth, imgHeight);
+                        }
+                    }
                 }
             }
         };
@@ -2094,38 +2278,16 @@ exports.MapClient = MapClient;
 
 
 /***/ }),
-/* 21 */
-/***/ (function(module, exports, __webpack_require__) {
-
-Object.defineProperty(exports, "__esModule", { value: true });
-const enums_1 = __webpack_require__(1);
-exports.imageName = {};
-exports.mapTileImageName = {};
-exports.imageName[enums_1.ItemType.pistol] = "pistol";
-exports.imageName[enums_1.ItemType.shotgun] = "shotgun";
-exports.imageName[enums_1.ItemType.rifle] = "rifle";
-exports.imageName[enums_1.ItemType.medicalkit] = "medicalkit";
-exports.imageName[enums_1.ItemType.knife] = "knife";
-exports.imageName[enums_1.WeaponAmmoType.pistol] = "pistolammo";
-exports.imageName[enums_1.WeaponAmmoType.shotgun] = "shotgunammo";
-exports.imageName[enums_1.WeaponAmmoType.rifle] = "rifleammo";
-exports.mapTileImageName[enums_1.TerrainMaterial.grass] = "grass";
-exports.mapTileImageName[enums_1.TerrainMaterial.dirt] = "dirt";
-exports.mapTileImageName[enums_1.TerrainMaterial.water] = "water";
-exports.mapTileImageName[enums_1.TerrainMaterial.stone] = "stone";
-
-
-/***/ }),
 /* 22 */
 /***/ (function(module, exports, __webpack_require__) {
 
 Object.defineProperty(exports, "__esModule", { value: true });
 const game_1 = __webpack_require__(2);
-const EnemyClient_1 = __webpack_require__(9);
+const EnemyClient_1 = __webpack_require__(10);
 const GeometryAndPhysics_1 = __webpack_require__(0);
 const game_2 = __webpack_require__(2);
 const PlayerClient_1 = __webpack_require__(3);
-const ExplosionClient_1 = __webpack_require__(10);
+const ExplosionClient_1 = __webpack_require__(11);
 class BulletClient {
     constructor(initPack) {
         this.id = -1;
@@ -2277,7 +2439,7 @@ exports.Pack = Pack;
 
 Object.defineProperty(exports, "__esModule", { value: true });
 const MapControler_1 = __webpack_require__(4);
-const Counter_1 = __webpack_require__(13);
+const Counter_1 = __webpack_require__(14);
 const GeometryAndPhysics_1 = __webpack_require__(0);
 class MovementController {
     constructor(parent, param) {
@@ -2383,10 +2545,10 @@ exports.MovementController = MovementController;
 /***/ (function(module, exports, __webpack_require__) {
 
 Object.defineProperty(exports, "__esModule", { value: true });
-const Bullet_1 = __webpack_require__(14);
+const Bullet_1 = __webpack_require__(15);
 const WeaponCollection_1 = __webpack_require__(27);
-const Counter_1 = __webpack_require__(13);
-const WeaponTypes_1 = __webpack_require__(8);
+const Counter_1 = __webpack_require__(14);
+const WeaponTypes_1 = __webpack_require__(9);
 const GeometryAndPhysics_1 = __webpack_require__(0);
 class AttackController {
     constructor(parent, param) {
@@ -2493,7 +2655,7 @@ exports.AttackController = AttackController;
 /***/ (function(module, exports, __webpack_require__) {
 
 Object.defineProperty(exports, "__esModule", { value: true });
-const WeaponTypes_1 = __webpack_require__(8);
+const WeaponTypes_1 = __webpack_require__(9);
 const enums_1 = __webpack_require__(1);
 class WeaponCollection {
     constructor(owner) {

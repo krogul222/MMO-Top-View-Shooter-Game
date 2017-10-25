@@ -5,6 +5,9 @@ export class MapTile {
 
     public grid: number[][];
     private _material: TerrainMaterial;
+    public sides: number[] = [];
+    public corners: number[] = [];
+    public convex: boolean = true;
 
     constructor(private _width: number, private _height: number, material: TerrainMaterial) {
         this._material = material;
@@ -15,6 +18,12 @@ export class MapTile {
                 this.grid[i][j] = (material != TerrainMaterial.water) ? 0 : 2;
             }
         }
+
+        for(let i = 0; i < 4 ; i++ ){
+            this.sides[i] = 0;
+            this.corners[i] = 0;
+        }
+        
     }
 
     updateMaterial = (material) => {
@@ -24,14 +33,14 @@ export class MapTile {
     isPositionWall = (position: Point) => {
         let areaX = Math.floor(position.x/32);
         let areaY = Math.floor(position.y/32);
-        console.log("AX = "+areaX + "   areaY = "+areaY);
+        //console.log("AX = "+areaX + "   areaY = "+areaY);
         if(areaX < this._width && areaY < this._height){
-            console.log(this.grid[areaY][areaX]);
+          //  console.log(this.grid[areaY][areaX]);
             return this.grid[areaY][areaX];
            // return 0;
         }
         else{
-            console.log("MAPTILE FAIL "+areaX+" "+areaY);
+           // console.log("MAPTILE FAIL "+areaX+" "+areaY);
             return 0;
         }
             

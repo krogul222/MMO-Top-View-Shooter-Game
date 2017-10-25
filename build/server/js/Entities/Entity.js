@@ -1,6 +1,7 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 const GeometryAndPhysics_1 = require("./../GeometryAndPhysics");
 const globalVariables_1 = require("../globalVariables");
+const Constants_1 = require("../Constants");
 class Entity {
     constructor(param) {
         this._position = new GeometryAndPhysics_1.Point(250, 250);
@@ -11,7 +12,7 @@ class Entity {
         this._map = "forest";
         this._type = "entity";
         this._img = "";
-        this.updatePosition = () => this._position.changePosition(this._speed.x, this._speed.y);
+        this.updatePosition = () => this._position.changePosition(this._speed.x * Constants_1.GAME_SPEED_TOOLINGFACTOR, this._speed.y * Constants_1.GAME_SPEED_TOOLINGFACTOR);
         this.update = () => this.updatePosition();
         this.getDistance = (entity) => {
             if (entity == null)

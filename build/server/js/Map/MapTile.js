@@ -4,19 +4,19 @@ class MapTile {
     constructor(_width, _height, material) {
         this._width = _width;
         this._height = _height;
+        this.sides = [];
+        this.corners = [];
+        this.convex = true;
         this.updateMaterial = (material) => {
             this._material = material;
         };
         this.isPositionWall = (position) => {
             let areaX = Math.floor(position.x / 32);
             let areaY = Math.floor(position.y / 32);
-            console.log("AX = " + areaX + "   areaY = " + areaY);
             if (areaX < this._width && areaY < this._height) {
-                console.log(this.grid[areaY][areaX]);
                 return this.grid[areaY][areaX];
             }
             else {
-                console.log("MAPTILE FAIL " + areaX + " " + areaY);
                 return 0;
             }
         };
@@ -27,6 +27,10 @@ class MapTile {
             for (let j = 0; j < this._width; j++) {
                 this.grid[i][j] = (material != enums_1.TerrainMaterial.water) ? 0 : 2;
             }
+        }
+        for (let i = 0; i < 4; i++) {
+            this.sides[i] = 0;
+            this.corners[i] = 0;
         }
     }
     get width() { return this._width; }

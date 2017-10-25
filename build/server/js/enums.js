@@ -40,6 +40,20 @@ var TerrainMaterialWithoutWater;
     TerrainMaterialWithoutWater[TerrainMaterialWithoutWater["dirt"] = 1] = "dirt";
     TerrainMaterialWithoutWater[TerrainMaterialWithoutWater["stone"] = 3] = "stone";
 })(TerrainMaterialWithoutWater = exports.TerrainMaterialWithoutWater || (exports.TerrainMaterialWithoutWater = {}));
+var Orientation;
+(function (Orientation) {
+    Orientation[Orientation["up"] = 0] = "up";
+    Orientation[Orientation["right"] = 1] = "right";
+    Orientation[Orientation["down"] = 2] = "down";
+    Orientation[Orientation["left"] = 3] = "left";
+})(Orientation = exports.Orientation || (exports.Orientation = {}));
+var CornerOrientation;
+(function (CornerOrientation) {
+    CornerOrientation[CornerOrientation["RU"] = 0] = "RU";
+    CornerOrientation[CornerOrientation["RD"] = 1] = "RD";
+    CornerOrientation[CornerOrientation["LD"] = 2] = "LD";
+    CornerOrientation[CornerOrientation["LU"] = 3] = "LU";
+})(CornerOrientation = exports.CornerOrientation || (exports.CornerOrientation = {}));
 function randomEnum(myEnum) {
     const enumValues = Object.keys(myEnum)
         .map(n => Number.parseInt(n))

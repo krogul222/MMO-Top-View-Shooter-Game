@@ -1,8 +1,9 @@
+import { mapTileSideImageName } from './../../server/js/Constants';
 import { PlayerClient } from './Entities/PlayerClient';
 import { selfId } from './game';
 import { GameMap } from '../../server/js/Map/GameMap';
 import { TerrainMaterial } from '../../server/js/enums';
-import { mapTileImageName } from '../../server/js/Constants';
+import { mapTileImageName, mapTileCornerImageName } from '../../server/js/Constants';
 
 declare var mouseX: any;
 declare var mouseY: any;
@@ -37,7 +38,7 @@ export class MapClient {
         y = y - (mouseY-HEIGHT/2)/CAMERA_BOX_ADJUSTMENT;
 
         let size = this.map.size;
-        let material: TerrainMaterial = TerrainMaterial.grass;
+        let material: TerrainMaterial = TerrainMaterial.dirt;
         let imgWidth: number = 1;
         let imgHeight: number = 1;
 
@@ -46,7 +47,19 @@ export class MapClient {
                 material = this.map.mapTiles[i][j].material;
                 imgWidth = Img[mapTileImageName[material]].width;
                 imgHeight = Img[mapTileImageName[material]].height;
-                ctx.drawImage(Img[mapTileImageName[material]], 0, 0, imgWidth, imgHeight, x+imgWidth*j, y+imgHeight*i, imgWidth, imgHeight);                
+                ctx.drawImage(Img[mapTileImageName[material]], 0, 0, imgWidth, imgHeight, x+imgWidth*j, y+imgHeight*i, imgWidth, imgHeight);   
+                for(let k = 0; k < 4; k++){
+                    if(this.map.mapTiles[i][j].sides[k] > 0){
+                        ctx.drawImage(Img[mapTileSideImageName[k][this.map.mapTiles[i][j].sides[k]]], 0, 0, imgWidth, imgHeight, x+imgWidth*j, y+imgHeight*i, imgWidth, imgHeight);   
+                    }
+                }
+                //console.log(mapTileCornerImageName[0][this.map.mapTiles[i][j].corners[0]]);
+                for(let k = 0; k < 4; k++){
+                    if(this.map.mapTiles[i][j].corners[k] > 0){
+                        //console.log("CORNER "+mapTileCornerImageName[k][this.map.mapTiles[i][j].corners[k]]);
+                        ctx.drawImage(Img[mapTileCornerImageName[k][this.map.mapTiles[i][j].corners[k]]], 0, 0, imgWidth, imgHeight, x+imgWidth*j, y+imgHeight*i, imgWidth, imgHeight);   
+                    } 
+                }
             }
         }
        // ctx.drawImage(this.image, 0, 0, this.image.width, this.image.height, x, y, this.image.width*2, this.image.height*2);

@@ -5,11 +5,84 @@ Img.map = {}
 Img.guibackground = new Image();
 Img.guibackground.src = '/client/img/guibackground.jpg'
 
-Img.map['field'] = new Image();
-Img.map['field'].src = '/client/img/field.png';
+//Img.map['field'] = new Image();
+//Img.map['field'].src = '/client/img/field.png';
 
-Img.map['forest'] = new Image();
-Img.map['forest'].src = '/client/img/forest.png';
+//Img.map['forest'] = new Image();
+//Img.map['forest'].src = '/client/img/forest.png';
+
+Img.waterRU = new Image();
+Img.waterRU.src = '/client/img/MapTiles/waterRU.png';
+
+Img.waterLU = new Image();
+Img.waterLU.src = '/client/img/MapTiles/waterLU.png';
+
+Img.waterLD = new Image();
+Img.waterLD.src = '/client/img/MapTiles/waterLD.png';
+
+Img.waterRD = new Image();
+Img.waterRD.src = '/client/img/MapTiles/waterRD.png';
+
+Img.waterR = new Image();
+Img.waterR.src = '/client/img/MapTiles/waterR.png';
+
+Img.waterL = new Image();
+Img.waterL.src = '/client/img/MapTiles/waterL.png';
+
+Img.waterU = new Image();
+Img.waterU.src = '/client/img/MapTiles/waterU.png';
+
+Img.waterD = new Image();
+Img.waterD.src = '/client/img/MapTiles/waterD.png';
+
+
+Img.stoneRU = new Image();
+Img.stoneRU.src = '/client/img/MapTiles/stoneRU.png';
+
+Img.stoneLU = new Image();
+Img.stoneLU.src = '/client/img/MapTiles/stoneLU.png';
+
+Img.stoneLD = new Image();
+Img.stoneLD.src = '/client/img/MapTiles/stoneLD.png';
+
+Img.stoneRD = new Image();
+Img.stoneRD.src = '/client/img/MapTiles/stoneRD.png';
+
+Img.stoneR = new Image();
+Img.stoneR.src = '/client/img/MapTiles/stoneR.png';
+
+Img.stoneL = new Image();
+Img.stoneL.src = '/client/img/MapTiles/stoneL.png';
+
+Img.stoneU = new Image();
+Img.stoneU.src = '/client/img/MapTiles/stoneU.png';
+
+Img.stoneD = new Image();
+Img.stoneD.src = '/client/img/MapTiles/stoneD.png';
+
+Img.dirtRU = new Image();
+Img.dirtRU.src = '/client/img/MapTiles/dirtRU.png';
+
+Img.dirtLU = new Image();
+Img.dirtLU.src = '/client/img/MapTiles/dirtLU.png';
+
+Img.dirtLD = new Image();
+Img.dirtLD.src = '/client/img/MapTiles/dirtLD.png';
+
+Img.dirtRD = new Image();
+Img.dirtRD.src = '/client/img/MapTiles/dirtRD.png';
+
+Img.dirtR = new Image();
+Img.dirtR.src = '/client/img/MapTiles/dirtR.png';
+
+Img.dirtL = new Image();
+Img.dirtL.src = '/client/img/MapTiles/dirtL.png';
+
+Img.dirtU = new Image();
+Img.dirtU.src = '/client/img/MapTiles/dirtU.png';
+
+Img.dirtD = new Image();
+Img.dirtD.src = '/client/img/MapTiles/dirtD.png';
 
 Img.grass = new Image();
 Img.grass.src = '/client/img/MapTiles/grass.png';

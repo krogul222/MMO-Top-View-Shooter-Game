@@ -1,6 +1,6 @@
 import { GameMap } from './../Map/GameMap';
 import { MapTile } from '../Map/MapTile';
-import { TerrainMaterial, getRandomInt, randomEnum, TerrainMaterialWithoutWater } from '../enums';
+import { TerrainMaterial, getRandomInt, randomEnum, TerrainMaterialWithoutWater, Orientation, CornerOrientation } from '../enums';
 import { Point } from '../GeometryAndPhysics';
 
 export class MapController {
@@ -22,15 +22,24 @@ export class MapController {
                 let gameMap: GameMap = MapController.maps[i];
 
                 let material: string ="";
+                let sides: string = "";
+                let corners: string = "";
 
                 for(let i = 0; i < gameMap.size; i++){
                     for(let j = 0; j < gameMap.size; j++){
                         material +=gameMap.mapTiles[i][j].material+",";
+
+                        for(let k = 0; k < 4; k++){
+                            sides +=gameMap.mapTiles[i][j].sides[k];
+                            corners +=gameMap.mapTiles[i][j].corners[k];
+                            sides += (k<3) ? "," : ";";
+                            corners += (k<3) ? "," : ";";
+                        }
                     }
                 }
 
                 
-                return { material: material, name: MapController.maps[i].name}
+                return { material: material, name: MapController.maps[i].name, sides: sides, corners: corners}
 
             }
         }
@@ -55,20 +64,40 @@ export class MapController {
     static updateMap = (param) => {
         if(param !== undefined){
             for (let i in MapController.maps) {
-                console.log("UPDATE2");
+               // console.log("UPDATE2");
                 if(param.name == MapController.maps[i].name){
                     let gameMap: GameMap = MapController.maps[i];
                     
                     let str: string = param.material;
-                    let arr = str.split(",");
+                    let materialArr = str.split(",");
                     let counter = 0;
-                    console.log("Array map "+arr);
-                    console.log("MAPA UPDATE: ")
+                    str = param.sides;
+                    let sidesArr = str.split(";");
+                    let smallsidesArr;
+                    str = param.corners;
+                   
+                    let cornersArr = str.split(";");
+                    let smallcornersArr;
+
+                   
+                   // console.log("MAPA UPDATE: ")
                     for(let i = 0; i < gameMap.size; i++){
                         for(let j = 0; j < gameMap.size; j++){
-                            gameMap.mapTiles[i][j].updateMaterial(arr[counter]);
+                            gameMap.mapTiles[i][j].updateMaterial(materialArr[counter]);
+                            str = sidesArr[counter];
+                            smallsidesArr = str.split(",");
+                            str = cornersArr[counter];
+                            smallcornersArr = str.split(",");
                             counter++;
-                            console.log(gameMap.mapTiles[i][j].material+", ");
+ 
+
+                            console.log("Array corners "+smallcornersArr);
+                            for(let k = 0; k < 4; k++){
+                                gameMap.mapTiles[i][j].sides[k] = smallsidesArr[k];
+                                gameMap.mapTiles[i][j].corners[k] = smallcornersArr[k];
+                                console.log("Laduje:"+ smallcornersArr[k]);
+                            }
+                           // console.log(gameMap.mapTiles[i][j].material+", ");
                         }
                     }
                 }
@@ -84,7 +113,7 @@ export class MapController {
         let seedx = 0;
         let seedy = 0;
         let seedMaterial: TerrainMaterial[] = [];
-        let seedM: TerrainMaterial = TerrainMaterial.grass;
+        let seedM: TerrainMaterial = TerrainMaterial.dirt;
 
         let waterSeeds = Math.floor(seeds/10);
 
@@ -107,6 +136,8 @@ export class MapController {
         let distance = 10000;
         let closestSeed = 0;
 
+       // let checkLeftNeighbour = true; 
+
         for(let i = 0; i < size; i++){
             mapTiles[i] = [];
             for(let j = 0; j < size; j++){
@@ -120,6 +151,74 @@ export class MapController {
                 }
 
                 mapTiles[i][j] = new MapTile(8, 8, seedMaterial[closestSeed]);
+                
+            
+               if(j > 0){
+                    if(mapTiles[i][j].material !== mapTiles[i][j-1].material){
+                        mapTiles[i][j].convex = !mapTiles[i][j-1].convex;
+                    } else{
+                        mapTiles[i][j].convex = mapTiles[i][j-1].convex;
+                    }
+                } else{
+                    if(i > 0) {
+                        if(mapTiles[i][j].material !== mapTiles[i-1][j].material){
+                            mapTiles[i][j].convex = !mapTiles[i-1][j].convex;
+                        } else{
+                            mapTiles[i][j].convex = mapTiles[i-1][j].convex;
+                        }
+                    }
+                }
+
+                if(j > 0 ){
+                    if(mapTiles[i][j].material !== mapTiles[i][j-1].material){
+                        if(mapTiles[i][j-1].convex){
+                            mapTiles[i][j].sides[Orientation.left] = mapTiles[i][j-1].material;
+                        } else{
+                            mapTiles[i][j-1].sides[Orientation.right] = mapTiles[i][j].material;
+                        }
+                    }
+                }
+
+                if(i > 0 ){
+                    if(mapTiles[i][j].material !== mapTiles[i-1][j].material){
+                        if(mapTiles[i-1][j].convex){
+                            mapTiles[i][j].sides[Orientation.up] = mapTiles[i-1][j].material;
+                        } else{
+                            mapTiles[i-1][j].sides[Orientation.down] = mapTiles[i][j].material;
+                        }
+                    }
+                }
+            }
+        }
+
+        
+        for(let i = 0; i < size; i++){
+            for(let j = 0; j < size; j++){
+                
+                if(i > 0 && j > 0){
+                    if(mapTiles[i][j-1].sides[Orientation.up] == mapTiles[i-1][j].sides[Orientation.left]){
+                        mapTiles[i][j].corners[CornerOrientation.LU] = mapTiles[i][j-1].sides[Orientation.up];
+                    }
+                }
+                if(i > 0 && j < (size-1)){
+                    if(mapTiles[i][j+1].sides[Orientation.up] == mapTiles[i-1][j].sides[Orientation.right]){
+                        mapTiles[i][j].corners[CornerOrientation.RU] = mapTiles[i][j+1].sides[Orientation.up];
+                    }
+                }
+
+                if(i < (size-1) && j < (size-1)){
+                    if(mapTiles[i][j+1].sides[Orientation.down] == mapTiles[i+1][j].sides[Orientation.right]){
+                        mapTiles[i][j].corners[CornerOrientation.RD] = mapTiles[i][j+1].sides[Orientation.down];
+                    }
+                }
+
+
+                if(i < (size-1) && j > 0){
+                    if(mapTiles[i][j-1].sides[Orientation.down] == mapTiles[i+1][j].sides[Orientation.left]){
+                        mapTiles[i][j].corners[CornerOrientation.LD] = mapTiles[i+1][j].sides[Orientation.left];
+                    }
+                }
+                
             }
         }
 

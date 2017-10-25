@@ -4,6 +4,8 @@ export enum ItemType { knife = 0, pistol = 1, shotgun = 2, rifle = 3, medicalkit
 export enum UpgradeCategory { item = 0, ammo = 1}
 export enum TerrainMaterial { dirt = 1, water = 2, stone = 3 }
 export enum TerrainMaterialWithoutWater { dirt = 1, stone =3 }
+export enum Orientation { up = 0, right = 1, down = 2, left = 3 }
+export enum CornerOrientation { RU = 0, RD = 1, LD = 2, LU = 3 }
 
 export function randomEnum (myEnum) {
     const enumValues = Object.keys(myEnum)
