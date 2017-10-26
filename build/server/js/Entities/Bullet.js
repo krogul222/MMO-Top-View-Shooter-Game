@@ -57,7 +57,7 @@ class Bullet extends Entity_1.Entity {
                 }
             }
             let map = MapControler_1.MapController.getMap(this.map);
-            if (map.isPositionWall(this.position) && map.isPositionWall(this.position) !== 2) {
+            if (map.isPositionWall(this.position) > 2) {
                 this.toRemove = true;
                 this.hitCategory = 2;
             }
