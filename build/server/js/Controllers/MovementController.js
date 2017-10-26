@@ -22,25 +22,25 @@ class MovementController {
             let downBumper = new GeometryAndPhysics_1.Point(x, y + this.collisionBounds.Down);
             let speedX = 0;
             let speedY = 0;
-            if (map.isPositionWall(rightBumper)) {
+            if (map.isPositionWall(rightBumper) >= 2) {
                 speedX = !this._pressingRight ? -this._maxSpdX : speedX;
             }
             else {
                 speedX = this._pressingRight ? this._maxSpdX : speedX;
             }
-            if (map.isPositionWall(leftBumper)) {
+            if (map.isPositionWall(leftBumper) >= 2) {
                 speedX = !this._pressingLeft ? this._maxSpdX : speedX;
             }
             else {
                 speedX = this._pressingLeft ? -this._maxSpdX : speedX;
             }
-            if (map.isPositionWall(downBumper)) {
+            if (map.isPositionWall(downBumper) >= 2) {
                 speedY = !this._pressingDown ? -this._maxSpdY : speedY;
             }
             else {
                 speedY = this._pressingDown ? this._maxSpdY : speedY;
             }
-            if (map.isPositionWall(upBumper)) {
+            if (map.isPositionWall(upBumper) >= 2) {
                 speedY = !this._pressingUp ? this._maxSpdY : speedY;
             }
             else {
@@ -60,6 +60,10 @@ class MovementController {
             }
             else {
                 this._recoilCounter.deactivate();
+            }
+            if (map.isPositionWall(this.parent.position) == 1) {
+                speedX = speedX / 2;
+                speedY = speedY / 2;
             }
             this.parent.setSpdX(speedX);
             this.parent.setSpdY(speedY);

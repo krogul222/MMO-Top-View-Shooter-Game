@@ -1,5 +1,6 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 const GeometryAndPhysics_1 = require("../GeometryAndPhysics");
+const Constants_1 = require("../Constants");
 class GameMap {
     constructor(_name, mapTiles) {
         this._name = _name;
@@ -11,10 +12,10 @@ class GameMap {
                 return 1;
             if (position.y < 0 || position.y >= this.height)
                 return 1;
-            let tileX = Math.floor(position.x / (8 * 32));
-            let tileY = Math.floor(position.y / (8 * 32));
-            let inTileX = position.x - tileX * 8 * 32;
-            let inTileY = position.y - tileY * 8 * 32;
+            let tileX = Math.floor(position.x / (Constants_1.TILE_SIZE * 32));
+            let tileY = Math.floor(position.y / (Constants_1.TILE_SIZE * 32));
+            let inTileX = position.x - tileX * Constants_1.TILE_SIZE * 32;
+            let inTileY = position.y - tileY * Constants_1.TILE_SIZE * 32;
             if (tileX < this._size && tileY < this._size)
                 return this.mapTiles[tileY][tileX].isPositionWall(new GeometryAndPhysics_1.Point(inTileX, inTileY));
             else {
@@ -29,8 +30,8 @@ class GameMap {
                 this.mapTiles[i][j] = mapTiles[i][j];
             }
         }
-        this._height = 8 * 32 * this._size;
-        this._width = 8 * 32 * this._size;
+        this._height = Constants_1.TILE_SIZE * 32 * this._size;
+        this._width = Constants_1.TILE_SIZE * 32 * this._size;
     }
     get width() { return this._width; }
     get height() { return this._height; }

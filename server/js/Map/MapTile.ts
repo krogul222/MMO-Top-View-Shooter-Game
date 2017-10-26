@@ -1,5 +1,6 @@
+import { mapObjectCollisions, TILE_SIZE } from './../Constants';
 import { Point } from './../GeometryAndPhysics';
-import { TerrainMaterial } from "../enums";
+import { TerrainMaterial, MapObjectType } from "../enums";
 
 export class MapTile {
 
@@ -7,6 +8,7 @@ export class MapTile {
     private _material: TerrainMaterial;
     public sides: number[] = [];
     public corners: number[] = [];
+    public objects: MapObjectType[] = [];
     public convex: boolean = true;
 
     constructor(private _width: number, private _height: number, material: TerrainMaterial) {
@@ -23,7 +25,7 @@ export class MapTile {
             this.sides[i] = 0;
             this.corners[i] = 0;
         }
-        
+        this.objects.push(0);
     }
 
     updateMaterial = (material) => {
@@ -44,6 +46,29 @@ export class MapTile {
             return 0;
         }
             
+    }
+
+    addObject = (type : MapObjectType, collisions: boolean) => {
+        this.objects.push(type);
+        if(collisions == true){
+            this.updateCollisions(type);
+        }
+        
+    }
+
+    updateCollisions = (type : MapObjectType) => {
+
+        let gridUpdate = mapObjectCollisions[type];
+        console.log("COLLISIONS: "+mapObjectCollisions[type]);
+
+        for(let i = 0; i < this._height; i++){
+            for(let j = 0; j < this._width; j++){
+               // if(gridUpdate[i*TILE_SIZE+j] > this.grid[i][j]){
+                    this.grid[i][j] = gridUpdate[i*TILE_SIZE+j];
+               // }
+            }
+        }
+
     }
 
     get width() { return this._width; }

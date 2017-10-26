@@ -39,25 +39,25 @@ export class MovementController {
 
         // Collisions implementation
 
-        if(map.isPositionWall(rightBumper)){
+        if(map.isPositionWall(rightBumper)>=2){
             speedX = !this._pressingRight ? -this._maxSpdX : speedX;
         } else{
             speedX = this._pressingRight ? this._maxSpdX : speedX;
         } 
 
-        if(map.isPositionWall(leftBumper)){
+        if(map.isPositionWall(leftBumper)>=2){
             speedX = !this._pressingLeft ? this._maxSpdX : speedX;
         } else{
             speedX = this._pressingLeft ? -this._maxSpdX : speedX;
         } 
 
-        if(map.isPositionWall(downBumper)){
+        if(map.isPositionWall(downBumper)>=2){
             speedY = !this._pressingDown ? -this._maxSpdY : speedY;
         } else{
             speedY = this._pressingDown ? this._maxSpdY : speedY;
         } 
 
-        if(map.isPositionWall(upBumper)){
+        if(map.isPositionWall(upBumper)>=2){
             speedY = !this._pressingUp ? this._maxSpdY : speedY;
         } else{
             speedY = this._pressingUp ? -this._maxSpdY : speedY;
@@ -80,7 +80,10 @@ export class MovementController {
         }
 
         // Update speed
-
+        if(map.isPositionWall(this.parent.position) == 1){
+            speedX = speedX/2;
+            speedY = speedY/2;
+        }
         this.parent.setSpdX(speedX);
         this.parent.setSpdY(speedY);
 

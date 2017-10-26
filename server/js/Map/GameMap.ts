@@ -1,5 +1,6 @@
 import { MapTile } from './MapTile';
 import { Point } from '../GeometryAndPhysics';
+import { TILE_SIZE } from '../Constants';
 
 
 export class GameMap {
@@ -18,8 +19,8 @@ export class GameMap {
                 this.mapTiles[i][j] = mapTiles[i][j];
             }
         }
-        this._height = 8*32*this._size;
-        this._width = 8*32*this._size;
+        this._height = TILE_SIZE*32*this._size;
+        this._width = TILE_SIZE*32*this._size;
     }
 
     isPositionWall = (position: Point) =>{
@@ -29,11 +30,11 @@ export class GameMap {
         if(position.y < 0 || position.y >= this.height)
             return 1;
     
-        let tileX = Math.floor(position.x/(8*32));
-        let tileY = Math.floor(position.y/(8*32));
+        let tileX = Math.floor(position.x/(TILE_SIZE*32));
+        let tileY = Math.floor(position.y/(TILE_SIZE*32));
         
-        let inTileX = position.x - tileX*8*32;
-        let inTileY = position.y - tileY*8*32;
+        let inTileX = position.x - tileX*TILE_SIZE*32;
+        let inTileY = position.y - tileY*TILE_SIZE*32;
 
         //console.log("X = "+tileX + "   Y = "+tileY);
 

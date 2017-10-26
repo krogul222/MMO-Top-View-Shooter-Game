@@ -10,9 +10,8 @@ const ExplosionClient_1 = require("./Entities/ExplosionClient");
 const Inventory_1 = require("../../server/js/Inventory/Inventory");
 exports.selfId = 0;
 exports.inventory = new Inventory_1.Inventory(socket, false, 0);
-let mapController = new MapControler_1.MapController({});
-MapControler_1.MapController.loadMaps();
-let currentMap = new MapClient_1.MapClient(MapControler_1.MapController.getMap("forest"));
+MapControler_1.MapController.loadMaps(true);
+let currentMap = new MapClient_1.MapClient(null, "forest");
 socket.on('updateInventory', function (items) {
     exports.inventory.items = items;
     exports.inventory.refreshRender();
@@ -20,7 +19,7 @@ socket.on('updateInventory', function (items) {
 exports.gameSoundManager = new GameSoundManager_1.GameSoundManager();
 socket.on('mapData', function (data) {
     MapControler_1.MapController.updateMap(data);
-    if (currentMap.map.name == data.name)
+    if (currentMap.name == data.name)
         currentMap.reloadMap(MapControler_1.MapController.getMap(data.name));
 });
 socket.on('init', function (data) {

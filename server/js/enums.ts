@@ -7,6 +7,11 @@ export enum TerrainMaterialWithoutWater { dirt = 1, stone =3 }
 export enum Orientation { up = 0, right = 1, down = 2, left = 3 }
 export enum CornerOrientation { RU = 0, RD = 1, LD = 2, LU = 3 }
 
+export enum MapObjectType { GR_LU = 1, GR_LD = 2, GR_RU = 3, GR_RD = 4, GR_L = 5, GR_R = 6,
+GR_D = 7, GR_U = 8, GR_EU = 9, GR_ED = 10, GR_EL = 11, GR_ER = 12 }
+
+
+
 export function randomEnum (myEnum) {
     const enumValues = Object.keys(myEnum)
     .map(n => Number.parseInt(n))

@@ -1,11 +1,14 @@
-import { ItemType, WeaponAmmoType, TerrainMaterial, Orientation, CornerOrientation } from './enums';
+import { ItemType, WeaponAmmoType, TerrainMaterial, Orientation, CornerOrientation, MapObjectType } from './enums';
 
 export let imageName: any = {};
 export let mapTileImageName: any = {};
 export let mapTileSideImageName: any = {}; 
 export let mapTileCornerImageName: any = {}; 
+export let mapObjectImageName: any = {}; 
+export let mapObjectCollisions: any = {}; 
 
 export const GAME_SPEED_TOOLINGFACTOR = 0.75;
+export const TILE_SIZE = 8;
 
 imageName[ ItemType.pistol ] = "pistol";
 //imageName[ ItemType.claws ] = "claws";
@@ -63,3 +66,29 @@ mapTileCornerImageName[CornerOrientation.LD] = {};
 mapTileCornerImageName[CornerOrientation.LD][TerrainMaterial.stone] = "stoneLD"; 
 mapTileCornerImageName[CornerOrientation.LD][TerrainMaterial.dirt] = "dirtLD";
 mapTileCornerImageName[CornerOrientation.LD][TerrainMaterial.water] = "waterLD";
+
+//------------------------------------------------
+mapObjectImageName[MapObjectType.GR_D] = "groundRingD";
+mapObjectImageName[MapObjectType.GR_U] = "groundRingU";
+mapObjectImageName[MapObjectType.GR_L] = "groundRingL";
+mapObjectImageName[MapObjectType.GR_R] = "groundRingR";
+mapObjectImageName[MapObjectType.GR_RU] = "groundRingRU";
+mapObjectImageName[MapObjectType.GR_LU] = "groundRingLU";
+mapObjectImageName[MapObjectType.GR_RD] = "groundRingRD";
+mapObjectImageName[MapObjectType.GR_LD] = "groundRingLD";
+mapObjectImageName[MapObjectType.GR_EU] = "groundRingUenter";
+mapObjectImageName[MapObjectType.GR_ED] = "groundRingDenter";
+//--------------------------------------------------------
+
+mapObjectCollisions[MapObjectType.GR_D] = [0,0,0,0,0,0,0,0, 0,0,0,0,0,0,0,0, 0,0,0,0,0,0,0,0, 0,0,0,0,0,0,0,0, 0,0,0,0,0,0,0,0, 0,0,0,0,0,0,0,0, 2,2,2,2,2,2,2,2, 2,2,2,2,2,2,2,2]; 
+mapObjectCollisions[MapObjectType.GR_U] = [0,0,0,0,0,0,0,0, 0,0,0,0,0,0,0,0, 2,2,2,2,2,2,2,2, 0,0,0,0,0,0,0,0, 0,0,0,0,0,0,0,0, 0,0,0,0,0,0,0,0, 0,0,0,0,0,0,0,0, 0,0,0,0,0,0,0,0];
+mapObjectCollisions[MapObjectType.GR_L] = [0,0,0,0,0,2,0,0, 0,0,0,0,0,2,0,0, 0,0,0,0,0,2,0,0, 0,0,0,0,0,2,0,0, 0,0,0,0,0,2,0,0, 0,0,0,0,0,2,0,0, 0,0,0,0,0,2,0,0, 0,0,0,0,0,2,0,0];
+mapObjectCollisions[MapObjectType.GR_R] = [0,0,2,0,0,0,0,0, 0,0,2,0,0,0,0,0, 0,0,2,0,0,0,0,0, 0,0,2,0,0,0,0,0, 0,0,2,0,0,0,0,0, 0,0,2,0,0,0,0,0, 0,0,2,0,0,0,0,0, 0,0,2,0,0,0,0,0];
+
+mapObjectCollisions[MapObjectType.GR_RD] = [0,0,2,0,0,0,0,0, 0,0,2,0,0,0,0,0, 0,0,2,0,0,0,0,0, 0,0,2,0,0,0,0,0, 0,0,2,0,0,0,0,0, 0,2,2,0,0,0,0,0, 2,2,0,0,0,0,0,0, 2,0,0,0,0,0,0,0];
+mapObjectCollisions[MapObjectType.GR_LD] = [0,0,0,0,0,2,0,0, 0,0,0,0,0,2,0,0, 0,0,0,0,0,2,0,0, 0,0,0,0,0,2,0,0, 0,0,0,0,0,2,0,0, 0,0,0,0,0,2,2,0, 0,0,0,0,0,0,2,2, 0,0,0,0,0,0,0,2];
+mapObjectCollisions[MapObjectType.GR_RU] = [0,0,0,0,0,0,0,0, 0,0,0,0,0,0,0,0, 2,0,0,0,0,0,0,0, 2,2,0,0,0,0,0,0, 0,2,2,0,0,0,0,0, 0,0,2,0,0,0,0,0, 0,0,2,0,0,0,0,0, 0,0,2,0,0,0,0,0];
+mapObjectCollisions[MapObjectType.GR_LU] = [0,0,0,0,0,0,0,0, 0,0,0,0,0,0,0,0, 0,0,0,0,0,0,0,2, 0,0,0,0,0,0,2,2, 0,0,0,0,0,2,2,0, 0,0,0,0,0,2,0,0, 0,0,0,0,0,2,0,0, 0,0,0,0,0,2,0,0];
+
+mapObjectCollisions[MapObjectType.GR_EU] = [0,0,0,0,0,0,0,0, 0,0,0,0,0,0,0,0, 2,2,2,1,1,2,2,2, 0,0,0,0,0,0,0,0, 0,0,0,0,0,0,0,0, 0,0,0,0,0,0,0,0, 0,0,0,0,0,0,0,0, 0,0,0,0,0,0,0,0];
+mapObjectCollisions[MapObjectType.GR_ED] = [0,0,0,0,0,0,0,0, 0,0,0,0,0,0,0,0, 0,0,0,0,0,0,0,0, 0,0,0,0,0,0,0,0, 0,0,0,0,0,0,0,0, 0,0,0,0,0,0,0,0, 2,2,2,1,1,2,2,2, 2,2,2,1,1,2,2,2];

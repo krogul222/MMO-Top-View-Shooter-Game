@@ -1,8 +1,10 @@
 Object.defineProperty(exports, "__esModule", { value: true });
+const GroundRing_1 = require("./../Map/MapObjects/GroundRing");
 const GameMap_1 = require("./../Map/GameMap");
 const MapTile_1 = require("../Map/MapTile");
 const enums_1 = require("../enums");
 const GeometryAndPhysics_1 = require("../GeometryAndPhysics");
+const Constants_1 = require("../Constants");
 class MapController {
     constructor(param) {
     }
@@ -26,6 +28,7 @@ MapController.getMapPack = (map) => {
             let gameMap = MapController.maps[i];
             let material = "";
             let sides = "";
+            let objects = "";
             for (let i = 0; i < gameMap.size; i++) {
                 for (let j = 0; j < gameMap.size; j++) {
                     material += gameMap.mapTiles[i][j].material + ",";
@@ -33,14 +36,20 @@ MapController.getMapPack = (map) => {
                         sides += gameMap.mapTiles[i][j].sides[k];
                         sides += (k < 3) ? "," : ";";
                     }
+                    for (let k = 0, length = gameMap.mapTiles[i][j].objects.length; k < length; k++) {
+                        objects += gameMap.mapTiles[i][j].objects[k];
+                        objects += (k < length - 1) ? "," : ";";
+                    }
                 }
             }
-            return { material: material, name: MapController.maps[i].name, sides: sides };
+            return { material: material, name: MapController.maps[i].name, sides: sides, objects: objects };
         }
     }
 };
 MapController.loadMaps = () => {
+    console.log("Pierwsza Map");
     MapController.createMap("forest", 16, 20);
+    console.log("Druga Map");
     MapController.createMap("forest2", 16, 20);
 };
 MapController.updateMap = (param) => {
@@ -54,14 +63,24 @@ MapController.updateMap = (param) => {
                 str = param.sides;
                 let sidesArr = str.split(";");
                 let smallsidesArr;
+                str = param.objects;
+                let objectsArr = str.split(";");
+                let smallobjectsArr;
+                console.log("MAPA OBJECTS: " + param.objects);
                 for (let i = 0; i < gameMap.size; i++) {
                     for (let j = 0; j < gameMap.size; j++) {
+                        gameMap.mapTiles[i][j].objects.length = 0;
                         gameMap.mapTiles[i][j].updateMaterial(materialArr[counter]);
                         str = sidesArr[counter];
                         smallsidesArr = str.split(",");
+                        str = objectsArr[counter];
+                        smallobjectsArr = str.split(",");
                         counter++;
                         for (let k = 0; k < 4; k++) {
                             gameMap.mapTiles[i][j].sides[k] = smallsidesArr[k];
+                        }
+                        for (let k = 0; k < smallobjectsArr.length; k++) {
+                            gameMap.mapTiles[i][j].addObject(smallobjectsArr[k], false);
                         }
                     }
                 }
@@ -105,28 +124,10 @@ MapController.createMap = (name, size, seeds) => {
                     closestSeed = k;
                 }
             }
-            mapTiles[i][j] = new MapTile_1.MapTile(8, 8, seedMaterial[closestSeed]);
+            mapTiles[i][j] = new MapTile_1.MapTile(Constants_1.TILE_SIZE, Constants_1.TILE_SIZE, seedMaterial[closestSeed]);
             if (j > 0) {
                 if (mapTiles[i][j].material !== mapTiles[i][j - 1].material) {
-                    mapTiles[i][j].convex = !mapTiles[i][j - 1].convex;
-                }
-                else {
-                    mapTiles[i][j].convex = mapTiles[i][j - 1].convex;
-                }
-            }
-            else {
-                if (i > 0) {
-                    if (mapTiles[i][j].material !== mapTiles[i - 1][j].material) {
-                        mapTiles[i][j].convex = !mapTiles[i - 1][j].convex;
-                    }
-                    else {
-                        mapTiles[i][j].convex = mapTiles[i - 1][j].convex;
-                    }
-                }
-            }
-            if (j > 0) {
-                if (mapTiles[i][j].material !== mapTiles[i][j - 1].material) {
-                    if (mapTiles[i][j - 1].convex) {
+                    if (mapTiles[i][j - 1].material < mapTiles[i][j].material) {
                         mapTiles[i][j].sides[enums_1.Orientation.left] = mapTiles[i][j - 1].material;
                     }
                     else {
@@ -136,7 +137,7 @@ MapController.createMap = (name, size, seeds) => {
             }
             if (i > 0) {
                 if (mapTiles[i][j].material !== mapTiles[i - 1][j].material) {
-                    if (mapTiles[i - 1][j].convex) {
+                    if (mapTiles[i - 1][j].material < mapTiles[i][j].material) {
                         mapTiles[i][j].sides[enums_1.Orientation.up] = mapTiles[i - 1][j].material;
                     }
                     else {
@@ -146,10 +147,24 @@ MapController.createMap = (name, size, seeds) => {
             }
         }
     }
+    let width = enums_1.getRandomInt(0, 4);
+    let height = enums_1.getRandomInt(0, 4);
+    let enter = enums_1.Orientation.down;
+    if (Math.random() < 0.5) {
+        enter = enums_1.Orientation.up;
+    }
+    let gr = new GroundRing_1.GroundRing(3 + width, 3 + height, enter);
+    MapController.loadObject(gr, mapTiles, new GeometryAndPhysics_1.Point(4, 4));
     MapController.maps[name] = (new GameMap_1.GameMap(name, mapTiles));
 };
 MapController.getTileDistance = (x, y, tx, ty) => {
     return Math.sqrt((x - tx) * (x - tx) + (y - ty) * (y - ty));
+};
+MapController.loadObject = (mapObject, mapTiles, position) => {
+    for (let i in mapObject.objectTiles) {
+        let object = mapObject.objectTiles[i];
+        mapTiles[position.y + object.position.y][position.x + object.position.x].addObject(object.type, true);
+    }
 };
 exports.MapController = MapController;
 //# sourceMappingURL=MapControler.js.map

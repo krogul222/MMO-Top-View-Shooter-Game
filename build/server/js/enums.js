@@ -54,6 +54,21 @@ var CornerOrientation;
     CornerOrientation[CornerOrientation["LD"] = 2] = "LD";
     CornerOrientation[CornerOrientation["LU"] = 3] = "LU";
 })(CornerOrientation = exports.CornerOrientation || (exports.CornerOrientation = {}));
+var MapObjectType;
+(function (MapObjectType) {
+    MapObjectType[MapObjectType["GR_LU"] = 1] = "GR_LU";
+    MapObjectType[MapObjectType["GR_LD"] = 2] = "GR_LD";
+    MapObjectType[MapObjectType["GR_RU"] = 3] = "GR_RU";
+    MapObjectType[MapObjectType["GR_RD"] = 4] = "GR_RD";
+    MapObjectType[MapObjectType["GR_L"] = 5] = "GR_L";
+    MapObjectType[MapObjectType["GR_R"] = 6] = "GR_R";
+    MapObjectType[MapObjectType["GR_D"] = 7] = "GR_D";
+    MapObjectType[MapObjectType["GR_U"] = 8] = "GR_U";
+    MapObjectType[MapObjectType["GR_EU"] = 9] = "GR_EU";
+    MapObjectType[MapObjectType["GR_ED"] = 10] = "GR_ED";
+    MapObjectType[MapObjectType["GR_EL"] = 11] = "GR_EL";
+    MapObjectType[MapObjectType["GR_ER"] = 12] = "GR_ER";
+})(MapObjectType = exports.MapObjectType || (exports.MapObjectType = {}));
 function randomEnum(myEnum) {
     const enumValues = Object.keys(myEnum)
         .map(n => Number.parseInt(n))

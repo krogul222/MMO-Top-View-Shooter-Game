@@ -24,9 +24,8 @@ export var selfId: number = 0;
 
 export let inventory = new Inventory(socket, false, 0);
 
-let mapController: MapController = new MapController({});
-MapController.loadMaps();
-let currentMap = new MapClient(MapController.getMap("forest"));
+MapController.loadMaps(true);
+let currentMap = new MapClient(null, "forest");
 
 
 socket.on('updateInventory', function(items){
@@ -38,7 +37,7 @@ export let gameSoundManager = new GameSoundManager();
 
 socket.on('mapData', function(data){
     MapController.updateMap(data);
-    if(currentMap.map.name == data.name)
+    if(currentMap.name == data.name)
         currentMap.reloadMap(MapController.getMap(data.name));
 
 });

@@ -5,6 +5,28 @@ Img.map = {}
 Img.guibackground = new Image();
 Img.guibackground.src = '/client/img/guibackground.jpg'
 
+
+Img.groundRingD = new Image();
+Img.groundRingD.src = '/client/img/MapObjects/groundRing/groundRingD.png';
+Img.groundRingU = new Image();
+Img.groundRingU.src = '/client/img/MapObjects/groundRing/groundRingU.png';
+Img.groundRingL = new Image();
+Img.groundRingL.src = '/client/img/MapObjects/groundRing/groundRingL.png';
+Img.groundRingR = new Image();
+Img.groundRingR.src = '/client/img/MapObjects/groundRing/groundRingR.png';
+Img.groundRingRD = new Image();
+Img.groundRingRD.src = '/client/img/MapObjects/groundRing/groundRingRD.png';
+Img.groundRingRU = new Image();
+Img.groundRingRU.src = '/client/img/MapObjects/groundRing/groundRingRU.png';
+Img.groundRingLD = new Image();
+Img.groundRingLD.src = '/client/img/MapObjects/groundRing/groundRingLD.png';
+Img.groundRingLU = new Image();
+Img.groundRingLU.src = '/client/img/MapObjects/groundRing/groundRingLU.png';
+Img.groundRingUenter = new Image();
+Img.groundRingUenter.src = '/client/img/MapObjects/groundRing/groundRingUenter.png';
+Img.groundRingDenter = new Image();
+Img.groundRingDenter.src = '/client/img/MapObjects/groundRing/groundRingDenter.png';
+
 //Img.map['field'] = new Image();
 //Img.map['field'].src = '/client/img/field.png';
 
