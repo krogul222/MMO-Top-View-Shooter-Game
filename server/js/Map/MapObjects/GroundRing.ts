@@ -1,6 +1,7 @@
 import { MapObject } from './MapObject';
-import { Point } from './../../GeometryAndPhysics';
+import { Point, Size } from './../../GeometryAndPhysics';
 import { Orientation, CornerOrientation, getRandomInt, MapObjectType } from '../../enums';
+import { MapTile } from '../MapTile';
 
 export class GroundRing extends MapObject{
 
@@ -11,6 +12,8 @@ export class GroundRing extends MapObject{
     sidesR: Point[] = [];
     enter: Point;
     enterOrientation: Orientation;
+
+
 
     constructor(width: number, height: number, enterOrientation: Orientation){
         super();
@@ -53,17 +56,45 @@ export class GroundRing extends MapObject{
                 y = 0;
             }
 
+            if(enterOrientation == Orientation.left){
+                x = 0;
+            } else if(enterOrientation == Orientation.right){
+                x = width-1;
+            }
+
             this.enter = new Point(x,y);
 
             if(enterOrientation == Orientation.down){
                 this.addObjectTile(this.enter, MapObjectType.GR_ED);
             } else if(enterOrientation == Orientation.up){
                 this.addObjectTile(this.enter, MapObjectType.GR_EU);
-            }            
+            } else if(enterOrientation == Orientation.right){
+                this.addObjectTile(this.enter, MapObjectType.GR_ER);
+            } else if(enterOrientation == Orientation.left){
+                this.addObjectTile(this.enter, MapObjectType.GR_EL);
+            }                        
 
             
         }
 
     }
+
+    isColliding = (mapTiles: MapTile[][], position: Point) =>{
+        
+                for(let i = 0; i < (this.sidesU.length+2); i++){
+                    if(mapTiles[position.y][position.x+i].collisions || mapTiles[position.y+ this.sidesR.length+1][position.x+i].collisions){
+                        return true;
+                    }
+                }
+        
+                for(let i = 0; i < (this.sidesR.length+2); i++){
+                    if(mapTiles[position.y+i][position.x].collisions || mapTiles[position.y+ i][position.x+this.sidesD.length+1].collisions){
+                        return true;
+                    }
+                }
+        
+                return false;
+        
+            }
 
 }

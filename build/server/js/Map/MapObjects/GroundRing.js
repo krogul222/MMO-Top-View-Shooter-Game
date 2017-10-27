@@ -10,6 +10,19 @@ class GroundRing extends MapObject_1.MapObject {
         this.sidesD = [];
         this.sidesL = [];
         this.sidesR = [];
+        this.isColliding = (mapTiles, position) => {
+            for (let i = 0; i < (this.sidesU.length + 2); i++) {
+                if (mapTiles[position.y][position.x + i].collisions || mapTiles[position.y + this.sidesR.length + 1][position.x + i].collisions) {
+                    return true;
+                }
+            }
+            for (let i = 0; i < (this.sidesR.length + 2); i++) {
+                if (mapTiles[position.y + i][position.x].collisions || mapTiles[position.y + i][position.x + this.sidesD.length + 1].collisions) {
+                    return true;
+                }
+            }
+            return false;
+        };
         if (width > 2 && height > 2) {
             this.corners[enums_1.CornerOrientation.LU] = new GeometryAndPhysics_1.Point(0, 0);
             this.addObjectTile(this.corners[enums_1.CornerOrientation.LU], enums_1.MapObjectType.GR_LU);
@@ -40,12 +53,24 @@ class GroundRing extends MapObject_1.MapObject {
             else if (enterOrientation == enums_1.Orientation.up) {
                 y = 0;
             }
+            if (enterOrientation == enums_1.Orientation.left) {
+                x = 0;
+            }
+            else if (enterOrientation == enums_1.Orientation.right) {
+                x = width - 1;
+            }
             this.enter = new GeometryAndPhysics_1.Point(x, y);
             if (enterOrientation == enums_1.Orientation.down) {
                 this.addObjectTile(this.enter, enums_1.MapObjectType.GR_ED);
             }
             else if (enterOrientation == enums_1.Orientation.up) {
                 this.addObjectTile(this.enter, enums_1.MapObjectType.GR_EU);
+            }
+            else if (enterOrientation == enums_1.Orientation.right) {
+                this.addObjectTile(this.enter, enums_1.MapObjectType.GR_ER);
+            }
+            else if (enterOrientation == enums_1.Orientation.left) {
+                this.addObjectTile(this.enter, enums_1.MapObjectType.GR_EL);
             }
         }
     }

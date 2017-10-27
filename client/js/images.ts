@@ -26,6 +26,10 @@ Img.groundRingUenter = new Image();
 Img.groundRingUenter.src = '/client/img/MapObjects/groundRing/groundRingUenter.png';
 Img.groundRingDenter = new Image();
 Img.groundRingDenter.src = '/client/img/MapObjects/groundRing/groundRingDenter.png';
+Img.groundRingRenter = new Image();
+Img.groundRingRenter.src = '/client/img/MapObjects/groundRing/groundRingRenter.png';
+Img.groundRingLenter = new Image();
+Img.groundRingLenter.src = '/client/img/MapObjects/groundRing/groundRingLenter.png';
 
 //Img.map['field'] = new Image();
 //Img.map['field'].src = '/client/img/field.png';

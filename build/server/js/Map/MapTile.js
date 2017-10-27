@@ -9,6 +9,7 @@ class MapTile {
         this.corners = [];
         this.objects = [];
         this.convex = true;
+        this.collisions = false;
         this.updateMaterial = (material) => {
             this._material = material;
         };
@@ -31,9 +32,13 @@ class MapTile {
         this.updateCollisions = (type) => {
             let gridUpdate = Constants_1.mapObjectCollisions[type];
             console.log("COLLISIONS: " + Constants_1.mapObjectCollisions[type]);
+            this.collisions = false;
             for (let i = 0; i < this._height; i++) {
                 for (let j = 0; j < this._width; j++) {
                     this.grid[i][j] = gridUpdate[i * Constants_1.TILE_SIZE + j];
+                    if (this.grid[i][j] > 0) {
+                        this.collisions = true;
+                    }
                 }
             }
         };
@@ -43,6 +48,9 @@ class MapTile {
             this.grid[i] = [];
             for (let j = 0; j < this._width; j++) {
                 this.grid[i][j] = (material != enums_1.TerrainMaterial.water) ? 0 : 2;
+                if (this.grid[i][j] > 0) {
+                    this.collisions = true;
+                }
             }
         }
         for (let i = 0; i < 4; i++) {

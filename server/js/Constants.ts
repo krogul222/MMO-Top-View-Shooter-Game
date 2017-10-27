@@ -78,6 +78,8 @@ mapObjectImageName[MapObjectType.GR_RD] = "groundRingRD";
 mapObjectImageName[MapObjectType.GR_LD] = "groundRingLD";
 mapObjectImageName[MapObjectType.GR_EU] = "groundRingUenter";
 mapObjectImageName[MapObjectType.GR_ED] = "groundRingDenter";
+mapObjectImageName[MapObjectType.GR_EL] = "groundRingLenter";
+mapObjectImageName[MapObjectType.GR_ER] = "groundRingRenter";
 //--------------------------------------------------------
 
 mapObjectCollisions[MapObjectType.GR_D] = [0,0,0,0,0,0,0,0, 0,0,0,0,0,0,0,0, 0,0,0,0,0,0,0,0, 0,0,0,0,0,0,0,0, 0,0,0,0,0,0,0,0, 0,0,0,0,0,0,0,0, 2,2,2,2,2,2,2,2, 2,2,2,2,2,2,2,2]; 
@@ -92,3 +94,5 @@ mapObjectCollisions[MapObjectType.GR_LU] = [0,0,0,0,0,0,0,0, 0,0,0,0,0,0,0,0, 0,
 
 mapObjectCollisions[MapObjectType.GR_EU] = [0,0,0,0,0,0,0,0, 0,0,0,0,0,0,0,0, 2,2,2,1,1,2,2,2, 0,0,0,1,1,0,0,0, 0,0,0,0,0,0,0,0, 0,0,0,0,0,0,0,0, 0,0,0,0,0,0,0,0, 0,0,0,0,0,0,0,0];
 mapObjectCollisions[MapObjectType.GR_ED] = [0,0,0,0,0,0,0,0, 0,0,0,0,0,0,0,0, 0,0,0,0,0,0,0,0, 0,0,0,0,0,0,0,0, 0,0,0,0,0,0,0,0, 0,0,0,1,1,0,0,0, 2,2,2,1,1,2,2,2, 2,2,2,1,1,2,2,2];
+mapObjectCollisions[MapObjectType.GR_EL] = [0,0,0,0,0,2,0,0, 0,0,0,0,0,2,0,0, 0,0,0,0,0,2,0,0, 0,0,0,0,0,1,1,0, 0,0,0,0,0,1,1,0, 0,0,0,0,0,2,0,0, 0,0,0,0,0,2,0,0, 0,0,0,0,0,2,0,0];
+mapObjectCollisions[MapObjectType.GR_ER] = [0,0,2,0,0,0,0,0, 0,0,2,0,0,0,0,0, 0,0,2,0,0,0,0,0, 0,1,1,0,0,0,0,0, 0,1,1,0,0,0,0,0, 0,0,2,0,0,0,0,0, 0,0,2,0,0,0,0,0, 0,0,2,0,0,0,0,0];

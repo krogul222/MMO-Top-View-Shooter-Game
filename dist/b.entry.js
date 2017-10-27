@@ -60,7 +60,7 @@
 /******/ 	__webpack_require__.p = "/dist/";
 /******/
 /******/ 	// Load entry module and return exports
-/******/ 	return __webpack_require__(__webpack_require__.s = 32);
+/******/ 	return __webpack_require__(__webpack_require__.s = 33);
 /******/ })
 /************************************************************************/
 /******/ ([
@@ -223,11 +223,11 @@ exports.getRandomInt = getRandomInt;
 
 Object.defineProperty(exports, "__esModule", { value: true });
 const MapControler_1 = __webpack_require__(5);
-const GameSoundManager_1 = __webpack_require__(22);
-const UpgradeClient_1 = __webpack_require__(23);
-const MapClient_1 = __webpack_require__(24);
+const GameSoundManager_1 = __webpack_require__(23);
+const UpgradeClient_1 = __webpack_require__(24);
+const MapClient_1 = __webpack_require__(25);
 const PlayerClient_1 = __webpack_require__(4);
-const BulletClient_1 = __webpack_require__(25);
+const BulletClient_1 = __webpack_require__(26);
 const EnemyClient_1 = __webpack_require__(10);
 const ExplosionClient_1 = __webpack_require__(11);
 const Inventory_1 = __webpack_require__(12);
@@ -580,6 +580,8 @@ exports.mapObjectImageName[enums_1.MapObjectType.GR_RD] = "groundRingRD";
 exports.mapObjectImageName[enums_1.MapObjectType.GR_LD] = "groundRingLD";
 exports.mapObjectImageName[enums_1.MapObjectType.GR_EU] = "groundRingUenter";
 exports.mapObjectImageName[enums_1.MapObjectType.GR_ED] = "groundRingDenter";
+exports.mapObjectImageName[enums_1.MapObjectType.GR_EL] = "groundRingLenter";
+exports.mapObjectImageName[enums_1.MapObjectType.GR_ER] = "groundRingRenter";
 exports.mapObjectCollisions[enums_1.MapObjectType.GR_D] = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2];
 exports.mapObjectCollisions[enums_1.MapObjectType.GR_U] = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 2, 2, 2, 2, 2, 2, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
 exports.mapObjectCollisions[enums_1.MapObjectType.GR_L] = [0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 2, 0, 0];
@@ -590,6 +592,8 @@ exports.mapObjectCollisions[enums_1.MapObjectType.GR_RU] = [0, 0, 0, 0, 0, 0, 0,
 exports.mapObjectCollisions[enums_1.MapObjectType.GR_LU] = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 2, 2, 0, 0, 0, 0, 0, 2, 2, 0, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 2, 0, 0];
 exports.mapObjectCollisions[enums_1.MapObjectType.GR_EU] = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 2, 2, 1, 1, 2, 2, 2, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
 exports.mapObjectCollisions[enums_1.MapObjectType.GR_ED] = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 0, 0, 0, 2, 2, 2, 1, 1, 2, 2, 2, 2, 2, 2, 1, 1, 2, 2, 2];
+exports.mapObjectCollisions[enums_1.MapObjectType.GR_EL] = [0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 2, 0, 0];
+exports.mapObjectCollisions[enums_1.MapObjectType.GR_ER] = [0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0];
 
 
 /***/ }),
@@ -771,9 +775,10 @@ exports.PlayerClient = PlayerClient;
 /***/ (function(module, exports, __webpack_require__) {
 
 Object.defineProperty(exports, "__esModule", { value: true });
-const GroundRing_1 = __webpack_require__(17);
-const GameMap_1 = __webpack_require__(20);
-const MapTile_1 = __webpack_require__(21);
+const SpawnObjectMapChecker_1 = __webpack_require__(17);
+const GroundRing_1 = __webpack_require__(18);
+const GameMap_1 = __webpack_require__(21);
+const MapTile_1 = __webpack_require__(22);
 const enums_1 = __webpack_require__(1);
 const GeometryAndPhysics_1 = __webpack_require__(0);
 const Constants_1 = __webpack_require__(3);
@@ -821,8 +826,6 @@ MapController.getMapPack = (map) => {
 MapController.loadMaps = () => {
     console.log("Pierwsza Map");
     MapController.createMap("forest", 16, 20);
-    console.log("Druga Map");
-    MapController.createMap("forest2", 16, 20);
 };
 MapController.updateMap = (param) => {
     if (param !== undefined) {
@@ -891,8 +894,8 @@ MapController.createMap = (name, size, seeds) => {
             distance = 10000;
             closestSeed = 0;
             for (let k = 0; k < seeds; k++) {
-                if (MapController.getTileDistance(i, j, seedPosition[k].x, seedPosition[k].y) < distance) {
-                    distance = MapController.getTileDistance(i, j, seedPosition[k].x, seedPosition[k].y);
+                if (MapController.getTileDistance(i, j, seedPosition[k].y, seedPosition[k].x) < distance) {
+                    distance = MapController.getTileDistance(i, j, seedPosition[k].y, seedPosition[k].x);
                     closestSeed = k;
                 }
             }
@@ -919,14 +922,7 @@ MapController.createMap = (name, size, seeds) => {
             }
         }
     }
-    let width = enums_1.getRandomInt(0, 4);
-    let height = enums_1.getRandomInt(0, 4);
-    let enter = enums_1.Orientation.down;
-    if (Math.random() < 0.5) {
-        enter = enums_1.Orientation.up;
-    }
-    let gr = new GroundRing_1.GroundRing(3 + width, 3 + height, enter);
-    MapController.loadObject(gr, mapTiles, new GeometryAndPhysics_1.Point(4, 4));
+    MapController.generateGroundRings(mapTiles, seedMaterial, seedPosition);
     MapController.maps[name] = (new GameMap_1.GameMap(name, mapTiles));
 };
 MapController.getTileDistance = (x, y, tx, ty) => {
@@ -938,6 +934,31 @@ MapController.loadObject = (mapObject, mapTiles, position) => {
         mapTiles[position.y + object.position.y][position.x + object.position.x].addObject(object.type, true);
     }
 };
+MapController.generateGroundRings = (mapTiles, seedMaterial, seedPosition) => {
+    let grCheckers = [];
+    grCheckers[2] = new SpawnObjectMapChecker_1.SpawnObjectMapChecker(mapTiles, enums_1.TerrainMaterial.dirt, new GeometryAndPhysics_1.Point(3, 3));
+    grCheckers[1] = new SpawnObjectMapChecker_1.SpawnObjectMapChecker(mapTiles, enums_1.TerrainMaterial.dirt, new GeometryAndPhysics_1.Point(4, 3));
+    grCheckers[0] = new SpawnObjectMapChecker_1.SpawnObjectMapChecker(mapTiles, enums_1.TerrainMaterial.dirt, new GeometryAndPhysics_1.Point(5, 3));
+    let grSpawnPosition;
+    let gr;
+    let enter;
+    let seeds = seedMaterial.length;
+    for (let k = 0; k < seeds; k++) {
+        if (seedMaterial[k] == enums_1.TerrainMaterial.dirt) {
+            for (let i = 0; i < grCheckers.length; i++) {
+                grSpawnPosition = grCheckers[i].search(seedPosition[k]);
+                console.log("Pozycja: " + grSpawnPosition.x + " " + grSpawnPosition.y);
+                if (grSpawnPosition.x > -1 && grSpawnPosition.y > -1) {
+                    enter = enums_1.randomEnum(enums_1.Orientation);
+                    gr = new GroundRing_1.GroundRing(grCheckers[i].size.x, grCheckers[i].size.y, enter);
+                    if (!gr.isColliding(mapTiles, new GeometryAndPhysics_1.Point(grSpawnPosition.x, grSpawnPosition.y))) {
+                        MapController.loadObject(gr, mapTiles, new GeometryAndPhysics_1.Point(grSpawnPosition.x, grSpawnPosition.y));
+                    }
+                }
+            }
+        }
+    }
+};
 exports.MapController = MapController;
 
 
@@ -946,7 +967,7 @@ exports.MapController = MapController;
 /***/ (function(module, exports, __webpack_require__) {
 
 Object.defineProperty(exports, "__esModule", { value: true });
-const Pack_1 = __webpack_require__(27);
+const Pack_1 = __webpack_require__(28);
 exports.initPack = new Pack_1.Pack();
 exports.removePack = new Pack_1.Pack();
 
@@ -1621,7 +1642,7 @@ exports.ExplosionClient = ExplosionClient;
 /***/ (function(module, exports, __webpack_require__) {
 
 Object.defineProperty(exports, "__esModule", { value: true });
-const Item_1 = __webpack_require__(26);
+const Item_1 = __webpack_require__(27);
 const Player_1 = __webpack_require__(7);
 class Inventory {
     constructor(socket, server, owner) {
@@ -1724,9 +1745,9 @@ exports.Inventory = Inventory;
 Object.defineProperty(exports, "__esModule", { value: true });
 const Inventory_1 = __webpack_require__(12);
 const MapControler_1 = __webpack_require__(5);
-const MovementController_1 = __webpack_require__(28);
-const AttackControler_1 = __webpack_require__(29);
-const LifeAndBodyController_1 = __webpack_require__(31);
+const MovementController_1 = __webpack_require__(29);
+const AttackControler_1 = __webpack_require__(30);
+const LifeAndBodyController_1 = __webpack_require__(32);
 const Entity_1 = __webpack_require__(16);
 const Player_1 = __webpack_require__(7);
 const Enemy_1 = __webpack_require__(8);
@@ -2057,7 +2078,125 @@ exports.Entity = Entity;
 /***/ (function(module, exports, __webpack_require__) {
 
 Object.defineProperty(exports, "__esModule", { value: true });
-const MapObject_1 = __webpack_require__(18);
+const GeometryAndPhysics_1 = __webpack_require__(0);
+class SpawnObjectMapChecker {
+    constructor(mapTiles, desiredTerrain, size) {
+        this.search = (start, maxIterations = 20) => {
+            let p = new GeometryAndPhysics_1.Point(start.x, start.y);
+            let iterations = 0;
+            let dPosition;
+            while (!this.loadCheckerArray(p)) {
+                if (iterations >= maxIterations) {
+                    p.updatePosition(-1, -1);
+                    break;
+                }
+                dPosition = this.moveCheckerArray();
+                p.x += dPosition.x;
+                p.y += dPosition.y;
+                iterations++;
+            }
+            console.log("ITERATIONS " + iterations);
+            return p;
+        };
+        this.loadCheckerArray = (p) => {
+            let end = true;
+            for (let i = 0; i < this.checkerArray.length; i++) {
+                for (let j = 0; j < this.checkerArray[0].length; j++) {
+                    if (this.pointInMap(p.x + j, p.y + i)) {
+                        this.checkerArray[i][j] = this.map[p.y + i][p.x + j].material;
+                        if (this.checkerArray[i][j] !== this.desiredTerrain) {
+                            end = false;
+                        }
+                    }
+                    else {
+                        this.checkerArray[i][j] = -1;
+                        end = false;
+                    }
+                }
+            }
+            return end;
+        };
+        this.pointInMap = (x, y) => {
+            if (x >= 0 && x < this.map[0].length && y >= 0 && y < this.map.length) {
+                return true;
+            }
+            else {
+                return false;
+            }
+        };
+        this.moveCheckerArray = () => {
+            let leftOrUp = 0;
+            let rightOrDown = 0;
+            let deltaPosition = new GeometryAndPhysics_1.Point(0, 0);
+            for (let i = 0; i < this.checkerArray.length; i++) {
+                if (this.checkerArray[i][this.size.x - 1] == this.desiredTerrain) {
+                    rightOrDown++;
+                }
+                if (this.checkerArray[i][0] == this.desiredTerrain) {
+                    leftOrUp++;
+                }
+                if (rightOrDown > leftOrUp) {
+                    deltaPosition.x = 1;
+                }
+                else if (leftOrUp > rightOrDown) {
+                    deltaPosition.x = -1;
+                }
+                else {
+                    if (this.checkerArray[0][this.size.x - 1] == -1) {
+                        deltaPosition.x = -1;
+                    }
+                    else if (this.checkerArray[0][0] == -1) {
+                        deltaPosition.x = 1;
+                    }
+                }
+            }
+            leftOrUp = 0;
+            rightOrDown = 0;
+            for (let j = 0; j < this.checkerArray[0].length; j++) {
+                if (this.checkerArray[this.size.y - 1][j] == this.desiredTerrain) {
+                    rightOrDown++;
+                }
+                if (this.checkerArray[0][j] == this.desiredTerrain) {
+                    leftOrUp++;
+                }
+                if (rightOrDown > leftOrUp) {
+                    deltaPosition.y = 1;
+                }
+                else if (leftOrUp > rightOrDown) {
+                    deltaPosition.y = -1;
+                }
+                else {
+                    if (this.checkerArray[this.size.y - 1][0] == -1) {
+                        deltaPosition.y = -1;
+                    }
+                    else if (this.checkerArray[0][0] == -1) {
+                        deltaPosition.y = 1;
+                    }
+                }
+            }
+            return deltaPosition;
+        };
+        this.desiredTerrain = desiredTerrain;
+        this.checkerArray = [];
+        this.size = size;
+        for (let i = 0; i < size.y; i++) {
+            this.checkerArray[i] = [];
+            for (let j = 0; j < size.x; j++) {
+                this.checkerArray[i][j] = -1;
+            }
+        }
+        this.map = mapTiles;
+    }
+}
+exports.SpawnObjectMapChecker = SpawnObjectMapChecker;
+
+
+/***/ }),
+/* 18 */
+/***/ (function(module, exports, __webpack_require__) {
+
+Object.defineProperty(exports, "__esModule", { value: true });
+const MapObject_1 = __webpack_require__(19);
 const GeometryAndPhysics_1 = __webpack_require__(0);
 const enums_1 = __webpack_require__(1);
 class GroundRing extends MapObject_1.MapObject {
@@ -2068,6 +2207,19 @@ class GroundRing extends MapObject_1.MapObject {
         this.sidesD = [];
         this.sidesL = [];
         this.sidesR = [];
+        this.isColliding = (mapTiles, position) => {
+            for (let i = 0; i < (this.sidesU.length + 2); i++) {
+                if (mapTiles[position.y][position.x + i].collisions || mapTiles[position.y + this.sidesR.length + 1][position.x + i].collisions) {
+                    return true;
+                }
+            }
+            for (let i = 0; i < (this.sidesR.length + 2); i++) {
+                if (mapTiles[position.y + i][position.x].collisions || mapTiles[position.y + i][position.x + this.sidesD.length + 1].collisions) {
+                    return true;
+                }
+            }
+            return false;
+        };
         if (width > 2 && height > 2) {
             this.corners[enums_1.CornerOrientation.LU] = new GeometryAndPhysics_1.Point(0, 0);
             this.addObjectTile(this.corners[enums_1.CornerOrientation.LU], enums_1.MapObjectType.GR_LU);
@@ -2098,12 +2250,24 @@ class GroundRing extends MapObject_1.MapObject {
             else if (enterOrientation == enums_1.Orientation.up) {
                 y = 0;
             }
+            if (enterOrientation == enums_1.Orientation.left) {
+                x = 0;
+            }
+            else if (enterOrientation == enums_1.Orientation.right) {
+                x = width - 1;
+            }
             this.enter = new GeometryAndPhysics_1.Point(x, y);
             if (enterOrientation == enums_1.Orientation.down) {
                 this.addObjectTile(this.enter, enums_1.MapObjectType.GR_ED);
             }
             else if (enterOrientation == enums_1.Orientation.up) {
                 this.addObjectTile(this.enter, enums_1.MapObjectType.GR_EU);
+            }
+            else if (enterOrientation == enums_1.Orientation.right) {
+                this.addObjectTile(this.enter, enums_1.MapObjectType.GR_ER);
+            }
+            else if (enterOrientation == enums_1.Orientation.left) {
+                this.addObjectTile(this.enter, enums_1.MapObjectType.GR_EL);
             }
         }
     }
@@ -2112,11 +2276,11 @@ exports.GroundRing = GroundRing;
 
 
 /***/ }),
-/* 18 */
+/* 19 */
 /***/ (function(module, exports, __webpack_require__) {
 
 Object.defineProperty(exports, "__esModule", { value: true });
-const ObjectTile_1 = __webpack_require__(19);
+const ObjectTile_1 = __webpack_require__(20);
 class MapObject {
     constructor() {
         this.objectTiles = [];
@@ -2129,7 +2293,7 @@ exports.MapObject = MapObject;
 
 
 /***/ }),
-/* 19 */
+/* 20 */
 /***/ (function(module, exports, __webpack_require__) {
 
 Object.defineProperty(exports, "__esModule", { value: true });
@@ -2151,7 +2315,7 @@ exports.ObjectTile = ObjectTile;
 
 
 /***/ }),
-/* 20 */
+/* 21 */
 /***/ (function(module, exports, __webpack_require__) {
 
 Object.defineProperty(exports, "__esModule", { value: true });
@@ -2198,7 +2362,7 @@ exports.GameMap = GameMap;
 
 
 /***/ }),
-/* 21 */
+/* 22 */
 /***/ (function(module, exports, __webpack_require__) {
 
 Object.defineProperty(exports, "__esModule", { value: true });
@@ -2212,6 +2376,7 @@ class MapTile {
         this.corners = [];
         this.objects = [];
         this.convex = true;
+        this.collisions = false;
         this.updateMaterial = (material) => {
             this._material = material;
         };
@@ -2234,9 +2399,13 @@ class MapTile {
         this.updateCollisions = (type) => {
             let gridUpdate = Constants_1.mapObjectCollisions[type];
             console.log("COLLISIONS: " + Constants_1.mapObjectCollisions[type]);
+            this.collisions = false;
             for (let i = 0; i < this._height; i++) {
                 for (let j = 0; j < this._width; j++) {
                     this.grid[i][j] = gridUpdate[i * Constants_1.TILE_SIZE + j];
+                    if (this.grid[i][j] > 0) {
+                        this.collisions = true;
+                    }
                 }
             }
         };
@@ -2246,6 +2415,9 @@ class MapTile {
             this.grid[i] = [];
             for (let j = 0; j < this._width; j++) {
                 this.grid[i][j] = (material != enums_1.TerrainMaterial.water) ? 0 : 2;
+                if (this.grid[i][j] > 0) {
+                    this.collisions = true;
+                }
             }
         }
         for (let i = 0; i < 4; i++) {
@@ -2262,7 +2434,7 @@ exports.MapTile = MapTile;
 
 
 /***/ }),
-/* 22 */
+/* 23 */
 /***/ (function(module, exports) {
 
 Object.defineProperty(exports, "__esModule", { value: true });
@@ -2315,7 +2487,7 @@ exports.GameSoundManager = GameSoundManager;
 
 
 /***/ }),
-/* 23 */
+/* 24 */
 /***/ (function(module, exports, __webpack_require__) {
 
 Object.defineProperty(exports, "__esModule", { value: true });
@@ -2359,7 +2531,7 @@ exports.UpgradeClient = UpgradeClient;
 
 
 /***/ }),
-/* 24 */
+/* 25 */
 /***/ (function(module, exports, __webpack_require__) {
 
 Object.defineProperty(exports, "__esModule", { value: true });
@@ -2417,7 +2589,7 @@ exports.MapClient = MapClient;
 
 
 /***/ }),
-/* 25 */
+/* 26 */
 /***/ (function(module, exports, __webpack_require__) {
 
 Object.defineProperty(exports, "__esModule", { value: true });
@@ -2489,7 +2661,7 @@ exports.BulletClient = BulletClient;
 
 
 /***/ }),
-/* 26 */
+/* 27 */
 /***/ (function(module, exports, __webpack_require__) {
 
 Object.defineProperty(exports, "__esModule", { value: true });
@@ -2556,7 +2728,7 @@ new Item(enums_1.WeaponType.claws, "Claws", function (actor) {
 
 
 /***/ }),
-/* 27 */
+/* 28 */
 /***/ (function(module, exports) {
 
 Object.defineProperty(exports, "__esModule", { value: true });
@@ -2573,7 +2745,7 @@ exports.Pack = Pack;
 
 
 /***/ }),
-/* 28 */
+/* 29 */
 /***/ (function(module, exports, __webpack_require__) {
 
 Object.defineProperty(exports, "__esModule", { value: true });
@@ -2684,12 +2856,12 @@ exports.MovementController = MovementController;
 
 
 /***/ }),
-/* 29 */
+/* 30 */
 /***/ (function(module, exports, __webpack_require__) {
 
 Object.defineProperty(exports, "__esModule", { value: true });
 const Bullet_1 = __webpack_require__(15);
-const WeaponCollection_1 = __webpack_require__(30);
+const WeaponCollection_1 = __webpack_require__(31);
 const Counter_1 = __webpack_require__(14);
 const WeaponTypes_1 = __webpack_require__(9);
 const GeometryAndPhysics_1 = __webpack_require__(0);
@@ -2794,7 +2966,7 @@ exports.AttackController = AttackController;
 
 
 /***/ }),
-/* 30 */
+/* 31 */
 /***/ (function(module, exports, __webpack_require__) {
 
 Object.defineProperty(exports, "__esModule", { value: true });
@@ -2982,7 +3154,7 @@ exports.SingleWeapon = SingleWeapon;
 
 
 /***/ }),
-/* 31 */
+/* 32 */
 /***/ (function(module, exports) {
 
 Object.defineProperty(exports, "__esModule", { value: true });
@@ -3014,11 +3186,11 @@ exports.LifeAndBodyController = LifeAndBodyController;
 
 
 /***/ }),
-/* 32 */
+/* 33 */
 /***/ (function(module, exports, __webpack_require__) {
 
 Object.defineProperty(exports, "__esModule", { value: true });
-const GUI_1 = __webpack_require__(33);
+const GUI_1 = __webpack_require__(34);
 gui = new GUI_1.GUI({ ctx: ctxui, width: WIDTH, height: HEIGHTUI });
 let resizeCanvas = function () {
     WIDTH = window.innerWidth - 4;
@@ -3045,7 +3217,7 @@ window.addEventListener('resize', function () {
 
 
 /***/ }),
-/* 33 */
+/* 34 */
 /***/ (function(module, exports, __webpack_require__) {
 
 Object.defineProperty(exports, "__esModule", { value: true });

@@ -1,3 +1,5 @@
+import { MapClient } from './../../../client/js/MapClient';
+import { SpawnObjectMapChecker } from './../Map/SpawnObjectMapChecker';
 import { GroundRing } from './../Map/MapObjects/GroundRing';
 import { ObjectTile } from './../Map/MapObjects/ObjectTile';
 import { MapObject } from './../Map/MapObjects/MapObject';
@@ -61,8 +63,8 @@ export class MapController {
     static loadMaps = () => {
         console.log("Pierwsza Map");
         MapController.createMap("forest", 16,20);
-        console.log("Druga Map");
-        MapController.createMap("forest2", 16,20);
+      //  console.log("Druga Map");
+     //   MapController.createMap("forest2", 16,20);
     }
 
     static reloadMaps(maps){
@@ -157,8 +159,8 @@ export class MapController {
                 distance = 10000;
                 closestSeed = 0;
                 for(let k = 0; k < seeds; k++){
-                    if(MapController.getTileDistance(i, j, seedPosition[k].x, seedPosition[k].y) < distance){
-                        distance = MapController.getTileDistance(i, j, seedPosition[k].x, seedPosition[k].y);
+                    if(MapController.getTileDistance(i, j, seedPosition[k].y, seedPosition[k].x) < distance){
+                        distance = MapController.getTileDistance(i, j, seedPosition[k].y, seedPosition[k].x);
                         closestSeed = k;
                     }
                 }
@@ -188,64 +190,18 @@ export class MapController {
             }
         }
 
+        MapController.generateGroundRings(mapTiles, seedMaterial, seedPosition);
+    
 /*
-        let grSeeds: number[] =[];
-        for(let k = 0; k < seeds; k++){
-            let width = 0;
-            let height = 0;
-            if(seedMaterial[k] == TerrainMaterial.dirt){
-
-                let x = seedPosition[k].y-1;
-                let y = seedPosition[k].x-1;
-
-                let terrainOK: boolean = true;
-
-                for(let i = 0; i<3 ; i++){
-                    for(let j=0; j<3; j++)
-                    {
-                        if(x>=0 && x<size && y>=0 && y<size ){
-                            if(mapTiles[y][x].material == TerrainMaterial.dirt){
-                                x++;
-                            } else{
-                                terrainOK = false;
-                            }
-                        } else{
-                            terrainOK = false;
-                        }
-                    }
-                    y++;
-                }
-
-                if(terrainOK){
-                    let heightRF = 0; //getRandomInt(0,0);
-                    let widthRF = 0; //getRandomInt(0,0);
-                    for(let i=0; i<grSeeds.length; i++){
-                        if(MapController.getTileDistance(seedPosition[k].x,seedPosition[k].y, seedPosition[grSeeds[i]].x-1,seedPosition[grSeeds[i]].y-1) < 4){
-                            terrainOK = false;
-                        }
-                    }
-                    if(terrainOK){
-                        let gr: GroundRing = new GroundRing(3+widthRF,3+heightRF, Orientation.down);
-                        MapController.loadObject(gr ,mapTiles, new Point(seedPosition[k].x-1,seedPosition[k].y-1));
-                        grSeeds.push(k);
-                    }
-                }
-
-                width = 0;
-                height = 0;
-            }
-        }*/
-
-
         let width = getRandomInt(0,4);
         let height = getRandomInt(0,4);
         let enter = Orientation.down;
         if(Math.random()<0.5){
             enter = Orientation.up;
         }
-        let gr: GroundRing = new GroundRing(3+width,3+height, enter);
+        gr = new GroundRing(3+width,3+height, enter);
         MapController.loadObject(gr ,mapTiles, new Point(4,4));
-        
+        */
 
 
         MapController.maps[name] = (new GameMap(name, mapTiles));
@@ -260,10 +216,36 @@ export class MapController {
         for(let i in mapObject.objectTiles){
             let object: ObjectTile = mapObject.objectTiles[i];
             mapTiles[position.y+object.position.y][position.x+object.position.x].addObject(object.type, true);
-        }
+        } 
+    }
 
+    static generateGroundRings = (mapTiles: MapTile[][], seedMaterial: TerrainMaterial[], seedPosition: Point[]) => {
+        let grCheckers: SpawnObjectMapChecker[] = [];
+        
+                grCheckers[2] = new SpawnObjectMapChecker(mapTiles, TerrainMaterial.dirt, new Point(3,3));
+                grCheckers[1] = new SpawnObjectMapChecker(mapTiles, TerrainMaterial.dirt, new Point(4,3));
+                grCheckers[0] = new SpawnObjectMapChecker(mapTiles, TerrainMaterial.dirt, new Point(5,3));
+                
+                let grSpawnPosition: Point;
+                let gr: GroundRing; 
+                let enter: Orientation;
+                let seeds = seedMaterial.length;
 
-
+                for(let k = 0; k < seeds; k++){
+                    if(seedMaterial[k] == TerrainMaterial.dirt){
+                        for(let i = 0; i < grCheckers.length; i++){
+                            grSpawnPosition = grCheckers[i].search(seedPosition[k]);
+                            console.log("Pozycja: " + grSpawnPosition.x + " "+ grSpawnPosition.y);
+                            if(grSpawnPosition.x > -1 && grSpawnPosition.y > -1){
+                                enter = randomEnum(Orientation);
+                                gr = new GroundRing(grCheckers[i].size.x, grCheckers[i].size.y, enter);
+                                if(!gr.isColliding(mapTiles, new Point(grSpawnPosition.x,grSpawnPosition.y))){
+                                    MapController.loadObject(gr ,mapTiles, new Point(grSpawnPosition.x,grSpawnPosition.y));
+                                }      
+                            }
+                        }        
+                    }
+               }
     }
     
 }

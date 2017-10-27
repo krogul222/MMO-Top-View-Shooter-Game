@@ -10,6 +10,7 @@ export class MapTile {
     public corners: number[] = [];
     public objects: MapObjectType[] = [];
     public convex: boolean = true;
+    public collisions: boolean = false;
 
     constructor(private _width: number, private _height: number, material: TerrainMaterial) {
         this._material = material;
@@ -18,6 +19,9 @@ export class MapTile {
             this.grid[i] = [];
             for(let j = 0; j < this._width; j++){
                 this.grid[i][j] = (material != TerrainMaterial.water) ? 0 : 2;
+                if(this.grid[i][j]>0){
+                    this.collisions = true;
+                }
             }
         }
 
@@ -60,16 +64,22 @@ export class MapTile {
 
         let gridUpdate = mapObjectCollisions[type];
         console.log("COLLISIONS: "+mapObjectCollisions[type]);
-
+        this.collisions = false;
         for(let i = 0; i < this._height; i++){
             for(let j = 0; j < this._width; j++){
                // if(gridUpdate[i*TILE_SIZE+j] > this.grid[i][j]){
                     this.grid[i][j] = gridUpdate[i*TILE_SIZE+j];
+                    if(this.grid[i][j] > 0){
+                        this.collisions = true;
+                    }
+                    
                // }
             }
         }
 
     }
+
+
 
     get width() { return this._width; }
     get height() { return this._height; }
