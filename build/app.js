@@ -15,7 +15,7 @@ app.get('/', function (request, response) {
     response.sendFile(__dirname + '/client/index.html');
 });
 app.use('/client', express.static(__dirname + '/client'));
-var listener = server.listen(process.env.PORT || 5000, function () {
+var listener = server.listen(process.env.PORT || 2000, function () {
     console.log('Example app listening on port ', listener.address().port);
 });
 console.log("Server started.");

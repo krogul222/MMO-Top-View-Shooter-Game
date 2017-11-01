@@ -1,4 +1,5 @@
 Object.defineProperty(exports, "__esModule", { value: true });
+const Constants_1 = require("./../../server/js/Constants");
 const PlayerClient_1 = require("./Entities/PlayerClient");
 const game_1 = require("./game");
 const enums_1 = require("./../../server/js/enums");
@@ -18,6 +19,7 @@ class GUI {
                 this.drawFace();
                 this.drawItems();
                 this.ctx.fillText('Hit points: ' + PlayerClient_1.PlayerClient.list[game_1.selfId].hp + '/' + PlayerClient_1.PlayerClient.list[game_1.selfId].hpMax, 0, 0.6 * this.height);
+                this.drawMinimap();
             }
         };
         this.resize = (width, height) => {
@@ -56,6 +58,46 @@ class GUI {
                 let frameHeight = Img["face"].height / spriteRows;
                 this.ctx.drawImage(Img["face"], facex * frameWidth, facey * frameHeight, frameWidth, frameHeight, (this.width - 0.8 * this.height) / 2, (this.height - 0.8 * this.height) / 2, 0.8 * this.height, 0.8 * this.height);
             }
+        };
+        this.drawMinimap = () => {
+            let sizeY = game_1.currentMap.map.mapTiles.length;
+            let sizeX = game_1.currentMap.map.mapTiles[0].length;
+            let imgSize = 64;
+            var imgData = this.ctx.createImageData(imgSize, imgSize);
+            var data = imgData.data;
+            let ratio = imgSize / game_1.currentMap.map.size;
+            let Ra = [];
+            let Ga = [];
+            let Ba = [];
+            Ra[enums_1.TerrainMaterial.dirt] = 255;
+            Ra[enums_1.TerrainMaterial.water] = 0;
+            Ra[enums_1.TerrainMaterial.stone] = 128;
+            Ga[enums_1.TerrainMaterial.dirt] = 255;
+            Ga[enums_1.TerrainMaterial.water] = 0;
+            Ga[enums_1.TerrainMaterial.stone] = 128;
+            Ba[enums_1.TerrainMaterial.dirt] = 0;
+            Ba[enums_1.TerrainMaterial.water] = 255;
+            Ba[enums_1.TerrainMaterial.stone] = 128;
+            let material;
+            let playerPosition = PlayerClient_1.PlayerClient.list[game_1.selfId].position;
+            for (let i = 0; i < imgSize; i++) {
+                for (let j = 0; j < imgSize; j++) {
+                    material = game_1.currentMap.map.mapTiles[Math.floor(i / ratio)][Math.floor(j / ratio)].material;
+                    data[(j + i * imgSize) * 4] = Ra[material];
+                    data[(j + i * imgSize) * 4 + 1] = Ga[material];
+                    data[(j + i * imgSize) * 4 + 2] = Ba[material];
+                    data[(j + i * imgSize) * 4 + 3] = 255;
+                    if (Math.floor(playerPosition.x / (Constants_1.TILE_SIZE * 32)) == Math.floor(j / ratio) && Math.floor(playerPosition.y / (Constants_1.TILE_SIZE * 32)) == Math.floor(i / ratio)) {
+                        data[(j + i * imgSize) * 4] = 255;
+                        data[(j + i * imgSize) * 4 + 1] = 0;
+                        data[(j + i * imgSize) * 4 + 2] = 0;
+                        data[(j + i * imgSize) * 4 + 3] = 255;
+                    }
+                }
+            }
+            let px = Math.floor(PlayerClient_1.PlayerClient.list[game_1.selfId].position.x / (Constants_1.TILE_SIZE * 32 * sizeX) * imgSize);
+            let py = Math.floor(PlayerClient_1.PlayerClient.list[game_1.selfId].position.y / (Constants_1.TILE_SIZE * 32 * sizeY) * imgSize);
+            this.ctx.putImageData(imgData, 5 * (this.width) / 6, 0);
         };
         if (param.ctx !== undefined)
             this.ctx = param.ctx;

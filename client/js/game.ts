@@ -27,7 +27,7 @@ export var selfId: number = 0;
 export let inventory = new Inventory(socket, false, 0);
 
 MapController.loadMaps();
-let currentMap = new MapClient(null, "forest");
+export let currentMap = new MapClient(null, "forest");
 
 
 socket.on('updateInventory', function(items){

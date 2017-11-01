@@ -28,22 +28,24 @@ class Camera {
             return false;
         };
         this.getScreenPosition = (position) => {
+            let mouseXCorrection = (mouseX - this.width / 2) / CAMERA_BOX_ADJUSTMENT;
+            let mouseYCorrection = (mouseY - this.height / 2) / CAMERA_BOX_ADJUSTMENT;
             let x = position.x - this.position.x;
-            if (this.position.x + (mouseX - this.width / 2) / CAMERA_BOX_ADJUSTMENT > 0 && this.position.x + (mouseX - this.width / 2) / CAMERA_BOX_ADJUSTMENT < this.worldWidth - this.width)
-                x = x - (mouseX - this.width / 2) / CAMERA_BOX_ADJUSTMENT;
+            if (this.position.x + mouseXCorrection > 0 && this.position.x + mouseXCorrection < this.worldWidth - this.width)
+                x = x - mouseXCorrection;
             else {
-                if (this.position.x + (mouseX - this.width / 2) / CAMERA_BOX_ADJUSTMENT <= 0)
+                if (this.position.x + mouseXCorrection <= 0)
                     x = position.x;
-                if (this.position.x + (mouseX - this.width / 2) / CAMERA_BOX_ADJUSTMENT >= this.worldWidth - this.width)
+                if (this.position.x + mouseXCorrection >= this.worldWidth - this.width)
                     x = position.x - (this.worldWidth - this.width);
             }
             let y = position.y - this.position.y;
-            if (this.position.y + (mouseY - this.height / 2) / CAMERA_BOX_ADJUSTMENT > 0 && this.position.y + (mouseY - this.height / 2) / CAMERA_BOX_ADJUSTMENT < this.worldHeight - this.height)
-                y = y - (mouseY - this.height / 2) / CAMERA_BOX_ADJUSTMENT;
+            if (this.position.y + mouseYCorrection > 0 && this.position.y + mouseYCorrection < this.worldHeight - this.height)
+                y = y - mouseYCorrection;
             else {
-                if (this.position.y + (mouseY - this.height / 2) / CAMERA_BOX_ADJUSTMENT <= 0)
+                if (this.position.y + mouseYCorrection <= 0)
                     y = position.y;
-                if (this.position.y + (mouseY - this.height / 2) / CAMERA_BOX_ADJUSTMENT >= this.worldHeight - this.height)
+                if (this.position.y + mouseYCorrection >= this.worldHeight - this.height)
                     y = position.y - (this.worldHeight - this.height);
             }
             return new GeometryAndPhysics_1.Point(x, y);
@@ -62,14 +64,14 @@ class Camera {
         };
         this.drawBar = (px, py, width, height, style) => {
             let position = this.getScreenPosition(new GeometryAndPhysics_1.Point(px, py));
-            if (px > this.position.x && px < this.position.x + width && py > this.position.y && py < this.position.y + height) {
+            if ((position.x <= this.width || position.x + width >= 0) && (position.y + height >= 0 && position.y <= this.height)) {
                 this.ctx.fillStyle = style;
                 this.ctx.fillRect(position.x, position.y, width, height);
             }
         };
         this.drawImage = (img, frameWidth, frameHeight, aimAngle, directionMod, walkingMod, px, py, width, height) => {
             let position = this.getScreenPosition(new GeometryAndPhysics_1.Point(px, py));
-            if (position.x < width && position.x > 0 && position.y > 0 && position.y < height) {
+            if ((position.x <= this.width || position.x + width >= 0) && (position.y + height >= 0 && position.y <= this.height)) {
                 if (aimAngle !== 0) {
                     this.ctx.save();
                     this.ctx.translate(position.x - width / 2, position.y - height / 2);

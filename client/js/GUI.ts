@@ -1,6 +1,9 @@
+import { TILE_SIZE } from './../../server/js/Constants';
+import { GameMap } from './../../server/js/Map/GameMap';
+import { Rectangle, Point } from './../../server/js/GeometryAndPhysics';
 import { PlayerClient } from './Entities/PlayerClient';
-import { selfId, inventory } from './game';
-import { ItemType } from './../../server/js/enums';
+import { selfId, inventory, currentMap } from './game';
+import { ItemType, TerrainMaterial } from './../../server/js/enums';
 import { WeaponTypes } from '../../server/js/Weapons/WeaponTypes';
 
 export class GUI {
@@ -29,6 +32,7 @@ export class GUI {
             this.drawFace();
             this.drawItems();
             this.ctx.fillText('Hit points: '+PlayerClient.list[selfId].hp + '/'+PlayerClient.list[selfId].hpMax, 0, 0.6*this.height);
+            this.drawMinimap();
         }
     }
 
@@ -79,5 +83,59 @@ export class GUI {
             
             this.ctx.drawImage(Img["face"], facex*frameWidth, facey*frameHeight, frameWidth, frameHeight, (this.width-0.8*this.height)/2, (this.height-0.8*this.height)/2, 0.8*this.height, 0.8*this.height);
         }
+    }
+
+    drawMinimap = () => {
+        let sizeY = currentMap.map.mapTiles.length;
+        let sizeX = currentMap.map.mapTiles[0].length;
+
+        let imgSize = 64;
+        var imgData = this.ctx.createImageData(imgSize, imgSize);
+        var data = imgData.data;
+        let ratio = imgSize/currentMap.map.size;
+        let Ra: number[] = [];
+        let Ga: number[] = [];
+        let Ba: number[] = [];
+
+        Ra[TerrainMaterial.dirt] = 255;
+        Ra[TerrainMaterial.water] = 0;
+        Ra[TerrainMaterial.stone] = 128;
+
+        Ga[TerrainMaterial.dirt] = 255;
+        Ga[TerrainMaterial.water] = 0;
+        Ga[TerrainMaterial.stone] = 128;
+
+        Ba[TerrainMaterial.dirt] = 0;
+        Ba[TerrainMaterial.water] = 255;
+        Ba[TerrainMaterial.stone] = 128;
+
+        let material: TerrainMaterial;
+        let playerPosition: Point = PlayerClient.list[selfId].position;
+
+        for(let i = 0; i < imgSize; i++){
+            for(let j = 0; j < imgSize; j++){
+                material = currentMap.map.mapTiles[Math.floor(i/ratio)][Math.floor(j/ratio)].material;
+
+                data[(j+i*imgSize)*4] = Ra[material];
+                data[(j+i*imgSize)*4+1] = Ga[material];
+                data[(j+i*imgSize)*4+2] = Ba[material];
+                data[(j+i*imgSize)*4+3] = 255;
+
+                if(Math.floor(playerPosition.x/(TILE_SIZE*32)) == Math.floor(j/ratio) && Math.floor(playerPosition.y/(TILE_SIZE*32)) == Math.floor(i/ratio)){
+                    data[(j+i*imgSize)*4] = 255;
+                    data[(j+i*imgSize)*4+1] = 0;
+                    data[(j+i*imgSize)*4+2] = 0;
+                    data[(j+i*imgSize)*4+3] = 255;
+                }
+                
+            }
+        }
+
+        let px = Math.floor(PlayerClient.list[selfId].position.x/(TILE_SIZE*32*sizeX)*imgSize);
+        let py = Math.floor(PlayerClient.list[selfId].position.y/(TILE_SIZE*32*sizeY)*imgSize);
+
+
+
+        this.ctx.putImageData(imgData, 5*(this.width)/6, (this.height-imgSize)/2);
     }
 }
