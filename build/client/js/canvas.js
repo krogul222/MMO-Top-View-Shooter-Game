@@ -1,17 +1,14 @@
 Object.defineProperty(exports, "__esModule", { value: true });
+const Camera_1 = require("./Camera");
 const GUI_1 = require("./GUI");
 gui = new GUI_1.GUI({ ctx: ctxui, width: WIDTH, height: HEIGHTUI });
+exports.camera = new Camera_1.Camera(canvas, WIDTH, HEIGHT);
 let resizeCanvas = function () {
     WIDTH = window.innerWidth - 4;
     HEIGHT = window.innerHeight - 48 - HEIGHTUI;
-    canvas.width = WIDTH;
-    canvas.height = HEIGHT;
+    exports.camera.resize(WIDTH, HEIGHT);
     canvasui.width = WIDTH;
     canvasui.height = HEIGHTUI;
-    ctx.font = '30px Arial';
-    ctx.mozImageSmoothingEnabled = false;
-    ctx.msImageSmoothingEnabled = false;
-    ctx.imageSmoothingEnabled = false;
     ctxui.font = '30px Arial';
     ctxui.mozImageSmoothingEnabled = false;
     ctxui.msImageSmoothingEnabled = false;

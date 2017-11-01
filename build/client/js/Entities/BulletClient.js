@@ -5,6 +5,7 @@ const GeometryAndPhysics_1 = require("./../../../server/js/GeometryAndPhysics");
 const game_2 = require("../game");
 const PlayerClient_1 = require("./PlayerClient");
 const ExplosionClient_1 = require("./ExplosionClient");
+const canvas_1 = require("../canvas");
 class BulletClient {
     constructor(initPack) {
         this.id = -1;
@@ -18,16 +19,7 @@ class BulletClient {
             if (PlayerClient_1.PlayerClient.list[game_2.selfId].map !== this.map) {
                 return;
             }
-            let bx = this.position.x;
-            let by = this.position.y;
-            let mainPlayer = PlayerClient_1.PlayerClient.list[game_2.selfId];
-            let mainPlayerx = mainPlayer.position.x;
-            let mainPlayery = mainPlayer.position.y;
-            let x = bx - (mainPlayerx - WIDTH / 2);
-            x = x - (mouseX - WIDTH / 2) / CAMERA_BOX_ADJUSTMENT;
-            let y = by - (mainPlayery - HEIGHT / 2);
-            y = y - (mouseY - HEIGHT / 2) / CAMERA_BOX_ADJUSTMENT;
-            ctx.drawImage(this.img, 0, 0, this.img.width, this.img.height, x - this.width / 2, y - this.height / 2, this.width, this.height);
+            canvas_1.camera.drawImage(this.img, this.img.width, this.img.height, 0, 0, 0, this.position.x, this.position.y, this.width, this.height);
         };
         this.hit = (category, entityCategory, entityId) => {
             let x = this.position.x;

@@ -1,6 +1,7 @@
 import { Point } from './../../../server/js/GeometryAndPhysics';
 import { PlayerClient } from './PlayerClient';
 import { selfId } from '../game';
+import { camera } from '../canvas';
 
 declare var mouseX: any;
 declare var mouseY: any;
@@ -38,22 +39,7 @@ export class UpgradeClient {
             return;  
         }
 
-        let mainPlayer: PlayerClient = PlayerClient.list[selfId];
-        let mainPlayerx = mainPlayer.position.x;
-        let mainPlayery = mainPlayer.position.y;
-        let ex = this.position.x;
-        let ey = this.position.y;
-
-        let x = ex - (mainPlayerx-WIDTH/2);
-        x = x - (mouseX-WIDTH/2)/CAMERA_BOX_ADJUSTMENT;
-
-        let y = ey - (mainPlayery-HEIGHT/2);
-        y = y - (mouseY-HEIGHT/2)/CAMERA_BOX_ADJUSTMENT;
-
-        x -= this.width/2;
-		y -= this.height/2;
-		 
-		ctx.drawImage(this.img, 0,0,this.img.width,this.img.height, x,y,this.width,this.height);
+        camera.drawImage(this.img, this.img.width, this.img.height, 0, 0, 0, this.position.x-this.width/2, this.position.y-this.height/2, this.width, this.height);            
     }
 
     static list = {};

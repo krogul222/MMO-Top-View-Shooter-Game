@@ -1,3 +1,5 @@
+import { Point } from './../../server/js/GeometryAndPhysics';
+import { camera } from './canvas';
 import { GameMap } from './../../server/js/Map/GameMap';
 import { AttackController } from './../../server/js/Controllers/AttackControler';
 import { MapController } from './../../server/js/Controllers/MapControler';
@@ -24,7 +26,7 @@ export var selfId: number = 0;
 
 export let inventory = new Inventory(socket, false, 0);
 
-MapController.loadMaps(true);
+MapController.loadMaps();
 let currentMap = new MapClient(null, "forest");
 
 
@@ -37,9 +39,10 @@ export let gameSoundManager = new GameSoundManager();
 
 socket.on('mapData', function(data){
     MapController.updateMap(data);
-    if(currentMap.name == data.name)
+    if(currentMap.name == data.name){
         currentMap.reloadMap(MapController.getMap(data.name));
-
+        camera.updateWorldSize(currentMap.map.width, currentMap.map.height);
+    }
 });
 
 socket.on('init', function(data){
@@ -68,6 +71,7 @@ socket.on('init', function(data){
 
 
 socket.on('update', function(data){
+
    for(let i = 0, length = data.player.length; i < length ; i++){
        let pack = data.player[i];
        let p:PlayerClient = PlayerClient.list[pack.id];
@@ -189,7 +193,13 @@ socket.on('update', function(data){
     }
 
     gui.draw();
-    
+    if(PlayerClient.list[selfId] !== undefined){ 
+        camera.updatePosition(PlayerClient.list[selfId].position);
+        let position: boolean = camera.isPositionNearEdge(PlayerClient.list[selfId].position);
+        if(position) updateMouse();
+    }
+
+
 });
 
 socket.on('remove', function(data){
@@ -339,19 +349,32 @@ document.onmouseup = function(event){
 
 
 document.onmousemove = function(event){
-    let x = -WIDTH/2 + event.clientX - 8 - (WIDTH/2 -event.clientX)/CAMERA_BOX_ADJUSTMENT;
-    let y = -HEIGHT/2 + event.clientY - 8 - (HEIGHT/2-event.clientY)/CAMERA_BOX_ADJUSTMENT;
-    
-    mouseX = event.clientX;
-    mouseY = event.clientY;
-    
-    let angle = Math.atan2(y,x)/Math.PI * 180;
-    
     if(selfId){
-        let player = PlayerClient.list[selfId];
+        let player: PlayerClient = PlayerClient.list[selfId];
+        let position: Point = camera.getScreenPosition(player.position);
+        let x =  event.clientX - 8 - position.x;
+        let y =  event.clientY - 8 - position.y;
+        
+        mouseX = event.clientX;
+        mouseY = event.clientY;
+        
+        let angle = Math.atan2(y,x)/Math.PI * 180;
         player.aimAngle = angle;
-    }
-    socket.emit('keyPress', {inputId:'mouseAngle', state: angle});
+        socket.emit('keyPress', {inputId:'mouseAngle', state: angle});
+    }   
+}
+
+let updateMouse = () => {
+    if(selfId){
+        let player: PlayerClient = PlayerClient.list[selfId];
+        let position: Point = camera.getScreenPosition(player.position);
+        let x =  mouseX - 8 - position.x;
+        let y =  mouseY - 8 - position.y;
+        
+        let angle = Math.atan2(y,x)/Math.PI * 180;
+        player.aimAngle = angle;
+        socket.emit('keyPress', {inputId:'mouseAngle', state: angle});
+    }  
 }
 
 /*

@@ -5,6 +5,7 @@ import { Point } from './../../../server/js/GeometryAndPhysics';
 import { selfId } from '../game';
 import { PlayerClient } from './PlayerClient';
 import { ExplosionClient } from './ExplosionClient';
+import { camera } from '../canvas';
 
 declare var mouseX: any;
 declare var mouseY: any;
@@ -39,21 +40,7 @@ export class BulletClient {
             return;  
         }
         
-        //console.log("Bullet "+ this.position.x+ " "+this.position.y);
-        
-        let bx = this.position.x;
-        let by = this.position.y;
-
-        let mainPlayer: PlayerClient = PlayerClient.list[selfId];
-        let mainPlayerx = mainPlayer.position.x;
-        let mainPlayery = mainPlayer.position.y;
-
-        let x = bx - (mainPlayerx-WIDTH/2);
-        x = x - (mouseX-WIDTH/2)/CAMERA_BOX_ADJUSTMENT;
-
-        let y = by - (mainPlayery-HEIGHT/2);
-        y = y - (mouseY-HEIGHT/2)/CAMERA_BOX_ADJUSTMENT;
-        ctx.drawImage(this.img, 0, 0, this.img.width, this.img.height, x - this.width/2, y - this.height/2, this.width, this.height);
+        camera.drawImage(this.img, this.img.width, this.img.height, 0, 0, 0, this.position.x, this.position.y, this.width, this.height);
     }
 
     hit = (category, entityCategory, entityId) => {

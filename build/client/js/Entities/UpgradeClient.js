@@ -2,6 +2,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const GeometryAndPhysics_1 = require("./../../../server/js/GeometryAndPhysics");
 const PlayerClient_1 = require("./PlayerClient");
 const game_1 = require("../game");
+const canvas_1 = require("../canvas");
 class UpgradeClient {
     constructor(param) {
         this.position = new GeometryAndPhysics_1.Point(0, 0);
@@ -10,18 +11,7 @@ class UpgradeClient {
             if (PlayerClient_1.PlayerClient.list[game_1.selfId].map !== this.map) {
                 return;
             }
-            let mainPlayer = PlayerClient_1.PlayerClient.list[game_1.selfId];
-            let mainPlayerx = mainPlayer.position.x;
-            let mainPlayery = mainPlayer.position.y;
-            let ex = this.position.x;
-            let ey = this.position.y;
-            let x = ex - (mainPlayerx - WIDTH / 2);
-            x = x - (mouseX - WIDTH / 2) / CAMERA_BOX_ADJUSTMENT;
-            let y = ey - (mainPlayery - HEIGHT / 2);
-            y = y - (mouseY - HEIGHT / 2) / CAMERA_BOX_ADJUSTMENT;
-            x -= this.width / 2;
-            y -= this.height / 2;
-            ctx.drawImage(this.img, 0, 0, this.img.width, this.img.height, x, y, this.width, this.height);
+            canvas_1.camera.drawImage(this.img, this.img.width, this.img.height, 0, 0, 0, this.position.x - this.width / 2, this.position.y - this.height / 2, this.width, this.height);
         };
         this.id = param.id ? param.id : this.id;
         this.position = param.position ? param.position : this.position;

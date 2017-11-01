@@ -4,6 +4,7 @@ const PlayerClient_1 = require("./Entities/PlayerClient");
 const game_1 = require("./game");
 const enums_1 = require("../../server/js/enums");
 const Constants_2 = require("../../server/js/Constants");
+const canvas_1 = require("./canvas");
 class MapClient {
     constructor(map, name) {
         this.image = new Image();
@@ -30,15 +31,15 @@ class MapClient {
                         material = this.map.mapTiles[i][j].material;
                         imgWidth = Img[Constants_2.mapTileImageName[material]].width;
                         imgHeight = Img[Constants_2.mapTileImageName[material]].height;
-                        ctx.drawImage(Img[Constants_2.mapTileImageName[material]], 0, 0, imgWidth, imgHeight, x + imgWidth * j, y + imgHeight * i, imgWidth, imgHeight);
+                        canvas_1.camera.drawImage(Img[Constants_2.mapTileImageName[material]], imgWidth, imgHeight, 0, 0, 0, imgWidth * j, imgHeight * i, imgWidth, imgHeight);
                         for (let k = 0; k < 4; k++) {
                             if (this.map.mapTiles[i][j].sides[k] > 0) {
-                                ctx.drawImage(Img[Constants_1.mapTileSideImageName[k][this.map.mapTiles[i][j].sides[k]]], 0, 0, imgWidth, imgHeight, x + imgWidth * j, y + imgHeight * i, imgWidth, imgHeight);
+                                canvas_1.camera.drawImage(Img[Constants_1.mapTileSideImageName[k][this.map.mapTiles[i][j].sides[k]]], imgWidth, imgHeight, 0, 0, 0, imgWidth * j, imgHeight * i, imgWidth, imgHeight);
                             }
                         }
                         for (let k = 0; k < this.map.mapTiles[i][j].objects.length; k++) {
                             if (this.map.mapTiles[i][j].objects[k] > 0) {
-                                ctx.drawImage(Img[Constants_1.mapObjectImageName[this.map.mapTiles[i][j].objects[k]]], 0, 0, imgWidth, imgHeight, x + imgWidth * j, y + imgHeight * i, imgWidth, imgHeight);
+                                canvas_1.camera.drawImage(Img[Constants_1.mapObjectImageName[this.map.mapTiles[i][j].objects[k]]], imgWidth, imgHeight, 0, 0, 0, imgWidth * j, imgHeight * i, imgWidth, imgHeight);
                             }
                         }
                     }

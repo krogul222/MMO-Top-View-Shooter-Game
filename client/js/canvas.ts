@@ -1,3 +1,4 @@
+import { Camera } from './Camera';
 import { GUI } from "./GUI";
 declare const CAMERA_BOX_ADJUSTMENT: any;
 declare var WIDTH: any;
@@ -13,20 +14,25 @@ declare var gui: any;
 
 gui = new GUI({ctx: ctxui, width: WIDTH, height: HEIGHTUI});
 
+export let camera: Camera = new Camera(canvas, WIDTH, HEIGHT);
+
 let resizeCanvas = function(){
     WIDTH = window.innerWidth - 4;
     HEIGHT = window.innerHeight - 48-HEIGHTUI;
     
-    canvas.width = WIDTH;
-    canvas.height = HEIGHT;
-    
+   /* canvas.width = WIDTH;
+    canvas.height = HEIGHT;*/
+
+    camera.resize(WIDTH, HEIGHT);
+
     canvasui.width = WIDTH;
     canvasui.height = HEIGHTUI;
-    
+
+   /* 
     ctx.font = '30px Arial';
     ctx.mozImageSmoothingEnabled = false;
     ctx.msImageSmoothingEnabled = false;
-    ctx.imageSmoothingEnabled = false;
+    ctx.imageSmoothingEnabled = false;*/
     
     ctxui.font = '30px Arial';
     ctxui.mozImageSmoothingEnabled = false;

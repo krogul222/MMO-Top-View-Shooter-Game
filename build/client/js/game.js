@@ -1,4 +1,5 @@
 Object.defineProperty(exports, "__esModule", { value: true });
+const canvas_1 = require("./canvas");
 const MapControler_1 = require("./../../server/js/Controllers/MapControler");
 const GameSoundManager_1 = require("./GameSoundManager");
 const UpgradeClient_1 = require("./Entities/UpgradeClient");
@@ -10,7 +11,7 @@ const ExplosionClient_1 = require("./Entities/ExplosionClient");
 const Inventory_1 = require("../../server/js/Inventory/Inventory");
 exports.selfId = 0;
 exports.inventory = new Inventory_1.Inventory(socket, false, 0);
-MapControler_1.MapController.loadMaps(true);
+MapControler_1.MapController.loadMaps();
 let currentMap = new MapClient_1.MapClient(null, "forest");
 socket.on('updateInventory', function (items) {
     exports.inventory.items = items;
@@ -19,8 +20,10 @@ socket.on('updateInventory', function (items) {
 exports.gameSoundManager = new GameSoundManager_1.GameSoundManager();
 socket.on('mapData', function (data) {
     MapControler_1.MapController.updateMap(data);
-    if (currentMap.name == data.name)
+    if (currentMap.name == data.name) {
         currentMap.reloadMap(MapControler_1.MapController.getMap(data.name));
+        canvas_1.camera.updateWorldSize(currentMap.map.width, currentMap.map.height);
+    }
 });
 socket.on('init', function (data) {
     if (data.selfId) {
@@ -146,6 +149,12 @@ socket.on('update', function (data) {
         }
     }
     gui.draw();
+    if (PlayerClient_1.PlayerClient.list[exports.selfId] !== undefined) {
+        canvas_1.camera.updatePosition(PlayerClient_1.PlayerClient.list[exports.selfId].position);
+        let position = canvas_1.camera.isPositionNearEdge(PlayerClient_1.PlayerClient.list[exports.selfId].position);
+        if (position)
+            updateMouse();
+    }
 });
 socket.on('remove', function (data) {
     for (let i = 0, length = data.player.length; i < length; i++) {
@@ -277,15 +286,27 @@ document.onmouseup = function (event) {
     socket.emit('keyPress', { inputId: 'attack', state: false });
 };
 document.onmousemove = function (event) {
-    let x = -WIDTH / 2 + event.clientX - 8 - (WIDTH / 2 - event.clientX) / CAMERA_BOX_ADJUSTMENT;
-    let y = -HEIGHT / 2 + event.clientY - 8 - (HEIGHT / 2 - event.clientY) / CAMERA_BOX_ADJUSTMENT;
-    mouseX = event.clientX;
-    mouseY = event.clientY;
-    let angle = Math.atan2(y, x) / Math.PI * 180;
     if (exports.selfId) {
         let player = PlayerClient_1.PlayerClient.list[exports.selfId];
+        let position = canvas_1.camera.getScreenPosition(player.position);
+        let x = event.clientX - 8 - position.x;
+        let y = event.clientY - 8 - position.y;
+        mouseX = event.clientX;
+        mouseY = event.clientY;
+        let angle = Math.atan2(y, x) / Math.PI * 180;
         player.aimAngle = angle;
+        socket.emit('keyPress', { inputId: 'mouseAngle', state: angle });
     }
-    socket.emit('keyPress', { inputId: 'mouseAngle', state: angle });
+};
+let updateMouse = () => {
+    if (exports.selfId) {
+        let player = PlayerClient_1.PlayerClient.list[exports.selfId];
+        let position = canvas_1.camera.getScreenPosition(player.position);
+        let x = mouseX - 8 - position.x;
+        let y = mouseY - 8 - position.y;
+        let angle = Math.atan2(y, x) / Math.PI * 180;
+        player.aimAngle = angle;
+        socket.emit('keyPress', { inputId: 'mouseAngle', state: angle });
+    }
 };
 //# sourceMappingURL=game.js.map

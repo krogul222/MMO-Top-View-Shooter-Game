@@ -1,6 +1,7 @@
 import { Point } from './../../../server/js/GeometryAndPhysics';
 import { PlayerClient } from './PlayerClient';
 import { selfId } from '../game';
+import { camera } from '../canvas';
 
 declare var mouseX: any;
 declare var mouseY: any;
@@ -43,30 +44,12 @@ export class ExplosionClient {
 
         let frameWidth = this.img.width/this.animColumns;
         let frameHeight = this.img.height/this.animRows;
-
-        let mainPlayer: PlayerClient = PlayerClient.list[selfId];
-        let mainPlayerx = mainPlayer.position.x;
-        let mainPlayery = mainPlayer.position.y;
-        let ex = this.position.x;
-        let ey = this.position.y;
-
-        let x = ex - (mainPlayerx-WIDTH/2);
-        x = x - (mouseX-WIDTH/2)/CAMERA_BOX_ADJUSTMENT;
-
-        let y = ey - (mainPlayery-HEIGHT/2);
-        y = y - (mouseY-HEIGHT/2)/CAMERA_BOX_ADJUSTMENT;
-
-		
-		x -= this.width/2;
-		y -= this.height/2;
 		
         let spriteColumn = Math.floor(this.spriteAnimCounter) % this.animColumns;
         let spriteRow = Math.floor(this.spriteAnimCounter/this.animColumns);
         
-		ctx.drawImage(this.img,
-			frameWidth*spriteColumn,frameHeight*spriteRow,frameWidth,frameHeight,
-			x,y,this.width,this.height); 
-		
+        camera.drawImage(this.img, frameWidth, frameHeight, 0, spriteRow, spriteColumn, this.position.x-this.width/2, this.position.y-this.height/2, this.width, this.height);            
+            
     }
 
     isCompleted = () => {

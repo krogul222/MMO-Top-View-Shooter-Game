@@ -60,7 +60,7 @@
 /******/ 	__webpack_require__.p = "/dist/";
 /******/
 /******/ 	// Load entry module and return exports
-/******/ 	return __webpack_require__(__webpack_require__.s = 33);
+/******/ 	return __webpack_require__(__webpack_require__.s = 3);
 /******/ })
 /************************************************************************/
 /******/ ([
@@ -222,18 +222,19 @@ exports.getRandomInt = getRandomInt;
 /***/ (function(module, exports, __webpack_require__) {
 
 Object.defineProperty(exports, "__esModule", { value: true });
-const MapControler_1 = __webpack_require__(5);
-const GameSoundManager_1 = __webpack_require__(23);
-const UpgradeClient_1 = __webpack_require__(24);
-const MapClient_1 = __webpack_require__(25);
+const canvas_1 = __webpack_require__(3);
+const MapControler_1 = __webpack_require__(6);
+const GameSoundManager_1 = __webpack_require__(26);
+const UpgradeClient_1 = __webpack_require__(27);
+const MapClient_1 = __webpack_require__(28);
 const PlayerClient_1 = __webpack_require__(4);
-const BulletClient_1 = __webpack_require__(26);
-const EnemyClient_1 = __webpack_require__(10);
-const ExplosionClient_1 = __webpack_require__(11);
-const Inventory_1 = __webpack_require__(12);
+const BulletClient_1 = __webpack_require__(29);
+const EnemyClient_1 = __webpack_require__(11);
+const ExplosionClient_1 = __webpack_require__(12);
+const Inventory_1 = __webpack_require__(13);
 exports.selfId = 0;
 exports.inventory = new Inventory_1.Inventory(socket, false, 0);
-MapControler_1.MapController.loadMaps(true);
+MapControler_1.MapController.loadMaps();
 let currentMap = new MapClient_1.MapClient(null, "forest");
 socket.on('updateInventory', function (items) {
     exports.inventory.items = items;
@@ -242,8 +243,10 @@ socket.on('updateInventory', function (items) {
 exports.gameSoundManager = new GameSoundManager_1.GameSoundManager();
 socket.on('mapData', function (data) {
     MapControler_1.MapController.updateMap(data);
-    if (currentMap.name == data.name)
+    if (currentMap.name == data.name) {
         currentMap.reloadMap(MapControler_1.MapController.getMap(data.name));
+        canvas_1.camera.updateWorldSize(currentMap.map.width, currentMap.map.height);
+    }
 });
 socket.on('init', function (data) {
     if (data.selfId) {
@@ -369,6 +372,12 @@ socket.on('update', function (data) {
         }
     }
     gui.draw();
+    if (PlayerClient_1.PlayerClient.list[exports.selfId] !== undefined) {
+        canvas_1.camera.updatePosition(PlayerClient_1.PlayerClient.list[exports.selfId].position);
+        let position = canvas_1.camera.isPositionNearEdge(PlayerClient_1.PlayerClient.list[exports.selfId].position);
+        if (position)
+            updateMouse();
+    }
 });
 socket.on('remove', function (data) {
     for (let i = 0, length = data.player.length; i < length; i++) {
@@ -500,21 +509,204 @@ document.onmouseup = function (event) {
     socket.emit('keyPress', { inputId: 'attack', state: false });
 };
 document.onmousemove = function (event) {
-    let x = -WIDTH / 2 + event.clientX - 8 - (WIDTH / 2 - event.clientX) / CAMERA_BOX_ADJUSTMENT;
-    let y = -HEIGHT / 2 + event.clientY - 8 - (HEIGHT / 2 - event.clientY) / CAMERA_BOX_ADJUSTMENT;
-    mouseX = event.clientX;
-    mouseY = event.clientY;
-    let angle = Math.atan2(y, x) / Math.PI * 180;
     if (exports.selfId) {
         let player = PlayerClient_1.PlayerClient.list[exports.selfId];
+        let position = canvas_1.camera.getScreenPosition(player.position);
+        let x = event.clientX - 8 - position.x;
+        let y = event.clientY - 8 - position.y;
+        mouseX = event.clientX;
+        mouseY = event.clientY;
+        let angle = Math.atan2(y, x) / Math.PI * 180;
         player.aimAngle = angle;
+        socket.emit('keyPress', { inputId: 'mouseAngle', state: angle });
     }
-    socket.emit('keyPress', { inputId: 'mouseAngle', state: angle });
+};
+let updateMouse = () => {
+    if (exports.selfId) {
+        let player = PlayerClient_1.PlayerClient.list[exports.selfId];
+        let position = canvas_1.camera.getScreenPosition(player.position);
+        let x = mouseX - 8 - position.x;
+        let y = mouseY - 8 - position.y;
+        let angle = Math.atan2(y, x) / Math.PI * 180;
+        player.aimAngle = angle;
+        socket.emit('keyPress', { inputId: 'mouseAngle', state: angle });
+    }
 };
 
 
 /***/ }),
 /* 3 */
+/***/ (function(module, exports, __webpack_require__) {
+
+Object.defineProperty(exports, "__esModule", { value: true });
+const Camera_1 = __webpack_require__(18);
+const GUI_1 = __webpack_require__(19);
+gui = new GUI_1.GUI({ ctx: ctxui, width: WIDTH, height: HEIGHTUI });
+exports.camera = new Camera_1.Camera(canvas, WIDTH, HEIGHT);
+let resizeCanvas = function () {
+    WIDTH = window.innerWidth - 4;
+    HEIGHT = window.innerHeight - 48 - HEIGHTUI;
+    exports.camera.resize(WIDTH, HEIGHT);
+    canvasui.width = WIDTH;
+    canvasui.height = HEIGHTUI;
+    ctxui.font = '30px Arial';
+    ctxui.mozImageSmoothingEnabled = false;
+    ctxui.msImageSmoothingEnabled = false;
+    ctxui.imageSmoothingEnabled = false;
+    gui.resize(canvasui.width, canvasui.height);
+    gui.draw();
+};
+resizeCanvas();
+window.addEventListener('resize', function () {
+    resizeCanvas();
+});
+
+
+/***/ }),
+/* 4 */
+/***/ (function(module, exports, __webpack_require__) {
+
+Object.defineProperty(exports, "__esModule", { value: true });
+const GeometryAndPhysics_1 = __webpack_require__(0);
+const game_1 = __webpack_require__(2);
+const canvas_1 = __webpack_require__(3);
+class PlayerClient {
+    constructor(initPack) {
+        this.id = -1;
+        this.position = new GeometryAndPhysics_1.Point(250, 250);
+        this.width = 0;
+        this.height = 0;
+        this.img = Img["player" + "pistol"];
+        this.imgMeleeAttack = Img["playerknifemeeleattack"];
+        this.imgReload = Img["playerpistolreload"];
+        this.hp = 1;
+        this.hpMax = 1;
+        this.map = "forest";
+        this.aimAngle = 0;
+        this.attackStarted = false;
+        this.attackMelee = false;
+        this.bodySpriteAnimCounter = 0;
+        this.walkSpriteAnimCounter = 0;
+        this.moving = false;
+        this.reload = false;
+        this.weapon = "pistol";
+        this.ammo = 0;
+        this.ammoInGun = 0;
+        this.draw = () => {
+            if (PlayerClient.list[game_1.selfId].map !== this.map) {
+                return;
+            }
+            let spriteRows = 1;
+            let spriteColumns = 20;
+            let hpWidth = 30 * this.hp / this.hpMax;
+            let aimAngle = this.aimAngle;
+            aimAngle = (aimAngle < 0) ? (360 + aimAngle) : aimAngle;
+            let directionMod = this.inWhichDirection(aimAngle);
+            let walkingMod = Math.floor(this.walkSpriteAnimCounter) % spriteColumns;
+            this.drawWalk(spriteColumns, spriteRows, aimAngle, 0, walkingMod, this.position.x, this.position.y);
+            if (this.attackStarted && this.attackMelee) {
+                spriteColumns = 15;
+                walkingMod = Math.floor(this.bodySpriteAnimCounter) % spriteColumns;
+                this.drawMeleeAttackBody(spriteColumns, spriteRows, aimAngle, 0, walkingMod, this.position.x, this.position.y);
+            }
+            else {
+                if (this.reload) {
+                    if (this.weapon == "pistol")
+                        spriteColumns = 15;
+                    walkingMod = Math.floor(this.bodySpriteAnimCounter) % spriteColumns;
+                    this.drawReloadBodyWithGun(spriteColumns, spriteRows, aimAngle, 0, walkingMod, this.position.x, this.position.y);
+                }
+                else {
+                    this.drawNormalBodyWithGun(spriteColumns, spriteRows, aimAngle, 0, walkingMod, this.position.x, this.position.y);
+                }
+            }
+            canvas_1.camera.drawBar(this.position.x - hpWidth / 2, this.position.y - 40, hpWidth, 4, 'red');
+        };
+        this.inWhichDirection = (aimAngle) => {
+            let directionMod = 3;
+            if (aimAngle >= 45 && aimAngle < 135) {
+                directionMod = 2;
+            }
+            else if (aimAngle >= 135 && aimAngle < 225) {
+                directionMod = 1;
+            }
+            else if (aimAngle >= 225 && aimAngle < 315) {
+                directionMod = 0;
+            }
+            return directionMod;
+        };
+        this.drawMeleeAttackBody = (spriteColumns, spriteRows, aimAngle, directionMod, walkingMod, x, y) => {
+            let correction = 1.3;
+            let correctionWidth = 1;
+            let correctionHeight = 1;
+            if (this.weapon == "pistol") {
+                correction = 1.1;
+            }
+            if (this.weapon == "shotgun") {
+                correction = 1.4;
+            }
+            let frameWidth = this.imgMeleeAttack.width / spriteColumns;
+            let frameHeight = this.imgMeleeAttack.height / spriteRows;
+            canvas_1.camera.drawImage(this.imgMeleeAttack, frameWidth, frameHeight, aimAngle, directionMod, walkingMod, x, y, this.width * correction, this.height * correction);
+            if (this.bodySpriteAnimCounter % spriteColumns >= (spriteColumns - 1)) {
+                this.bodySpriteAnimCounter = 0;
+                this.attackStarted = false;
+            }
+        };
+        this.drawNormalBodyWithGun = (spriteColumns, spriteRows, aimAngle, directionMod, walkingMod, x, y) => {
+            let frameWidth = this.img.width / spriteColumns;
+            let frameHeight = this.img.height / spriteRows;
+            canvas_1.camera.drawImage(this.img, frameWidth, frameHeight, aimAngle, directionMod, walkingMod, x, y, this.width, this.height);
+        };
+        this.drawReloadBodyWithGun = (spriteColumns, spriteRows, aimAngle, directionMod, walkingMod, x, y) => {
+            let frameWidth = this.imgReload.width / spriteColumns;
+            let frameHeight = this.imgReload.height / spriteRows;
+            canvas_1.camera.drawImage(this.imgReload, frameWidth, frameHeight, aimAngle, directionMod, walkingMod, x, y, this.width, this.height);
+        };
+        this.drawWalk = (spriteColumns, spriteRows, aimAngle, directionMod, walkingMod, x, y) => {
+            let frameWidth = Img["walk"].width / spriteColumns;
+            let frameHeight = Img["walk"].height / spriteRows;
+            canvas_1.camera.drawImage(Img["walk"], frameWidth, frameHeight, aimAngle, directionMod, walkingMod, x, y, this.width / 2, this.height / 2);
+        };
+        if (initPack.id)
+            this.id = initPack.id;
+        if (initPack.position)
+            this.position = initPack.position;
+        if (initPack.width)
+            this.width = initPack.width;
+        if (initPack.height)
+            this.height = initPack.height;
+        if (initPack.weapon) {
+            this.img = Img["player" + initPack.weapon];
+            this.weapon = initPack.weapon;
+            this.imgMeleeAttack = Img["player" + initPack.weapon + "meeleattack"];
+            this.imgReload = Img["player" + initPack.weapon + "reload"];
+        }
+        if (initPack.hp)
+            this.hp = initPack.hp;
+        if (initPack.hpMax)
+            this.hpMax = initPack.hpMax;
+        if (initPack.aimAngle)
+            this.aimAngle = initPack.aimAngle;
+        if (initPack.moving)
+            this.moving = initPack.moving;
+        if (initPack.attackStarted)
+            this.attackStarted = initPack.attackStarted;
+        if (initPack.attackMelee)
+            this.attackMelee = initPack.attackMelee;
+        if (initPack.ammo)
+            this.ammo = initPack.ammo;
+        if (initPack.ammoInGun)
+            this.ammoInGun = initPack.ammoInGun;
+        PlayerClient.list[initPack.id] = this;
+    }
+}
+PlayerClient.list = {};
+exports.PlayerClient = PlayerClient;
+
+
+/***/ }),
+/* 5 */
 /***/ (function(module, exports, __webpack_require__) {
 
 Object.defineProperty(exports, "__esModule", { value: true });
@@ -597,191 +789,17 @@ exports.mapObjectCollisions[enums_1.MapObjectType.GR_ER] = [0, 0, 2, 0, 0, 0, 0,
 
 
 /***/ }),
-/* 4 */
+/* 6 */
 /***/ (function(module, exports, __webpack_require__) {
 
 Object.defineProperty(exports, "__esModule", { value: true });
-const GeometryAndPhysics_1 = __webpack_require__(0);
-const game_1 = __webpack_require__(2);
-class PlayerClient {
-    constructor(initPack) {
-        this.id = -1;
-        this.position = new GeometryAndPhysics_1.Point(250, 250);
-        this.width = 0;
-        this.height = 0;
-        this.img = Img["player" + "pistol"];
-        this.imgMeleeAttack = Img["playerknifemeeleattack"];
-        this.imgReload = Img["playerpistolreload"];
-        this.hp = 1;
-        this.hpMax = 1;
-        this.map = "forest";
-        this.aimAngle = 0;
-        this.attackStarted = false;
-        this.attackMelee = false;
-        this.bodySpriteAnimCounter = 0;
-        this.walkSpriteAnimCounter = 0;
-        this.moving = false;
-        this.reload = false;
-        this.weapon = "pistol";
-        this.ammo = 0;
-        this.ammoInGun = 0;
-        this.draw = () => {
-            if (PlayerClient.list[game_1.selfId].map !== this.map) {
-                return;
-            }
-            let spriteRows = 1;
-            let spriteColumns = 20;
-            let hpWidth = 30 * this.hp / this.hpMax;
-            let mainPlayer = PlayerClient.list[game_1.selfId];
-            let mainPlayerx = mainPlayer.position.x;
-            let mainPlayery = mainPlayer.position.y;
-            let px = this.position.x;
-            let py = this.position.y;
-            console.log("Player position: " + px + " " + py);
-            let x = px - (mainPlayerx - WIDTH / 2);
-            x = x - (mouseX - WIDTH / 2) / CAMERA_BOX_ADJUSTMENT;
-            let y = py - (mainPlayery - HEIGHT / 2);
-            y = y - (mouseY - HEIGHT / 2) / CAMERA_BOX_ADJUSTMENT;
-            let aimAngle = this.aimAngle;
-            aimAngle = (aimAngle < 0) ? (360 + aimAngle) : aimAngle;
-            let directionMod = this.inWhichDirection(aimAngle);
-            let walkingMod = Math.floor(this.walkSpriteAnimCounter) % spriteColumns;
-            this.drawWalk(spriteColumns, spriteRows, aimAngle, 0, walkingMod, x, y);
-            if (this.attackStarted && this.attackMelee) {
-                spriteColumns = 15;
-                walkingMod = Math.floor(this.bodySpriteAnimCounter) % spriteColumns;
-                this.drawMeleeAttackBody(spriteColumns, spriteRows, aimAngle, 0, walkingMod, x, y);
-            }
-            else {
-                if (this.reload) {
-                    if (this.weapon == "pistol")
-                        spriteColumns = 15;
-                    walkingMod = Math.floor(this.bodySpriteAnimCounter) % spriteColumns;
-                    this.drawReloadBodyWithGun(spriteColumns, spriteRows, aimAngle, 0, walkingMod, x, y);
-                }
-                else {
-                    this.drawNormalBodyWithGun(spriteColumns, spriteRows, aimAngle, 0, walkingMod, x, y);
-                }
-            }
-            ctx.fillStyle = 'red';
-            ctx.fillRect(x - hpWidth / 2, y - 40, hpWidth, 4);
-        };
-        this.inWhichDirection = (aimAngle) => {
-            let directionMod = 3;
-            if (aimAngle >= 45 && aimAngle < 135) {
-                directionMod = 2;
-            }
-            else if (aimAngle >= 135 && aimAngle < 225) {
-                directionMod = 1;
-            }
-            else if (aimAngle >= 225 && aimAngle < 315) {
-                directionMod = 0;
-            }
-            return directionMod;
-        };
-        this.drawMeleeAttackBody = (spriteColumns, spriteRows, aimAngle, directionMod, walkingMod, x, y) => {
-            let correction = 1.3;
-            let correctionWidth = 1;
-            let correctionHeight = 1;
-            if (this.weapon == "pistol") {
-                correction = 1.1;
-            }
-            if (this.weapon == "shotgun") {
-                correction = 1.4;
-            }
-            let frameWidth = this.imgMeleeAttack.width / spriteColumns;
-            let frameHeight = this.imgMeleeAttack.height / spriteRows;
-            ctx.save();
-            ctx.translate(x - (this.width * correctionWidth) * correction / 2, y - this.height * correction / 2);
-            ctx.translate((this.width) * correction / 2, this.height * correction / 2);
-            ctx.rotate(aimAngle * Math.PI / 180);
-            ctx.drawImage(this.imgMeleeAttack, walkingMod * frameWidth, directionMod * frameHeight, frameWidth, frameHeight, -this.width * correction / 2, -this.height * correction / 2, (this.width) * correction, this.height * correction);
-            ctx.restore();
-            if (this.bodySpriteAnimCounter % spriteColumns >= (spriteColumns - 1)) {
-                this.bodySpriteAnimCounter = 0;
-                this.attackStarted = false;
-            }
-        };
-        this.drawNormalBodyWithGun = (spriteColumns, spriteRows, aimAngle, directionMod, walkingMod, x, y) => {
-            let frameWidth = this.img.width / spriteColumns;
-            let frameHeight = this.img.height / spriteRows;
-            ctx.save();
-            ctx.translate(x - this.width / 2, y - this.height / 2);
-            ctx.translate(this.width / 2, this.height / 2);
-            ctx.rotate(aimAngle * Math.PI / 180);
-            ctx.drawImage(this.img, walkingMod * frameWidth, directionMod * frameHeight, frameWidth, frameHeight, -this.width / 2, -this.height / 2, this.width, this.height);
-            ctx.restore();
-        };
-        this.drawReloadBodyWithGun = (spriteColumns, spriteRows, aimAngle, directionMod, walkingMod, x, y) => {
-            let frameWidth = this.imgReload.width / spriteColumns;
-            let frameHeight = this.imgReload.height / spriteRows;
-            ctx.save();
-            ctx.translate(x - this.width / 2, y - this.height / 2);
-            ctx.translate(this.width / 2, this.height / 2);
-            ctx.rotate(aimAngle * Math.PI / 180);
-            ctx.drawImage(this.imgReload, walkingMod * frameWidth, directionMod * frameHeight, frameWidth, frameHeight, -this.width / 2, -this.height / 2, this.width, this.height);
-            ctx.restore();
-        };
-        this.drawWalk = (spriteColumns, spriteRows, aimAngle, directionMod, walkingMod, x, y) => {
-            let frameWidth = Img["walk"].width / spriteColumns;
-            let frameHeight = Img["walk"].height / spriteRows;
-            ctx.save();
-            ctx.translate(x - this.width / 4, y - this.height / 4);
-            ctx.translate(this.width / 4, this.height / 4);
-            ctx.rotate(aimAngle * Math.PI / 180);
-            console.log("WALK MODE: " + walkingMod);
-            ctx.drawImage(Img["walk"], walkingMod * frameWidth, directionMod * frameHeight, frameWidth, frameHeight, -this.width / 4, -this.height / 4, this.width / 2, this.height / 2);
-            ctx.restore();
-        };
-        if (initPack.id)
-            this.id = initPack.id;
-        if (initPack.position)
-            this.position = initPack.position;
-        if (initPack.width)
-            this.width = initPack.width;
-        if (initPack.height)
-            this.height = initPack.height;
-        if (initPack.weapon) {
-            this.img = Img["player" + initPack.weapon];
-            this.weapon = initPack.weapon;
-            this.imgMeleeAttack = Img["player" + initPack.weapon + "meeleattack"];
-            this.imgReload = Img["player" + initPack.weapon + "reload"];
-        }
-        if (initPack.hp)
-            this.hp = initPack.hp;
-        if (initPack.hpMax)
-            this.hpMax = initPack.hpMax;
-        if (initPack.aimAngle)
-            this.aimAngle = initPack.aimAngle;
-        if (initPack.moving)
-            this.moving = initPack.moving;
-        if (initPack.attackStarted)
-            this.attackStarted = initPack.attackStarted;
-        if (initPack.attackMelee)
-            this.attackMelee = initPack.attackMelee;
-        if (initPack.ammo)
-            this.ammo = initPack.ammo;
-        if (initPack.ammoInGun)
-            this.ammoInGun = initPack.ammoInGun;
-        PlayerClient.list[initPack.id] = this;
-    }
-}
-PlayerClient.list = {};
-exports.PlayerClient = PlayerClient;
-
-
-/***/ }),
-/* 5 */
-/***/ (function(module, exports, __webpack_require__) {
-
-Object.defineProperty(exports, "__esModule", { value: true });
-const SpawnObjectMapChecker_1 = __webpack_require__(17);
-const GroundRing_1 = __webpack_require__(18);
-const GameMap_1 = __webpack_require__(21);
-const MapTile_1 = __webpack_require__(22);
+const SpawnObjectMapChecker_1 = __webpack_require__(20);
+const GroundRing_1 = __webpack_require__(21);
+const GameMap_1 = __webpack_require__(24);
+const MapTile_1 = __webpack_require__(25);
 const enums_1 = __webpack_require__(1);
 const GeometryAndPhysics_1 = __webpack_require__(0);
-const Constants_1 = __webpack_require__(3);
+const Constants_1 = __webpack_require__(5);
 class MapController {
     constructor(param) {
     }
@@ -963,27 +981,141 @@ exports.MapController = MapController;
 
 
 /***/ }),
-/* 6 */
+/* 7 */
 /***/ (function(module, exports, __webpack_require__) {
 
 Object.defineProperty(exports, "__esModule", { value: true });
-const Pack_1 = __webpack_require__(28);
+const Pack_1 = __webpack_require__(31);
 exports.initPack = new Pack_1.Pack();
 exports.removePack = new Pack_1.Pack();
 
 
 /***/ }),
-/* 7 */
+/* 8 */
 /***/ (function(module, exports, __webpack_require__) {
 
 Object.defineProperty(exports, "__esModule", { value: true });
-const globalVariables_1 = __webpack_require__(6);
-const Enemy_1 = __webpack_require__(8);
-const Bullet_1 = __webpack_require__(15);
-const Actor_1 = __webpack_require__(13);
+const enums_1 = __webpack_require__(1);
+class WeaponTypes {
+    constructor(param) {
+        this.name = "";
+        this.meleeDmg = 0;
+        this.shootDmg = 0;
+        this.shootSpeed = 0;
+        this.attackRadius = 0;
+        this.attackSpd = 30;
+        this.attackMelee = true;
+        this.reloadSpd = 30;
+        this.recoil = false;
+        this.maxSpd = 8;
+        this.reloadAmmo = 0;
+        this._weapon = (param.weapon !== undefined) ? param.weapon : enums_1.WeaponType.knife;
+        this.attackRadius = (param.attackRadius !== undefined) ? param.attackRadius : 0;
+        this.attackSpd = (param.attackSpd !== undefined) ? param.attackSpd : 0;
+        this.attackMelee = (param.attackMelee !== undefined) ? param.attackMelee : true;
+        this.shootDmg = (param.shootDmg !== undefined) ? param.shootDmg : 0;
+        this.meleeDmg = (param.meleeDmg !== undefined) ? param.meleeDmg : 0;
+        this.maxSpd = (param.maxSpd !== undefined) ? param.maxSpd : 8;
+        this.shootSpeed = (param.shootSpeed !== undefined) ? param.shootSpeed : 0;
+        this.reloadAmmo = (param.reloadAmmo !== undefined) ? param.reloadAmmo : 0;
+        this.reloadSpd = (param.reloadSpd !== undefined) ? param.reloadSpd : 0;
+        this.recoil = (param.recoil !== undefined) ? param.recoil : false;
+        this.name = (param.name !== undefined) ? param.name : "knife";
+        WeaponTypes.list[param.weapon] = this;
+    }
+    get weapon() { return this._weapon; }
+}
+WeaponTypes.getWeaponParameters = (weapon) => {
+    for (let i in WeaponTypes.list) {
+        let weaponFromBank = WeaponTypes.list[i];
+        if (weaponFromBank.weapon == weapon) {
+            return weaponFromBank;
+        }
+    }
+    return WeaponTypes.list[0];
+};
+WeaponTypes.getWeaponIdbyName = (name) => {
+    for (let i in WeaponTypes.list) {
+        let weaponFromBank = WeaponTypes.list[i];
+        if (weaponFromBank.name == name) {
+            return weaponFromBank.weapon;
+        }
+    }
+    return enums_1.WeaponType.knife;
+};
+WeaponTypes.list = {};
+exports.WeaponTypes = WeaponTypes;
+new WeaponTypes({ weapon: enums_1.WeaponType.pistol, name: "pistol",
+    attackRadius: 0,
+    attackSpd: 4,
+    attackMelee: false,
+    shootDmg: 2,
+    meleeDmg: 2,
+    maxSpd: 10,
+    shootSpeed: 30,
+    reloadAmmo: 6,
+    reloadSpd: 5,
+    recoil: false
+});
+new WeaponTypes({ weapon: enums_1.WeaponType.shotgun, name: "shotgun",
+    attackRadius: 3,
+    attackSpd: 2,
+    attackMelee: false,
+    shootDmg: 3,
+    meleeDmg: 4,
+    maxSpd: 8,
+    shootSpeed: 25,
+    reloadAmmo: 2,
+    reloadSpd: 2,
+    recoil: false
+});
+new WeaponTypes({ weapon: enums_1.WeaponType.knife, name: "knife",
+    attackRadius: 0,
+    attackSpd: 3,
+    attackMelee: true,
+    shootDmg: 0,
+    meleeDmg: 8,
+    maxSpd: 11,
+    reloadAmmo: 0,
+    reloadSpd: 0,
+    recoil: false
+});
+new WeaponTypes({ weapon: enums_1.WeaponType.rifle, name: "rifle",
+    attackRadius: 0,
+    attackSpd: 1,
+    attackMelee: false,
+    shootDmg: 15,
+    meleeDmg: 4,
+    maxSpd: 8,
+    shootSpeed: 40,
+    reloadAmmo: 1,
+    reloadSpd: 2,
+    recoil: true
+});
+new WeaponTypes({ weapon: enums_1.WeaponType.claws, name: "claws",
+    attackRadius: 0,
+    attackSpd: 3,
+    attackMelee: true,
+    shootDmg: 0,
+    meleeDmg: 5,
+    reloadAmmo: 0,
+    reloadSpd: 0,
+    recoil: false
+});
+
+
+/***/ }),
+/* 9 */
+/***/ (function(module, exports, __webpack_require__) {
+
+Object.defineProperty(exports, "__esModule", { value: true });
+const globalVariables_1 = __webpack_require__(7);
+const Enemy_1 = __webpack_require__(10);
+const Bullet_1 = __webpack_require__(16);
+const Actor_1 = __webpack_require__(14);
 const GeometryAndPhysics_1 = __webpack_require__(0);
 const enums_1 = __webpack_require__(1);
-const MapControler_1 = __webpack_require__(5);
+const MapControler_1 = __webpack_require__(6);
 class Player extends Actor_1.Actor {
     constructor(param) {
         super(param);
@@ -1137,15 +1269,15 @@ exports.Player = Player;
 
 
 /***/ }),
-/* 8 */
+/* 10 */
 /***/ (function(module, exports, __webpack_require__) {
 
 Object.defineProperty(exports, "__esModule", { value: true });
-const Actor_1 = __webpack_require__(13);
+const Actor_1 = __webpack_require__(14);
 const GeometryAndPhysics_1 = __webpack_require__(0);
-const globalVariables_1 = __webpack_require__(6);
+const globalVariables_1 = __webpack_require__(7);
 const enums_1 = __webpack_require__(1);
-const MapControler_1 = __webpack_require__(5);
+const MapControler_1 = __webpack_require__(6);
 class Enemy extends Actor_1.Actor {
     constructor(param) {
         super(param);
@@ -1331,124 +1463,11 @@ exports.Enemy = Enemy;
 
 
 /***/ }),
-/* 9 */
+/* 11 */
 /***/ (function(module, exports, __webpack_require__) {
 
 Object.defineProperty(exports, "__esModule", { value: true });
-const enums_1 = __webpack_require__(1);
-class WeaponTypes {
-    constructor(param) {
-        this.name = "";
-        this.meleeDmg = 0;
-        this.shootDmg = 0;
-        this.shootSpeed = 0;
-        this.attackRadius = 0;
-        this.attackSpd = 30;
-        this.attackMelee = true;
-        this.reloadSpd = 30;
-        this.recoil = false;
-        this.maxSpd = 8;
-        this.reloadAmmo = 0;
-        this._weapon = (param.weapon !== undefined) ? param.weapon : enums_1.WeaponType.knife;
-        this.attackRadius = (param.attackRadius !== undefined) ? param.attackRadius : 0;
-        this.attackSpd = (param.attackSpd !== undefined) ? param.attackSpd : 0;
-        this.attackMelee = (param.attackMelee !== undefined) ? param.attackMelee : true;
-        this.shootDmg = (param.shootDmg !== undefined) ? param.shootDmg : 0;
-        this.meleeDmg = (param.meleeDmg !== undefined) ? param.meleeDmg : 0;
-        this.maxSpd = (param.maxSpd !== undefined) ? param.maxSpd : 8;
-        this.shootSpeed = (param.shootSpeed !== undefined) ? param.shootSpeed : 0;
-        this.reloadAmmo = (param.reloadAmmo !== undefined) ? param.reloadAmmo : 0;
-        this.reloadSpd = (param.reloadSpd !== undefined) ? param.reloadSpd : 0;
-        this.recoil = (param.recoil !== undefined) ? param.recoil : false;
-        this.name = (param.name !== undefined) ? param.name : "knife";
-        WeaponTypes.list[param.weapon] = this;
-    }
-    get weapon() { return this._weapon; }
-}
-WeaponTypes.getWeaponParameters = (weapon) => {
-    for (let i in WeaponTypes.list) {
-        let weaponFromBank = WeaponTypes.list[i];
-        if (weaponFromBank.weapon == weapon) {
-            return weaponFromBank;
-        }
-    }
-    return WeaponTypes.list[0];
-};
-WeaponTypes.getWeaponIdbyName = (name) => {
-    for (let i in WeaponTypes.list) {
-        let weaponFromBank = WeaponTypes.list[i];
-        if (weaponFromBank.name == name) {
-            return weaponFromBank.weapon;
-        }
-    }
-    return enums_1.WeaponType.knife;
-};
-WeaponTypes.list = {};
-exports.WeaponTypes = WeaponTypes;
-new WeaponTypes({ weapon: enums_1.WeaponType.pistol, name: "pistol",
-    attackRadius: 0,
-    attackSpd: 4,
-    attackMelee: false,
-    shootDmg: 2,
-    meleeDmg: 2,
-    maxSpd: 10,
-    shootSpeed: 30,
-    reloadAmmo: 6,
-    reloadSpd: 5,
-    recoil: false
-});
-new WeaponTypes({ weapon: enums_1.WeaponType.shotgun, name: "shotgun",
-    attackRadius: 3,
-    attackSpd: 2,
-    attackMelee: false,
-    shootDmg: 3,
-    meleeDmg: 4,
-    maxSpd: 8,
-    shootSpeed: 25,
-    reloadAmmo: 2,
-    reloadSpd: 2,
-    recoil: false
-});
-new WeaponTypes({ weapon: enums_1.WeaponType.knife, name: "knife",
-    attackRadius: 0,
-    attackSpd: 3,
-    attackMelee: true,
-    shootDmg: 0,
-    meleeDmg: 8,
-    maxSpd: 11,
-    reloadAmmo: 0,
-    reloadSpd: 0,
-    recoil: false
-});
-new WeaponTypes({ weapon: enums_1.WeaponType.rifle, name: "rifle",
-    attackRadius: 0,
-    attackSpd: 1,
-    attackMelee: false,
-    shootDmg: 15,
-    meleeDmg: 4,
-    maxSpd: 8,
-    shootSpeed: 40,
-    reloadAmmo: 1,
-    reloadSpd: 2,
-    recoil: true
-});
-new WeaponTypes({ weapon: enums_1.WeaponType.claws, name: "claws",
-    attackRadius: 0,
-    attackSpd: 3,
-    attackMelee: true,
-    shootDmg: 0,
-    meleeDmg: 5,
-    reloadAmmo: 0,
-    reloadSpd: 0,
-    recoil: false
-});
-
-
-/***/ }),
-/* 10 */
-/***/ (function(module, exports, __webpack_require__) {
-
-Object.defineProperty(exports, "__esModule", { value: true });
+const canvas_1 = __webpack_require__(3);
 const PlayerClient_1 = __webpack_require__(4);
 const GeometryAndPhysics_1 = __webpack_require__(0);
 const game_1 = __webpack_require__(2);
@@ -1502,14 +1521,13 @@ class EnemyClient {
             }
             let walkingMod = Math.floor(this.spriteAnimCounter) % 6;
             if (this.kind == 'zombie') {
-                this.drawTopViewSprite(x, y, aimAngle);
+                this.drawTopViewSprite(this.position.x, this.position.y, aimAngle);
             }
             else {
                 walkingMod = Math.floor(this.spriteAnimCounter) % 6;
-                ctx.drawImage(this.img, walkingMod * frameWidth, directionMod * frameHeight, frameWidth, frameHeight, x - this.width / 2, y - this.height / 2, this.width, this.height);
+                canvas_1.camera.drawImage(this.img, frameWidth, frameHeight, 0, directionMod, walkingMod, this.position.x - this.width / 2, this.position.y - this.height / 2, this.width, this.height);
             }
-            ctx.fillStyle = 'red';
-            ctx.fillRect(x - hpWidth / 2, y - 40, hpWidth, 4);
+            canvas_1.camera.drawBar(this.position.x - hpWidth / 2, this.position.y - 40, hpWidth, 4, 'red');
         };
         this.drawTopViewSprite = (x, y, aimAngle) => {
             if (this.attackStarted) {
@@ -1525,12 +1543,7 @@ class EnemyClient {
             let walkingMod = Math.floor(this.spriteAnimCounter) % spriteColumns;
             let frameWidth = Img[this.kind + 'attack'].width / spriteColumns;
             let frameHeight = Img[this.kind + 'attack'].height / spriteRows;
-            ctx.save();
-            ctx.translate(x - (this.width) / 2, y - this.height / 2);
-            ctx.translate((this.width) / 2, this.height / 2);
-            ctx.rotate(aimAngle * Math.PI / 180);
-            ctx.drawImage(Img[this.kind + 'attack'], walkingMod * frameWidth, 0, frameWidth, frameHeight, -this.width / 2, -this.height / 2, (this.width), this.height);
-            ctx.restore();
+            canvas_1.camera.drawImage(Img[this.kind + 'attack'], frameWidth, frameHeight, aimAngle, 0, walkingMod, x, y, this.width, this.height);
             if (this.spriteAnimCounter % spriteColumns >= (spriteColumns - 1)) {
                 this.spriteAnimCounter = 0;
                 this.attackStarted = false;
@@ -1539,13 +1552,8 @@ class EnemyClient {
         this.drawTopViewSpriteWalk = (x, y, aimAngle) => {
             let frameWidth = this.img.width / framesMove[this.kind];
             let frameHeight = this.img.height;
-            ctx.save();
-            ctx.translate(x - this.width / 2, y - this.height / 2);
-            ctx.translate(this.width / 2, this.height / 2);
-            ctx.rotate(aimAngle * Math.PI / 180);
             let walkingMod = Math.floor(this.spriteAnimCounter) % framesMove[this.kind];
-            ctx.drawImage(this.img, walkingMod * frameWidth, 0, frameWidth, frameHeight, -this.width / 2, -this.height / 2, this.width, this.height);
-            ctx.restore();
+            canvas_1.camera.drawImage(this.img, frameWidth, frameHeight, aimAngle, 0, walkingMod, x, y, this.width, this.height);
         };
         if (initPack.id)
             this.id = initPack.id;
@@ -1581,13 +1589,14 @@ exports.EnemyClient = EnemyClient;
 
 
 /***/ }),
-/* 11 */
+/* 12 */
 /***/ (function(module, exports, __webpack_require__) {
 
 Object.defineProperty(exports, "__esModule", { value: true });
 const GeometryAndPhysics_1 = __webpack_require__(0);
 const PlayerClient_1 = __webpack_require__(4);
 const game_1 = __webpack_require__(2);
+const canvas_1 = __webpack_require__(3);
 class ExplosionClient {
     constructor(param) {
         this.id = Math.random();
@@ -1601,20 +1610,9 @@ class ExplosionClient {
             }
             let frameWidth = this.img.width / this.animColumns;
             let frameHeight = this.img.height / this.animRows;
-            let mainPlayer = PlayerClient_1.PlayerClient.list[game_1.selfId];
-            let mainPlayerx = mainPlayer.position.x;
-            let mainPlayery = mainPlayer.position.y;
-            let ex = this.position.x;
-            let ey = this.position.y;
-            let x = ex - (mainPlayerx - WIDTH / 2);
-            x = x - (mouseX - WIDTH / 2) / CAMERA_BOX_ADJUSTMENT;
-            let y = ey - (mainPlayery - HEIGHT / 2);
-            y = y - (mouseY - HEIGHT / 2) / CAMERA_BOX_ADJUSTMENT;
-            x -= this.width / 2;
-            y -= this.height / 2;
             let spriteColumn = Math.floor(this.spriteAnimCounter) % this.animColumns;
             let spriteRow = Math.floor(this.spriteAnimCounter / this.animColumns);
-            ctx.drawImage(this.img, frameWidth * spriteColumn, frameHeight * spriteRow, frameWidth, frameHeight, x, y, this.width, this.height);
+            canvas_1.camera.drawImage(this.img, frameWidth, frameHeight, 0, spriteRow, spriteColumn, this.position.x - this.width / 2, this.position.y - this.height / 2, this.width, this.height);
         };
         this.isCompleted = () => {
             if (this.spriteAnimCounter > (this.animRows * this.animColumns))
@@ -1638,12 +1636,12 @@ exports.ExplosionClient = ExplosionClient;
 
 
 /***/ }),
-/* 12 */
+/* 13 */
 /***/ (function(module, exports, __webpack_require__) {
 
 Object.defineProperty(exports, "__esModule", { value: true });
-const Item_1 = __webpack_require__(27);
-const Player_1 = __webpack_require__(7);
+const Item_1 = __webpack_require__(30);
+const Player_1 = __webpack_require__(9);
 class Inventory {
     constructor(socket, server, owner) {
         this.items = [];
@@ -1739,18 +1737,18 @@ exports.Inventory = Inventory;
 
 
 /***/ }),
-/* 13 */
+/* 14 */
 /***/ (function(module, exports, __webpack_require__) {
 
 Object.defineProperty(exports, "__esModule", { value: true });
-const Inventory_1 = __webpack_require__(12);
-const MapControler_1 = __webpack_require__(5);
-const MovementController_1 = __webpack_require__(29);
-const AttackControler_1 = __webpack_require__(30);
-const LifeAndBodyController_1 = __webpack_require__(32);
-const Entity_1 = __webpack_require__(16);
-const Player_1 = __webpack_require__(7);
-const Enemy_1 = __webpack_require__(8);
+const Inventory_1 = __webpack_require__(13);
+const MapControler_1 = __webpack_require__(6);
+const MovementController_1 = __webpack_require__(32);
+const AttackControler_1 = __webpack_require__(33);
+const LifeAndBodyController_1 = __webpack_require__(35);
+const Entity_1 = __webpack_require__(17);
+const Player_1 = __webpack_require__(9);
+const Enemy_1 = __webpack_require__(10);
 const GeometryAndPhysics_1 = __webpack_require__(0);
 class Actor extends Entity_1.Entity {
     constructor(param) {
@@ -1840,7 +1838,7 @@ exports.Actor = Actor;
 
 
 /***/ }),
-/* 14 */
+/* 15 */
 /***/ (function(module, exports) {
 
 Object.defineProperty(exports, "__esModule", { value: true });
@@ -1876,15 +1874,15 @@ exports.Counter = Counter;
 
 
 /***/ }),
-/* 15 */
+/* 16 */
 /***/ (function(module, exports, __webpack_require__) {
 
 Object.defineProperty(exports, "__esModule", { value: true });
-const Enemy_1 = __webpack_require__(8);
-const Player_1 = __webpack_require__(7);
-const Entity_1 = __webpack_require__(16);
-const globalVariables_1 = __webpack_require__(6);
-const MapControler_1 = __webpack_require__(5);
+const Enemy_1 = __webpack_require__(10);
+const Player_1 = __webpack_require__(9);
+const Entity_1 = __webpack_require__(17);
+const globalVariables_1 = __webpack_require__(7);
+const MapControler_1 = __webpack_require__(6);
 class Bullet extends Entity_1.Entity {
     constructor(param) {
         super(Bullet.updateParam(param));
@@ -2012,13 +2010,13 @@ exports.Bullet = Bullet;
 
 
 /***/ }),
-/* 16 */
+/* 17 */
 /***/ (function(module, exports, __webpack_require__) {
 
 Object.defineProperty(exports, "__esModule", { value: true });
 const GeometryAndPhysics_1 = __webpack_require__(0);
-const globalVariables_1 = __webpack_require__(6);
-const Constants_1 = __webpack_require__(3);
+const globalVariables_1 = __webpack_require__(7);
+const Constants_1 = __webpack_require__(5);
 class Entity {
     constructor(param) {
         this._position = new GeometryAndPhysics_1.Point(250, 250);
@@ -2074,7 +2072,180 @@ exports.Entity = Entity;
 
 
 /***/ }),
-/* 17 */
+/* 18 */
+/***/ (function(module, exports, __webpack_require__) {
+
+Object.defineProperty(exports, "__esModule", { value: true });
+const GeometryAndPhysics_1 = __webpack_require__(0);
+class Camera {
+    constructor(canvas, width, height, worldWidth = 1024, worldHeight = 1024) {
+        this.canvas = canvas;
+        this.width = width;
+        this.height = height;
+        this.worldWidth = worldWidth;
+        this.worldHeight = worldHeight;
+        this.position = new GeometryAndPhysics_1.Point(0, 0);
+        this.resize = (width, height) => {
+            this.width = width;
+            this.height = height;
+            this.canvas.width = width;
+            this.canvas.height = height;
+        };
+        this.updateWorldSize = (width, height) => {
+            this.worldHeight = height;
+            this.worldWidth = width;
+        };
+        this.isPositionNearEdge = (position) => {
+            if (!(this.position.x + (mouseX - this.width / 2) / CAMERA_BOX_ADJUSTMENT > 0 && this.position.x + (mouseX - this.width / 2) / CAMERA_BOX_ADJUSTMENT < this.worldWidth - this.width)) {
+                return true;
+            }
+            if (!(this.position.y + (mouseY - this.height / 2) / CAMERA_BOX_ADJUSTMENT > 0 && this.position.y + (mouseY - this.height / 2) / CAMERA_BOX_ADJUSTMENT < this.worldHeight - this.height)) {
+                return true;
+            }
+            return false;
+        };
+        this.getScreenPosition = (position) => {
+            let mouseXCorrection = (mouseX - this.width / 2) / CAMERA_BOX_ADJUSTMENT;
+            let mouseYCorrection = (mouseY - this.height / 2) / CAMERA_BOX_ADJUSTMENT;
+            let x = position.x - this.position.x;
+            if (this.position.x + mouseXCorrection > 0 && this.position.x + mouseXCorrection < this.worldWidth - this.width)
+                x = x - mouseXCorrection;
+            else {
+                if (this.position.x + mouseXCorrection <= 0)
+                    x = position.x;
+                if (this.position.x + mouseXCorrection >= this.worldWidth - this.width)
+                    x = position.x - (this.worldWidth - this.width);
+            }
+            let y = position.y - this.position.y;
+            if (this.position.y + mouseYCorrection > 0 && this.position.y + mouseYCorrection < this.worldHeight - this.height)
+                y = y - mouseYCorrection;
+            else {
+                if (this.position.y + mouseYCorrection <= 0)
+                    y = position.y;
+                if (this.position.y + mouseYCorrection >= this.worldHeight - this.height)
+                    y = position.y - (this.worldHeight - this.height);
+            }
+            return new GeometryAndPhysics_1.Point(x, y);
+        };
+        this.updatePosition = (position) => {
+            this.position.x = position.x - this.width / 2;
+            this.position.y = position.y - this.height / 2;
+            if (this.position.x < 0)
+                this.position.x = 0;
+            if (this.position.y < 0)
+                this.position.y = 0;
+            if (this.position.x > this.worldWidth - this.width)
+                this.position.x = this.worldWidth - this.width;
+            if (this.position.y > this.worldHeight - this.height)
+                this.position.y = this.worldHeight - this.height;
+        };
+        this.drawBar = (px, py, width, height, style) => {
+            let position = this.getScreenPosition(new GeometryAndPhysics_1.Point(px, py));
+            if ((position.x <= this.width || position.x + width >= 0) && (position.y + height >= 0 && position.y <= this.height)) {
+                this.ctx.fillStyle = style;
+                this.ctx.fillRect(position.x, position.y, width, height);
+            }
+        };
+        this.drawImage = (img, frameWidth, frameHeight, aimAngle, directionMod, walkingMod, px, py, width, height) => {
+            let position = this.getScreenPosition(new GeometryAndPhysics_1.Point(px, py));
+            if ((position.x <= this.width || position.x + width >= 0) && (position.y + height >= 0 && position.y <= this.height)) {
+                if (aimAngle !== 0) {
+                    this.ctx.save();
+                    this.ctx.translate(position.x - width / 2, position.y - height / 2);
+                    this.ctx.translate(width / 2, height / 2);
+                    this.ctx.rotate(aimAngle * Math.PI / 180);
+                    this.ctx.drawImage(img, walkingMod * frameWidth, directionMod * frameHeight, frameWidth, frameHeight, -width / 2, -height / 2, width, height);
+                }
+                else {
+                    this.ctx.drawImage(img, walkingMod * frameWidth, directionMod * frameHeight, frameWidth, frameHeight, position.x, position.y, width, height);
+                }
+                if (aimAngle !== 0) {
+                    this.ctx.restore();
+                }
+            }
+        };
+        this.ctx = canvas.getContext("2d");
+    }
+}
+exports.Camera = Camera;
+
+
+/***/ }),
+/* 19 */
+/***/ (function(module, exports, __webpack_require__) {
+
+Object.defineProperty(exports, "__esModule", { value: true });
+const PlayerClient_1 = __webpack_require__(4);
+const game_1 = __webpack_require__(2);
+const enums_1 = __webpack_require__(1);
+const WeaponTypes_1 = __webpack_require__(8);
+class GUI {
+    constructor(param) {
+        this.draw = () => {
+            this.ctx.clearRect(0, 0, this.width, this.height);
+            let pat = this.ctx.createPattern(Img["guibackground"], "repeat-x");
+            this.ctx.fillStyle = pat;
+            this.ctx.fillRect(0, 0, this.width, this.height);
+            this.ctx.fill();
+            this.ctx.fillStyle = "#000000";
+            if (PlayerClient_1.PlayerClient.list[game_1.selfId]) {
+                this.drawWeapon();
+                this.drawAmmo();
+                this.drawFace();
+                this.drawItems();
+                this.ctx.fillText('Hit points: ' + PlayerClient_1.PlayerClient.list[game_1.selfId].hp + '/' + PlayerClient_1.PlayerClient.list[game_1.selfId].hpMax, 0, 0.6 * this.height);
+            }
+        };
+        this.resize = (width, height) => {
+            this.width = width;
+            this.height = height;
+        };
+        this.drawWeapon = () => {
+            if (PlayerClient_1.PlayerClient.list[game_1.selfId]) {
+                this.ctx.drawImage(Img[PlayerClient_1.PlayerClient.list[game_1.selfId].weapon], 0, 0, Img[PlayerClient_1.PlayerClient.list[game_1.selfId].weapon].width, Img[PlayerClient_1.PlayerClient.list[game_1.selfId].weapon].height, (this.width - 0.8 * this.height) / 4, (this.height - 0.8 * this.height) / 2, 0.8 * this.height, 0.8 * this.height);
+            }
+        };
+        this.drawAmmo = () => {
+            if (PlayerClient_1.PlayerClient.list[game_1.selfId]) {
+                if (Img[PlayerClient_1.PlayerClient.list[game_1.selfId].weapon + "ammo"]) {
+                    this.ctx.drawImage(Img[PlayerClient_1.PlayerClient.list[game_1.selfId].weapon + "ammo"], 0, 0, Img[PlayerClient_1.PlayerClient.list[game_1.selfId].weapon + "ammo"].width, Img[PlayerClient_1.PlayerClient.list[game_1.selfId].weapon + "ammo"].height, 11 * (this.width - 0.8 * this.height) / 32, (this.height - 0.4 * this.height) / 2, 0.4 * this.height, 0.4 * this.height);
+                    this.ctx.fillText(' x' + PlayerClient_1.PlayerClient.list[game_1.selfId].ammo + "  " + PlayerClient_1.PlayerClient.list[game_1.selfId].ammoInGun + "/" + WeaponTypes_1.WeaponTypes.list[WeaponTypes_1.WeaponTypes.getWeaponIdbyName(PlayerClient_1.PlayerClient.list[game_1.selfId].weapon)].reloadAmmo, 11 * (this.width - 0.8 * this.height) / 32 + 0.4 * this.height, (this.height) / 2 + 10);
+                }
+            }
+        };
+        this.drawItems = () => {
+            if (PlayerClient_1.PlayerClient.list[game_1.selfId]) {
+                this.ctx.drawImage(Img["medicalkit"], 0, 0, Img["medicalkit"].width, Img["medicalkit"].height, 3 * (this.width - 0.8 * this.height) / 4, (this.height - 0.8 * this.height) / 2, 0.8 * this.height, 0.8 * this.height);
+                this.ctx.fillText(' x' + game_1.inventory.getItemAmount(enums_1.ItemType.medicalkit), 3 * (this.width - 0.8 * this.height) / 4 + 0.8 * this.height, (this.height) / 2 + 10);
+            }
+        };
+        this.drawFace = () => {
+            let spriteRows = 2;
+            let spriteColumns = 4;
+            let facelook = 1;
+            this.ctx.drawImage(Img["faceborder"], 0, 0, Img["faceborder"].width, Img["faceborder"].height, (this.width - 0.85 * this.height) / 2, (this.height - 0.85 * this.height) / 2, 0.85 * this.height, 0.85 * this.height);
+            if (PlayerClient_1.PlayerClient.list[game_1.selfId]) {
+                facelook = Math.round(((PlayerClient_1.PlayerClient.list[game_1.selfId].hpMax - PlayerClient_1.PlayerClient.list[game_1.selfId].hp) / PlayerClient_1.PlayerClient.list[game_1.selfId].hpMax) * (spriteRows * spriteColumns - 1));
+                let facex = facelook % spriteColumns;
+                let facey = Math.floor(facelook / spriteColumns);
+                let frameWidth = Img["face"].width / spriteColumns;
+                let frameHeight = Img["face"].height / spriteRows;
+                this.ctx.drawImage(Img["face"], facex * frameWidth, facey * frameHeight, frameWidth, frameHeight, (this.width - 0.8 * this.height) / 2, (this.height - 0.8 * this.height) / 2, 0.8 * this.height, 0.8 * this.height);
+            }
+        };
+        if (param.ctx !== undefined)
+            this.ctx = param.ctx;
+        if (param.width !== undefined)
+            this.width = param.width;
+        if (param.height !== undefined)
+            this.height = param.height;
+    }
+}
+exports.GUI = GUI;
+
+
+/***/ }),
+/* 20 */
 /***/ (function(module, exports, __webpack_require__) {
 
 Object.defineProperty(exports, "__esModule", { value: true });
@@ -2192,11 +2363,11 @@ exports.SpawnObjectMapChecker = SpawnObjectMapChecker;
 
 
 /***/ }),
-/* 18 */
+/* 21 */
 /***/ (function(module, exports, __webpack_require__) {
 
 Object.defineProperty(exports, "__esModule", { value: true });
-const MapObject_1 = __webpack_require__(19);
+const MapObject_1 = __webpack_require__(22);
 const GeometryAndPhysics_1 = __webpack_require__(0);
 const enums_1 = __webpack_require__(1);
 class GroundRing extends MapObject_1.MapObject {
@@ -2276,11 +2447,11 @@ exports.GroundRing = GroundRing;
 
 
 /***/ }),
-/* 19 */
+/* 22 */
 /***/ (function(module, exports, __webpack_require__) {
 
 Object.defineProperty(exports, "__esModule", { value: true });
-const ObjectTile_1 = __webpack_require__(20);
+const ObjectTile_1 = __webpack_require__(23);
 class MapObject {
     constructor() {
         this.objectTiles = [];
@@ -2293,11 +2464,11 @@ exports.MapObject = MapObject;
 
 
 /***/ }),
-/* 20 */
+/* 23 */
 /***/ (function(module, exports, __webpack_require__) {
 
 Object.defineProperty(exports, "__esModule", { value: true });
-const Constants_1 = __webpack_require__(3);
+const Constants_1 = __webpack_require__(5);
 class ObjectTile {
     constructor(position, type) {
         this.position = position;
@@ -2315,12 +2486,12 @@ exports.ObjectTile = ObjectTile;
 
 
 /***/ }),
-/* 21 */
+/* 24 */
 /***/ (function(module, exports, __webpack_require__) {
 
 Object.defineProperty(exports, "__esModule", { value: true });
 const GeometryAndPhysics_1 = __webpack_require__(0);
-const Constants_1 = __webpack_require__(3);
+const Constants_1 = __webpack_require__(5);
 class GameMap {
     constructor(_name, mapTiles) {
         this._name = _name;
@@ -2362,11 +2533,11 @@ exports.GameMap = GameMap;
 
 
 /***/ }),
-/* 22 */
+/* 25 */
 /***/ (function(module, exports, __webpack_require__) {
 
 Object.defineProperty(exports, "__esModule", { value: true });
-const Constants_1 = __webpack_require__(3);
+const Constants_1 = __webpack_require__(5);
 const enums_1 = __webpack_require__(1);
 class MapTile {
     constructor(_width, _height, material) {
@@ -2434,7 +2605,7 @@ exports.MapTile = MapTile;
 
 
 /***/ }),
-/* 23 */
+/* 26 */
 /***/ (function(module, exports) {
 
 Object.defineProperty(exports, "__esModule", { value: true });
@@ -2487,13 +2658,14 @@ exports.GameSoundManager = GameSoundManager;
 
 
 /***/ }),
-/* 24 */
+/* 27 */
 /***/ (function(module, exports, __webpack_require__) {
 
 Object.defineProperty(exports, "__esModule", { value: true });
 const GeometryAndPhysics_1 = __webpack_require__(0);
 const PlayerClient_1 = __webpack_require__(4);
 const game_1 = __webpack_require__(2);
+const canvas_1 = __webpack_require__(3);
 class UpgradeClient {
     constructor(param) {
         this.position = new GeometryAndPhysics_1.Point(0, 0);
@@ -2502,18 +2674,7 @@ class UpgradeClient {
             if (PlayerClient_1.PlayerClient.list[game_1.selfId].map !== this.map) {
                 return;
             }
-            let mainPlayer = PlayerClient_1.PlayerClient.list[game_1.selfId];
-            let mainPlayerx = mainPlayer.position.x;
-            let mainPlayery = mainPlayer.position.y;
-            let ex = this.position.x;
-            let ey = this.position.y;
-            let x = ex - (mainPlayerx - WIDTH / 2);
-            x = x - (mouseX - WIDTH / 2) / CAMERA_BOX_ADJUSTMENT;
-            let y = ey - (mainPlayery - HEIGHT / 2);
-            y = y - (mouseY - HEIGHT / 2) / CAMERA_BOX_ADJUSTMENT;
-            x -= this.width / 2;
-            y -= this.height / 2;
-            ctx.drawImage(this.img, 0, 0, this.img.width, this.img.height, x, y, this.width, this.height);
+            canvas_1.camera.drawImage(this.img, this.img.width, this.img.height, 0, 0, 0, this.position.x - this.width / 2, this.position.y - this.height / 2, this.width, this.height);
         };
         this.id = param.id ? param.id : this.id;
         this.position = param.position ? param.position : this.position;
@@ -2531,15 +2692,16 @@ exports.UpgradeClient = UpgradeClient;
 
 
 /***/ }),
-/* 25 */
+/* 28 */
 /***/ (function(module, exports, __webpack_require__) {
 
 Object.defineProperty(exports, "__esModule", { value: true });
-const Constants_1 = __webpack_require__(3);
+const Constants_1 = __webpack_require__(5);
 const PlayerClient_1 = __webpack_require__(4);
 const game_1 = __webpack_require__(2);
 const enums_1 = __webpack_require__(1);
-const Constants_2 = __webpack_require__(3);
+const Constants_2 = __webpack_require__(5);
+const canvas_1 = __webpack_require__(3);
 class MapClient {
     constructor(map, name) {
         this.image = new Image();
@@ -2566,15 +2728,15 @@ class MapClient {
                         material = this.map.mapTiles[i][j].material;
                         imgWidth = Img[Constants_2.mapTileImageName[material]].width;
                         imgHeight = Img[Constants_2.mapTileImageName[material]].height;
-                        ctx.drawImage(Img[Constants_2.mapTileImageName[material]], 0, 0, imgWidth, imgHeight, x + imgWidth * j, y + imgHeight * i, imgWidth, imgHeight);
+                        canvas_1.camera.drawImage(Img[Constants_2.mapTileImageName[material]], imgWidth, imgHeight, 0, 0, 0, imgWidth * j, imgHeight * i, imgWidth, imgHeight);
                         for (let k = 0; k < 4; k++) {
                             if (this.map.mapTiles[i][j].sides[k] > 0) {
-                                ctx.drawImage(Img[Constants_1.mapTileSideImageName[k][this.map.mapTiles[i][j].sides[k]]], 0, 0, imgWidth, imgHeight, x + imgWidth * j, y + imgHeight * i, imgWidth, imgHeight);
+                                canvas_1.camera.drawImage(Img[Constants_1.mapTileSideImageName[k][this.map.mapTiles[i][j].sides[k]]], imgWidth, imgHeight, 0, 0, 0, imgWidth * j, imgHeight * i, imgWidth, imgHeight);
                             }
                         }
                         for (let k = 0; k < this.map.mapTiles[i][j].objects.length; k++) {
                             if (this.map.mapTiles[i][j].objects[k] > 0) {
-                                ctx.drawImage(Img[Constants_1.mapObjectImageName[this.map.mapTiles[i][j].objects[k]]], 0, 0, imgWidth, imgHeight, x + imgWidth * j, y + imgHeight * i, imgWidth, imgHeight);
+                                canvas_1.camera.drawImage(Img[Constants_1.mapObjectImageName[this.map.mapTiles[i][j].objects[k]]], imgWidth, imgHeight, 0, 0, 0, imgWidth * j, imgHeight * i, imgWidth, imgHeight);
                             }
                         }
                     }
@@ -2589,16 +2751,17 @@ exports.MapClient = MapClient;
 
 
 /***/ }),
-/* 26 */
+/* 29 */
 /***/ (function(module, exports, __webpack_require__) {
 
 Object.defineProperty(exports, "__esModule", { value: true });
 const game_1 = __webpack_require__(2);
-const EnemyClient_1 = __webpack_require__(10);
+const EnemyClient_1 = __webpack_require__(11);
 const GeometryAndPhysics_1 = __webpack_require__(0);
 const game_2 = __webpack_require__(2);
 const PlayerClient_1 = __webpack_require__(4);
-const ExplosionClient_1 = __webpack_require__(11);
+const ExplosionClient_1 = __webpack_require__(12);
+const canvas_1 = __webpack_require__(3);
 class BulletClient {
     constructor(initPack) {
         this.id = -1;
@@ -2612,16 +2775,7 @@ class BulletClient {
             if (PlayerClient_1.PlayerClient.list[game_2.selfId].map !== this.map) {
                 return;
             }
-            let bx = this.position.x;
-            let by = this.position.y;
-            let mainPlayer = PlayerClient_1.PlayerClient.list[game_2.selfId];
-            let mainPlayerx = mainPlayer.position.x;
-            let mainPlayery = mainPlayer.position.y;
-            let x = bx - (mainPlayerx - WIDTH / 2);
-            x = x - (mouseX - WIDTH / 2) / CAMERA_BOX_ADJUSTMENT;
-            let y = by - (mainPlayery - HEIGHT / 2);
-            y = y - (mouseY - HEIGHT / 2) / CAMERA_BOX_ADJUSTMENT;
-            ctx.drawImage(this.img, 0, 0, this.img.width, this.img.height, x - this.width / 2, y - this.height / 2, this.width, this.height);
+            canvas_1.camera.drawImage(this.img, this.img.width, this.img.height, 0, 0, 0, this.position.x, this.position.y, this.width, this.height);
         };
         this.hit = (category, entityCategory, entityId) => {
             let x = this.position.x;
@@ -2661,7 +2815,7 @@ exports.BulletClient = BulletClient;
 
 
 /***/ }),
-/* 27 */
+/* 30 */
 /***/ (function(module, exports, __webpack_require__) {
 
 Object.defineProperty(exports, "__esModule", { value: true });
@@ -2728,7 +2882,7 @@ new Item(enums_1.WeaponType.claws, "Claws", function (actor) {
 
 
 /***/ }),
-/* 28 */
+/* 31 */
 /***/ (function(module, exports) {
 
 Object.defineProperty(exports, "__esModule", { value: true });
@@ -2745,12 +2899,12 @@ exports.Pack = Pack;
 
 
 /***/ }),
-/* 29 */
+/* 32 */
 /***/ (function(module, exports, __webpack_require__) {
 
 Object.defineProperty(exports, "__esModule", { value: true });
-const MapControler_1 = __webpack_require__(5);
-const Counter_1 = __webpack_require__(14);
+const MapControler_1 = __webpack_require__(6);
+const Counter_1 = __webpack_require__(15);
 const GeometryAndPhysics_1 = __webpack_require__(0);
 class MovementController {
     constructor(parent, param) {
@@ -2856,14 +3010,14 @@ exports.MovementController = MovementController;
 
 
 /***/ }),
-/* 30 */
+/* 33 */
 /***/ (function(module, exports, __webpack_require__) {
 
 Object.defineProperty(exports, "__esModule", { value: true });
-const Bullet_1 = __webpack_require__(15);
-const WeaponCollection_1 = __webpack_require__(31);
-const Counter_1 = __webpack_require__(14);
-const WeaponTypes_1 = __webpack_require__(9);
+const Bullet_1 = __webpack_require__(16);
+const WeaponCollection_1 = __webpack_require__(34);
+const Counter_1 = __webpack_require__(15);
+const WeaponTypes_1 = __webpack_require__(8);
 const GeometryAndPhysics_1 = __webpack_require__(0);
 class AttackController {
     constructor(parent, param) {
@@ -2966,11 +3120,11 @@ exports.AttackController = AttackController;
 
 
 /***/ }),
-/* 31 */
+/* 34 */
 /***/ (function(module, exports, __webpack_require__) {
 
 Object.defineProperty(exports, "__esModule", { value: true });
-const WeaponTypes_1 = __webpack_require__(9);
+const WeaponTypes_1 = __webpack_require__(8);
 const enums_1 = __webpack_require__(1);
 class WeaponCollection {
     constructor(owner) {
@@ -3154,7 +3308,7 @@ exports.SingleWeapon = SingleWeapon;
 
 
 /***/ }),
-/* 32 */
+/* 35 */
 /***/ (function(module, exports) {
 
 Object.defineProperty(exports, "__esModule", { value: true });
@@ -3183,111 +3337,6 @@ class LifeAndBodyController {
     get hpMax() { return this._hpMax; }
 }
 exports.LifeAndBodyController = LifeAndBodyController;
-
-
-/***/ }),
-/* 33 */
-/***/ (function(module, exports, __webpack_require__) {
-
-Object.defineProperty(exports, "__esModule", { value: true });
-const GUI_1 = __webpack_require__(34);
-gui = new GUI_1.GUI({ ctx: ctxui, width: WIDTH, height: HEIGHTUI });
-let resizeCanvas = function () {
-    WIDTH = window.innerWidth - 4;
-    HEIGHT = window.innerHeight - 48 - HEIGHTUI;
-    canvas.width = WIDTH;
-    canvas.height = HEIGHT;
-    canvasui.width = WIDTH;
-    canvasui.height = HEIGHTUI;
-    ctx.font = '30px Arial';
-    ctx.mozImageSmoothingEnabled = false;
-    ctx.msImageSmoothingEnabled = false;
-    ctx.imageSmoothingEnabled = false;
-    ctxui.font = '30px Arial';
-    ctxui.mozImageSmoothingEnabled = false;
-    ctxui.msImageSmoothingEnabled = false;
-    ctxui.imageSmoothingEnabled = false;
-    gui.resize(canvasui.width, canvasui.height);
-    gui.draw();
-};
-resizeCanvas();
-window.addEventListener('resize', function () {
-    resizeCanvas();
-});
-
-
-/***/ }),
-/* 34 */
-/***/ (function(module, exports, __webpack_require__) {
-
-Object.defineProperty(exports, "__esModule", { value: true });
-const PlayerClient_1 = __webpack_require__(4);
-const game_1 = __webpack_require__(2);
-const enums_1 = __webpack_require__(1);
-const WeaponTypes_1 = __webpack_require__(9);
-class GUI {
-    constructor(param) {
-        this.draw = () => {
-            this.ctx.clearRect(0, 0, this.width, this.height);
-            let pat = this.ctx.createPattern(Img["guibackground"], "repeat-x");
-            this.ctx.fillStyle = pat;
-            this.ctx.fillRect(0, 0, this.width, this.height);
-            this.ctx.fill();
-            this.ctx.fillStyle = "#000000";
-            if (PlayerClient_1.PlayerClient.list[game_1.selfId]) {
-                this.drawWeapon();
-                this.drawAmmo();
-                this.drawFace();
-                this.drawItems();
-                this.ctx.fillText('Hit points: ' + PlayerClient_1.PlayerClient.list[game_1.selfId].hp + '/' + PlayerClient_1.PlayerClient.list[game_1.selfId].hpMax, 0, 0.6 * this.height);
-            }
-        };
-        this.resize = (width, height) => {
-            this.width = width;
-            this.height = height;
-        };
-        this.drawWeapon = () => {
-            if (PlayerClient_1.PlayerClient.list[game_1.selfId]) {
-                this.ctx.drawImage(Img[PlayerClient_1.PlayerClient.list[game_1.selfId].weapon], 0, 0, Img[PlayerClient_1.PlayerClient.list[game_1.selfId].weapon].width, Img[PlayerClient_1.PlayerClient.list[game_1.selfId].weapon].height, (this.width - 0.8 * this.height) / 4, (this.height - 0.8 * this.height) / 2, 0.8 * this.height, 0.8 * this.height);
-            }
-        };
-        this.drawAmmo = () => {
-            if (PlayerClient_1.PlayerClient.list[game_1.selfId]) {
-                if (Img[PlayerClient_1.PlayerClient.list[game_1.selfId].weapon + "ammo"]) {
-                    this.ctx.drawImage(Img[PlayerClient_1.PlayerClient.list[game_1.selfId].weapon + "ammo"], 0, 0, Img[PlayerClient_1.PlayerClient.list[game_1.selfId].weapon + "ammo"].width, Img[PlayerClient_1.PlayerClient.list[game_1.selfId].weapon + "ammo"].height, 11 * (this.width - 0.8 * this.height) / 32, (this.height - 0.4 * this.height) / 2, 0.4 * this.height, 0.4 * this.height);
-                    this.ctx.fillText(' x' + PlayerClient_1.PlayerClient.list[game_1.selfId].ammo + "  " + PlayerClient_1.PlayerClient.list[game_1.selfId].ammoInGun + "/" + WeaponTypes_1.WeaponTypes.list[WeaponTypes_1.WeaponTypes.getWeaponIdbyName(PlayerClient_1.PlayerClient.list[game_1.selfId].weapon)].reloadAmmo, 11 * (this.width - 0.8 * this.height) / 32 + 0.4 * this.height, (this.height) / 2 + 10);
-                }
-            }
-        };
-        this.drawItems = () => {
-            if (PlayerClient_1.PlayerClient.list[game_1.selfId]) {
-                this.ctx.drawImage(Img["medicalkit"], 0, 0, Img["medicalkit"].width, Img["medicalkit"].height, 3 * (this.width - 0.8 * this.height) / 4, (this.height - 0.8 * this.height) / 2, 0.8 * this.height, 0.8 * this.height);
-                this.ctx.fillText(' x' + game_1.inventory.getItemAmount(enums_1.ItemType.medicalkit), 3 * (this.width - 0.8 * this.height) / 4 + 0.8 * this.height, (this.height) / 2 + 10);
-            }
-        };
-        this.drawFace = () => {
-            let spriteRows = 2;
-            let spriteColumns = 4;
-            let facelook = 1;
-            this.ctx.drawImage(Img["faceborder"], 0, 0, Img["faceborder"].width, Img["faceborder"].height, (this.width - 0.85 * this.height) / 2, (this.height - 0.85 * this.height) / 2, 0.85 * this.height, 0.85 * this.height);
-            if (PlayerClient_1.PlayerClient.list[game_1.selfId]) {
-                facelook = Math.round(((PlayerClient_1.PlayerClient.list[game_1.selfId].hpMax - PlayerClient_1.PlayerClient.list[game_1.selfId].hp) / PlayerClient_1.PlayerClient.list[game_1.selfId].hpMax) * (spriteRows * spriteColumns - 1));
-                let facex = facelook % spriteColumns;
-                let facey = Math.floor(facelook / spriteColumns);
-                let frameWidth = Img["face"].width / spriteColumns;
-                let frameHeight = Img["face"].height / spriteRows;
-                this.ctx.drawImage(Img["face"], facex * frameWidth, facey * frameHeight, frameWidth, frameHeight, (this.width - 0.8 * this.height) / 2, (this.height - 0.8 * this.height) / 2, 0.8 * this.height, 0.8 * this.height);
-            }
-        };
-        if (param.ctx !== undefined)
-            this.ctx = param.ctx;
-        if (param.width !== undefined)
-            this.width = param.width;
-        if (param.height !== undefined)
-            this.height = param.height;
-    }
-}
-exports.GUI = GUI;
 
 
 /***/ })

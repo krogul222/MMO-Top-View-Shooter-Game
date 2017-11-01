@@ -4,6 +4,7 @@ import { selfId } from './game';
 import { GameMap } from '../../server/js/Map/GameMap';
 import { TerrainMaterial } from '../../server/js/enums';
 import { mapTileImageName, mapTileCornerImageName } from '../../server/js/Constants';
+import { camera } from './canvas';
 
 declare var mouseX: any;
 declare var mouseY: any;
@@ -45,21 +46,27 @@ export class MapClient {
             let imgWidth: number = 1;
             let imgHeight: number = 1;
     
+            
             for (let i = 0 ; i < size ; i++){
                 for (let j = 0; j < size; j++){
                     material = this.map.mapTiles[i][j].material;
                     imgWidth = Img[mapTileImageName[material]].width;
                     imgHeight = Img[mapTileImageName[material]].height;
-                    ctx.drawImage(Img[mapTileImageName[material]], 0, 0, imgWidth, imgHeight, x+imgWidth*j, y+imgHeight*i, imgWidth, imgHeight);   
+
+                    camera.drawImage(Img[mapTileImageName[material]], imgWidth, imgHeight, 0, 0, 0,  imgWidth*j, imgHeight*i, imgWidth, imgHeight);
+                    
+                    
                     for(let k = 0; k < 4; k++){
                         if(this.map.mapTiles[i][j].sides[k] > 0){
-                            ctx.drawImage(Img[mapTileSideImageName[k][this.map.mapTiles[i][j].sides[k]]], 0, 0, imgWidth, imgHeight, x+imgWidth*j, y+imgHeight*i, imgWidth, imgHeight);   
+                            //ctx.drawImage(Img[mapTileSideImageName[k][this.map.mapTiles[i][j].sides[k]]], 0, 0, imgWidth, imgHeight, x+imgWidth*j, y+imgHeight*i, imgWidth, imgHeight);   
+                            camera.drawImage(Img[mapTileSideImageName[k][this.map.mapTiles[i][j].sides[k]]], imgWidth, imgHeight, 0, 0, 0,  imgWidth*j, imgHeight*i, imgWidth, imgHeight);        
                         }
                     }
     
                     for(let k = 0; k < this.map.mapTiles[i][j].objects.length; k++){
                         if(this.map.mapTiles[i][j].objects[k] > 0){
-                            ctx.drawImage(Img[mapObjectImageName[this.map.mapTiles[i][j].objects[k]]], 0, 0, imgWidth, imgHeight, x+imgWidth*j, y+imgHeight*i, imgWidth, imgHeight);   
+                            //ctx.drawImage(Img[mapObjectImageName[this.map.mapTiles[i][j].objects[k]]], 0, 0, imgWidth, imgHeight, x+imgWidth*j, y+imgHeight*i, imgWidth, imgHeight);   
+                            camera.drawImage(Img[mapObjectImageName[this.map.mapTiles[i][j].objects[k]]], imgWidth, imgHeight, 0, 0, 0,  imgWidth*j, imgHeight*i, imgWidth, imgHeight);        
                         }
                     }
     

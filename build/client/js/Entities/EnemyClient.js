@@ -1,4 +1,5 @@
 Object.defineProperty(exports, "__esModule", { value: true });
+const canvas_1 = require("./../canvas");
 const PlayerClient_1 = require("./PlayerClient");
 const GeometryAndPhysics_1 = require("../../../server/js/GeometryAndPhysics");
 const game_1 = require("../game");
@@ -52,14 +53,13 @@ class EnemyClient {
             }
             let walkingMod = Math.floor(this.spriteAnimCounter) % 6;
             if (this.kind == 'zombie') {
-                this.drawTopViewSprite(x, y, aimAngle);
+                this.drawTopViewSprite(this.position.x, this.position.y, aimAngle);
             }
             else {
                 walkingMod = Math.floor(this.spriteAnimCounter) % 6;
-                ctx.drawImage(this.img, walkingMod * frameWidth, directionMod * frameHeight, frameWidth, frameHeight, x - this.width / 2, y - this.height / 2, this.width, this.height);
+                canvas_1.camera.drawImage(this.img, frameWidth, frameHeight, 0, directionMod, walkingMod, this.position.x - this.width / 2, this.position.y - this.height / 2, this.width, this.height);
             }
-            ctx.fillStyle = 'red';
-            ctx.fillRect(x - hpWidth / 2, y - 40, hpWidth, 4);
+            canvas_1.camera.drawBar(this.position.x - hpWidth / 2, this.position.y - 40, hpWidth, 4, 'red');
         };
         this.drawTopViewSprite = (x, y, aimAngle) => {
             if (this.attackStarted) {
@@ -75,12 +75,7 @@ class EnemyClient {
             let walkingMod = Math.floor(this.spriteAnimCounter) % spriteColumns;
             let frameWidth = Img[this.kind + 'attack'].width / spriteColumns;
             let frameHeight = Img[this.kind + 'attack'].height / spriteRows;
-            ctx.save();
-            ctx.translate(x - (this.width) / 2, y - this.height / 2);
-            ctx.translate((this.width) / 2, this.height / 2);
-            ctx.rotate(aimAngle * Math.PI / 180);
-            ctx.drawImage(Img[this.kind + 'attack'], walkingMod * frameWidth, 0, frameWidth, frameHeight, -this.width / 2, -this.height / 2, (this.width), this.height);
-            ctx.restore();
+            canvas_1.camera.drawImage(Img[this.kind + 'attack'], frameWidth, frameHeight, aimAngle, 0, walkingMod, x, y, this.width, this.height);
             if (this.spriteAnimCounter % spriteColumns >= (spriteColumns - 1)) {
                 this.spriteAnimCounter = 0;
                 this.attackStarted = false;
@@ -89,13 +84,8 @@ class EnemyClient {
         this.drawTopViewSpriteWalk = (x, y, aimAngle) => {
             let frameWidth = this.img.width / framesMove[this.kind];
             let frameHeight = this.img.height;
-            ctx.save();
-            ctx.translate(x - this.width / 2, y - this.height / 2);
-            ctx.translate(this.width / 2, this.height / 2);
-            ctx.rotate(aimAngle * Math.PI / 180);
             let walkingMod = Math.floor(this.spriteAnimCounter) % framesMove[this.kind];
-            ctx.drawImage(this.img, walkingMod * frameWidth, 0, frameWidth, frameHeight, -this.width / 2, -this.height / 2, this.width, this.height);
-            ctx.restore();
+            canvas_1.camera.drawImage(this.img, frameWidth, frameHeight, aimAngle, 0, walkingMod, x, y, this.width, this.height);
         };
         if (initPack.id)
             this.id = initPack.id;
