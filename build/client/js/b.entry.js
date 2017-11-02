@@ -60,7 +60,7 @@
 /******/ 	__webpack_require__.p = "/dist/";
 /******/
 /******/ 	// Load entry module and return exports
-/******/ 	return __webpack_require__(__webpack_require__.s = 4);
+/******/ 	return __webpack_require__(__webpack_require__.s = 5);
 /******/ })
 /************************************************************************/
 /******/ ([
@@ -222,16 +222,16 @@ exports.getRandomInt = getRandomInt;
 /***/ (function(module, exports, __webpack_require__) {
 
 Object.defineProperty(exports, "__esModule", { value: true });
-const canvas_1 = __webpack_require__(4);
-const MapControler_1 = __webpack_require__(6);
-const GameSoundManager_1 = __webpack_require__(26);
-const UpgradeClient_1 = __webpack_require__(27);
-const MapClient_1 = __webpack_require__(28);
-const PlayerClient_1 = __webpack_require__(5);
-const BulletClient_1 = __webpack_require__(29);
-const EnemyClient_1 = __webpack_require__(11);
-const ExplosionClient_1 = __webpack_require__(12);
-const Inventory_1 = __webpack_require__(13);
+const canvas_1 = __webpack_require__(5);
+const MapControler_1 = __webpack_require__(7);
+const GameSoundManager_1 = __webpack_require__(27);
+const UpgradeClient_1 = __webpack_require__(28);
+const MapClient_1 = __webpack_require__(29);
+const PlayerClient_1 = __webpack_require__(6);
+const BulletClient_1 = __webpack_require__(30);
+const EnemyClient_1 = __webpack_require__(12);
+const ExplosionClient_1 = __webpack_require__(13);
+const Inventory_1 = __webpack_require__(14);
 exports.selfId = 0;
 exports.inventory = new Inventory_1.Inventory(socket, false, 0);
 MapControler_1.MapController.loadMaps();
@@ -281,9 +281,6 @@ socket.on('update', function (data) {
             }
             if (pack.weapon !== undefined) {
                 p.weapon = pack.weapon;
-                p.img = Img["player" + pack.weapon];
-                p.imgMeleeAttack = Img["player" + pack.weapon + "meeleattack"];
-                p.imgReload = Img["player" + pack.weapon + "reload"];
             }
             if (pack.attackMelee !== undefined) {
                 p.attackMelee = pack.attackMelee;
@@ -536,6 +533,33 @@ let updateMouse = () => {
 
 /***/ }),
 /* 3 */
+/***/ (function(module, exports) {
+
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.Img = {};
+exports.Img.map = {};
+exports.Img.guibackground = new Image();
+exports.Img.guibackground.src = '/client/img/guibackground.jpg';
+socket.on('jsonImages', function (data) {
+    console.log(data.jsonGUI);
+    console.log(data.jsonPlayer);
+    exports.jsonPlayer = data.jsonPlayer;
+    exports.jsonGUI = data.jsonGUI;
+    exports.jsonIAE = data.jsonIAE;
+    exports.jsonMap = data.jsonMap;
+});
+exports.Img.Player = new Image();
+exports.Img.Player.src = '/client/TexturePacks/PlayerImages.png';
+exports.Img.Map = new Image();
+exports.Img.Map.src = '/client/TexturePacks/MapImages.png';
+exports.Img.IAE = new Image();
+exports.Img.IAE.src = '/client/TexturePacks/ItemsAndEnemiesImages.png';
+exports.Img.GUI = new Image();
+exports.Img.GUI.src = '/client/TexturePacks/GUIImages.png';
+
+
+/***/ }),
+/* 4 */
 /***/ (function(module, exports, __webpack_require__) {
 
 Object.defineProperty(exports, "__esModule", { value: true });
@@ -618,12 +642,12 @@ exports.mapObjectCollisions[enums_1.MapObjectType.GR_ER] = [0, 0, 2, 0, 0, 0, 0,
 
 
 /***/ }),
-/* 4 */
+/* 5 */
 /***/ (function(module, exports, __webpack_require__) {
 
 Object.defineProperty(exports, "__esModule", { value: true });
-const Camera_1 = __webpack_require__(18);
-const GUI_1 = __webpack_require__(19);
+const Camera_1 = __webpack_require__(19);
+const GUI_1 = __webpack_require__(20);
 gui = new GUI_1.GUI({ ctx: ctxui, width: WIDTH, height: HEIGHTUI });
 exports.camera = new Camera_1.Camera(canvas, WIDTH, HEIGHT);
 let resizeCanvas = function () {
@@ -646,22 +670,21 @@ window.addEventListener('resize', function () {
 
 
 /***/ }),
-/* 5 */
+/* 6 */
 /***/ (function(module, exports, __webpack_require__) {
 
 Object.defineProperty(exports, "__esModule", { value: true });
+const images_1 = __webpack_require__(3);
 const GeometryAndPhysics_1 = __webpack_require__(0);
 const game_1 = __webpack_require__(2);
-const canvas_1 = __webpack_require__(4);
+const canvas_1 = __webpack_require__(5);
+const images_2 = __webpack_require__(3);
 class PlayerClient {
     constructor(initPack) {
         this.id = -1;
         this.position = new GeometryAndPhysics_1.Point(250, 250);
         this.width = 0;
         this.height = 0;
-        this.img = Img["player" + "pistol"];
-        this.imgMeleeAttack = Img["playerknifemeeleattack"];
-        this.imgReload = Img["playerpistolreload"];
         this.hp = 1;
         this.hpMax = 1;
         this.map = "forest";
@@ -728,28 +751,32 @@ class PlayerClient {
             if (this.weapon == "shotgun") {
                 correction = 1.4;
             }
-            let frameWidth = this.imgMeleeAttack.width / spriteColumns;
-            let frameHeight = this.imgMeleeAttack.height / spriteRows;
-            canvas_1.camera.drawImage(this.imgMeleeAttack, frameWidth, frameHeight, aimAngle, directionMod, walkingMod, x, y, this.width * correction, this.height * correction);
+            let frame = images_1.jsonPlayer["frames"]["player_" + this.weapon + "_meeleattack.png"]["frame"];
+            let frameWidth = frame["w"] / spriteColumns;
+            let frameHeight = frame["h"] / spriteRows;
+            canvas_1.camera.drawImage(images_2.Img["Player"], frameWidth, frameHeight, aimAngle, directionMod, walkingMod, x, y, this.width, this.height, frame["x"], frame["y"]);
             if (this.bodySpriteAnimCounter % spriteColumns >= (spriteColumns - 1)) {
                 this.bodySpriteAnimCounter = 0;
                 this.attackStarted = false;
             }
         };
         this.drawNormalBodyWithGun = (spriteColumns, spriteRows, aimAngle, directionMod, walkingMod, x, y) => {
-            let frameWidth = this.img.width / spriteColumns;
-            let frameHeight = this.img.height / spriteRows;
-            canvas_1.camera.drawImage(this.img, frameWidth, frameHeight, aimAngle, directionMod, walkingMod, x, y, this.width, this.height);
+            let frame = images_1.jsonPlayer["frames"]["player_" + this.weapon + ".png"]["frame"];
+            let frameWidth = frame["w"] / spriteColumns;
+            let frameHeight = frame["h"] / spriteRows;
+            canvas_1.camera.drawImage(images_2.Img["Player"], frameWidth, frameHeight, aimAngle, directionMod, walkingMod, x, y, this.width, this.height, frame["x"], frame["y"]);
         };
         this.drawReloadBodyWithGun = (spriteColumns, spriteRows, aimAngle, directionMod, walkingMod, x, y) => {
-            let frameWidth = this.imgReload.width / spriteColumns;
-            let frameHeight = this.imgReload.height / spriteRows;
-            canvas_1.camera.drawImage(this.imgReload, frameWidth, frameHeight, aimAngle, directionMod, walkingMod, x, y, this.width, this.height);
+            let frame = images_1.jsonPlayer["frames"]["player_" + this.weapon + "_reload.png"]["frame"];
+            let frameWidth = frame["w"] / spriteColumns;
+            let frameHeight = frame["h"] / spriteRows;
+            canvas_1.camera.drawImage(images_2.Img["Player"], frameWidth, frameHeight, aimAngle, directionMod, walkingMod, x, y, this.width, this.height, frame["x"], frame["y"]);
         };
         this.drawWalk = (spriteColumns, spriteRows, aimAngle, directionMod, walkingMod, x, y) => {
-            let frameWidth = Img["walk"].width / spriteColumns;
-            let frameHeight = Img["walk"].height / spriteRows;
-            canvas_1.camera.drawImage(Img["walk"], frameWidth, frameHeight, aimAngle, directionMod, walkingMod, x, y, this.width / 2, this.height / 2);
+            let frame = images_1.jsonPlayer["frames"]["walk.png"]["frame"];
+            let frameWidth = frame["w"] / spriteColumns;
+            let frameHeight = frame["h"] / spriteRows;
+            canvas_1.camera.drawImage(images_2.Img["Player"], frameWidth, frameHeight, aimAngle, directionMod, walkingMod, x, y, this.width / 2, this.height / 2, frame["x"], frame["y"]);
         };
         if (initPack.id)
             this.id = initPack.id;
@@ -760,10 +787,7 @@ class PlayerClient {
         if (initPack.height)
             this.height = initPack.height;
         if (initPack.weapon) {
-            this.img = Img["player" + initPack.weapon];
             this.weapon = initPack.weapon;
-            this.imgMeleeAttack = Img["player" + initPack.weapon + "meeleattack"];
-            this.imgReload = Img["player" + initPack.weapon + "reload"];
         }
         if (initPack.hp)
             this.hp = initPack.hp;
@@ -789,17 +813,17 @@ exports.PlayerClient = PlayerClient;
 
 
 /***/ }),
-/* 6 */
+/* 7 */
 /***/ (function(module, exports, __webpack_require__) {
 
 Object.defineProperty(exports, "__esModule", { value: true });
-const SpawnObjectMapChecker_1 = __webpack_require__(20);
-const GroundRing_1 = __webpack_require__(21);
-const GameMap_1 = __webpack_require__(24);
-const MapTile_1 = __webpack_require__(25);
+const SpawnObjectMapChecker_1 = __webpack_require__(21);
+const GroundRing_1 = __webpack_require__(22);
+const GameMap_1 = __webpack_require__(25);
+const MapTile_1 = __webpack_require__(26);
 const enums_1 = __webpack_require__(1);
 const GeometryAndPhysics_1 = __webpack_require__(0);
-const Constants_1 = __webpack_require__(3);
+const Constants_1 = __webpack_require__(4);
 class MapController {
     constructor(param) {
     }
@@ -981,17 +1005,17 @@ exports.MapController = MapController;
 
 
 /***/ }),
-/* 7 */
+/* 8 */
 /***/ (function(module, exports, __webpack_require__) {
 
 Object.defineProperty(exports, "__esModule", { value: true });
-const Pack_1 = __webpack_require__(31);
+const Pack_1 = __webpack_require__(32);
 exports.initPack = new Pack_1.Pack();
 exports.removePack = new Pack_1.Pack();
 
 
 /***/ }),
-/* 8 */
+/* 9 */
 /***/ (function(module, exports, __webpack_require__) {
 
 Object.defineProperty(exports, "__esModule", { value: true });
@@ -1105,17 +1129,17 @@ new WeaponTypes({ weapon: enums_1.WeaponType.claws, name: "claws",
 
 
 /***/ }),
-/* 9 */
+/* 10 */
 /***/ (function(module, exports, __webpack_require__) {
 
 Object.defineProperty(exports, "__esModule", { value: true });
-const globalVariables_1 = __webpack_require__(7);
-const Enemy_1 = __webpack_require__(10);
-const Bullet_1 = __webpack_require__(16);
-const Actor_1 = __webpack_require__(14);
+const globalVariables_1 = __webpack_require__(8);
+const Enemy_1 = __webpack_require__(11);
+const Bullet_1 = __webpack_require__(17);
+const Actor_1 = __webpack_require__(15);
 const GeometryAndPhysics_1 = __webpack_require__(0);
 const enums_1 = __webpack_require__(1);
-const MapControler_1 = __webpack_require__(6);
+const MapControler_1 = __webpack_require__(7);
 class Player extends Actor_1.Actor {
     constructor(param) {
         super(param);
@@ -1269,15 +1293,15 @@ exports.Player = Player;
 
 
 /***/ }),
-/* 10 */
+/* 11 */
 /***/ (function(module, exports, __webpack_require__) {
 
 Object.defineProperty(exports, "__esModule", { value: true });
-const Actor_1 = __webpack_require__(14);
+const Actor_1 = __webpack_require__(15);
 const GeometryAndPhysics_1 = __webpack_require__(0);
-const globalVariables_1 = __webpack_require__(7);
+const globalVariables_1 = __webpack_require__(8);
 const enums_1 = __webpack_require__(1);
-const MapControler_1 = __webpack_require__(6);
+const MapControler_1 = __webpack_require__(7);
 class Enemy extends Actor_1.Actor {
     constructor(param) {
         super(param);
@@ -1463,12 +1487,13 @@ exports.Enemy = Enemy;
 
 
 /***/ }),
-/* 11 */
+/* 12 */
 /***/ (function(module, exports, __webpack_require__) {
 
 Object.defineProperty(exports, "__esModule", { value: true });
-const canvas_1 = __webpack_require__(4);
-const PlayerClient_1 = __webpack_require__(5);
+const images_1 = __webpack_require__(3);
+const canvas_1 = __webpack_require__(5);
+const PlayerClient_1 = __webpack_require__(6);
 const GeometryAndPhysics_1 = __webpack_require__(0);
 const game_1 = __webpack_require__(2);
 class EnemyClient {
@@ -1477,7 +1502,7 @@ class EnemyClient {
         this.position = new GeometryAndPhysics_1.Point(250, 250);
         this.width = 0;
         this.height = 0;
-        this.img = Img["zombie"];
+        this.img = images_1.Img["zombie"];
         this.kind = "zombie";
         this.hp = 1;
         this.hpMax = 1;
@@ -1503,8 +1528,8 @@ class EnemyClient {
             x = x - (mouseX - WIDTH / 2) / CAMERA_BOX_ADJUSTMENT;
             let y = ey - (mainPlayery - HEIGHT / 2);
             y = y - (mouseY - HEIGHT / 2) / CAMERA_BOX_ADJUSTMENT;
-            let frameWidth = this.img.width / 6;
-            let frameHeight = this.img.height / 4;
+            let frameWidth = 32;
+            let frameHeight = 32;
             let aimAngle = this.aimAngle;
             if (aimAngle < 0) {
                 aimAngle = 360 + aimAngle;
@@ -1524,8 +1549,11 @@ class EnemyClient {
                 this.drawTopViewSprite(this.position.x, this.position.y, aimAngle);
             }
             else {
+                let frame = images_1.jsonIAE["frames"][this.kind + ".png"]["frame"];
+                frameWidth = frame["w"] / 6;
+                frameHeight = frame["h"] / 4;
                 walkingMod = Math.floor(this.spriteAnimCounter) % 6;
-                canvas_1.camera.drawImage(this.img, frameWidth, frameHeight, 0, directionMod, walkingMod, this.position.x - this.width / 2, this.position.y - this.height / 2, this.width, this.height);
+                canvas_1.camera.drawImage(images_1.Img["IAE"], frameWidth, frameHeight, 0, directionMod, walkingMod, this.position.x - this.width / 2, this.position.y - this.height / 2, this.width, this.height, frame["x"], frame["y"]);
             }
             canvas_1.camera.drawBar(this.position.x - hpWidth / 2, this.position.y - 40, hpWidth, 4, 'red');
         };
@@ -1541,19 +1569,21 @@ class EnemyClient {
             let spriteColumns = framesAttack[this.kind];
             let spriteRows = 1;
             let walkingMod = Math.floor(this.spriteAnimCounter) % spriteColumns;
-            let frameWidth = Img[this.kind + 'attack'].width / spriteColumns;
-            let frameHeight = Img[this.kind + 'attack'].height / spriteRows;
-            canvas_1.camera.drawImage(Img[this.kind + 'attack'], frameWidth, frameHeight, aimAngle, 0, walkingMod, x, y, this.width, this.height);
+            let frame = images_1.jsonIAE["frames"][this.kind + "_attack.png"]["frame"];
+            let frameWidth = frame["w"] / spriteColumns;
+            let frameHeight = frame["h"] / spriteRows;
+            canvas_1.camera.drawImage(images_1.Img["IAE"], frameWidth, frameHeight, aimAngle, 0, walkingMod, x, y, this.width, this.height, frame["x"], frame["y"]);
             if (this.spriteAnimCounter % spriteColumns >= (spriteColumns - 1)) {
                 this.spriteAnimCounter = 0;
                 this.attackStarted = false;
             }
         };
         this.drawTopViewSpriteWalk = (x, y, aimAngle) => {
-            let frameWidth = this.img.width / framesMove[this.kind];
-            let frameHeight = this.img.height;
             let walkingMod = Math.floor(this.spriteAnimCounter) % framesMove[this.kind];
-            canvas_1.camera.drawImage(this.img, frameWidth, frameHeight, aimAngle, 0, walkingMod, x, y, this.width, this.height);
+            let frame = images_1.jsonIAE["frames"][this.kind + "_move.png"]["frame"];
+            let frameWidth = frame["w"] / framesMove[this.kind];
+            let frameHeight = frame["h"];
+            canvas_1.camera.drawImage(images_1.Img["IAE"], frameWidth, frameHeight, aimAngle, 0, walkingMod, x, y, this.width, this.height, frame["x"], frame["y"]);
         };
         if (initPack.id)
             this.id = initPack.id;
@@ -1566,7 +1596,7 @@ class EnemyClient {
         if (initPack.weapon)
             this.weapon = initPack.weapon;
         if (initPack.img)
-            this.img = Img[initPack.img];
+            this.img = images_1.Img[initPack.img];
         if (initPack.hp)
             this.hp = initPack.hp;
         if (initPack.hpMax)
@@ -1589,14 +1619,15 @@ exports.EnemyClient = EnemyClient;
 
 
 /***/ }),
-/* 12 */
+/* 13 */
 /***/ (function(module, exports, __webpack_require__) {
 
 Object.defineProperty(exports, "__esModule", { value: true });
+const images_1 = __webpack_require__(3);
 const GeometryAndPhysics_1 = __webpack_require__(0);
-const PlayerClient_1 = __webpack_require__(5);
+const PlayerClient_1 = __webpack_require__(6);
 const game_1 = __webpack_require__(2);
-const canvas_1 = __webpack_require__(4);
+const canvas_1 = __webpack_require__(5);
 class ExplosionClient {
     constructor(param) {
         this.id = Math.random();
@@ -1608,11 +1639,12 @@ class ExplosionClient {
             if (PlayerClient_1.PlayerClient.list[game_1.selfId].map !== this.map) {
                 return;
             }
-            let frameWidth = this.img.width / this.animColumns;
-            let frameHeight = this.img.height / this.animRows;
+            let frame = images_1.jsonIAE["frames"][this.img + ".png"]["frame"];
+            let frameWidth = frame["w"] / this.animColumns;
+            let frameHeight = frame["h"] / this.animRows;
             let spriteColumn = Math.floor(this.spriteAnimCounter) % this.animColumns;
             let spriteRow = Math.floor(this.spriteAnimCounter / this.animColumns);
-            canvas_1.camera.drawImage(this.img, frameWidth, frameHeight, 0, spriteRow, spriteColumn, this.position.x - this.width / 2, this.position.y - this.height / 2, this.width, this.height);
+            canvas_1.camera.drawImage(images_1.Img["IAE"], frameWidth, frameHeight, 0, spriteRow, spriteColumn, this.position.x - this.width / 2, this.position.y - this.height / 2, this.width, this.height, frame["x"], frame["y"]);
         };
         this.isCompleted = () => {
             if (this.spriteAnimCounter > (this.animRows * this.animColumns))
@@ -1624,7 +1656,7 @@ class ExplosionClient {
         this.width = param.width ? param.width : this.width;
         this.height = param.height ? param.height : this.height;
         this.map = param.map ? param.map : this.map;
-        this.img = param.img ? Img[param.img] : this.img;
+        this.img = param.img ? param.img : this.img;
         this.category = param.category ? param.category : this.category;
         this.animRows = param.spriteRows ? param.spriteRows : this.animRows;
         this.animColumns = param.spriteColumns ? param.spriteColumns : this.animColumns;
@@ -1636,12 +1668,12 @@ exports.ExplosionClient = ExplosionClient;
 
 
 /***/ }),
-/* 13 */
+/* 14 */
 /***/ (function(module, exports, __webpack_require__) {
 
 Object.defineProperty(exports, "__esModule", { value: true });
-const Item_1 = __webpack_require__(30);
-const Player_1 = __webpack_require__(9);
+const Item_1 = __webpack_require__(31);
+const Player_1 = __webpack_require__(10);
 class Inventory {
     constructor(socket, server, owner) {
         this.items = [];
@@ -1737,18 +1769,18 @@ exports.Inventory = Inventory;
 
 
 /***/ }),
-/* 14 */
+/* 15 */
 /***/ (function(module, exports, __webpack_require__) {
 
 Object.defineProperty(exports, "__esModule", { value: true });
-const Inventory_1 = __webpack_require__(13);
-const MapControler_1 = __webpack_require__(6);
-const MovementController_1 = __webpack_require__(32);
-const AttackControler_1 = __webpack_require__(33);
-const LifeAndBodyController_1 = __webpack_require__(35);
-const Entity_1 = __webpack_require__(17);
-const Player_1 = __webpack_require__(9);
-const Enemy_1 = __webpack_require__(10);
+const Inventory_1 = __webpack_require__(14);
+const MapControler_1 = __webpack_require__(7);
+const MovementController_1 = __webpack_require__(33);
+const AttackControler_1 = __webpack_require__(34);
+const LifeAndBodyController_1 = __webpack_require__(36);
+const Entity_1 = __webpack_require__(18);
+const Player_1 = __webpack_require__(10);
+const Enemy_1 = __webpack_require__(11);
 const GeometryAndPhysics_1 = __webpack_require__(0);
 class Actor extends Entity_1.Entity {
     constructor(param) {
@@ -1838,7 +1870,7 @@ exports.Actor = Actor;
 
 
 /***/ }),
-/* 15 */
+/* 16 */
 /***/ (function(module, exports) {
 
 Object.defineProperty(exports, "__esModule", { value: true });
@@ -1874,15 +1906,15 @@ exports.Counter = Counter;
 
 
 /***/ }),
-/* 16 */
+/* 17 */
 /***/ (function(module, exports, __webpack_require__) {
 
 Object.defineProperty(exports, "__esModule", { value: true });
-const Enemy_1 = __webpack_require__(10);
-const Player_1 = __webpack_require__(9);
-const Entity_1 = __webpack_require__(17);
-const globalVariables_1 = __webpack_require__(7);
-const MapControler_1 = __webpack_require__(6);
+const Enemy_1 = __webpack_require__(11);
+const Player_1 = __webpack_require__(10);
+const Entity_1 = __webpack_require__(18);
+const globalVariables_1 = __webpack_require__(8);
+const MapControler_1 = __webpack_require__(7);
 class Bullet extends Entity_1.Entity {
     constructor(param) {
         super(Bullet.updateParam(param));
@@ -2010,13 +2042,13 @@ exports.Bullet = Bullet;
 
 
 /***/ }),
-/* 17 */
+/* 18 */
 /***/ (function(module, exports, __webpack_require__) {
 
 Object.defineProperty(exports, "__esModule", { value: true });
 const GeometryAndPhysics_1 = __webpack_require__(0);
-const globalVariables_1 = __webpack_require__(7);
-const Constants_1 = __webpack_require__(3);
+const globalVariables_1 = __webpack_require__(8);
+const Constants_1 = __webpack_require__(4);
 class Entity {
     constructor(param) {
         this._position = new GeometryAndPhysics_1.Point(250, 250);
@@ -2072,7 +2104,7 @@ exports.Entity = Entity;
 
 
 /***/ }),
-/* 18 */
+/* 19 */
 /***/ (function(module, exports, __webpack_require__) {
 
 Object.defineProperty(exports, "__esModule", { value: true });
@@ -2146,7 +2178,7 @@ class Camera {
                 this.ctx.fillRect(position.x, position.y, width, height);
             }
         };
-        this.drawImage = (img, frameWidth, frameHeight, aimAngle, directionMod, walkingMod, px, py, width, height) => {
+        this.drawImage = (img, frameWidth, frameHeight, aimAngle, directionMod, walkingMod, px, py, width, height, startx = 0, starty = 0) => {
             let position = this.getScreenPosition(new GeometryAndPhysics_1.Point(px, py));
             if ((position.x <= this.width || position.x + width >= 0) && (position.y + height >= 0 && position.y <= this.height)) {
                 if (aimAngle !== 0) {
@@ -2154,10 +2186,28 @@ class Camera {
                     this.ctx.translate(position.x - width / 2, position.y - height / 2);
                     this.ctx.translate(width / 2, height / 2);
                     this.ctx.rotate(aimAngle * Math.PI / 180);
-                    this.ctx.drawImage(img, walkingMod * frameWidth, directionMod * frameHeight, frameWidth, frameHeight, -width / 2, -height / 2, width, height);
+                    this.ctx.drawImage(img, startx + walkingMod * frameWidth, starty + directionMod * frameHeight, frameWidth, frameHeight, -width / 2, -height / 2, width, height);
                 }
                 else {
-                    this.ctx.drawImage(img, walkingMod * frameWidth, directionMod * frameHeight, frameWidth, frameHeight, position.x, position.y, width, height);
+                    this.ctx.drawImage(img, startx + walkingMod * frameWidth, starty + directionMod * frameHeight, frameWidth, frameHeight, position.x, position.y, width, height);
+                }
+                if (aimAngle !== 0) {
+                    this.ctx.restore();
+                }
+            }
+        };
+        this.drawImageFromTP = (img, startx, starty, imgWidth, imgHeight, frameWidth, frameHeight, aimAngle, directionMod, walkingMod, px, py, width, height) => {
+            let position = this.getScreenPosition(new GeometryAndPhysics_1.Point(px, py));
+            if ((position.x <= this.width || position.x + width >= 0) && (position.y + height >= 0 && position.y <= this.height)) {
+                if (aimAngle !== 0) {
+                    this.ctx.save();
+                    this.ctx.translate(position.x - width / 2, position.y - height / 2);
+                    this.ctx.translate(width / 2, height / 2);
+                    this.ctx.rotate(aimAngle * Math.PI / 180);
+                    this.ctx.drawImage(img, startx + walkingMod * frameWidth, starty + directionMod * frameHeight, frameWidth, frameHeight, -width / 2, -height / 2, width, height);
+                }
+                else {
+                    this.ctx.drawImage(img, startx + walkingMod * frameWidth, starty + directionMod * frameHeight, frameWidth, frameHeight, position.x, position.y, width, height);
                 }
                 if (aimAngle !== 0) {
                     this.ctx.restore();
@@ -2171,20 +2221,21 @@ exports.Camera = Camera;
 
 
 /***/ }),
-/* 19 */
+/* 20 */
 /***/ (function(module, exports, __webpack_require__) {
 
 Object.defineProperty(exports, "__esModule", { value: true });
-const Constants_1 = __webpack_require__(3);
-const PlayerClient_1 = __webpack_require__(5);
+const images_1 = __webpack_require__(3);
+const Constants_1 = __webpack_require__(4);
+const PlayerClient_1 = __webpack_require__(6);
 const game_1 = __webpack_require__(2);
 const enums_1 = __webpack_require__(1);
-const WeaponTypes_1 = __webpack_require__(8);
+const WeaponTypes_1 = __webpack_require__(9);
 class GUI {
     constructor(param) {
         this.draw = () => {
             this.ctx.clearRect(0, 0, this.width, this.height);
-            let pat = this.ctx.createPattern(Img["guibackground"], "repeat-x");
+            let pat = this.ctx.createPattern(images_1.Img["guibackground"], "repeat-x");
             this.ctx.fillStyle = pat;
             this.ctx.fillRect(0, 0, this.width, this.height);
             this.ctx.fill();
@@ -2204,20 +2255,29 @@ class GUI {
         };
         this.drawWeapon = () => {
             if (PlayerClient_1.PlayerClient.list[game_1.selfId]) {
-                this.ctx.drawImage(Img[PlayerClient_1.PlayerClient.list[game_1.selfId].weapon], 0, 0, Img[PlayerClient_1.PlayerClient.list[game_1.selfId].weapon].width, Img[PlayerClient_1.PlayerClient.list[game_1.selfId].weapon].height, (this.width - 0.8 * this.height) / 4, (this.height - 0.8 * this.height) / 2, 0.8 * this.height, 0.8 * this.height);
+                let frame = images_1.jsonIAE["frames"][PlayerClient_1.PlayerClient.list[game_1.selfId].weapon + ".png"]["frame"];
+                let frameWidth = frame["w"];
+                let frameHeight = frame["h"];
+                this.ctx.drawImage(images_1.Img["IAE"], frame["x"], frame["y"], frameWidth, frameHeight, (this.width - 0.8 * this.height) / 4, (this.height - 0.8 * this.height) / 2, 0.8 * this.height, 0.8 * this.height);
             }
         };
         this.drawAmmo = () => {
             if (PlayerClient_1.PlayerClient.list[game_1.selfId]) {
-                if (Img[PlayerClient_1.PlayerClient.list[game_1.selfId].weapon + "ammo"]) {
-                    this.ctx.drawImage(Img[PlayerClient_1.PlayerClient.list[game_1.selfId].weapon + "ammo"], 0, 0, Img[PlayerClient_1.PlayerClient.list[game_1.selfId].weapon + "ammo"].width, Img[PlayerClient_1.PlayerClient.list[game_1.selfId].weapon + "ammo"].height, 11 * (this.width - 0.8 * this.height) / 32, (this.height - 0.4 * this.height) / 2, 0.4 * this.height, 0.4 * this.height);
+                if (images_1.jsonIAE["frames"][PlayerClient_1.PlayerClient.list[game_1.selfId].weapon + "ammo.png"] !== undefined) {
+                    let frame = images_1.jsonIAE["frames"][PlayerClient_1.PlayerClient.list[game_1.selfId].weapon + "ammo.png"]["frame"];
+                    let frameWidth = frame["w"];
+                    let frameHeight = frame["h"];
+                    this.ctx.drawImage(images_1.Img["IAE"], frame["x"], frame["y"], frameWidth, frameHeight, 11 * (this.width - 0.8 * this.height) / 32, (this.height - 0.4 * this.height) / 2, 0.4 * this.height, 0.4 * this.height);
                     this.ctx.fillText(' x' + PlayerClient_1.PlayerClient.list[game_1.selfId].ammo + "  " + PlayerClient_1.PlayerClient.list[game_1.selfId].ammoInGun + "/" + WeaponTypes_1.WeaponTypes.list[WeaponTypes_1.WeaponTypes.getWeaponIdbyName(PlayerClient_1.PlayerClient.list[game_1.selfId].weapon)].reloadAmmo, 11 * (this.width - 0.8 * this.height) / 32 + 0.4 * this.height, (this.height) / 2 + 10);
                 }
             }
         };
         this.drawItems = () => {
             if (PlayerClient_1.PlayerClient.list[game_1.selfId]) {
-                this.ctx.drawImage(Img["medicalkit"], 0, 0, Img["medicalkit"].width, Img["medicalkit"].height, 3 * (this.width - 0.8 * this.height) / 4, (this.height - 0.8 * this.height) / 2, 0.8 * this.height, 0.8 * this.height);
+                let frame = images_1.jsonIAE["frames"]["medicalkit.png"]["frame"];
+                let frameWidth = frame["w"];
+                let frameHeight = frame["h"];
+                this.ctx.drawImage(images_1.Img["IAE"], frame["x"], frame["y"], frameWidth, frameHeight, 3 * (this.width - 0.8 * this.height) / 4, (this.height - 0.8 * this.height) / 2, 0.8 * this.height, 0.8 * this.height);
                 this.ctx.fillText(' x' + game_1.inventory.getItemAmount(enums_1.ItemType.medicalkit), 3 * (this.width - 0.8 * this.height) / 4 + 0.8 * this.height, (this.height) / 2 + 10);
             }
         };
@@ -2225,14 +2285,18 @@ class GUI {
             let spriteRows = 2;
             let spriteColumns = 4;
             let facelook = 1;
-            this.ctx.drawImage(Img["faceborder"], 0, 0, Img["faceborder"].width, Img["faceborder"].height, (this.width - 0.85 * this.height) / 2, (this.height - 0.85 * this.height) / 2, 0.85 * this.height, 0.85 * this.height);
+            let frame = images_1.jsonGUI["frames"]["faceborder.png"]["frame"];
+            let frameWidth = frame["w"];
+            let frameHeight = frame["h"];
+            this.ctx.drawImage(images_1.Img["GUI"], frame["x"], frame["y"], frameWidth, frameHeight, (this.width - 0.85 * this.height) / 2, (this.height - 0.85 * this.height) / 2, 0.85 * this.height, 0.85 * this.height);
             if (PlayerClient_1.PlayerClient.list[game_1.selfId]) {
                 facelook = Math.round(((PlayerClient_1.PlayerClient.list[game_1.selfId].hpMax - PlayerClient_1.PlayerClient.list[game_1.selfId].hp) / PlayerClient_1.PlayerClient.list[game_1.selfId].hpMax) * (spriteRows * spriteColumns - 1));
                 let facex = facelook % spriteColumns;
                 let facey = Math.floor(facelook / spriteColumns);
-                let frameWidth = Img["face"].width / spriteColumns;
-                let frameHeight = Img["face"].height / spriteRows;
-                this.ctx.drawImage(Img["face"], facex * frameWidth, facey * frameHeight, frameWidth, frameHeight, (this.width - 0.8 * this.height) / 2, (this.height - 0.8 * this.height) / 2, 0.8 * this.height, 0.8 * this.height);
+                let frame = images_1.jsonGUI["frames"]["face.png"]["frame"];
+                let frameWidth = frame["w"] / spriteColumns;
+                let frameHeight = frame["h"] / spriteRows;
+                this.ctx.drawImage(images_1.Img["GUI"], frame["x"] + facex * frameWidth, frame["y"] + facey * frameHeight, frameWidth, frameHeight, (this.width - 0.8 * this.height) / 2, (this.height - 0.8 * this.height) / 2, 0.8 * this.height, 0.8 * this.height);
             }
         };
         this.drawMinimap = () => {
@@ -2287,7 +2351,7 @@ exports.GUI = GUI;
 
 
 /***/ }),
-/* 20 */
+/* 21 */
 /***/ (function(module, exports, __webpack_require__) {
 
 Object.defineProperty(exports, "__esModule", { value: true });
@@ -2405,11 +2469,11 @@ exports.SpawnObjectMapChecker = SpawnObjectMapChecker;
 
 
 /***/ }),
-/* 21 */
+/* 22 */
 /***/ (function(module, exports, __webpack_require__) {
 
 Object.defineProperty(exports, "__esModule", { value: true });
-const MapObject_1 = __webpack_require__(22);
+const MapObject_1 = __webpack_require__(23);
 const GeometryAndPhysics_1 = __webpack_require__(0);
 const enums_1 = __webpack_require__(1);
 class GroundRing extends MapObject_1.MapObject {
@@ -2489,11 +2553,11 @@ exports.GroundRing = GroundRing;
 
 
 /***/ }),
-/* 22 */
+/* 23 */
 /***/ (function(module, exports, __webpack_require__) {
 
 Object.defineProperty(exports, "__esModule", { value: true });
-const ObjectTile_1 = __webpack_require__(23);
+const ObjectTile_1 = __webpack_require__(24);
 class MapObject {
     constructor() {
         this.objectTiles = [];
@@ -2506,11 +2570,11 @@ exports.MapObject = MapObject;
 
 
 /***/ }),
-/* 23 */
+/* 24 */
 /***/ (function(module, exports, __webpack_require__) {
 
 Object.defineProperty(exports, "__esModule", { value: true });
-const Constants_1 = __webpack_require__(3);
+const Constants_1 = __webpack_require__(4);
 class ObjectTile {
     constructor(position, type) {
         this.position = position;
@@ -2528,12 +2592,12 @@ exports.ObjectTile = ObjectTile;
 
 
 /***/ }),
-/* 24 */
+/* 25 */
 /***/ (function(module, exports, __webpack_require__) {
 
 Object.defineProperty(exports, "__esModule", { value: true });
 const GeometryAndPhysics_1 = __webpack_require__(0);
-const Constants_1 = __webpack_require__(3);
+const Constants_1 = __webpack_require__(4);
 class GameMap {
     constructor(_name, mapTiles) {
         this._name = _name;
@@ -2575,11 +2639,11 @@ exports.GameMap = GameMap;
 
 
 /***/ }),
-/* 25 */
+/* 26 */
 /***/ (function(module, exports, __webpack_require__) {
 
 Object.defineProperty(exports, "__esModule", { value: true });
-const Constants_1 = __webpack_require__(3);
+const Constants_1 = __webpack_require__(4);
 const enums_1 = __webpack_require__(1);
 class MapTile {
     constructor(_width, _height, material) {
@@ -2647,7 +2711,7 @@ exports.MapTile = MapTile;
 
 
 /***/ }),
-/* 26 */
+/* 27 */
 /***/ (function(module, exports) {
 
 Object.defineProperty(exports, "__esModule", { value: true });
@@ -2700,14 +2764,15 @@ exports.GameSoundManager = GameSoundManager;
 
 
 /***/ }),
-/* 27 */
+/* 28 */
 /***/ (function(module, exports, __webpack_require__) {
 
 Object.defineProperty(exports, "__esModule", { value: true });
+const images_1 = __webpack_require__(3);
 const GeometryAndPhysics_1 = __webpack_require__(0);
-const PlayerClient_1 = __webpack_require__(5);
+const PlayerClient_1 = __webpack_require__(6);
 const game_1 = __webpack_require__(2);
-const canvas_1 = __webpack_require__(4);
+const canvas_1 = __webpack_require__(5);
 class UpgradeClient {
     constructor(param) {
         this.position = new GeometryAndPhysics_1.Point(0, 0);
@@ -2716,14 +2781,17 @@ class UpgradeClient {
             if (PlayerClient_1.PlayerClient.list[game_1.selfId].map !== this.map) {
                 return;
             }
-            canvas_1.camera.drawImage(this.img, this.img.width, this.img.height, 0, 0, 0, this.position.x - this.width / 2, this.position.y - this.height / 2, this.width, this.height);
+            let frame = images_1.jsonIAE["frames"][this.img + ".png"]["frame"];
+            let frameWidth = frame["w"];
+            let frameHeight = frame["h"];
+            canvas_1.camera.drawImage(images_1.Img["IAE"], frameWidth, frameHeight, 0, 0, 0, this.position.x - this.width / 2, this.position.y - this.height / 2, this.width, this.height, frame["x"], frame["y"]);
         };
         this.id = param.id ? param.id : this.id;
         this.position = param.position ? param.position : this.position;
         this.width = param.width ? param.width : this.width;
         this.height = param.height ? param.height : this.height;
         this.map = param.map ? param.map : this.map;
-        this.img = param.img ? Img[param.img] : Img[this.img];
+        this.img = param.img ? param.img : this.img;
         this.category = param.category ? param.category : this.category;
         this.kind = param.kind ? param.kind : this.kind;
         UpgradeClient.list[this.id] = this;
@@ -2734,16 +2802,17 @@ exports.UpgradeClient = UpgradeClient;
 
 
 /***/ }),
-/* 28 */
+/* 29 */
 /***/ (function(module, exports, __webpack_require__) {
 
 Object.defineProperty(exports, "__esModule", { value: true });
-const Constants_1 = __webpack_require__(3);
-const PlayerClient_1 = __webpack_require__(5);
+const images_1 = __webpack_require__(3);
+const Constants_1 = __webpack_require__(4);
+const PlayerClient_1 = __webpack_require__(6);
 const game_1 = __webpack_require__(2);
 const enums_1 = __webpack_require__(1);
-const Constants_2 = __webpack_require__(3);
-const canvas_1 = __webpack_require__(4);
+const Constants_2 = __webpack_require__(4);
+const canvas_1 = __webpack_require__(5);
 class MapClient {
     constructor(map, name) {
         this.image = new Image();
@@ -2765,20 +2834,31 @@ class MapClient {
                 let material = enums_1.TerrainMaterial.dirt;
                 let imgWidth = 1;
                 let imgHeight = 1;
+                let frame = images_1.jsonMap["frames"];
+                let mapFrame = frame;
+                let frameWidth = 32;
+                let frameHeight = 32;
                 for (let i = 0; i < size; i++) {
                     for (let j = 0; j < size; j++) {
                         material = this.map.mapTiles[i][j].material;
-                        imgWidth = Img[Constants_2.mapTileImageName[material]].width;
-                        imgHeight = Img[Constants_2.mapTileImageName[material]].height;
-                        canvas_1.camera.drawImage(Img[Constants_2.mapTileImageName[material]], imgWidth, imgHeight, 0, 0, 0, imgWidth * j, imgHeight * i, imgWidth, imgHeight);
+                        mapFrame = frame[Constants_2.mapTileImageName[material] + ".png"]["frame"];
+                        imgWidth = mapFrame["w"];
+                        imgHeight = mapFrame["h"];
+                        canvas_1.camera.drawImage(images_1.Img["Map"], imgWidth, imgHeight, 0, 0, 0, (imgWidth - 1) * j, (imgHeight - 1) * i, imgWidth, imgHeight, mapFrame["x"], mapFrame["y"]);
                         for (let k = 0; k < 4; k++) {
                             if (this.map.mapTiles[i][j].sides[k] > 0) {
-                                canvas_1.camera.drawImage(Img[Constants_1.mapTileSideImageName[k][this.map.mapTiles[i][j].sides[k]]], imgWidth, imgHeight, 0, 0, 0, imgWidth * j, imgHeight * i, imgWidth, imgHeight);
+                                mapFrame = frame[Constants_1.mapTileSideImageName[k][this.map.mapTiles[i][j].sides[k]] + ".png"]["frame"];
+                                imgWidth = mapFrame["w"];
+                                imgHeight = mapFrame["h"];
+                                canvas_1.camera.drawImage(images_1.Img["Map"], imgWidth, imgHeight, 0, 0, 0, (imgWidth - 1) * j, (imgHeight - 1) * i, imgWidth, imgHeight, mapFrame["x"], mapFrame["y"]);
                             }
                         }
                         for (let k = 0; k < this.map.mapTiles[i][j].objects.length; k++) {
                             if (this.map.mapTiles[i][j].objects[k] > 0) {
-                                canvas_1.camera.drawImage(Img[Constants_1.mapObjectImageName[this.map.mapTiles[i][j].objects[k]]], imgWidth, imgHeight, 0, 0, 0, imgWidth * j, imgHeight * i, imgWidth, imgHeight);
+                                mapFrame = frame[Constants_1.mapObjectImageName[this.map.mapTiles[i][j].objects[k]] + ".png"]["frame"];
+                                imgWidth = mapFrame["w"];
+                                imgHeight = mapFrame["h"];
+                                canvas_1.camera.drawImage(images_1.Img["Map"], imgWidth, imgHeight, 0, 0, 0, (imgWidth - 1) * j, (imgHeight - 1) * i, imgWidth, imgHeight, mapFrame["x"], mapFrame["y"]);
                             }
                         }
                     }
@@ -2793,23 +2873,24 @@ exports.MapClient = MapClient;
 
 
 /***/ }),
-/* 29 */
+/* 30 */
 /***/ (function(module, exports, __webpack_require__) {
 
 Object.defineProperty(exports, "__esModule", { value: true });
+const images_1 = __webpack_require__(3);
 const game_1 = __webpack_require__(2);
-const EnemyClient_1 = __webpack_require__(11);
+const EnemyClient_1 = __webpack_require__(12);
 const GeometryAndPhysics_1 = __webpack_require__(0);
 const game_2 = __webpack_require__(2);
-const PlayerClient_1 = __webpack_require__(5);
-const ExplosionClient_1 = __webpack_require__(12);
-const canvas_1 = __webpack_require__(4);
+const PlayerClient_1 = __webpack_require__(6);
+const ExplosionClient_1 = __webpack_require__(13);
+const canvas_1 = __webpack_require__(5);
 class BulletClient {
     constructor(initPack) {
         this.id = -1;
         this.position = new GeometryAndPhysics_1.Point(250, 250);
         this.map = "forest";
-        this.img = Img["bullet"];
+        this.img = images_1.Img["bullet"];
         this.width = 32;
         this.height = 32;
         this.hitCategory = 1;
@@ -2817,7 +2898,10 @@ class BulletClient {
             if (PlayerClient_1.PlayerClient.list[game_2.selfId].map !== this.map) {
                 return;
             }
-            canvas_1.camera.drawImage(this.img, this.img.width, this.img.height, 0, 0, 0, this.position.x, this.position.y, this.width, this.height);
+            let frame = images_1.jsonIAE["frames"][this.img + ".png"]["frame"];
+            let frameWidth = frame["w"];
+            let frameHeight = frame["h"];
+            canvas_1.camera.drawImage(images_1.Img["IAE"], frameWidth, frameHeight, 0, 0, 0, this.position.x, this.position.y, this.width, this.height, frame["x"], frame["y"]);
         };
         this.hit = (category, entityCategory, entityId) => {
             let x = this.position.x;
@@ -2847,7 +2931,7 @@ class BulletClient {
         this.width = (initPack.width !== undefined) ? initPack.width : 32;
         this.height = (initPack.height !== undefined) ? initPack.height : 32;
         this.hitCategory = (initPack.hitCategory !== undefined) ? initPack.hitCategory : 1;
-        this.img = (initPack.img !== undefined) ? Img[initPack.img] : Img["bullet"];
+        this.img = (initPack.img !== undefined) ? initPack.img : "bullet";
         this.map = (initPack.map !== undefined) ? initPack.map : "forest";
         BulletClient.list[this.id] = this;
     }
@@ -2857,7 +2941,7 @@ exports.BulletClient = BulletClient;
 
 
 /***/ }),
-/* 30 */
+/* 31 */
 /***/ (function(module, exports, __webpack_require__) {
 
 Object.defineProperty(exports, "__esModule", { value: true });
@@ -2924,7 +3008,7 @@ new Item(enums_1.WeaponType.claws, "Claws", function (actor) {
 
 
 /***/ }),
-/* 31 */
+/* 32 */
 /***/ (function(module, exports) {
 
 Object.defineProperty(exports, "__esModule", { value: true });
@@ -2941,12 +3025,12 @@ exports.Pack = Pack;
 
 
 /***/ }),
-/* 32 */
+/* 33 */
 /***/ (function(module, exports, __webpack_require__) {
 
 Object.defineProperty(exports, "__esModule", { value: true });
-const MapControler_1 = __webpack_require__(6);
-const Counter_1 = __webpack_require__(15);
+const MapControler_1 = __webpack_require__(7);
+const Counter_1 = __webpack_require__(16);
 const GeometryAndPhysics_1 = __webpack_require__(0);
 class MovementController {
     constructor(parent, param) {
@@ -3052,14 +3136,14 @@ exports.MovementController = MovementController;
 
 
 /***/ }),
-/* 33 */
+/* 34 */
 /***/ (function(module, exports, __webpack_require__) {
 
 Object.defineProperty(exports, "__esModule", { value: true });
-const Bullet_1 = __webpack_require__(16);
-const WeaponCollection_1 = __webpack_require__(34);
-const Counter_1 = __webpack_require__(15);
-const WeaponTypes_1 = __webpack_require__(8);
+const Bullet_1 = __webpack_require__(17);
+const WeaponCollection_1 = __webpack_require__(35);
+const Counter_1 = __webpack_require__(16);
+const WeaponTypes_1 = __webpack_require__(9);
 const GeometryAndPhysics_1 = __webpack_require__(0);
 class AttackController {
     constructor(parent, param) {
@@ -3162,11 +3246,11 @@ exports.AttackController = AttackController;
 
 
 /***/ }),
-/* 34 */
+/* 35 */
 /***/ (function(module, exports, __webpack_require__) {
 
 Object.defineProperty(exports, "__esModule", { value: true });
-const WeaponTypes_1 = __webpack_require__(8);
+const WeaponTypes_1 = __webpack_require__(9);
 const enums_1 = __webpack_require__(1);
 class WeaponCollection {
     constructor(owner) {
@@ -3350,7 +3434,7 @@ exports.SingleWeapon = SingleWeapon;
 
 
 /***/ }),
-/* 35 */
+/* 36 */
 /***/ (function(module, exports) {
 
 Object.defineProperty(exports, "__esModule", { value: true });

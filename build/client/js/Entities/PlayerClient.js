@@ -1,16 +1,15 @@
 Object.defineProperty(exports, "__esModule", { value: true });
+const images_1 = require("./../images");
 const GeometryAndPhysics_1 = require("./../../../server/js/GeometryAndPhysics");
 const game_1 = require("../game");
 const canvas_1 = require("../canvas");
+const images_2 = require("../images");
 class PlayerClient {
     constructor(initPack) {
         this.id = -1;
         this.position = new GeometryAndPhysics_1.Point(250, 250);
         this.width = 0;
         this.height = 0;
-        this.img = Img["player" + "pistol"];
-        this.imgMeleeAttack = Img["playerknifemeeleattack"];
-        this.imgReload = Img["playerpistolreload"];
         this.hp = 1;
         this.hpMax = 1;
         this.map = "forest";
@@ -77,28 +76,32 @@ class PlayerClient {
             if (this.weapon == "shotgun") {
                 correction = 1.4;
             }
-            let frameWidth = this.imgMeleeAttack.width / spriteColumns;
-            let frameHeight = this.imgMeleeAttack.height / spriteRows;
-            canvas_1.camera.drawImage(this.imgMeleeAttack, frameWidth, frameHeight, aimAngle, directionMod, walkingMod, x, y, this.width * correction, this.height * correction);
+            let frame = images_1.jsonPlayer["frames"]["player_" + this.weapon + "_meeleattack.png"]["frame"];
+            let frameWidth = frame["w"] / spriteColumns;
+            let frameHeight = frame["h"] / spriteRows;
+            canvas_1.camera.drawImage(images_2.Img["Player"], frameWidth, frameHeight, aimAngle, directionMod, walkingMod, x, y, this.width, this.height, frame["x"], frame["y"]);
             if (this.bodySpriteAnimCounter % spriteColumns >= (spriteColumns - 1)) {
                 this.bodySpriteAnimCounter = 0;
                 this.attackStarted = false;
             }
         };
         this.drawNormalBodyWithGun = (spriteColumns, spriteRows, aimAngle, directionMod, walkingMod, x, y) => {
-            let frameWidth = this.img.width / spriteColumns;
-            let frameHeight = this.img.height / spriteRows;
-            canvas_1.camera.drawImage(this.img, frameWidth, frameHeight, aimAngle, directionMod, walkingMod, x, y, this.width, this.height);
+            let frame = images_1.jsonPlayer["frames"]["player_" + this.weapon + ".png"]["frame"];
+            let frameWidth = frame["w"] / spriteColumns;
+            let frameHeight = frame["h"] / spriteRows;
+            canvas_1.camera.drawImage(images_2.Img["Player"], frameWidth, frameHeight, aimAngle, directionMod, walkingMod, x, y, this.width, this.height, frame["x"], frame["y"]);
         };
         this.drawReloadBodyWithGun = (spriteColumns, spriteRows, aimAngle, directionMod, walkingMod, x, y) => {
-            let frameWidth = this.imgReload.width / spriteColumns;
-            let frameHeight = this.imgReload.height / spriteRows;
-            canvas_1.camera.drawImage(this.imgReload, frameWidth, frameHeight, aimAngle, directionMod, walkingMod, x, y, this.width, this.height);
+            let frame = images_1.jsonPlayer["frames"]["player_" + this.weapon + "_reload.png"]["frame"];
+            let frameWidth = frame["w"] / spriteColumns;
+            let frameHeight = frame["h"] / spriteRows;
+            canvas_1.camera.drawImage(images_2.Img["Player"], frameWidth, frameHeight, aimAngle, directionMod, walkingMod, x, y, this.width, this.height, frame["x"], frame["y"]);
         };
         this.drawWalk = (spriteColumns, spriteRows, aimAngle, directionMod, walkingMod, x, y) => {
-            let frameWidth = Img["walk"].width / spriteColumns;
-            let frameHeight = Img["walk"].height / spriteRows;
-            canvas_1.camera.drawImage(Img["walk"], frameWidth, frameHeight, aimAngle, directionMod, walkingMod, x, y, this.width / 2, this.height / 2);
+            let frame = images_1.jsonPlayer["frames"]["walk.png"]["frame"];
+            let frameWidth = frame["w"] / spriteColumns;
+            let frameHeight = frame["h"] / spriteRows;
+            canvas_1.camera.drawImage(images_2.Img["Player"], frameWidth, frameHeight, aimAngle, directionMod, walkingMod, x, y, this.width / 2, this.height / 2, frame["x"], frame["y"]);
         };
         if (initPack.id)
             this.id = initPack.id;
@@ -109,10 +112,7 @@ class PlayerClient {
         if (initPack.height)
             this.height = initPack.height;
         if (initPack.weapon) {
-            this.img = Img["player" + initPack.weapon];
             this.weapon = initPack.weapon;
-            this.imgMeleeAttack = Img["player" + initPack.weapon + "meeleattack"];
-            this.imgReload = Img["player" + initPack.weapon + "reload"];
         }
         if (initPack.hp)
             this.hp = initPack.hp;

@@ -1,4 +1,5 @@
 Object.defineProperty(exports, "__esModule", { value: true });
+const images_1 = require("./../images");
 const game_1 = require("./../game");
 const EnemyClient_1 = require("./EnemyClient");
 const GeometryAndPhysics_1 = require("./../../../server/js/GeometryAndPhysics");
@@ -11,7 +12,7 @@ class BulletClient {
         this.id = -1;
         this.position = new GeometryAndPhysics_1.Point(250, 250);
         this.map = "forest";
-        this.img = Img["bullet"];
+        this.img = images_1.Img["bullet"];
         this.width = 32;
         this.height = 32;
         this.hitCategory = 1;
@@ -19,7 +20,10 @@ class BulletClient {
             if (PlayerClient_1.PlayerClient.list[game_2.selfId].map !== this.map) {
                 return;
             }
-            canvas_1.camera.drawImage(this.img, this.img.width, this.img.height, 0, 0, 0, this.position.x, this.position.y, this.width, this.height);
+            let frame = images_1.jsonIAE["frames"][this.img + ".png"]["frame"];
+            let frameWidth = frame["w"];
+            let frameHeight = frame["h"];
+            canvas_1.camera.drawImage(images_1.Img["IAE"], frameWidth, frameHeight, 0, 0, 0, this.position.x, this.position.y, this.width, this.height, frame["x"], frame["y"]);
         };
         this.hit = (category, entityCategory, entityId) => {
             let x = this.position.x;
@@ -49,7 +53,7 @@ class BulletClient {
         this.width = (initPack.width !== undefined) ? initPack.width : 32;
         this.height = (initPack.height !== undefined) ? initPack.height : 32;
         this.hitCategory = (initPack.hitCategory !== undefined) ? initPack.hitCategory : 1;
-        this.img = (initPack.img !== undefined) ? Img[initPack.img] : Img["bullet"];
+        this.img = (initPack.img !== undefined) ? initPack.img : "bullet";
         this.map = (initPack.map !== undefined) ? initPack.map : "forest";
         BulletClient.list[this.id] = this;
     }

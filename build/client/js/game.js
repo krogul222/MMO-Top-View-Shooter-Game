@@ -58,9 +58,6 @@ socket.on('update', function (data) {
             }
             if (pack.weapon !== undefined) {
                 p.weapon = pack.weapon;
-                p.img = Img["player" + pack.weapon];
-                p.imgMeleeAttack = Img["player" + pack.weapon + "meeleattack"];
-                p.imgReload = Img["player" + pack.weapon + "reload"];
             }
             if (pack.attackMelee !== undefined) {
                 p.attackMelee = pack.attackMelee;

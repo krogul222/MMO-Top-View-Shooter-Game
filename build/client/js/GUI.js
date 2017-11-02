@@ -1,4 +1,5 @@
 Object.defineProperty(exports, "__esModule", { value: true });
+const images_1 = require("./images");
 const Constants_1 = require("./../../server/js/Constants");
 const PlayerClient_1 = require("./Entities/PlayerClient");
 const game_1 = require("./game");
@@ -8,7 +9,7 @@ class GUI {
     constructor(param) {
         this.draw = () => {
             this.ctx.clearRect(0, 0, this.width, this.height);
-            let pat = this.ctx.createPattern(Img["guibackground"], "repeat-x");
+            let pat = this.ctx.createPattern(images_1.Img["guibackground"], "repeat-x");
             this.ctx.fillStyle = pat;
             this.ctx.fillRect(0, 0, this.width, this.height);
             this.ctx.fill();
@@ -28,20 +29,29 @@ class GUI {
         };
         this.drawWeapon = () => {
             if (PlayerClient_1.PlayerClient.list[game_1.selfId]) {
-                this.ctx.drawImage(Img[PlayerClient_1.PlayerClient.list[game_1.selfId].weapon], 0, 0, Img[PlayerClient_1.PlayerClient.list[game_1.selfId].weapon].width, Img[PlayerClient_1.PlayerClient.list[game_1.selfId].weapon].height, (this.width - 0.8 * this.height) / 4, (this.height - 0.8 * this.height) / 2, 0.8 * this.height, 0.8 * this.height);
+                let frame = images_1.jsonIAE["frames"][PlayerClient_1.PlayerClient.list[game_1.selfId].weapon + ".png"]["frame"];
+                let frameWidth = frame["w"];
+                let frameHeight = frame["h"];
+                this.ctx.drawImage(images_1.Img["IAE"], frame["x"], frame["y"], frameWidth, frameHeight, (this.width - 0.8 * this.height) / 4, (this.height - 0.8 * this.height) / 2, 0.8 * this.height, 0.8 * this.height);
             }
         };
         this.drawAmmo = () => {
             if (PlayerClient_1.PlayerClient.list[game_1.selfId]) {
-                if (Img[PlayerClient_1.PlayerClient.list[game_1.selfId].weapon + "ammo"]) {
-                    this.ctx.drawImage(Img[PlayerClient_1.PlayerClient.list[game_1.selfId].weapon + "ammo"], 0, 0, Img[PlayerClient_1.PlayerClient.list[game_1.selfId].weapon + "ammo"].width, Img[PlayerClient_1.PlayerClient.list[game_1.selfId].weapon + "ammo"].height, 11 * (this.width - 0.8 * this.height) / 32, (this.height - 0.4 * this.height) / 2, 0.4 * this.height, 0.4 * this.height);
+                if (images_1.jsonIAE["frames"][PlayerClient_1.PlayerClient.list[game_1.selfId].weapon + "ammo.png"] !== undefined) {
+                    let frame = images_1.jsonIAE["frames"][PlayerClient_1.PlayerClient.list[game_1.selfId].weapon + "ammo.png"]["frame"];
+                    let frameWidth = frame["w"];
+                    let frameHeight = frame["h"];
+                    this.ctx.drawImage(images_1.Img["IAE"], frame["x"], frame["y"], frameWidth, frameHeight, 11 * (this.width - 0.8 * this.height) / 32, (this.height - 0.4 * this.height) / 2, 0.4 * this.height, 0.4 * this.height);
                     this.ctx.fillText(' x' + PlayerClient_1.PlayerClient.list[game_1.selfId].ammo + "  " + PlayerClient_1.PlayerClient.list[game_1.selfId].ammoInGun + "/" + WeaponTypes_1.WeaponTypes.list[WeaponTypes_1.WeaponTypes.getWeaponIdbyName(PlayerClient_1.PlayerClient.list[game_1.selfId].weapon)].reloadAmmo, 11 * (this.width - 0.8 * this.height) / 32 + 0.4 * this.height, (this.height) / 2 + 10);
                 }
             }
         };
         this.drawItems = () => {
             if (PlayerClient_1.PlayerClient.list[game_1.selfId]) {
-                this.ctx.drawImage(Img["medicalkit"], 0, 0, Img["medicalkit"].width, Img["medicalkit"].height, 3 * (this.width - 0.8 * this.height) / 4, (this.height - 0.8 * this.height) / 2, 0.8 * this.height, 0.8 * this.height);
+                let frame = images_1.jsonIAE["frames"]["medicalkit.png"]["frame"];
+                let frameWidth = frame["w"];
+                let frameHeight = frame["h"];
+                this.ctx.drawImage(images_1.Img["IAE"], frame["x"], frame["y"], frameWidth, frameHeight, 3 * (this.width - 0.8 * this.height) / 4, (this.height - 0.8 * this.height) / 2, 0.8 * this.height, 0.8 * this.height);
                 this.ctx.fillText(' x' + game_1.inventory.getItemAmount(enums_1.ItemType.medicalkit), 3 * (this.width - 0.8 * this.height) / 4 + 0.8 * this.height, (this.height) / 2 + 10);
             }
         };
@@ -49,14 +59,18 @@ class GUI {
             let spriteRows = 2;
             let spriteColumns = 4;
             let facelook = 1;
-            this.ctx.drawImage(Img["faceborder"], 0, 0, Img["faceborder"].width, Img["faceborder"].height, (this.width - 0.85 * this.height) / 2, (this.height - 0.85 * this.height) / 2, 0.85 * this.height, 0.85 * this.height);
+            let frame = images_1.jsonGUI["frames"]["faceborder.png"]["frame"];
+            let frameWidth = frame["w"];
+            let frameHeight = frame["h"];
+            this.ctx.drawImage(images_1.Img["GUI"], frame["x"], frame["y"], frameWidth, frameHeight, (this.width - 0.85 * this.height) / 2, (this.height - 0.85 * this.height) / 2, 0.85 * this.height, 0.85 * this.height);
             if (PlayerClient_1.PlayerClient.list[game_1.selfId]) {
                 facelook = Math.round(((PlayerClient_1.PlayerClient.list[game_1.selfId].hpMax - PlayerClient_1.PlayerClient.list[game_1.selfId].hp) / PlayerClient_1.PlayerClient.list[game_1.selfId].hpMax) * (spriteRows * spriteColumns - 1));
                 let facex = facelook % spriteColumns;
                 let facey = Math.floor(facelook / spriteColumns);
-                let frameWidth = Img["face"].width / spriteColumns;
-                let frameHeight = Img["face"].height / spriteRows;
-                this.ctx.drawImage(Img["face"], facex * frameWidth, facey * frameHeight, frameWidth, frameHeight, (this.width - 0.8 * this.height) / 2, (this.height - 0.8 * this.height) / 2, 0.8 * this.height, 0.8 * this.height);
+                let frame = images_1.jsonGUI["frames"]["face.png"]["frame"];
+                let frameWidth = frame["w"] / spriteColumns;
+                let frameHeight = frame["h"] / spriteRows;
+                this.ctx.drawImage(images_1.Img["GUI"], frame["x"] + facex * frameWidth, frame["y"] + facey * frameHeight, frameWidth, frameHeight, (this.width - 0.8 * this.height) / 2, (this.height - 0.8 * this.height) / 2, 0.8 * this.height, 0.8 * this.height);
             }
         };
         this.drawMinimap = () => {
@@ -97,7 +111,7 @@ class GUI {
             }
             let px = Math.floor(PlayerClient_1.PlayerClient.list[game_1.selfId].position.x / (Constants_1.TILE_SIZE * 32 * sizeX) * imgSize);
             let py = Math.floor(PlayerClient_1.PlayerClient.list[game_1.selfId].position.y / (Constants_1.TILE_SIZE * 32 * sizeY) * imgSize);
-            this.ctx.putImageData(imgData, 5 * (this.width) / 6, 0);
+            this.ctx.putImageData(imgData, 5 * (this.width) / 6, (this.height - imgSize) / 2);
         };
         if (param.ctx !== undefined)
             this.ctx = param.ctx;

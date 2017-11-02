@@ -1,3 +1,4 @@
+import { Img, jsonMap } from './images';
 import { mapTileSideImageName, mapObjectImageName } from './../../server/js/Constants';
 import { PlayerClient } from './Entities/PlayerClient';
 import { selfId } from './game';
@@ -46,27 +47,50 @@ export class MapClient {
             let imgWidth: number = 1;
             let imgHeight: number = 1;
     
+            let frame = jsonMap["frames"];
+            let mapFrame = frame;
+            let frameWidth = 32;
+            let frameHeight = 32;
+            //camera.drawImage(Img["IAE"], frameWidth, frameHeight, 0, 0, 0, this.position.x-this.width/2, this.position.y-this.height/2, this.width, this.height, frame["x"], frame["y"] );
+        
+            
             
             for (let i = 0 ; i < size ; i++){
                 for (let j = 0; j < size; j++){
                     material = this.map.mapTiles[i][j].material;
-                    imgWidth = Img[mapTileImageName[material]].width;
-                    imgHeight = Img[mapTileImageName[material]].height;
+                  //  imgWidth = Img[mapTileImageName[material]].width;
+                  //  imgHeight = Img[mapTileImageName[material]].height;
 
-                    camera.drawImage(Img[mapTileImageName[material]], imgWidth, imgHeight, 0, 0, 0,  imgWidth*j, imgHeight*i, imgWidth, imgHeight);
+                    mapFrame = frame[mapTileImageName[material]+".png"]["frame"];
+                    imgWidth = mapFrame["w"];
+                    imgHeight = mapFrame["h"];
+
+                    camera.drawImage(Img["Map"], imgWidth, imgHeight, 0, 0, 0,  (imgWidth-1)*j, (imgHeight-1)*i, imgWidth, imgHeight, mapFrame["x"], mapFrame["y"]);
                     
                     
                     for(let k = 0; k < 4; k++){
                         if(this.map.mapTiles[i][j].sides[k] > 0){
                             //ctx.drawImage(Img[mapTileSideImageName[k][this.map.mapTiles[i][j].sides[k]]], 0, 0, imgWidth, imgHeight, x+imgWidth*j, y+imgHeight*i, imgWidth, imgHeight);   
-                            camera.drawImage(Img[mapTileSideImageName[k][this.map.mapTiles[i][j].sides[k]]], imgWidth, imgHeight, 0, 0, 0,  imgWidth*j, imgHeight*i, imgWidth, imgHeight);        
+                            mapFrame = frame[mapTileSideImageName[k][this.map.mapTiles[i][j].sides[k]]+".png"]["frame"];
+                            imgWidth = mapFrame["w"];
+                            imgHeight = mapFrame["h"];
+                            
+                            camera.drawImage(Img["Map"], imgWidth, imgHeight, 0, 0, 0,  (imgWidth-1)*j, (imgHeight-1)*i, imgWidth, imgHeight, mapFrame["x"], mapFrame["y"]);
+                            
+                            //camera.drawImage(Img[mapTileSideImageName[k][this.map.mapTiles[i][j].sides[k]]], imgWidth, imgHeight, 0, 0, 0,  imgWidth*j, imgHeight*i, imgWidth, imgHeight);        
                         }
                     }
     
                     for(let k = 0; k < this.map.mapTiles[i][j].objects.length; k++){
                         if(this.map.mapTiles[i][j].objects[k] > 0){
                             //ctx.drawImage(Img[mapObjectImageName[this.map.mapTiles[i][j].objects[k]]], 0, 0, imgWidth, imgHeight, x+imgWidth*j, y+imgHeight*i, imgWidth, imgHeight);   
-                            camera.drawImage(Img[mapObjectImageName[this.map.mapTiles[i][j].objects[k]]], imgWidth, imgHeight, 0, 0, 0,  imgWidth*j, imgHeight*i, imgWidth, imgHeight);        
+                            mapFrame = frame[mapObjectImageName[this.map.mapTiles[i][j].objects[k]]+".png"]["frame"];
+                            imgWidth = mapFrame["w"];
+                            imgHeight = mapFrame["h"];
+                            
+                            camera.drawImage(Img["Map"], imgWidth, imgHeight, 0, 0, 0,  (imgWidth-1)*j, (imgHeight-1)*i, imgWidth, imgHeight, mapFrame["x"], mapFrame["y"]);
+                            
+                        //    camera.drawImage(Img[mapObjectImageName[this.map.mapTiles[i][j].objects[k]]], imgWidth, imgHeight, 0, 0, 0,  imgWidth*j, imgHeight*i, imgWidth, imgHeight);        
                         }
                     }
     

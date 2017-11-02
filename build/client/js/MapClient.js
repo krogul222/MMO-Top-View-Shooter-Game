@@ -1,4 +1,5 @@
 Object.defineProperty(exports, "__esModule", { value: true });
+const images_1 = require("./images");
 const Constants_1 = require("./../../server/js/Constants");
 const PlayerClient_1 = require("./Entities/PlayerClient");
 const game_1 = require("./game");
@@ -26,20 +27,31 @@ class MapClient {
                 let material = enums_1.TerrainMaterial.dirt;
                 let imgWidth = 1;
                 let imgHeight = 1;
+                let frame = images_1.jsonMap["frames"];
+                let mapFrame = frame;
+                let frameWidth = 32;
+                let frameHeight = 32;
                 for (let i = 0; i < size; i++) {
                     for (let j = 0; j < size; j++) {
                         material = this.map.mapTiles[i][j].material;
-                        imgWidth = Img[Constants_2.mapTileImageName[material]].width;
-                        imgHeight = Img[Constants_2.mapTileImageName[material]].height;
-                        canvas_1.camera.drawImage(Img[Constants_2.mapTileImageName[material]], imgWidth, imgHeight, 0, 0, 0, imgWidth * j, imgHeight * i, imgWidth, imgHeight);
+                        mapFrame = frame[Constants_2.mapTileImageName[material] + ".png"]["frame"];
+                        imgWidth = mapFrame["w"];
+                        imgHeight = mapFrame["h"];
+                        canvas_1.camera.drawImage(images_1.Img["Map"], imgWidth, imgHeight, 0, 0, 0, (imgWidth - 1) * j, (imgHeight - 1) * i, imgWidth, imgHeight, mapFrame["x"], mapFrame["y"]);
                         for (let k = 0; k < 4; k++) {
                             if (this.map.mapTiles[i][j].sides[k] > 0) {
-                                canvas_1.camera.drawImage(Img[Constants_1.mapTileSideImageName[k][this.map.mapTiles[i][j].sides[k]]], imgWidth, imgHeight, 0, 0, 0, imgWidth * j, imgHeight * i, imgWidth, imgHeight);
+                                mapFrame = frame[Constants_1.mapTileSideImageName[k][this.map.mapTiles[i][j].sides[k]] + ".png"]["frame"];
+                                imgWidth = mapFrame["w"];
+                                imgHeight = mapFrame["h"];
+                                canvas_1.camera.drawImage(images_1.Img["Map"], imgWidth, imgHeight, 0, 0, 0, (imgWidth - 1) * j, (imgHeight - 1) * i, imgWidth, imgHeight, mapFrame["x"], mapFrame["y"]);
                             }
                         }
                         for (let k = 0; k < this.map.mapTiles[i][j].objects.length; k++) {
                             if (this.map.mapTiles[i][j].objects[k] > 0) {
-                                canvas_1.camera.drawImage(Img[Constants_1.mapObjectImageName[this.map.mapTiles[i][j].objects[k]]], imgWidth, imgHeight, 0, 0, 0, imgWidth * j, imgHeight * i, imgWidth, imgHeight);
+                                mapFrame = frame[Constants_1.mapObjectImageName[this.map.mapTiles[i][j].objects[k]] + ".png"]["frame"];
+                                imgWidth = mapFrame["w"];
+                                imgHeight = mapFrame["h"];
+                                canvas_1.camera.drawImage(images_1.Img["Map"], imgWidth, imgHeight, 0, 0, 0, (imgWidth - 1) * j, (imgHeight - 1) * i, imgWidth, imgHeight, mapFrame["x"], mapFrame["y"]);
                             }
                         }
                     }

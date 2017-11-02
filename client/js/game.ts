@@ -12,6 +12,7 @@ import { BulletClient } from "./Entities/BulletClient";
 import { EnemyClient } from './Entities/EnemyClient';
 import { ExplosionClient } from './Entities/ExplosionClient';
 import { Inventory } from '../../server/js/Inventory/Inventory';
+import { Img } from './images';
 
 declare var ctx;
 declare const WIDTH;
@@ -87,9 +88,6 @@ socket.on('update', function(data){
 
            if(pack.weapon !== undefined){
             p.weapon = pack.weapon
-            p.img = Img["player"+pack.weapon];
-            p.imgMeleeAttack = Img["player" + pack.weapon + "meeleattack"];
-            p.imgReload = Img["player" + pack.weapon + "reload"];
             }
 
            if(pack.attackMelee !== undefined){

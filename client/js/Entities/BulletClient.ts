@@ -1,3 +1,4 @@
+import { Img, jsonIAE } from './../images';
 import { gameSoundManager } from './../game';
 import { EnemyClient } from './EnemyClient';
 import { initPack } from './../../../server/js/globalVariables';
@@ -30,7 +31,7 @@ export class BulletClient {
         this.width = (initPack.width !== undefined) ? initPack.width : 32;
         this.height = (initPack.height !== undefined) ? initPack.height : 32;
         this.hitCategory = (initPack.hitCategory !== undefined) ? initPack.hitCategory : 1;
-        this.img = (initPack.img !== undefined) ? Img[initPack.img] : Img["bullet"];
+        this.img = (initPack.img !== undefined) ? initPack.img : "bullet";
         this.map = (initPack.map !== undefined) ? initPack.map : "forest";
         BulletClient.list[this.id] = this;
     }
@@ -40,7 +41,11 @@ export class BulletClient {
             return;  
         }
         
-        camera.drawImage(this.img, this.img.width, this.img.height, 0, 0, 0, this.position.x, this.position.y, this.width, this.height);
+        let frame = jsonIAE["frames"][this.img+".png"]["frame"];
+        let frameWidth = frame["w"];
+        let frameHeight = frame["h"];
+
+        camera.drawImage(Img["IAE"], frameWidth, frameHeight, 0, 0, 0, this.position.x, this.position.y, this.width, this.height, frame["x"], frame["y"]);
     }
 
     hit = (category, entityCategory, entityId) => {

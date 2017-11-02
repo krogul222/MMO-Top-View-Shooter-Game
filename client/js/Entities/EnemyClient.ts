@@ -1,3 +1,4 @@
+import { Img, jsonIAE } from './../images';
 import { camera } from './../canvas';
 import { PlayerClient } from './PlayerClient';
 import { Point } from "../../../server/js/GeometryAndPhysics";
@@ -65,8 +66,9 @@ export class EnemyClient{
         y = y - (mouseY-HEIGHT/2)/CAMERA_BOX_ADJUSTMENT;  
 
 
-        let frameWidth = this.img.width/6;
-        let frameHeight = this.img.height/4;
+        let frameWidth = 32;
+        let frameHeight = 32;
+
         let aimAngle = this.aimAngle;
             
         if(aimAngle < 0){ aimAngle = 360 + aimAngle; }
@@ -85,8 +87,11 @@ export class EnemyClient{
         if(this.kind == 'zombie'){
             this.drawTopViewSprite(this.position.x, this.position.y, aimAngle);            
         } else{
+            let frame = jsonIAE["frames"][this.kind+".png"]["frame"];
+            frameWidth = frame["w"]/6;
+            frameHeight = frame["h"]/4;
             walkingMod = Math.floor(this.spriteAnimCounter) % 6; 
-            camera.drawImage(this.img, frameWidth, frameHeight, 0, directionMod, walkingMod, this.position.x-this.width/2, this.position.y-this.height/2, this.width, this.height);            
+            camera.drawImage(Img["IAE"], frameWidth, frameHeight, 0, directionMod, walkingMod, this.position.x-this.width/2, this.position.y-this.height/2, this.width, this.height, frame["x"], frame["y"]);            
         }
 
         camera.drawBar(this.position.x - hpWidth/2, this.position.y - 40, hpWidth, 4, 'red');  
@@ -106,10 +111,10 @@ export class EnemyClient{
         let spriteRows = 1;
         let walkingMod = Math.floor(this.spriteAnimCounter) % spriteColumns;
 
-        let frameWidth = Img[this.kind+'attack'].width/spriteColumns;
-        let frameHeight = Img[this.kind+'attack'].height/spriteRows;
-    
-        camera.drawImage(Img[this.kind+'attack'], frameWidth, frameHeight, aimAngle, 0, walkingMod, x, y, this.width, this.height);
+        let frame = jsonIAE["frames"][this.kind+"_attack.png"]["frame"];
+        let frameWidth = frame["w"]/spriteColumns;
+        let frameHeight = frame["h"]/spriteRows;
+        camera.drawImage(Img["IAE"], frameWidth, frameHeight, aimAngle, 0, walkingMod, x, y, this.width, this.height, frame["x"], frame["y"]);       
 
         if(this.spriteAnimCounter % spriteColumns >= (spriteColumns-1)){
             this.spriteAnimCounter = 0;
@@ -118,13 +123,15 @@ export class EnemyClient{
     }
 
     drawTopViewSpriteWalk = (x: number, y: number, aimAngle: number) => {
-        let frameWidth = this.img.width/framesMove[this.kind];
-        let frameHeight = this.img.height;
- 
+
         let walkingMod = Math.floor(this.spriteAnimCounter) % framesMove[this.kind];
 
-        camera.drawImage(this.img, frameWidth, frameHeight, aimAngle, 0, walkingMod, x, y, this.width, this.height);
-        
+        let frame = jsonIAE["frames"][this.kind+"_move.png"]["frame"];
+        let frameWidth = frame["w"]/framesMove[this.kind];
+        let frameHeight = frame["h"];
+        camera.drawImage(Img["IAE"], frameWidth, frameHeight, aimAngle, 0, walkingMod, x, y, this.width, this.height, frame["x"], frame["y"]);       
+
+
     }
 
     static list = {};

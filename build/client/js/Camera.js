@@ -69,7 +69,7 @@ class Camera {
                 this.ctx.fillRect(position.x, position.y, width, height);
             }
         };
-        this.drawImage = (img, frameWidth, frameHeight, aimAngle, directionMod, walkingMod, px, py, width, height) => {
+        this.drawImage = (img, frameWidth, frameHeight, aimAngle, directionMod, walkingMod, px, py, width, height, startx = 0, starty = 0) => {
             let position = this.getScreenPosition(new GeometryAndPhysics_1.Point(px, py));
             if ((position.x <= this.width || position.x + width >= 0) && (position.y + height >= 0 && position.y <= this.height)) {
                 if (aimAngle !== 0) {
@@ -77,10 +77,28 @@ class Camera {
                     this.ctx.translate(position.x - width / 2, position.y - height / 2);
                     this.ctx.translate(width / 2, height / 2);
                     this.ctx.rotate(aimAngle * Math.PI / 180);
-                    this.ctx.drawImage(img, walkingMod * frameWidth, directionMod * frameHeight, frameWidth, frameHeight, -width / 2, -height / 2, width, height);
+                    this.ctx.drawImage(img, startx + walkingMod * frameWidth, starty + directionMod * frameHeight, frameWidth, frameHeight, -width / 2, -height / 2, width, height);
                 }
                 else {
-                    this.ctx.drawImage(img, walkingMod * frameWidth, directionMod * frameHeight, frameWidth, frameHeight, position.x, position.y, width, height);
+                    this.ctx.drawImage(img, startx + walkingMod * frameWidth, starty + directionMod * frameHeight, frameWidth, frameHeight, position.x, position.y, width, height);
+                }
+                if (aimAngle !== 0) {
+                    this.ctx.restore();
+                }
+            }
+        };
+        this.drawImageFromTP = (img, startx, starty, imgWidth, imgHeight, frameWidth, frameHeight, aimAngle, directionMod, walkingMod, px, py, width, height) => {
+            let position = this.getScreenPosition(new GeometryAndPhysics_1.Point(px, py));
+            if ((position.x <= this.width || position.x + width >= 0) && (position.y + height >= 0 && position.y <= this.height)) {
+                if (aimAngle !== 0) {
+                    this.ctx.save();
+                    this.ctx.translate(position.x - width / 2, position.y - height / 2);
+                    this.ctx.translate(width / 2, height / 2);
+                    this.ctx.rotate(aimAngle * Math.PI / 180);
+                    this.ctx.drawImage(img, startx + walkingMod * frameWidth, starty + directionMod * frameHeight, frameWidth, frameHeight, -width / 2, -height / 2, width, height);
+                }
+                else {
+                    this.ctx.drawImage(img, startx + walkingMod * frameWidth, starty + directionMod * frameHeight, frameWidth, frameHeight, position.x, position.y, width, height);
                 }
                 if (aimAngle !== 0) {
                     this.ctx.restore();

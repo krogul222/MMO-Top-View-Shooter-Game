@@ -1,3 +1,4 @@
+import { Img, jsonIAE, jsonGUI } from './images';
 import { TILE_SIZE } from './../../server/js/Constants';
 import { GameMap } from './../../server/js/Map/GameMap';
 import { Rectangle, Point } from './../../server/js/GeometryAndPhysics';
@@ -43,23 +44,31 @@ export class GUI {
 
     drawWeapon = () => {
         if(PlayerClient.list[selfId]){
-            this.ctx.drawImage(Img[PlayerClient.list[selfId].weapon], 0, 0, Img[PlayerClient.list[selfId].weapon].width, Img[PlayerClient.list[selfId].weapon].height, (this.width-0.8*this.height)/4, (this.height-0.8*this.height)/2, 0.8*this.height, 0.8*this.height);
+            let frame = jsonIAE["frames"][PlayerClient.list[selfId].weapon+".png"]["frame"];
+            let frameWidth = frame["w"];
+            let frameHeight = frame["h"];
+            this.ctx.drawImage(Img["IAE"], frame["x"], frame["y"], frameWidth, frameHeight, (this.width-0.8*this.height)/4, (this.height-0.8*this.height)/2, 0.8*this.height, 0.8*this.height);
         }
     }
 
     drawAmmo = () => {
         if(PlayerClient.list[selfId]){
-            if(Img[PlayerClient.list[selfId].weapon+"ammo"]){
-                this.ctx.drawImage(Img[PlayerClient.list[selfId].weapon+"ammo"], 0, 0, Img[PlayerClient.list[selfId].weapon+"ammo"].width, Img[PlayerClient.list[selfId].weapon+"ammo"].height, 11*(this.width-0.8*this.height)/32, (this.height-0.4*this.height)/2, 0.4*this.height, 0.4*this.height); 
-                
-                this.ctx.fillText(' x'+PlayerClient.list[selfId].ammo+"  "+PlayerClient.list[selfId].ammoInGun+"/"+WeaponTypes.list[WeaponTypes.getWeaponIdbyName(PlayerClient.list[selfId].weapon)].reloadAmmo, 11*(this.width-0.8*this.height)/32+0.4*this.height, (this.height)/2+10);
-            }   
+            if(jsonIAE["frames"][PlayerClient.list[selfId].weapon+"ammo.png"] !== undefined){
+                let frame = jsonIAE["frames"][PlayerClient.list[selfId].weapon+"ammo.png"]["frame"];
+                let frameWidth = frame["w"];
+                let frameHeight = frame["h"];
+                this.ctx.drawImage(Img["IAE"], frame["x"], frame["y"], frameWidth, frameHeight, 11*(this.width-0.8*this.height)/32, (this.height-0.4*this.height)/2, 0.4*this.height, 0.4*this.height); 
+                this.ctx.fillText(' x'+PlayerClient.list[selfId].ammo+"  "+PlayerClient.list[selfId].ammoInGun+"/"+WeaponTypes.list[WeaponTypes.getWeaponIdbyName(PlayerClient.list[selfId].weapon)].reloadAmmo, 11*(this.width-0.8*this.height)/32+0.4*this.height, (this.height)/2+10); 
+            }
         }
     }
 
     drawItems = () => {
         if(PlayerClient.list[selfId]){
-            this.ctx.drawImage(Img["medicalkit"], 0, 0, Img["medicalkit"].width, Img["medicalkit"].height, 3*(this.width-0.8*this.height)/4, (this.height-0.8*this.height)/2, 0.8*this.height, 0.8*this.height);
+            let frame = jsonIAE["frames"]["medicalkit.png"]["frame"];
+            let frameWidth = frame["w"];
+            let frameHeight = frame["h"];
+            this.ctx.drawImage(Img["IAE"], frame["x"], frame["y"], frameWidth, frameHeight, 3*(this.width-0.8*this.height)/4, (this.height-0.8*this.height)/2, 0.8*this.height, 0.8*this.height);
             
             this.ctx.fillText(' x'+inventory.getItemAmount(ItemType.medicalkit), 3*(this.width-0.8*this.height)/4+0.8*this.height, (this.height)/2+10);
         }
@@ -69,8 +78,10 @@ export class GUI {
         let spriteRows = 2;
         let spriteColumns = 4;
         let facelook = 1;
-
-        this.ctx.drawImage(Img["faceborder"], 0, 0, Img["faceborder"].width, Img["faceborder"].height, (this.width-0.85*this.height)/2, (this.height-0.85*this.height)/2, 0.85*this.height, 0.85*this.height);
+        let frame = jsonGUI["frames"]["faceborder.png"]["frame"];
+        let frameWidth = frame["w"];
+        let frameHeight = frame["h"];
+        this.ctx.drawImage(Img["GUI"], frame["x"], frame["y"], frameWidth, frameHeight, (this.width-0.85*this.height)/2, (this.height-0.85*this.height)/2, 0.85*this.height, 0.85*this.height);
         
         if(PlayerClient.list[selfId]){ 
             facelook = Math.round(((PlayerClient.list[selfId].hpMax-PlayerClient.list[selfId].hp)/PlayerClient.list[selfId].hpMax)*(spriteRows*spriteColumns-1));
@@ -78,10 +89,11 @@ export class GUI {
             let facex = facelook % spriteColumns;
             let facey = Math.floor(facelook / spriteColumns);
             
-            let frameWidth = Img["face"].width/spriteColumns;
-            let frameHeight = Img["face"].height/spriteRows;
-            
-            this.ctx.drawImage(Img["face"], facex*frameWidth, facey*frameHeight, frameWidth, frameHeight, (this.width-0.8*this.height)/2, (this.height-0.8*this.height)/2, 0.8*this.height, 0.8*this.height);
+            let frame = jsonGUI["frames"]["face.png"]["frame"];
+            let frameWidth = frame["w"]/spriteColumns;
+            let frameHeight = frame["h"]/spriteRows;
+
+            this.ctx.drawImage(Img["GUI"], frame["x"]+facex*frameWidth, frame["y"]+ facey*frameHeight, frameWidth, frameHeight, (this.width-0.8*this.height)/2, (this.height-0.8*this.height)/2, 0.8*this.height, 0.8*this.height);
         }
     }
 

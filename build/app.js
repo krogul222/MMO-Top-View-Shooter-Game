@@ -7,6 +7,10 @@ const Enemy_1 = require("./server/js/Entities/Enemy");
 const Upgrade_1 = require("./server/js/Entities/Upgrade");
 var express = require('express');
 var mongojs = require('mongojs');
+var jsonGUI = require('./server/TexturePacks/GUIImages.json');
+var jsonPlayer = require('./server/TexturePacks/PlayerImages.json');
+var jsonMap = require('./server/TexturePacks/MapImages.json');
+var jsonIAE = require('./server/TexturePacks/ItemsAndEnemiesImages.json');
 var db = mongojs('mongodb://buka:buka123@ds123193.mlab.com:23193/brykiet', ['account', 'progress']);
 db.account.insert({ username: "buka", password: "buka" });
 var app = express();
@@ -15,7 +19,7 @@ app.get('/', function (request, response) {
     response.sendFile(__dirname + '/client/index.html');
 });
 app.use('/client', express.static(__dirname + '/client'));
-var listener = server.listen(process.env.PORT || 2000, function () {
+var listener = server.listen(process.env.PORT || 5000, function () {
     console.log('Example app listening on port ', listener.address().port);
 });
 console.log("Server started.");
@@ -43,6 +47,7 @@ io.sockets.on('connection', function (socket) {
     console.log("Socket connection");
     socket.id = Math.random();
     SOCKET_LIST[socket.id] = socket;
+    socket.emit('jsonImages', { jsonGUI: jsonGUI, jsonPlayer: jsonPlayer, jsonMap: jsonMap, jsonIAE: jsonIAE });
     socket.on('signIn', function (data) {
         isValidPassword(data, function (res) {
             if (res) {

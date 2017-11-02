@@ -1,4 +1,5 @@
 Object.defineProperty(exports, "__esModule", { value: true });
+const images_1 = require("./../images");
 const canvas_1 = require("./../canvas");
 const PlayerClient_1 = require("./PlayerClient");
 const GeometryAndPhysics_1 = require("../../../server/js/GeometryAndPhysics");
@@ -9,7 +10,7 @@ class EnemyClient {
         this.position = new GeometryAndPhysics_1.Point(250, 250);
         this.width = 0;
         this.height = 0;
-        this.img = Img["zombie"];
+        this.img = images_1.Img["zombie"];
         this.kind = "zombie";
         this.hp = 1;
         this.hpMax = 1;
@@ -35,8 +36,8 @@ class EnemyClient {
             x = x - (mouseX - WIDTH / 2) / CAMERA_BOX_ADJUSTMENT;
             let y = ey - (mainPlayery - HEIGHT / 2);
             y = y - (mouseY - HEIGHT / 2) / CAMERA_BOX_ADJUSTMENT;
-            let frameWidth = this.img.width / 6;
-            let frameHeight = this.img.height / 4;
+            let frameWidth = 32;
+            let frameHeight = 32;
             let aimAngle = this.aimAngle;
             if (aimAngle < 0) {
                 aimAngle = 360 + aimAngle;
@@ -56,8 +57,11 @@ class EnemyClient {
                 this.drawTopViewSprite(this.position.x, this.position.y, aimAngle);
             }
             else {
+                let frame = images_1.jsonIAE["frames"][this.kind + ".png"]["frame"];
+                frameWidth = frame["w"] / 6;
+                frameHeight = frame["h"] / 4;
                 walkingMod = Math.floor(this.spriteAnimCounter) % 6;
-                canvas_1.camera.drawImage(this.img, frameWidth, frameHeight, 0, directionMod, walkingMod, this.position.x - this.width / 2, this.position.y - this.height / 2, this.width, this.height);
+                canvas_1.camera.drawImage(images_1.Img["IAE"], frameWidth, frameHeight, 0, directionMod, walkingMod, this.position.x - this.width / 2, this.position.y - this.height / 2, this.width, this.height, frame["x"], frame["y"]);
             }
             canvas_1.camera.drawBar(this.position.x - hpWidth / 2, this.position.y - 40, hpWidth, 4, 'red');
         };
@@ -73,19 +77,21 @@ class EnemyClient {
             let spriteColumns = framesAttack[this.kind];
             let spriteRows = 1;
             let walkingMod = Math.floor(this.spriteAnimCounter) % spriteColumns;
-            let frameWidth = Img[this.kind + 'attack'].width / spriteColumns;
-            let frameHeight = Img[this.kind + 'attack'].height / spriteRows;
-            canvas_1.camera.drawImage(Img[this.kind + 'attack'], frameWidth, frameHeight, aimAngle, 0, walkingMod, x, y, this.width, this.height);
+            let frame = images_1.jsonIAE["frames"][this.kind + "_attack.png"]["frame"];
+            let frameWidth = frame["w"] / spriteColumns;
+            let frameHeight = frame["h"] / spriteRows;
+            canvas_1.camera.drawImage(images_1.Img["IAE"], frameWidth, frameHeight, aimAngle, 0, walkingMod, x, y, this.width, this.height, frame["x"], frame["y"]);
             if (this.spriteAnimCounter % spriteColumns >= (spriteColumns - 1)) {
                 this.spriteAnimCounter = 0;
                 this.attackStarted = false;
             }
         };
         this.drawTopViewSpriteWalk = (x, y, aimAngle) => {
-            let frameWidth = this.img.width / framesMove[this.kind];
-            let frameHeight = this.img.height;
             let walkingMod = Math.floor(this.spriteAnimCounter) % framesMove[this.kind];
-            canvas_1.camera.drawImage(this.img, frameWidth, frameHeight, aimAngle, 0, walkingMod, x, y, this.width, this.height);
+            let frame = images_1.jsonIAE["frames"][this.kind + "_move.png"]["frame"];
+            let frameWidth = frame["w"] / framesMove[this.kind];
+            let frameHeight = frame["h"];
+            canvas_1.camera.drawImage(images_1.Img["IAE"], frameWidth, frameHeight, aimAngle, 0, walkingMod, x, y, this.width, this.height, frame["x"], frame["y"]);
         };
         if (initPack.id)
             this.id = initPack.id;
@@ -98,7 +104,7 @@ class EnemyClient {
         if (initPack.weapon)
             this.weapon = initPack.weapon;
         if (initPack.img)
-            this.img = Img[initPack.img];
+            this.img = images_1.Img[initPack.img];
         if (initPack.hp)
             this.hp = initPack.hp;
         if (initPack.hpMax)

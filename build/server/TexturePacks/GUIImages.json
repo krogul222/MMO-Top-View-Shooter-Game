@@ -1,0 +1,44 @@
+{"frames": {
+
+"cursor.png":
+{
+	"frame": {"x":2,"y":2,"w":420,"h":420},
+	"rotated": false,
+	"trimmed": false,
+	"spriteSourceSize": {"x":0,"y":0,"w":420,"h":420},
+	"sourceSize": {"w":420,"h":420}
+},
+"face.png":
+{
+	"frame": {"x":424,"y":2,"w":579,"h":382},
+	"rotated": false,
+	"trimmed": false,
+	"spriteSourceSize": {"x":0,"y":0,"w":579,"h":382},
+	"sourceSize": {"w":579,"h":382}
+},
+"faceborder.png":
+{
+	"frame": {"x":2,"y":424,"w":155,"h":204},
+	"rotated": false,
+	"trimmed": false,
+	"spriteSourceSize": {"x":0,"y":0,"w":155,"h":204},
+	"sourceSize": {"w":155,"h":204}
+},
+"guibackground.jpg":
+{
+	"frame": {"x":159,"y":424,"w":852,"h":480},
+	"rotated": false,
+	"trimmed": false,
+	"spriteSourceSize": {"x":0,"y":0,"w":852,"h":480},
+	"sourceSize": {"w":852,"h":480}
+}},
+"meta": {
+	"app": "http://www.texturepacker.com",
+	"version": "1.0",
+	"image": "GUIImages.png",
+	"format": "RGBA8888",
+	"size": {"w":1024,"h":1024},
+	"scale": "1",
+	"smartupdate": "$TexturePacker:SmartUpdate:28b896105c192947f1708b37d72ccfd3$"
+}
+}
