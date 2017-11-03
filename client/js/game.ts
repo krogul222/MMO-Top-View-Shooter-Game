@@ -1,3 +1,5 @@
+import { Particle } from './Particle';
+import { Effects } from './Effects';
 import { Filters } from './Filters';
 import { Point } from './../../server/js/GeometryAndPhysics';
 import { camera } from './canvas';
@@ -24,7 +26,7 @@ declare var mouseY: any;
 declare var gui: GUI;
 
 export var selfId: number = 0;
-
+let smokeTest: boolean = false;
 
 export let inventory = new Inventory(socket, false, 0);
 
@@ -40,6 +42,7 @@ socket.on('updateInventory', function(items){
 export let gameSoundManager = new GameSoundManager();
 
 export let canvasFilters: Filters = new Filters(ctx);
+export let effects: Effects = new Effects(ctx);
 
 socket.on('mapData', function(data){
     MapController.updateMap(data);
@@ -285,6 +288,9 @@ setInterval(function(){
         } 
     }
 
+    effects.draw();
+    effects.update();
+
 }, 40);
 
 
@@ -319,6 +325,28 @@ document.onkeydown = function(event){
     }
     else if(event.keyCode === 109){
         canvasFilters.bAdjustment--;
+    }
+    else if(event.keyCode === 79){
+        if(smokeTest){
+            for(let i in Particle.list){
+                delete Particle.list[i];
+            }
+            smokeTest = false;
+        } else{
+            effects.initSmoke(60);
+            smokeTest = true;
+        }
+        
+    }
+    else if(event.keyCode === 38){
+        if(smokeTest){
+            effects.initSmoke(60);
+        }
+    }
+    else if(event.keyCode === 40){
+        if(smokeTest){
+            effects.decreaseSmoke(60);
+        }
     }
     else if(event.keyCode === 80){
         let elt = document.getElementById("gameDiv");

@@ -9,6 +9,8 @@ Img.map = {}
 Img.guibackground = new Image();
 Img.guibackground.src = '/client/img/guibackground.jpg'
 
+Img.smoke = new Image();
+Img.smoke.src = '/client/img/smoke.png'
 
 
 socket.on('jsonImages', function(data){
