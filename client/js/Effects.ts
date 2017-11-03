@@ -47,6 +47,9 @@ export class Effects{
     update = () => {
         for(let i in Particle.list){
             Particle.list[i].update();
+            if(Particle.list[i].lifeTime <=0){
+                delete Particle.list[i];
+            }
         }
     }
 

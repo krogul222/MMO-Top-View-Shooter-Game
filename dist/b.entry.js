@@ -1538,9 +1538,12 @@ class Particle {
         this.position = new GeometryAndPhysics_1.Point(0, 0);
         this.velocity = new GeometryAndPhysics_1.Point(0, 0);
         this.radius = 5;
+        this.maxLifeTime = 100;
         this.draw = () => {
             if (this.image) {
+                this.ctx.globalAlpha = this.lifeTime / this.maxLifeTime;
                 this.ctx.drawImage(this.image, this.position.x - 128, this.position.y - 128);
+                this.ctx.globalAlpha = 1.0;
                 return;
             }
             this.ctx.beginPath();
@@ -1568,12 +1571,15 @@ class Particle {
                 this.velocity.y = -this.velocity.y;
                 this.position.y = 0;
             }
+            this.lifeTime--;
         };
         this.setImage = (image) => {
             this.image = image;
         };
         let id = Math.random();
         Particle.list[id] = this;
+        this.maxLifeTime += Math.random() * 800;
+        this.lifeTime = this.maxLifeTime;
     }
 }
 Particle.list = {};
@@ -2240,6 +2246,9 @@ class Effects {
         this.update = () => {
             for (let i in Particle_1.Particle.list) {
                 Particle_1.Particle.list[i].update();
+                if (Particle_1.Particle.list[i].lifeTime <= 0) {
+                    delete Particle_1.Particle.list[i];
+                }
             }
         };
     }

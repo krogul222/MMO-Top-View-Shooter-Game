@@ -9,18 +9,24 @@ export class Particle {
     position: Point = new Point(0, 0);  // Set the initial x and y positions
     velocity: Point = new Point(0, 0);  // Set the initial velocity
     radius: number = 5;
+    maxLifeTime: number = 100;
+    lifeTime: number;
     image;
 
     constructor(private ctx){
         let id = Math.random();
         Particle.list[id] = this;
+        this.maxLifeTime += Math.random()*800;
+        this.lifeTime = this.maxLifeTime;
     }
 
     draw = () => {   // The function to draw the particle on the canvas.
         
      // If an image is set draw it
         if(this.image){
-            this.ctx.drawImage(this.image, this.position.x-128, this.position.y-128);         
+            this.ctx.globalAlpha = this.lifeTime/this.maxLifeTime;
+            this.ctx.drawImage(this.image, this.position.x-128, this.position.y-128);   
+            this.ctx.globalAlpha = 1.0;      
             return;
         }
 
@@ -56,6 +62,7 @@ export class Particle {
             this.position.y = 0;
         }
 
+        this.lifeTime--;
     }
 
     setImage = (image) =>{
