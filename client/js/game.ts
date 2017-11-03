@@ -1,3 +1,4 @@
+import { Filters } from './Filters';
 import { Point } from './../../server/js/GeometryAndPhysics';
 import { camera } from './canvas';
 import { GameMap } from './../../server/js/Map/GameMap';
@@ -37,6 +38,8 @@ socket.on('updateInventory', function(items){
 });
 
 export let gameSoundManager = new GameSoundManager();
+
+export let canvasFilters: Filters = new Filters(ctx);
 
 socket.on('mapData', function(data){
     MapController.updateMap(data);
@@ -228,6 +231,10 @@ setInterval(function(){
     
     ctx.clearRect(0,0,WIDTH,HEIGHT);
     currentMap.draw();
+    
+    //canvasFilters.getImageFromCanvas();
+    //canvasFilters.bright(0);
+    //canvasFilters.blur();
 
     for(let i in PlayerClient.list){
         if(PlayerClient.list[i].moving){
@@ -306,6 +313,12 @@ document.onkeydown = function(event){
     }
     else if(event.keyCode === 77){
         socket.emit('keyPress', {inputId:'map', state:true, map: currentMap.map.name});
+    }
+    else if(event.keyCode === 107){
+        canvasFilters.bAdjustment++;
+    }
+    else if(event.keyCode === 109){
+        canvasFilters.bAdjustment--;
     }
     else if(event.keyCode === 80){
         let elt = document.getElementById("gameDiv");

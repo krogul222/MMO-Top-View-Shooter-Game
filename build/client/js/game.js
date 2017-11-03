@@ -176,7 +176,9 @@ setInterval(function () {
         return;
     }
     ctx.clearRect(0, 0, WIDTH, HEIGHT);
+    ctx.filter = 'blur(1px)';
     exports.currentMap.draw();
+    ctx.filter = 'none';
     for (let i in PlayerClient_1.PlayerClient.list) {
         if (PlayerClient_1.PlayerClient.list[i].moving) {
             PlayerClient_1.PlayerClient.list[i].walkSpriteAnimCounter += 1;

@@ -71,10 +71,12 @@ class Player extends Actor_1.Actor {
         globalVariables_1.initPack.player.push(this.getInitPack());
         Player.list[param.id] = this;
         this.giveItems();
-        Enemy_1.Enemy.randomlyGenerate(this.map);
-        Enemy_1.Enemy.randomlyGenerate(this.map);
-        Enemy_1.Enemy.randomlyGenerate(this.map);
-        Enemy_1.Enemy.randomlyGenerate(this.map);
+        for (let i = 0; i < 1; i++) {
+            Enemy_1.Enemy.randomlyGenerate(this.map);
+            Enemy_1.Enemy.randomlyGenerate(this.map);
+            Enemy_1.Enemy.randomlyGenerate(this.map);
+            Enemy_1.Enemy.randomlyGenerate(this.map);
+        }
     }
 }
 Player.onConnect = (socket) => {

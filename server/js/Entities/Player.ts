@@ -15,10 +15,13 @@ export class Player extends Actor {
         initPack.player.push(this.getInitPack());
         Player.list[param.id] = this;
         this.giveItems();
+
+        for(let i = 0 ; i <1; i++){
         Enemy.randomlyGenerate(this.map);
         Enemy.randomlyGenerate(this.map);
         Enemy.randomlyGenerate(this.map);
         Enemy.randomlyGenerate(this.map);
+        }
     } 
 
     giveItems = () => {
