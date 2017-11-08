@@ -1,3 +1,4 @@
+import { Smoke } from './../Effects/Smoke';
 import { initPack, removePack } from './../globalVariables';
 import { Enemy } from './Enemy';
 import { Bullet } from './Bullet';
@@ -107,6 +108,7 @@ export class Player extends Actor {
             if(data.inputId == '3') player.attackController.weaponCollection.changeWeapon(WeaponType.shotgun); 
             if(data.inputId == '4') player.attackController.weaponCollection.changeWeapon(WeaponType.rifle); 
             if(data.inputId == 'space') player.attackController.weaponCollection.chooseNextWeaponWithAmmo();
+            if(data.inputId == 'smoke') new Smoke(new Point(player.position.x -128,player.position.y -128), 150, 750, 20, player.map);
             if(data.inputId == 'map'){
                 let gameMap : GameMap = MapController.getMap(data.map);
                 MapController.createMap(data.map, gameMap.size, 20);

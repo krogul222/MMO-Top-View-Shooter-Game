@@ -3,6 +3,8 @@ exports.Img = {};
 exports.Img.map = {};
 exports.Img.guibackground = new Image();
 exports.Img.guibackground.src = '/client/img/guibackground.jpg';
+exports.Img.smoke = new Image();
+exports.Img.smoke.src = '/client/img/smoke.png';
 socket.on('jsonImages', function (data) {
     console.log(data.jsonGUI);
     console.log(data.jsonPlayer);

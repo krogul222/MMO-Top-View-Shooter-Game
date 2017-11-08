@@ -91,6 +91,15 @@ export class Camera {
         }
     }
 
+    drawSimpleImage = (img,px,py) =>{
+        
+                let position = this.getScreenPosition(new Point(px,py));
+        
+                if((position.x <= this.width || position.x +200 >= 0) && (position.y+200 >= 0 && position.y <= this.height) ){
+                    this.ctx.drawImage(img, position.x, position.y);
+                }
+            }
+
     drawImage = (img, frameWidth, frameHeight, aimAngle, directionMod, walkingMod, px, py, width, height, startx = 0, starty = 0) => {
 
         let position = this.getScreenPosition(new Point(px,py));

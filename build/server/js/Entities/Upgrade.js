@@ -44,7 +44,7 @@ Upgrade.updateParam = (param) => {
 };
 Upgrade.update = () => {
     let pack = [];
-    if (app_1.frameCount % 25 === 0)
+    if (app_1.frameCount % 750 === 0)
         Upgrade.randomlyGenerate('forest');
     for (let key in Upgrade.list) {
         let upgrade = Upgrade.list[key];

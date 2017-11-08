@@ -1,3 +1,4 @@
+import { Smoke } from './server/js/Effects/Smoke';
 import { MapController } from './server/js/Controllers/MapControler';
 import { Player } from './server/js/Entities/Player';
 import { Entity } from './server/js/Entities/Entity';
@@ -24,7 +25,7 @@ app.get('/',function(request,response){
 
 app.use('/client', express.static(__dirname+'/client'));
 
-var listener = server.listen(process.env.PORT || 2000, function() {
+var listener = server.listen(process.env.PORT || 5000, function() {
   console.log('Example app listening on port ', listener.address().port);
 });
 
@@ -117,7 +118,8 @@ setInterval(function(){
         player: Player.update(),
         bullet: Bullet.update(),
         enemy: Enemy.update(),
-        upgrade: Upgrade.update()
+        smoke: Smoke.update()
+       // upgrade: Upgrade.update()
     }
     
     frameCount++;
@@ -136,10 +138,12 @@ setInterval(function(){
     packs.initPack.player = [];
     packs.initPack.bullet = [];
     packs.initPack.enemy = [];
+    packs.initPack.smoke = [];
     packs.initPack.upgrade = [];
     
     packs.removePack.player = [];
     packs.removePack.bullet = [];
     packs.removePack.enemy = [];
     packs.removePack.upgrade = [];
+    packs.removePack.smoke = [];
 }, 1000/25);

@@ -1,4 +1,5 @@
 Object.defineProperty(exports, "__esModule", { value: true });
+const Smoke_1 = require("./../Effects/Smoke");
 const globalVariables_1 = require("./../globalVariables");
 const Enemy_1 = require("./Enemy");
 const Bullet_1 = require("./Bullet");
@@ -127,6 +128,8 @@ Player.onConnect = (socket) => {
             player.attackController.weaponCollection.changeWeapon(enums_1.WeaponType.rifle);
         if (data.inputId == 'space')
             player.attackController.weaponCollection.chooseNextWeaponWithAmmo();
+        if (data.inputId == 'smoke')
+            new Smoke_1.Smoke(new GeometryAndPhysics_1.Point(player.position.x - 128, player.position.y - 128), 150, 750, 20, player.map);
         if (data.inputId == 'map') {
             let gameMap = MapControler_1.MapController.getMap(data.map);
             MapControler_1.MapController.createMap(data.map, gameMap.size, 20);

@@ -69,6 +69,12 @@ class Camera {
                 this.ctx.fillRect(position.x, position.y, width, height);
             }
         };
+        this.drawSimpleImage = (img, px, py) => {
+            let position = this.getScreenPosition(new GeometryAndPhysics_1.Point(px, py));
+            if ((position.x <= this.width || position.x + 200 >= 0) && (position.y + 200 >= 0 && position.y <= this.height)) {
+                this.ctx.drawImage(img, position.x, position.y);
+            }
+        };
         this.drawImage = (img, frameWidth, frameHeight, aimAngle, directionMod, walkingMod, px, py, width, height, startx = 0, starty = 0) => {
             let position = this.getScreenPosition(new GeometryAndPhysics_1.Point(px, py));
             if ((position.x <= this.width || position.x + width >= 0) && (position.y + height >= 0 && position.y <= this.height)) {

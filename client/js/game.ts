@@ -1,3 +1,4 @@
+import { SmokeClient } from './SmokeClient';
 import { Particle } from './Particle';
 import { Effects } from './Effects';
 import { Filters } from './Filters';
@@ -59,6 +60,11 @@ socket.on('init', function(data){
    for(let i = 0, length = data.player.length; i < length; i++){
        new PlayerClient(data.player[i]);
    } 
+   if(data.smoke !== undefined){
+        for(let i = 0, length = data.smoke.length; i < length; i++){
+            new SmokeClient(data.smoke[i]);
+        }    
+    }
 
    for(let i = 0, length = data.bullet.length; i < length; i++){
         new BulletClient(data.bullet[i]);  
@@ -196,6 +202,20 @@ socket.on('update', function(data){
         }
     }
 
+    for(let i = 0, length = data.smoke.length; i < length ; i++){
+        let pack = data.smoke[i];
+        let s: SmokeClient = SmokeClient.list[pack.id];
+        if(s){
+            if(pack.radius !== undefined){
+                //console.log("Radius "+ pack.radius);
+                if(s.radius !== pack.radius){
+                    s.radius = pack.radius;
+                    s.updateRadius();
+                }
+            } 
+        }
+    }
+
     gui.draw();
     if(PlayerClient.list[selfId] !== undefined){ 
         camera.updatePosition(PlayerClient.list[selfId].position);
@@ -224,6 +244,10 @@ socket.on('remove', function(data){
     
     for(let i = 0, length = data.upgrade.length; i < length; i++){
         delete UpgradeClient.list[data.upgrade[i]];
+    } 
+
+    for(let i = 0, length = data.smoke.length; i < length; i++){
+        delete SmokeClient.list[data.smoke[i]];
     } 
  });
 
@@ -291,6 +315,11 @@ setInterval(function(){
     effects.draw();
     effects.update();
 
+    for(let i in SmokeClient.list){
+        SmokeClient.list[i].update();
+        SmokeClient.list[i].draw();
+    }
+
 }, 40);
 
 
@@ -320,13 +349,16 @@ document.onkeydown = function(event){
     else if(event.keyCode === 77){
         socket.emit('keyPress', {inputId:'map', state:true, map: currentMap.map.name});
     }
-    else if(event.keyCode === 107){
+    
+    if(event.keyCode === 107){
         canvasFilters.bAdjustment++;
     }
-    else if(event.keyCode === 109){
+    
+    if(event.keyCode === 109){
         canvasFilters.bAdjustment--;
     }
-    else if(event.keyCode === 79){
+    
+    if(event.keyCode === 79){
         if(smokeTest){
             for(let i in Particle.list){
                 delete Particle.list[i];
@@ -338,17 +370,24 @@ document.onkeydown = function(event){
         }
         
     }
-    else if(event.keyCode === 38){
+    
+    if(event.keyCode === 38){
         if(smokeTest){
             effects.initSmoke(60);
         }
     }
-    else if(event.keyCode === 40){
+    
+    if(event.keyCode === 40){
         if(smokeTest){
             effects.decreaseSmoke(60);
         }
     }
-    else if(event.keyCode === 80){
+
+    if(event.keyCode === 66){
+        socket.emit('keyPress', {inputId:'smoke'});
+    }
+    
+    if(event.keyCode === 80){
         let elt = document.getElementById("gameDiv");
             console.log("Requesting fullscreen for", elt);
             if (elt.requestFullscreen) {

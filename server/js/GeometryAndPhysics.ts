@@ -36,6 +36,20 @@ export class Point {
     }
 }
 
+export let getRandomInCircle = (position: Point, radius: number) => {
+
+    let dist = (Math.random()*radius);
+
+    let angle = Math.random()*360;
+
+    let newPosition = new Point(position.x, position.y);
+
+    newPosition.x += Math.ceil(Math.cos((angle/360)*2*Math.PI)*dist);
+    newPosition.y += Math.ceil(Math.sin((angle/360)*2*Math.PI)*dist);
+
+    return newPosition;
+}
+
 export class Size {
     constructor(public width: number = 0, public height: number = 0) {}
 }

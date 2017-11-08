@@ -5,11 +5,14 @@ import { Point } from '../GeometryAndPhysics';
 import { initPack, removePack } from '../globalVariables';
 import { WeaponType } from '../enums';
 import { MapController } from '../Controllers/MapControler';
+//import { frameCount } from '../../../app';
 
 export class Enemy extends Actor {
 
     toRemove: boolean = false;
     private kind: string = "";
+    private playerToKill: Player;
+    private counter: number = 0;
 
     static globalMapControler = new MapController(null); 
     public superUpdate;
@@ -28,19 +31,24 @@ export class Enemy extends Actor {
     extendedUpdate = () => {
         this.update();
         
-        let player: Player = this.getClosestPlayer(10000, 360);
+        if( this.playerToKill == undefined || this.counter % 40 === 0)
+            this.playerToKill = this.getClosestPlayer(10000, 360);
 
         let diffX = 0;
         let diffY = 0;
         
-        if(player){
-            diffX = player.position.x - this.position.x;
-		    diffY = player.position.y - this.position.y;
+        if(this.playerToKill){
+            diffX = this.playerToKill.position.x - this.position.x;
+		    diffY = this.playerToKill.position.y - this.position.y;
         }
 
-		this.updateAim(player, diffX, diffY);
-		this.updateKeyPress(player, diffX, diffY);
-        this.updateAttack(player, diffX, diffY);
+        if(  this.counter % 10 === 0){
+            this.updateAim(this.playerToKill, diffX, diffY);
+            this.updateKeyPress(this.playerToKill, diffX, diffY);
+        }
+
+        this.updateAttack(this.playerToKill, diffX, diffY);
+        this.counter++;
 	}
 
     updateAim = (player: Player, diffX: number, diffY: number) => {

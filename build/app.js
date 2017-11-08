@@ -1,10 +1,10 @@
 Object.defineProperty(exports, "__esModule", { value: true });
+const Smoke_1 = require("./server/js/Effects/Smoke");
 const MapControler_1 = require("./server/js/Controllers/MapControler");
 const Player_1 = require("./server/js/Entities/Player");
 const Entity_1 = require("./server/js/Entities/Entity");
 const Bullet_1 = require("./server/js/Entities/Bullet");
 const Enemy_1 = require("./server/js/Entities/Enemy");
-const Upgrade_1 = require("./server/js/Entities/Upgrade");
 var express = require('express');
 var mongojs = require('mongojs');
 var jsonGUI = require('./server/TexturePacks/GUIImages.json');
@@ -19,7 +19,7 @@ app.get('/', function (request, response) {
     response.sendFile(__dirname + '/client/index.html');
 });
 app.use('/client', express.static(__dirname + '/client'));
-var listener = server.listen(process.env.PORT || 2000, function () {
+var listener = server.listen(process.env.PORT || 5000, function () {
     console.log('Example app listening on port ', listener.address().port);
 });
 console.log("Server started.");
@@ -96,7 +96,7 @@ setInterval(function () {
         player: Player_1.Player.update(),
         bullet: Bullet_1.Bullet.update(),
         enemy: Enemy_1.Enemy.update(),
-        upgrade: Upgrade_1.Upgrade.update()
+        smoke: Smoke_1.Smoke.update()
     };
     exports.frameCount++;
     for (let i in SOCKET_LIST) {
@@ -112,10 +112,12 @@ setInterval(function () {
     packs.initPack.player = [];
     packs.initPack.bullet = [];
     packs.initPack.enemy = [];
+    packs.initPack.smoke = [];
     packs.initPack.upgrade = [];
     packs.removePack.player = [];
     packs.removePack.bullet = [];
     packs.removePack.enemy = [];
     packs.removePack.upgrade = [];
+    packs.removePack.smoke = [];
 }, 1000 / 25);
 //# sourceMappingURL=app.js.map

@@ -1,4 +1,8 @@
 Object.defineProperty(exports, "__esModule", { value: true });
+const SmokeClient_1 = require("./SmokeClient");
+const Particle_1 = require("./Particle");
+const Effects_1 = require("./Effects");
+const Filters_1 = require("./Filters");
 const canvas_1 = require("./canvas");
 const MapControler_1 = require("./../../server/js/Controllers/MapControler");
 const GameSoundManager_1 = require("./GameSoundManager");
@@ -10,6 +14,7 @@ const EnemyClient_1 = require("./Entities/EnemyClient");
 const ExplosionClient_1 = require("./Entities/ExplosionClient");
 const Inventory_1 = require("../../server/js/Inventory/Inventory");
 exports.selfId = 0;
+let smokeTest = false;
 exports.inventory = new Inventory_1.Inventory(socket, false, 0);
 MapControler_1.MapController.loadMaps();
 exports.currentMap = new MapClient_1.MapClient(null, "forest");
@@ -18,6 +23,8 @@ socket.on('updateInventory', function (items) {
     exports.inventory.refreshRender();
 });
 exports.gameSoundManager = new GameSoundManager_1.GameSoundManager();
+exports.canvasFilters = new Filters_1.Filters(ctx);
+exports.effects = new Effects_1.Effects(ctx);
 socket.on('mapData', function (data) {
     MapControler_1.MapController.updateMap(data);
     if (exports.currentMap.name == data.name) {
@@ -31,6 +38,11 @@ socket.on('init', function (data) {
     }
     for (let i = 0, length = data.player.length; i < length; i++) {
         new PlayerClient_1.PlayerClient(data.player[i]);
+    }
+    if (data.smoke !== undefined) {
+        for (let i = 0, length = data.smoke.length; i < length; i++) {
+            new SmokeClient_1.SmokeClient(data.smoke[i]);
+        }
     }
     for (let i = 0, length = data.bullet.length; i < length; i++) {
         new BulletClient_1.BulletClient(data.bullet[i]);
@@ -145,6 +157,18 @@ socket.on('update', function (data) {
             }
         }
     }
+    for (let i = 0, length = data.smoke.length; i < length; i++) {
+        let pack = data.smoke[i];
+        let s = SmokeClient_1.SmokeClient.list[pack.id];
+        if (s) {
+            if (pack.radius !== undefined) {
+                if (s.radius !== pack.radius) {
+                    s.radius = pack.radius;
+                    s.updateRadius();
+                }
+            }
+        }
+    }
     gui.draw();
     if (PlayerClient_1.PlayerClient.list[exports.selfId] !== undefined) {
         canvas_1.camera.updatePosition(PlayerClient_1.PlayerClient.list[exports.selfId].position);
@@ -170,15 +194,16 @@ socket.on('remove', function (data) {
     for (let i = 0, length = data.upgrade.length; i < length; i++) {
         delete UpgradeClient_1.UpgradeClient.list[data.upgrade[i]];
     }
+    for (let i = 0, length = data.smoke.length; i < length; i++) {
+        delete SmokeClient_1.SmokeClient.list[data.smoke[i]];
+    }
 });
 setInterval(function () {
     if (!exports.selfId) {
         return;
     }
     ctx.clearRect(0, 0, WIDTH, HEIGHT);
-    ctx.filter = 'blur(1px)';
     exports.currentMap.draw();
-    ctx.filter = 'none';
     for (let i in PlayerClient_1.PlayerClient.list) {
         if (PlayerClient_1.PlayerClient.list[i].moving) {
             PlayerClient_1.PlayerClient.list[i].walkSpriteAnimCounter += 1;
@@ -221,6 +246,12 @@ setInterval(function () {
             ExplosionClient_1.ExplosionClient.list[i].draw();
         }
     }
+    exports.effects.draw();
+    exports.effects.update();
+    for (let i in SmokeClient_1.SmokeClient.list) {
+        SmokeClient_1.SmokeClient.list[i].update();
+        SmokeClient_1.SmokeClient.list[i].draw();
+    }
 }, 40);
 document.onkeydown = function (event) {
     if (event.keyCode === 68)
@@ -248,7 +279,38 @@ document.onkeydown = function (event) {
     else if (event.keyCode === 77) {
         socket.emit('keyPress', { inputId: 'map', state: true, map: exports.currentMap.map.name });
     }
-    else if (event.keyCode === 80) {
+    if (event.keyCode === 107) {
+        exports.canvasFilters.bAdjustment++;
+    }
+    if (event.keyCode === 109) {
+        exports.canvasFilters.bAdjustment--;
+    }
+    if (event.keyCode === 79) {
+        if (smokeTest) {
+            for (let i in Particle_1.Particle.list) {
+                delete Particle_1.Particle.list[i];
+            }
+            smokeTest = false;
+        }
+        else {
+            exports.effects.initSmoke(60);
+            smokeTest = true;
+        }
+    }
+    if (event.keyCode === 38) {
+        if (smokeTest) {
+            exports.effects.initSmoke(60);
+        }
+    }
+    if (event.keyCode === 40) {
+        if (smokeTest) {
+            exports.effects.decreaseSmoke(60);
+        }
+    }
+    if (event.keyCode === 66) {
+        socket.emit('keyPress', { inputId: 'smoke' });
+    }
+    if (event.keyCode === 80) {
         let elt = document.getElementById("gameDiv");
         console.log("Requesting fullscreen for", elt);
         if (elt.requestFullscreen) {

@@ -46,6 +46,12 @@ class MapClient {
                                 canvas_1.camera.drawImage(images_1.Img["Map"], imgWidth, imgHeight, 0, 0, 0, (imgWidth - 1) * j, (imgHeight - 1) * i, imgWidth, imgHeight, mapFrame["x"], mapFrame["y"]);
                             }
                         }
+                    }
+                }
+                game_1.canvasFilters.getImageFromCanvas();
+                game_1.canvasFilters.bright(-50);
+                for (let i = 0; i < size; i++) {
+                    for (let j = 0; j < size; j++) {
                         for (let k = 0; k < this.map.mapTiles[i][j].objects.length; k++) {
                             if (this.map.mapTiles[i][j].objects[k] > 0) {
                                 mapFrame = frame[Constants_1.mapObjectImageName[this.map.mapTiles[i][j].objects[k]] + ".png"]["frame"];

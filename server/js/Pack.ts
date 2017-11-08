@@ -9,6 +9,7 @@ export class Pack {
     public bullet: any[] = [];
     public enemy: any[] = [];
     public upgrade: any[] = [];
-
+    public smoke: any[] = [];
+    
     constructor(){}
 }

@@ -9,18 +9,23 @@ class Enemy extends Actor_1.Actor {
         super(param);
         this.toRemove = false;
         this.kind = "";
+        this.counter = 0;
         this.extendedUpdate = () => {
             this.update();
-            let player = this.getClosestPlayer(10000, 360);
+            if (this.playerToKill == undefined || this.counter % 40 === 0)
+                this.playerToKill = this.getClosestPlayer(10000, 360);
             let diffX = 0;
             let diffY = 0;
-            if (player) {
-                diffX = player.position.x - this.position.x;
-                diffY = player.position.y - this.position.y;
+            if (this.playerToKill) {
+                diffX = this.playerToKill.position.x - this.position.x;
+                diffY = this.playerToKill.position.y - this.position.y;
             }
-            this.updateAim(player, diffX, diffY);
-            this.updateKeyPress(player, diffX, diffY);
-            this.updateAttack(player, diffX, diffY);
+            if (this.counter % 10 === 0) {
+                this.updateAim(this.playerToKill, diffX, diffY);
+                this.updateKeyPress(this.playerToKill, diffX, diffY);
+            }
+            this.updateAttack(this.playerToKill, diffX, diffY);
+            this.counter++;
         };
         this.updateAim = (player, diffX, diffY) => {
             this.movementController.aimAngle = Math.atan2(diffY, diffX) / Math.PI * 180;
