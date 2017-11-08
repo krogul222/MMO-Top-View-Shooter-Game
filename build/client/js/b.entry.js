@@ -2612,7 +2612,8 @@ class SmokeParticle {
                 this.velocity.y = -this.velocity.y;
                 this.position.y = this.center.y - this.radius;
             }
-            this.lifeTime--;
+            if (this.lifeTime > 0)
+                this.lifeTime--;
         };
         this.setImage = (image) => {
             this.image = image;

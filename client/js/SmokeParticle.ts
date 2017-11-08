@@ -74,6 +74,7 @@ export class SmokeParticle {
             this.position.y = this.center.y-this.radius;
         }
 
+        if(this.lifeTime > 0)
         this.lifeTime--;
     }
 
