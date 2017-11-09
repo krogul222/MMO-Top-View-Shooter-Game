@@ -63,7 +63,7 @@ export class PlayerClient{
 
         let aimAngle: number = this.aimAngle;
         
-        aimAngle = (aimAngle < 0) ? (360 + aimAngle) : aimAngle;
+     //   aimAngle = (aimAngle < 0) ? (360 + aimAngle) : aimAngle;
         let directionMod: number = this.inWhichDirection(aimAngle);
         let walkingMod = Math.floor(this.walkSpriteAnimCounter) % spriteColumns;
 

@@ -1,3 +1,4 @@
+import { FireFlameClient } from './FireFlameClient';
 import { SmokeClient } from './SmokeClient';
 import { Particle } from './Particle';
 import { Effects } from './Effects';
@@ -28,6 +29,8 @@ declare var gui: GUI;
 
 export var selfId: number = 0;
 let smokeTest: boolean = false;
+let flameModeOn = false;
+let flameFire = false;
 
 export let inventory = new Inventory(socket, false, 0);
 
@@ -44,6 +47,8 @@ export let gameSoundManager = new GameSoundManager();
 
 export let canvasFilters: Filters = new Filters(ctx);
 export let effects: Effects = new Effects(ctx);
+
+let flame = new FireFlameClient(new Point(250,250), 0);
 
 socket.on('mapData', function(data){
     MapController.updateMap(data);
@@ -110,7 +115,7 @@ socket.on('update', function(data){
                p.moving = pack.moving;
            } 
            if(pack.aimAngle !== undefined){
-               p.aimAngle = pack.aimAngle;
+            //   p.aimAngle = pack.aimAngle;
            } 
 
            if(pack.ammo !== undefined){
@@ -312,6 +317,9 @@ setInterval(function(){
         } 
     }
 
+    flame.update(flameFire);
+    flame.draw();
+    
     effects.draw();
     effects.update();
 
@@ -319,6 +327,8 @@ setInterval(function(){
         SmokeClient.list[i].update();
         SmokeClient.list[i].draw();
     }
+
+
 
 }, 40);
 
@@ -387,6 +397,10 @@ document.onkeydown = function(event){
         socket.emit('keyPress', {inputId:'smoke'});
     }
     
+    if(event.keyCode === 70){
+        flameModeOn = flameModeOn ? false: true;
+    }
+
     if(event.keyCode === 80){
         let elt = document.getElementById("gameDiv");
             console.log("Requesting fullscreen for", elt);
@@ -418,10 +432,20 @@ document.onkeyup = function(event){
 
 document.onmousedown = function(event){
    // console.log("Left click PRESSED");
-    socket.emit('keyPress', {inputId:'attack', state:true});
+   if(flameModeOn){
+        flameFire = true;
+   } else {
+        socket.emit('keyPress', {inputId:'attack', state:true});
+   }
+    
 }
 document.onmouseup = function(event){
-    socket.emit('keyPress', {inputId:'attack', state:false});
+    if(flameModeOn){
+        flameFire = false;
+    } else{
+        socket.emit('keyPress', {inputId:'attack', state:false});
+    }
+    
 }
 
 
