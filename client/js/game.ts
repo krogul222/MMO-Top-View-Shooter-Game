@@ -18,6 +18,7 @@ import { EnemyClient } from './Entities/EnemyClient';
 import { ExplosionClient } from './Entities/ExplosionClient';
 import { Inventory } from '../../server/js/Inventory/Inventory';
 import { Img } from './images';
+import { ParticleClient } from './Effects/ParticleClient';
 
 declare var ctx;
 declare const WIDTH;
@@ -82,6 +83,12 @@ socket.on('init', function(data){
     if(data.upgrade !== undefined){
         for(let i = 0, length = data.upgrade.length; i < length; i++){
             new UpgradeClient(data.upgrade[i]);  
+        } 
+    }
+
+    if(data.particle !== undefined){
+        for(let i = 0, length = data.particle.length; i < length; i++){
+            new ParticleClient(data.particle[i]);  
         } 
     }
 
@@ -207,6 +214,17 @@ socket.on('update', function(data){
         }
     }
 
+    for(let i = 0, length = data.particle.length; i < length ; i++){
+        let pack = data.particle[i];
+        let p = ParticleClient.list[pack.id];
+        if(p){
+            if(pack.position !== undefined){
+                p.position.x = pack.position.x;
+                p.position.y = pack.position.y;
+            } 
+        }
+    }
+
     for(let i = 0, length = data.smoke.length; i < length ; i++){
         let pack = data.smoke[i];
         let s: SmokeClient = SmokeClient.list[pack.id];
@@ -249,6 +267,10 @@ socket.on('remove', function(data){
     
     for(let i = 0, length = data.upgrade.length; i < length; i++){
         delete UpgradeClient.list[data.upgrade[i]];
+    } 
+
+    for(let i = 0, length = data.particle.length; i < length; i++){
+        delete ParticleClient.list[data.particle[i].id];
     } 
 
     for(let i = 0, length = data.smoke.length; i < length; i++){
@@ -316,6 +338,11 @@ setInterval(function(){
             ExplosionClient.list[i].draw();
         } 
     }
+    ctx.globalCompositeOperation="lighter";
+    for(let i in ParticleClient.list){
+        ParticleClient.list[i].draw();
+    }  
+    ctx.globalCompositeOperation="source-over";
 
     flame.update(flameFire);
     flame.draw();

@@ -15,6 +15,7 @@ const BulletClient_1 = require("./Entities/BulletClient");
 const EnemyClient_1 = require("./Entities/EnemyClient");
 const ExplosionClient_1 = require("./Entities/ExplosionClient");
 const Inventory_1 = require("../../server/js/Inventory/Inventory");
+const ParticleClient_1 = require("./Effects/ParticleClient");
 exports.selfId = 0;
 let smokeTest = false;
 let flameModeOn = false;
@@ -60,6 +61,11 @@ socket.on('init', function (data) {
             new UpgradeClient_1.UpgradeClient(data.upgrade[i]);
         }
     }
+    if (data.particle !== undefined) {
+        for (let i = 0, length = data.particle.length; i < length; i++) {
+            new ParticleClient_1.ParticleClient(data.particle[i]);
+        }
+    }
 });
 socket.on('update', function (data) {
     for (let i = 0, length = data.player.length; i < length; i++) {
@@ -83,7 +89,6 @@ socket.on('update', function (data) {
                 p.moving = pack.moving;
             }
             if (pack.aimAngle !== undefined) {
-                p.aimAngle = pack.aimAngle;
             }
             if (pack.ammo !== undefined) {
                 p.ammo = pack.ammo;
@@ -162,6 +167,16 @@ socket.on('update', function (data) {
             }
         }
     }
+    for (let i = 0, length = data.particle.length; i < length; i++) {
+        let pack = data.particle[i];
+        let p = ParticleClient_1.ParticleClient.list[pack.id];
+        if (p) {
+            if (pack.position !== undefined) {
+                p.position.x = pack.position.x;
+                p.position.y = pack.position.y;
+            }
+        }
+    }
     for (let i = 0, length = data.smoke.length; i < length; i++) {
         let pack = data.smoke[i];
         let s = SmokeClient_1.SmokeClient.list[pack.id];
@@ -198,6 +213,9 @@ socket.on('remove', function (data) {
     }
     for (let i = 0, length = data.upgrade.length; i < length; i++) {
         delete UpgradeClient_1.UpgradeClient.list[data.upgrade[i]];
+    }
+    for (let i = 0, length = data.particle.length; i < length; i++) {
+        delete ParticleClient_1.ParticleClient.list[data.particle[i].id];
     }
     for (let i = 0, length = data.smoke.length; i < length; i++) {
         delete SmokeClient_1.SmokeClient.list[data.smoke[i]];
@@ -251,15 +269,18 @@ setInterval(function () {
             ExplosionClient_1.ExplosionClient.list[i].draw();
         }
     }
+    ctx.globalCompositeOperation = "lighter";
+    for (let i in ParticleClient_1.ParticleClient.list) {
+        ParticleClient_1.ParticleClient.list[i].draw();
+    }
+    ctx.globalCompositeOperation = "source-over";
+    flame.update(flameFire);
+    flame.draw();
     exports.effects.draw();
     exports.effects.update();
     for (let i in SmokeClient_1.SmokeClient.list) {
         SmokeClient_1.SmokeClient.list[i].update();
         SmokeClient_1.SmokeClient.list[i].draw();
-    }
-    if (flameFire) {
-        flame.update();
-        flame.draw();
     }
 }, 40);
 document.onkeydown = function (event) {

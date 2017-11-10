@@ -7,6 +7,7 @@ class Pack {
         this.enemy = [];
         this.upgrade = [];
         this.smoke = [];
+        this.particle = [];
     }
 }
 exports.Pack = Pack;

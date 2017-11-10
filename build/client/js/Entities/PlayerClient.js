@@ -31,7 +31,6 @@ class PlayerClient {
             let spriteColumns = 20;
             let hpWidth = 30 * this.hp / this.hpMax;
             let aimAngle = this.aimAngle;
-            aimAngle = (aimAngle < 0) ? (360 + aimAngle) : aimAngle;
             let directionMod = this.inWhichDirection(aimAngle);
             let walkingMod = Math.floor(this.walkSpriteAnimCounter) % spriteColumns;
             this.drawWalk(spriteColumns, spriteRows, aimAngle, 0, walkingMod, this.position.x, this.position.y);

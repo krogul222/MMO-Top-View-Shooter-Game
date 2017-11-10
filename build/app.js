@@ -5,6 +5,8 @@ const Player_1 = require("./server/js/Entities/Player");
 const Entity_1 = require("./server/js/Entities/Entity");
 const Bullet_1 = require("./server/js/Entities/Bullet");
 const Enemy_1 = require("./server/js/Entities/Enemy");
+const Particle_1 = require("./server/js/Effects/Particle/Particle");
+const Flame_1 = require("./server/js/Effects/Flame");
 var express = require('express');
 var mongojs = require('mongojs');
 var jsonGUI = require('./server/TexturePacks/GUIImages.json');
@@ -95,9 +97,15 @@ setInterval(function () {
     let pack = {
         player: Player_1.Player.update(),
         bullet: Bullet_1.Bullet.update(),
+        particle: Particle_1.Particle.update(),
         enemy: Enemy_1.Enemy.update(),
         smoke: Smoke_1.Smoke.update()
     };
+    let flame;
+    for (let i in Flame_1.Flame.list) {
+        flame = Flame_1.Flame.list[i];
+        flame.update(true);
+    }
     exports.frameCount++;
     for (let i in SOCKET_LIST) {
         let socket = SOCKET_LIST[i];
@@ -113,11 +121,13 @@ setInterval(function () {
     packs.initPack.bullet = [];
     packs.initPack.enemy = [];
     packs.initPack.smoke = [];
+    packs.initPack.particle = [];
     packs.initPack.upgrade = [];
     packs.removePack.player = [];
     packs.removePack.bullet = [];
     packs.removePack.enemy = [];
     packs.removePack.upgrade = [];
+    packs.removePack.particle = [];
     packs.removePack.smoke = [];
 }, 1000 / 25);
 //# sourceMappingURL=app.js.map

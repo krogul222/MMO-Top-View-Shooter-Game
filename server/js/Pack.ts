@@ -10,6 +10,7 @@ export class Pack {
     public enemy: any[] = [];
     public upgrade: any[] = [];
     public smoke: any[] = [];
+    public particle: any[] = [];
     
     constructor(){}
 }

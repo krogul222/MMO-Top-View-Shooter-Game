@@ -54,6 +54,11 @@ var CornerOrientation;
     CornerOrientation[CornerOrientation["LD"] = 2] = "LD";
     CornerOrientation[CornerOrientation["LU"] = 3] = "LU";
 })(CornerOrientation = exports.CornerOrientation || (exports.CornerOrientation = {}));
+var ParticleType;
+(function (ParticleType) {
+    ParticleType[ParticleType["fire"] = 0] = "fire";
+})(ParticleType = exports.ParticleType || (exports.ParticleType = {}));
+;
 var MapObjectType;
 (function (MapObjectType) {
     MapObjectType[MapObjectType["GR_LU"] = 1] = "GR_LU";

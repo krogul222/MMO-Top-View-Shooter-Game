@@ -5,6 +5,8 @@ import { Entity } from './server/js/Entities/Entity';
 import { Bullet } from './server/js/Entities/Bullet';
 import { Enemy } from './server/js/Entities/Enemy';
 import { Upgrade } from './server/js/Entities/Upgrade';
+import { Particle } from './server/js/Effects/Particle/Particle';
+import { Flame } from './server/js/Effects/Flame';
 var express = require('express');
 var mongojs = require('mongojs');
 
@@ -117,9 +119,17 @@ setInterval(function(){
     let pack = {
         player: Player.update(),
         bullet: Bullet.update(),
+        particle: Particle.update(),
         enemy: Enemy.update(),
         smoke: Smoke.update()
        // upgrade: Upgrade.update()
+    }
+
+    let flame: Flame;
+
+    for(let i in Flame.list){
+        flame = Flame.list[i];
+        flame.update(true);
     }
     
     frameCount++;
@@ -139,11 +149,13 @@ setInterval(function(){
     packs.initPack.bullet = [];
     packs.initPack.enemy = [];
     packs.initPack.smoke = [];
+    packs.initPack.particle = [];
     packs.initPack.upgrade = [];
     
     packs.removePack.player = [];
     packs.removePack.bullet = [];
     packs.removePack.enemy = [];
     packs.removePack.upgrade = [];
+    packs.removePack.particle = [];
     packs.removePack.smoke = [];
 }, 1000/25);

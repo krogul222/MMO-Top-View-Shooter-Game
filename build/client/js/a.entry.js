@@ -60,7 +60,7 @@
 /******/ 	__webpack_require__.p = "/dist/";
 /******/
 /******/ 	// Load entry module and return exports
-/******/ 	return __webpack_require__(__webpack_require__.s = 3);
+/******/ 	return __webpack_require__(__webpack_require__.s = 2);
 /******/ })
 /************************************************************************/
 /******/ ([
@@ -194,6 +194,11 @@ var CornerOrientation;
     CornerOrientation[CornerOrientation["LD"] = 2] = "LD";
     CornerOrientation[CornerOrientation["LU"] = 3] = "LU";
 })(CornerOrientation = exports.CornerOrientation || (exports.CornerOrientation = {}));
+var ParticleType;
+(function (ParticleType) {
+    ParticleType[ParticleType["fire"] = 0] = "fire";
+})(ParticleType = exports.ParticleType || (exports.ParticleType = {}));
+;
 var MapObjectType;
 (function (MapObjectType) {
     MapObjectType[MapObjectType["GR_LU"] = 1] = "GR_LU";
@@ -227,35 +232,6 @@ exports.getRandomInt = getRandomInt;
 
 /***/ }),
 /* 2 */
-/***/ (function(module, exports) {
-
-Object.defineProperty(exports, "__esModule", { value: true });
-exports.Img = {};
-exports.Img.map = {};
-exports.Img.guibackground = new Image();
-exports.Img.guibackground.src = '/client/img/guibackground.jpg';
-exports.Img.smoke = new Image();
-exports.Img.smoke.src = '/client/img/smoke.png';
-socket.on('jsonImages', function (data) {
-    console.log(data.jsonGUI);
-    console.log(data.jsonPlayer);
-    exports.jsonPlayer = data.jsonPlayer;
-    exports.jsonGUI = data.jsonGUI;
-    exports.jsonIAE = data.jsonIAE;
-    exports.jsonMap = data.jsonMap;
-});
-exports.Img.Player = new Image();
-exports.Img.Player.src = '/client/TexturePacks/PlayerImages.png';
-exports.Img.Map = new Image();
-exports.Img.Map.src = '/client/TexturePacks/MapImages.png';
-exports.Img.IAE = new Image();
-exports.Img.IAE.src = '/client/TexturePacks/ItemsAndEnemiesImages.png';
-exports.Img.GUI = new Image();
-exports.Img.GUI.src = '/client/TexturePacks/GUIImages.png';
-
-
-/***/ }),
-/* 3 */
 /***/ (function(module, exports, __webpack_require__) {
 
 Object.defineProperty(exports, "__esModule", { value: true });
@@ -275,6 +251,7 @@ const BulletClient_1 = __webpack_require__(37);
 const EnemyClient_1 = __webpack_require__(13);
 const ExplosionClient_1 = __webpack_require__(14);
 const Inventory_1 = __webpack_require__(15);
+const ParticleClient_1 = __webpack_require__(47);
 exports.selfId = 0;
 let smokeTest = false;
 let flameModeOn = false;
@@ -318,6 +295,11 @@ socket.on('init', function (data) {
     if (data.upgrade !== undefined) {
         for (let i = 0, length = data.upgrade.length; i < length; i++) {
             new UpgradeClient_1.UpgradeClient(data.upgrade[i]);
+        }
+    }
+    if (data.particle !== undefined) {
+        for (let i = 0, length = data.particle.length; i < length; i++) {
+            new ParticleClient_1.ParticleClient(data.particle[i]);
         }
     }
 });
@@ -421,6 +403,16 @@ socket.on('update', function (data) {
             }
         }
     }
+    for (let i = 0, length = data.particle.length; i < length; i++) {
+        let pack = data.particle[i];
+        let p = ParticleClient_1.ParticleClient.list[pack.id];
+        if (p) {
+            if (pack.position !== undefined) {
+                p.position.x = pack.position.x;
+                p.position.y = pack.position.y;
+            }
+        }
+    }
     for (let i = 0, length = data.smoke.length; i < length; i++) {
         let pack = data.smoke[i];
         let s = SmokeClient_1.SmokeClient.list[pack.id];
@@ -457,6 +449,9 @@ socket.on('remove', function (data) {
     }
     for (let i = 0, length = data.upgrade.length; i < length; i++) {
         delete UpgradeClient_1.UpgradeClient.list[data.upgrade[i]];
+    }
+    for (let i = 0, length = data.particle.length; i < length; i++) {
+        delete ParticleClient_1.ParticleClient.list[data.particle[i].id];
     }
     for (let i = 0, length = data.smoke.length; i < length; i++) {
         delete SmokeClient_1.SmokeClient.list[data.smoke[i]];
@@ -510,6 +505,11 @@ setInterval(function () {
             ExplosionClient_1.ExplosionClient.list[i].draw();
         }
     }
+    ctx.globalCompositeOperation = "lighter";
+    for (let i in ParticleClient_1.ParticleClient.list) {
+        ParticleClient_1.ParticleClient.list[i].draw();
+    }
+    ctx.globalCompositeOperation = "source-over";
     flame.update(flameFire);
     flame.draw();
     exports.effects.draw();
@@ -652,6 +652,35 @@ let updateMouse = () => {
 
 
 /***/ }),
+/* 3 */
+/***/ (function(module, exports) {
+
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.Img = {};
+exports.Img.map = {};
+exports.Img.guibackground = new Image();
+exports.Img.guibackground.src = '/client/img/guibackground.jpg';
+exports.Img.smoke = new Image();
+exports.Img.smoke.src = '/client/img/smoke.png';
+socket.on('jsonImages', function (data) {
+    console.log(data.jsonGUI);
+    console.log(data.jsonPlayer);
+    exports.jsonPlayer = data.jsonPlayer;
+    exports.jsonGUI = data.jsonGUI;
+    exports.jsonIAE = data.jsonIAE;
+    exports.jsonMap = data.jsonMap;
+});
+exports.Img.Player = new Image();
+exports.Img.Player.src = '/client/TexturePacks/PlayerImages.png';
+exports.Img.Map = new Image();
+exports.Img.Map.src = '/client/TexturePacks/MapImages.png';
+exports.Img.IAE = new Image();
+exports.Img.IAE.src = '/client/TexturePacks/ItemsAndEnemiesImages.png';
+exports.Img.GUI = new Image();
+exports.Img.GUI.src = '/client/TexturePacks/GUIImages.png';
+
+
+/***/ }),
 /* 4 */
 /***/ (function(module, exports, __webpack_require__) {
 
@@ -684,11 +713,11 @@ window.addEventListener('resize', function () {
 /***/ (function(module, exports, __webpack_require__) {
 
 Object.defineProperty(exports, "__esModule", { value: true });
-const images_1 = __webpack_require__(2);
+const images_1 = __webpack_require__(3);
 const GeometryAndPhysics_1 = __webpack_require__(0);
-const game_1 = __webpack_require__(3);
+const game_1 = __webpack_require__(2);
 const canvas_1 = __webpack_require__(4);
-const images_2 = __webpack_require__(2);
+const images_2 = __webpack_require__(3);
 class PlayerClient {
     constructor(initPack) {
         this.id = -1;
@@ -1101,7 +1130,7 @@ exports.MapController = MapController;
 /***/ (function(module, exports, __webpack_require__) {
 
 Object.defineProperty(exports, "__esModule", { value: true });
-const Pack_1 = __webpack_require__(40);
+const Pack_1 = __webpack_require__(41);
 exports.initPack = new Pack_1.Pack();
 exports.removePack = new Pack_1.Pack();
 
@@ -1225,7 +1254,8 @@ new WeaponTypes({ weapon: enums_1.WeaponType.claws, name: "claws",
 /***/ (function(module, exports, __webpack_require__) {
 
 Object.defineProperty(exports, "__esModule", { value: true });
-const Smoke_1 = __webpack_require__(39);
+const Flame_1 = __webpack_require__(39);
+const Smoke_1 = __webpack_require__(42);
 const globalVariables_1 = __webpack_require__(8);
 const Enemy_1 = __webpack_require__(11);
 const Bullet_1 = __webpack_require__(18);
@@ -1321,6 +1351,7 @@ Player.onConnect = (socket) => {
         hp: 40,
         socket: socket
     });
+    let flame = new Flame_1.Flame({ parent: player, map: map, offset: 50, life: 50 });
     socket.on('changeWeapon', function (data) {
         if (data.state == 'next') {
             player.attackController.weaponCollection.chooseNextWeaponWithAmmo();
@@ -1653,11 +1684,11 @@ exports.Particle = Particle;
 /***/ (function(module, exports, __webpack_require__) {
 
 Object.defineProperty(exports, "__esModule", { value: true });
-const images_1 = __webpack_require__(2);
+const images_1 = __webpack_require__(3);
 const canvas_1 = __webpack_require__(4);
 const PlayerClient_1 = __webpack_require__(5);
 const GeometryAndPhysics_1 = __webpack_require__(0);
-const game_1 = __webpack_require__(3);
+const game_1 = __webpack_require__(2);
 class EnemyClient {
     constructor(initPack) {
         this.id = -1;
@@ -1785,10 +1816,10 @@ exports.EnemyClient = EnemyClient;
 /***/ (function(module, exports, __webpack_require__) {
 
 Object.defineProperty(exports, "__esModule", { value: true });
-const images_1 = __webpack_require__(2);
+const images_1 = __webpack_require__(3);
 const GeometryAndPhysics_1 = __webpack_require__(0);
 const PlayerClient_1 = __webpack_require__(5);
-const game_1 = __webpack_require__(3);
+const game_1 = __webpack_require__(2);
 const canvas_1 = __webpack_require__(4);
 class ExplosionClient {
     constructor(param) {
@@ -1937,9 +1968,9 @@ exports.Inventory = Inventory;
 Object.defineProperty(exports, "__esModule", { value: true });
 const Inventory_1 = __webpack_require__(15);
 const MapControler_1 = __webpack_require__(7);
-const MovementController_1 = __webpack_require__(41);
-const AttackControler_1 = __webpack_require__(42);
-const LifeAndBodyController_1 = __webpack_require__(44);
+const MovementController_1 = __webpack_require__(43);
+const AttackControler_1 = __webpack_require__(44);
+const LifeAndBodyController_1 = __webpack_require__(46);
 const Entity_1 = __webpack_require__(19);
 const Player_1 = __webpack_require__(10);
 const Enemy_1 = __webpack_require__(11);
@@ -2270,7 +2301,7 @@ exports.Entity = Entity;
 /***/ (function(module, exports, __webpack_require__) {
 
 Object.defineProperty(exports, "__esModule", { value: true });
-const game_1 = __webpack_require__(3);
+const game_1 = __webpack_require__(2);
 const PlayerClient_1 = __webpack_require__(5);
 const GeometryAndPhysics_1 = __webpack_require__(0);
 const FireParticle_1 = __webpack_require__(23);
@@ -2450,10 +2481,10 @@ exports.Camera = Camera;
 /***/ (function(module, exports, __webpack_require__) {
 
 Object.defineProperty(exports, "__esModule", { value: true });
-const images_1 = __webpack_require__(2);
+const images_1 = __webpack_require__(3);
 const Constants_1 = __webpack_require__(6);
 const PlayerClient_1 = __webpack_require__(5);
-const game_1 = __webpack_require__(3);
+const game_1 = __webpack_require__(2);
 const enums_1 = __webpack_require__(1);
 const WeaponTypes_1 = __webpack_require__(9);
 class GUI {
@@ -2614,9 +2645,9 @@ exports.FireParticle = FireParticle;
 Object.defineProperty(exports, "__esModule", { value: true });
 const PlayerClient_1 = __webpack_require__(5);
 const GeometryAndPhysics_1 = __webpack_require__(0);
-const images_1 = __webpack_require__(2);
+const images_1 = __webpack_require__(3);
 const SmokeParticle_1 = __webpack_require__(25);
-const game_1 = __webpack_require__(3);
+const game_1 = __webpack_require__(2);
 class SmokeClient {
     constructor(initPack) {
         this.position = new GeometryAndPhysics_1.Point(0, 0);
@@ -2748,7 +2779,7 @@ exports.SmokeParticle = SmokeParticle;
 Object.defineProperty(exports, "__esModule", { value: true });
 const Particle_1 = __webpack_require__(12);
 const enums_1 = __webpack_require__(1);
-const images_1 = __webpack_require__(2);
+const images_1 = __webpack_require__(3);
 class Effects {
     constructor(ctx) {
         this.ctx = ctx;
@@ -3267,10 +3298,10 @@ exports.GameSoundManager = GameSoundManager;
 /***/ (function(module, exports, __webpack_require__) {
 
 Object.defineProperty(exports, "__esModule", { value: true });
-const images_1 = __webpack_require__(2);
+const images_1 = __webpack_require__(3);
 const GeometryAndPhysics_1 = __webpack_require__(0);
 const PlayerClient_1 = __webpack_require__(5);
-const game_1 = __webpack_require__(3);
+const game_1 = __webpack_require__(2);
 const canvas_1 = __webpack_require__(4);
 class UpgradeClient {
     constructor(param) {
@@ -3305,10 +3336,10 @@ exports.UpgradeClient = UpgradeClient;
 /***/ (function(module, exports, __webpack_require__) {
 
 Object.defineProperty(exports, "__esModule", { value: true });
-const images_1 = __webpack_require__(2);
+const images_1 = __webpack_require__(3);
 const Constants_1 = __webpack_require__(6);
 const PlayerClient_1 = __webpack_require__(5);
-const game_1 = __webpack_require__(3);
+const game_1 = __webpack_require__(2);
 const enums_1 = __webpack_require__(1);
 const Constants_2 = __webpack_require__(6);
 const canvas_1 = __webpack_require__(4);
@@ -3382,11 +3413,11 @@ exports.MapClient = MapClient;
 /***/ (function(module, exports, __webpack_require__) {
 
 Object.defineProperty(exports, "__esModule", { value: true });
-const images_1 = __webpack_require__(2);
-const game_1 = __webpack_require__(3);
+const images_1 = __webpack_require__(3);
+const game_1 = __webpack_require__(2);
 const EnemyClient_1 = __webpack_require__(13);
 const GeometryAndPhysics_1 = __webpack_require__(0);
-const game_2 = __webpack_require__(3);
+const game_2 = __webpack_require__(2);
 const PlayerClient_1 = __webpack_require__(5);
 const ExplosionClient_1 = __webpack_require__(14);
 const canvas_1 = __webpack_require__(4);
@@ -3517,6 +3548,162 @@ new Item(enums_1.WeaponType.claws, "Claws", function (actor) {
 /***/ (function(module, exports, __webpack_require__) {
 
 Object.defineProperty(exports, "__esModule", { value: true });
+const enums_1 = __webpack_require__(1);
+const GeometryAndPhysics_1 = __webpack_require__(0);
+const Particle_1 = __webpack_require__(40);
+class Flame {
+    constructor(param) {
+        this.id = Math.random();
+        this.particles = {};
+        this.angle = 0;
+        this.position = new GeometryAndPhysics_1.Point(0, 0);
+        this.speed = 5;
+        this.offset = 0;
+        this.parent = null;
+        this.life = 60;
+        this.update = (create) => {
+            if (create) {
+                let angleInRad = 0;
+                let posWithOffset = new GeometryAndPhysics_1.Point(0, 0);
+                for (let i = 0; i < 10; i++) {
+                    if (this.parent !== undefined) {
+                        angleInRad = ((this.parent.movementController.aimAngle + 180) * Math.PI) / 180;
+                        posWithOffset.x = this.parent.position.x - Math.cos(angleInRad) * this.offset;
+                        posWithOffset.y = this.parent.position.y - Math.sin(angleInRad) * this.offset;
+                    }
+                    else {
+                        angleInRad = (this.angle * Math.PI) / 180;
+                        posWithOffset.x = this.position.x - Math.cos(angleInRad) * this.offset;
+                        posWithOffset.y = this.position.y - Math.sin(angleInRad) * this.offset;
+                    }
+                    let flame = (0 - Math.random() * 2 * this.speed);
+                    let velocity = new GeometryAndPhysics_1.Point(0, 0);
+                    velocity.x = Math.cos(angleInRad) * flame;
+                    velocity.y = Math.sin(angleInRad) * flame;
+                    angleInRad += Math.PI / 2;
+                    flame = (Math.random() * 2 * this.speed - this.speed) / 6;
+                    velocity.x += Math.cos(angleInRad) * flame;
+                    velocity.y += Math.sin(angleInRad) * flame;
+                    let p = new Particle_1.Particle({ position: posWithOffset, velocity: velocity, maxLife: this.life, type: enums_1.ParticleType.fire, map: this.map });
+                    this.particles[p.id] = p;
+                }
+            }
+        };
+        if (param.position !== undefined) {
+            this.position.x = param.position.x;
+            this.position.y = param.position.y;
+        }
+        this.parent = (param.parent !== undefined) ? param.parent : null;
+        this.angle = (param.angle !== undefined) ? param.angle : 0;
+        this.offset = (param.offset !== undefined) ? param.offset : 0;
+        this.life = (param.life !== undefined) ? param.life : 60;
+        this.map = (param.map !== undefined) ? param.map : 0;
+        Flame.list[this.id] = this;
+    }
+}
+Flame.list = {};
+exports.Flame = Flame;
+
+
+/***/ }),
+/* 40 */
+/***/ (function(module, exports, __webpack_require__) {
+
+Object.defineProperty(exports, "__esModule", { value: true });
+const globalVariables_1 = __webpack_require__(8);
+const enums_1 = __webpack_require__(1);
+const GeometryAndPhysics_1 = __webpack_require__(0);
+class Particle {
+    constructor(param) {
+        this.position = new GeometryAndPhysics_1.Point(0, 0);
+        this.velocity = new GeometryAndPhysics_1.Point(0, 0);
+        this.size = 15;
+        this.life = 0;
+        this.maxLife = 10;
+        this.toRemove = false;
+        this.id = Math.random();
+        this.update = () => {
+            this.position.x += this.velocity.x;
+            this.position.y += this.velocity.y;
+            this.life++;
+            if (this.life >= this.maxLife)
+                this.toRemove = true;
+        };
+        this.getInitPack = () => {
+            return {
+                id: this.id,
+                position: this.position,
+                map: this.map,
+                size: this.size,
+                type: this.type,
+                maxLife: this.maxLife
+            };
+        };
+        this.getUpdatePack = () => {
+            return {
+                id: this.id,
+                position: this.position,
+                life: this.life
+            };
+        };
+        this.maxLife = (param.maxLife !== undefined) ? param.maxLife : 60;
+        this.type = (param.type !== undefined) ? param.type : enums_1.ParticleType.fire;
+        if (param.position !== undefined) {
+            this.position.x = param.position.x;
+            this.position.y = param.position.y;
+        }
+        if (param.velocity !== undefined) {
+            this.velocity.x = param.velocity.x;
+            this.velocity.y = param.velocity.y;
+        }
+        this.map = (param.map !== undefined) ? param.map : 0;
+        globalVariables_1.initPack.particle.push(this.getInitPack());
+        Particle.list[this.id] = this;
+    }
+}
+Particle.update = () => {
+    let pack = [];
+    for (let i in Particle.list) {
+        let particle = Particle.list[i];
+        particle.update();
+        if (particle.toRemove) {
+            delete Particle.list[i];
+            globalVariables_1.removePack.particle.push({ id: particle.id });
+        }
+        else {
+            pack.push(particle.getUpdatePack());
+        }
+    }
+    return pack;
+};
+Particle.list = {};
+exports.Particle = Particle;
+
+
+/***/ }),
+/* 41 */
+/***/ (function(module, exports) {
+
+Object.defineProperty(exports, "__esModule", { value: true });
+var initPack = { player: [], bullet: [], enemy: [], upgrade: [] };
+class Pack {
+    constructor() {
+        this.player = [];
+        this.bullet = [];
+        this.enemy = [];
+        this.upgrade = [];
+        this.smoke = [];
+        this.particle = [];
+    }
+}
+exports.Pack = Pack;
+
+
+/***/ }),
+/* 42 */
+/***/ (function(module, exports, __webpack_require__) {
+
+Object.defineProperty(exports, "__esModule", { value: true });
 const globalVariables_1 = __webpack_require__(8);
 class Smoke {
     constructor(position, maxRadius, time, speed, map) {
@@ -3584,25 +3771,7 @@ exports.Smoke = Smoke;
 
 
 /***/ }),
-/* 40 */
-/***/ (function(module, exports) {
-
-Object.defineProperty(exports, "__esModule", { value: true });
-var initPack = { player: [], bullet: [], enemy: [], upgrade: [] };
-class Pack {
-    constructor() {
-        this.player = [];
-        this.bullet = [];
-        this.enemy = [];
-        this.upgrade = [];
-        this.smoke = [];
-    }
-}
-exports.Pack = Pack;
-
-
-/***/ }),
-/* 41 */
+/* 43 */
 /***/ (function(module, exports, __webpack_require__) {
 
 Object.defineProperty(exports, "__esModule", { value: true });
@@ -3713,12 +3882,12 @@ exports.MovementController = MovementController;
 
 
 /***/ }),
-/* 42 */
+/* 44 */
 /***/ (function(module, exports, __webpack_require__) {
 
 Object.defineProperty(exports, "__esModule", { value: true });
 const Bullet_1 = __webpack_require__(18);
-const WeaponCollection_1 = __webpack_require__(43);
+const WeaponCollection_1 = __webpack_require__(45);
 const Counter_1 = __webpack_require__(17);
 const WeaponTypes_1 = __webpack_require__(9);
 const GeometryAndPhysics_1 = __webpack_require__(0);
@@ -3823,7 +3992,7 @@ exports.AttackController = AttackController;
 
 
 /***/ }),
-/* 43 */
+/* 45 */
 /***/ (function(module, exports, __webpack_require__) {
 
 Object.defineProperty(exports, "__esModule", { value: true });
@@ -4011,7 +4180,7 @@ exports.SingleWeapon = SingleWeapon;
 
 
 /***/ }),
-/* 44 */
+/* 46 */
 /***/ (function(module, exports) {
 
 Object.defineProperty(exports, "__esModule", { value: true });
@@ -4040,6 +4209,54 @@ class LifeAndBodyController {
     get hpMax() { return this._hpMax; }
 }
 exports.LifeAndBodyController = LifeAndBodyController;
+
+
+/***/ }),
+/* 47 */
+/***/ (function(module, exports, __webpack_require__) {
+
+Object.defineProperty(exports, "__esModule", { value: true });
+const canvas_1 = __webpack_require__(4);
+const GeometryAndPhysics_1 = __webpack_require__(0);
+const enums_1 = __webpack_require__(1);
+const PlayerClient_1 = __webpack_require__(5);
+const game_1 = __webpack_require__(2);
+class ParticleClient {
+    constructor(param) {
+        this.id = 0;
+        this.position = new GeometryAndPhysics_1.Point(0, 0);
+        this.maxLife = 0;
+        this.life = 0;
+        this.size = 15;
+        this.draw = () => {
+            if (PlayerClient_1.PlayerClient.list[game_1.selfId].map !== this.map) {
+                return;
+            }
+            if (this.type == enums_1.ParticleType.fire)
+                this.drawFireParticle();
+        };
+        this.drawFireParticle = () => {
+            ctx.fillStyle = "rgba(" + (260 - (this.life * 2)) + "," + ((this.life * 2) + 50) + "," + (this.life * 2) + "," + (((this.maxLife - this.life) / this.maxLife) * 0.4) + ")";
+            ctx.beginPath();
+            let pos = canvas_1.camera.getScreenPosition(this.position);
+            ctx.arc(pos.x, pos.y, (this.maxLife - this.life) / this.maxLife * (this.size / 2) + (this.size / 2), 0, 2 * Math.PI);
+            ctx.fill();
+        };
+        this.id = (param.id !== undefined) ? param.id : 0;
+        this.type = (param.type !== undefined) ? param.type : enums_1.ParticleType.fire;
+        this.map = (param.map !== undefined) ? param.map : 0;
+        if (param.position !== undefined) {
+            this.position.x = param.position.x;
+            this.position.y = param.position.y;
+        }
+        this.maxLife = (param.maxLife !== undefined) ? param.maxLife : 60;
+        this.life = (param.life !== undefined) ? param.life : 0;
+        this.size = (param.size !== undefined) ? param.size : 0;
+        ParticleClient.list[this.id] = this;
+    }
+}
+ParticleClient.list = {};
+exports.ParticleClient = ParticleClient;
 
 
 /***/ })

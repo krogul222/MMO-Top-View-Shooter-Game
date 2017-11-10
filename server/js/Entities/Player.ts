@@ -1,3 +1,4 @@
+import { Flame } from './../Effects/Flame';
 import { Smoke } from './../Effects/Smoke';
 import { initPack, removePack } from './../globalVariables';
 import { Enemy } from './Enemy';
@@ -89,6 +90,8 @@ export class Player extends Actor {
              type: "player", 
              hp: 40, 
              socket: socket});
+
+            let flame: Flame = new Flame({parent: player, map: map, offset: 50, life: 30});
 
         socket.on('changeWeapon', function(data){
             if(data.state == 'next') { player.attackController.weaponCollection.chooseNextWeaponWithAmmo() }

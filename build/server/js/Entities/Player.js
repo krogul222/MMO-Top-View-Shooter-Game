@@ -1,4 +1,5 @@
 Object.defineProperty(exports, "__esModule", { value: true });
+const Flame_1 = require("./../Effects/Flame");
 const Smoke_1 = require("./../Effects/Smoke");
 const globalVariables_1 = require("./../globalVariables");
 const Enemy_1 = require("./Enemy");
@@ -95,6 +96,7 @@ Player.onConnect = (socket) => {
         hp: 40,
         socket: socket
     });
+    let flame = new Flame_1.Flame({ parent: player, map: map, offset: 50, life: 30 });
     socket.on('changeWeapon', function (data) {
         if (data.state == 'next') {
             player.attackController.weaponCollection.chooseNextWeaponWithAmmo();

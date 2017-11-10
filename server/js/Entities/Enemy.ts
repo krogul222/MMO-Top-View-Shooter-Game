@@ -5,6 +5,7 @@ import { Point } from '../GeometryAndPhysics';
 import { initPack, removePack } from '../globalVariables';
 import { WeaponType } from '../enums';
 import { MapController } from '../Controllers/MapControler';
+import { Flame } from '../Effects/Flame';
 //import { frameCount } from '../../../app';
 
 export class Enemy extends Actor {
@@ -24,7 +25,6 @@ export class Enemy extends Actor {
         this.attackController.pressingAttack = true;
 
         this.giveWeapons();
-
         initPack.enemy.push(this.getInitPack());
     } 
 
