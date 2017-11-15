@@ -28,6 +28,16 @@ new Item(WeaponType.pistol,"Pistol",function(actor: Actor){
     //return "Ammo: "+actor.weaponCollection.getWeaponAmmo("pistol");
 });
 
+new Item(WeaponType.flamethrower,"Flamethrower",function(actor: Actor){
+    actor.attackController.equip(WeaponType.flamethrower);
+},function(actor: Actor, amount: number){
+    actor.attackController.weaponCollection.addWeapon(WeaponType.flamethrower, amount);
+}, function(actor: Actor, amount: number){
+    actor.attackController.weaponCollection.removeWeapon(WeaponType.flamethrower, amount);
+}, function(actor: Actor){
+    //return "Ammo: "+actor.weaponCollection.getWeaponAmmo("pistol");
+});
+
 new Item(WeaponType.knife,"Knife",function(actor){
     actor.attackController.equip(WeaponType.knife);
 },function(actor: Actor, amount: number){

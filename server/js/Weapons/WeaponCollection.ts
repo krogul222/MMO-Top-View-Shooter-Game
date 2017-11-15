@@ -57,6 +57,12 @@ export class WeaponCollection {
             for(let i = 0 ; i < this.weapons.length; i++){
                 if(this.weapons[i].id === id){
                     this.weapons[i].ammo = ammo;
+
+                    let weaponProperties: WeaponTypes = WeaponTypes.getWeaponParameters(id);
+                    if(weaponProperties.reloadSpd == -1) {
+                        this.weapons[i].ammoInGun = this.weapons[i].ammo;
+                    }
+
                     if(this.owner.attackController.activeWeapon.weapon == id){
                         if(this.owner.attackController.activeWeapon.ammo == 0 && ammo > 0){
                             this.owner.attackController.reloadCounter.activate();
@@ -71,6 +77,12 @@ export class WeaponCollection {
             for(let i = 0 ; i < this.weapons.length; i++){
                 if(this.weapons[i].id === id){
                     this.weapons[i].ammo = this.weapons[i].ammo + ammo;
+
+                    let weaponProperties: WeaponTypes = WeaponTypes.getWeaponParameters(id);
+                    if(weaponProperties.reloadSpd == -1) {
+                        this.weapons[i].ammoInGun = this.weapons[i].ammo;
+                    }
+
                     if(this.owner.attackController.activeWeapon.weapon == id){
                         if(this.owner.attackController.activeWeapon.ammo == 0 && ammo > 0){
                             this.owner.attackController.reloadCounter.activate();
@@ -85,6 +97,11 @@ export class WeaponCollection {
             for(let i = 0 ; i < this.weapons.length; i++){
                 if(this.weapons[i].id === id){
                     this.weapons[i].ammoInGun = (this.weapons[i].ammoInGun > amount) ? this.weapons[i].ammoInGun-amount : 0;
+                
+                    let weaponProperties: WeaponTypes = WeaponTypes.getWeaponParameters(id);
+                    if(weaponProperties.reloadSpd == -1) {
+                        this.weapons[i].ammo = this.weapons[i].ammoInGun;
+                    }
                 }
             }
         }
@@ -161,6 +178,12 @@ export class SingleWeapon {
         decAmmo = (amount: number) => {
             this._ammoInGun = (this._ammoInGun - amount >= 0) ? this._ammoInGun - amount : 0;
             this.parent.attackController.weaponCollection.decAmmo(this._weapon, amount);
+
+            let weaponProperties: WeaponTypes = WeaponTypes.getWeaponParameters(this._weapon);
+            if(weaponProperties.reloadSpd == -1) {
+                this._ammo = this._ammoInGun;
+            }
+            
         }
 
         updateAmmo = () => {
@@ -169,6 +192,10 @@ export class SingleWeapon {
             for(let i = 0 ; i < weaponCollection.weapons.length; i++){
                 if(weaponCollection.weapons[i].id === this.weapon){
                     this._ammo = weaponCollection.weapons[i].ammo;
+                    let weaponProperties: WeaponTypes = WeaponTypes.getWeaponParameters(this.weapon);
+                    if(weaponProperties.reloadSpd == -1) {
+                        this._ammoInGun = this._ammo;
+                    }
                 }
             }
         }
@@ -183,7 +210,12 @@ export class SingleWeapon {
                             return false;
                         }
 
-                        if(this._ammoInGun == 0) this.parent.attackController.reloadCounter.activate();
+                        if(this._ammoInGun == 0) {
+                            let weaponProperties: WeaponTypes = WeaponTypes.getWeaponParameters(this.weapon);
+                            if(weaponProperties.reloadSpd > 0) {
+                                this.parent.attackController.reloadCounter.activate();
+                            }
+                        }
                         
                         if(WeaponTypes.list[this.weapon].recoil) this.parent.movementController.recoilCounter.activate();
 

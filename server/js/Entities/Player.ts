@@ -31,9 +31,11 @@ export class Player extends Actor {
         this.inventory.addItem(ItemType.pistol,1);
         this.inventory.addItem(ItemType.shotgun,1);
         this.inventory.addItem(ItemType.rifle,1);
+        this.inventory.addItem(ItemType.flamethrower,1);
         this.attackController.weaponCollection.setWeaponAmmo(WeaponType.shotgun, 100);
         this.attackController.weaponCollection.setWeaponAmmo(WeaponType.pistol, 200);
         this.attackController.weaponCollection.setWeaponAmmo(WeaponType.rifle, 100);
+        this.attackController.weaponCollection.setWeaponAmmo(WeaponType.flamethrower, 100);
 
         this.inventory.addItem(ItemType.medicalkit,4);  
         this.inventory.useItem(WeaponType.shotgun);
@@ -110,6 +112,7 @@ export class Player extends Actor {
             if(data.inputId == '2') player.attackController.weaponCollection.changeWeapon(WeaponType.pistol); 
             if(data.inputId == '3') player.attackController.weaponCollection.changeWeapon(WeaponType.shotgun); 
             if(data.inputId == '4') player.attackController.weaponCollection.changeWeapon(WeaponType.rifle); 
+            if(data.inputId == '5') player.attackController.weaponCollection.changeWeapon(WeaponType.flamethrower); 
             if(data.inputId == 'space') player.attackController.weaponCollection.chooseNextWeaponWithAmmo();
             if(data.inputId == 'smoke') new Smoke(new Point(player.position.x -128,player.position.y -128), 150, 750, 20, player.map);
             if(data.inputId == 'map'){

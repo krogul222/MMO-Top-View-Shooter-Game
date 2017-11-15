@@ -1,8 +1,24 @@
 {"frames": {
 
+"player_flamethrower.png":
+{
+	"frame": {"x":2,"y":2,"w":6260,"h":206},
+	"rotated": false,
+	"trimmed": false,
+	"spriteSourceSize": {"x":0,"y":0,"w":6260,"h":206},
+	"sourceSize": {"w":6260,"h":206}
+},
+"player_flamethrower_meeleattack.png":
+{
+	"frame": {"x":2,"y":210,"w":5370,"h":353},
+	"rotated": false,
+	"trimmed": false,
+	"spriteSourceSize": {"x":0,"y":0,"w":5370,"h":353},
+	"sourceSize": {"w":5370,"h":353}
+},
 "player_knife.png":
 {
-	"frame": {"x":2,"y":2,"w":5580,"h":219},
+	"frame": {"x":2,"y":565,"w":5580,"h":219},
 	"rotated": false,
 	"trimmed": false,
 	"spriteSourceSize": {"x":0,"y":0,"w":5580,"h":219},
@@ -10,7 +26,7 @@
 },
 "player_knife_meeleattack.png":
 {
-	"frame": {"x":2,"y":223,"w":4935,"h":300},
+	"frame": {"x":2,"y":786,"w":4935,"h":300},
 	"rotated": false,
 	"trimmed": false,
 	"spriteSourceSize": {"x":0,"y":0,"w":4935,"h":300},
@@ -18,7 +34,7 @@
 },
 "player_pistol.png":
 {
-	"frame": {"x":2,"y":525,"w":5160,"h":220},
+	"frame": {"x":2,"y":1088,"w":5160,"h":220},
 	"rotated": false,
 	"trimmed": false,
 	"spriteSourceSize": {"x":0,"y":0,"w":5160,"h":220},
@@ -26,7 +42,7 @@
 },
 "player_pistol_meeleattack.png":
 {
-	"frame": {"x":2,"y":747,"w":4365,"h":256},
+	"frame": {"x":2,"y":1310,"w":4365,"h":256},
 	"rotated": false,
 	"trimmed": false,
 	"spriteSourceSize": {"x":0,"y":0,"w":4365,"h":256},
@@ -34,7 +50,7 @@
 },
 "player_pistol_reload.png":
 {
-	"frame": {"x":2,"y":1005,"w":3900,"h":230},
+	"frame": {"x":2,"y":1568,"w":3900,"h":230},
 	"rotated": false,
 	"trimmed": false,
 	"spriteSourceSize": {"x":0,"y":0,"w":3900,"h":230},
@@ -42,7 +58,7 @@
 },
 "player_rifle.png":
 {
-	"frame": {"x":2,"y":1237,"w":6260,"h":206},
+	"frame": {"x":2,"y":1800,"w":6260,"h":206},
 	"rotated": false,
 	"trimmed": false,
 	"spriteSourceSize": {"x":0,"y":0,"w":6260,"h":206},
@@ -50,7 +66,7 @@
 },
 "player_rifle_meeleattack.png":
 {
-	"frame": {"x":2,"y":1445,"w":5370,"h":353},
+	"frame": {"x":2,"y":2008,"w":5370,"h":353},
 	"rotated": false,
 	"trimmed": false,
 	"spriteSourceSize": {"x":0,"y":0,"w":5370,"h":353},
@@ -58,7 +74,7 @@
 },
 "player_rifle_reload.png":
 {
-	"frame": {"x":2,"y":1800,"w":6440,"h":217},
+	"frame": {"x":2,"y":2363,"w":6440,"h":217},
 	"rotated": false,
 	"trimmed": false,
 	"spriteSourceSize": {"x":0,"y":0,"w":6440,"h":217},
@@ -66,7 +82,7 @@
 },
 "player_shotgun.png":
 {
-	"frame": {"x":2,"y":2019,"w":6260,"h":206},
+	"frame": {"x":2,"y":2582,"w":6260,"h":206},
 	"rotated": false,
 	"trimmed": false,
 	"spriteSourceSize": {"x":0,"y":0,"w":6260,"h":206},
@@ -74,7 +90,7 @@
 },
 "player_shotgun_meeleattack.png":
 {
-	"frame": {"x":2,"y":2227,"w":5370,"h":353},
+	"frame": {"x":2,"y":2790,"w":5370,"h":353},
 	"rotated": false,
 	"trimmed": false,
 	"spriteSourceSize": {"x":0,"y":0,"w":5370,"h":353},
@@ -82,7 +98,7 @@
 },
 "player_shotgun_reload.png":
 {
-	"frame": {"x":2,"y":2582,"w":6440,"h":217},
+	"frame": {"x":2,"y":3145,"w":6440,"h":217},
 	"rotated": false,
 	"trimmed": false,
 	"spriteSourceSize": {"x":0,"y":0,"w":6440,"h":217},
@@ -90,7 +106,7 @@
 },
 "run.png":
 {
-	"frame": {"x":2,"y":2801,"w":4080,"h":124},
+	"frame": {"x":2,"y":3364,"w":4080,"h":124},
 	"rotated": false,
 	"trimmed": false,
 	"spriteSourceSize": {"x":0,"y":0,"w":4080,"h":124},
@@ -98,7 +114,7 @@
 },
 "walk.png":
 {
-	"frame": {"x":4084,"y":2801,"w":3440,"h":124},
+	"frame": {"x":4084,"y":3364,"w":3440,"h":124},
 	"rotated": false,
 	"trimmed": false,
 	"spriteSourceSize": {"x":0,"y":0,"w":3440,"h":124},
@@ -107,10 +123,10 @@
 "meta": {
 	"app": "http://www.texturepacker.com",
 	"version": "1.0",
-	"image": "Player.png",
+	"image": "PlayerImages.png",
 	"format": "RGBA8888",
 	"size": {"w":8192,"h":4096},
 	"scale": "1",
-	"smartupdate": "$TexturePacker:SmartUpdate:ce86c2b8d03c240ddfbb3bd454e8614b$"
+	"smartupdate": "$TexturePacker:SmartUpdate:597bb2fce60e814037afc5f9c6eba1b5$"
 }
 }

@@ -16,9 +16,11 @@ class Player extends Actor_1.Actor {
             this.inventory.addItem(enums_1.ItemType.pistol, 1);
             this.inventory.addItem(enums_1.ItemType.shotgun, 1);
             this.inventory.addItem(enums_1.ItemType.rifle, 1);
+            this.inventory.addItem(enums_1.ItemType.flamethrower, 1);
             this.attackController.weaponCollection.setWeaponAmmo(enums_1.WeaponType.shotgun, 100);
             this.attackController.weaponCollection.setWeaponAmmo(enums_1.WeaponType.pistol, 200);
             this.attackController.weaponCollection.setWeaponAmmo(enums_1.WeaponType.rifle, 100);
+            this.attackController.weaponCollection.setWeaponAmmo(enums_1.WeaponType.flamethrower, 100);
             this.inventory.addItem(enums_1.ItemType.medicalkit, 4);
             this.inventory.useItem(enums_1.WeaponType.shotgun);
         };
@@ -128,6 +130,8 @@ Player.onConnect = (socket) => {
             player.attackController.weaponCollection.changeWeapon(enums_1.WeaponType.shotgun);
         if (data.inputId == '4')
             player.attackController.weaponCollection.changeWeapon(enums_1.WeaponType.rifle);
+        if (data.inputId == '5')
+            player.attackController.weaponCollection.changeWeapon(enums_1.WeaponType.flamethrower);
         if (data.inputId == 'space')
             player.attackController.weaponCollection.chooseNextWeaponWithAmmo();
         if (data.inputId == 'smoke')

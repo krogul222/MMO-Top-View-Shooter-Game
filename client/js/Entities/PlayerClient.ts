@@ -110,14 +110,14 @@ export class PlayerClient{
             correction = 1.1;
         }
         
-        if(this.weapon == "shotgun"){
+        if(this.weapon == "shotgun" || this.weapon == "flamethrower"){
             correction = 1.4;
         }
        
         let frame = jsonPlayer["frames"]["player_"+this.weapon+"_meeleattack.png"]["frame"];
         let frameWidth = frame["w"]/spriteColumns;
         let frameHeight = frame["h"]/spriteRows;
-        camera.drawImage(Img["Player"], frameWidth, frameHeight, aimAngle, directionMod, walkingMod, x, y, this.width, this.height, frame["x"], frame["y"] );
+        camera.drawImage(Img["Player"], frameWidth, frameHeight, aimAngle, directionMod, walkingMod, x, y, this.width*correction, this.height*correction, frame["x"], frame["y"] );
         
 
 

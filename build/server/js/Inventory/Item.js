@@ -27,6 +27,14 @@ new Item(enums_1.WeaponType.pistol, "Pistol", function (actor) {
     actor.attackController.weaponCollection.removeWeapon(enums_1.WeaponType.pistol, amount);
 }, function (actor) {
 });
+new Item(enums_1.WeaponType.flamethrower, "Flamethrower", function (actor) {
+    actor.attackController.equip(enums_1.WeaponType.flamethrower);
+}, function (actor, amount) {
+    actor.attackController.weaponCollection.addWeapon(enums_1.WeaponType.flamethrower, amount);
+}, function (actor, amount) {
+    actor.attackController.weaponCollection.removeWeapon(enums_1.WeaponType.flamethrower, amount);
+}, function (actor) {
+});
 new Item(enums_1.WeaponType.knife, "Knife", function (actor) {
     actor.attackController.equip(enums_1.WeaponType.knife);
 }, function (actor, amount) {

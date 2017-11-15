@@ -16,39 +16,23 @@
 	"spriteSourceSize": {"x":0,"y":0,"w":16,"h":16},
 	"sourceSize": {"w":16,"h":16}
 },
+"cursor.png":
+{
+	"frame": {"x":3094,"y":2,"w":420,"h":420},
+	"rotated": false,
+	"trimmed": false,
+	"spriteSourceSize": {"x":0,"y":0,"w":420,"h":420},
+	"sourceSize": {"w":420,"h":420}
+},
 "explosion1.png":
 {
-	"frame": {"x":3094,"y":2,"w":500,"h":215},
+	"frame": {"x":3516,"y":2,"w":500,"h":215},
 	"rotated": false,
 	"trimmed": false,
 	"spriteSourceSize": {"x":0,"y":0,"w":500,"h":215},
 	"sourceSize": {"w":500,"h":215}
 },
-"hp.png":
-{
-	"frame": {"x":3596,"y":2,"w":32,"h":32},
-	"rotated": false,
-	"trimmed": false,
-	"spriteSourceSize": {"x":0,"y":0,"w":32,"h":32},
-	"sourceSize": {"w":32,"h":32}
-},
-"knife.png":
-{
-	"frame": {"x":3630,"y":2,"w":128,"h":128},
-	"rotated": false,
-	"trimmed": false,
-	"spriteSourceSize": {"x":0,"y":0,"w":128,"h":128},
-	"sourceSize": {"w":128,"h":128}
-},
-"pistol.png":
-{
-	"frame": {"x":3760,"y":2,"w":256,"h":256},
-	"rotated": false,
-	"trimmed": false,
-	"spriteSourceSize": {"x":0,"y":0,"w":256,"h":256},
-	"sourceSize": {"w":256,"h":256}
-},
-"pistolammo.png":
+"flamethrower.png":
 {
 	"frame": {"x":4018,"y":2,"w":128,"h":128},
 	"rotated": false,
@@ -56,9 +40,49 @@
 	"spriteSourceSize": {"x":0,"y":0,"w":128,"h":128},
 	"sourceSize": {"w":128,"h":128}
 },
+"flamethrowerammo.png":
+{
+	"frame": {"x":4148,"y":2,"w":128,"h":128},
+	"rotated": false,
+	"trimmed": false,
+	"spriteSourceSize": {"x":0,"y":0,"w":128,"h":128},
+	"sourceSize": {"w":128,"h":128}
+},
+"knife.png":
+{
+	"frame": {"x":4278,"y":2,"w":128,"h":128},
+	"rotated": false,
+	"trimmed": false,
+	"spriteSourceSize": {"x":0,"y":0,"w":128,"h":128},
+	"sourceSize": {"w":128,"h":128}
+},
+"medicalkit.png":
+{
+	"frame": {"x":4408,"y":2,"w":32,"h":32},
+	"rotated": false,
+	"trimmed": false,
+	"spriteSourceSize": {"x":0,"y":0,"w":32,"h":32},
+	"sourceSize": {"w":32,"h":32}
+},
+"pistol.png":
+{
+	"frame": {"x":4442,"y":2,"w":256,"h":256},
+	"rotated": false,
+	"trimmed": false,
+	"spriteSourceSize": {"x":0,"y":0,"w":256,"h":256},
+	"sourceSize": {"w":256,"h":256}
+},
+"pistolammo.png":
+{
+	"frame": {"x":4700,"y":2,"w":128,"h":128},
+	"rotated": false,
+	"trimmed": false,
+	"spriteSourceSize": {"x":0,"y":0,"w":128,"h":128},
+	"sourceSize": {"w":128,"h":128}
+},
 "rifle.png":
 {
-	"frame": {"x":4148,"y":2,"w":400,"h":400},
+	"frame": {"x":4830,"y":2,"w":400,"h":400},
 	"rotated": false,
 	"trimmed": false,
 	"spriteSourceSize": {"x":0,"y":0,"w":400,"h":400},
@@ -66,7 +90,7 @@
 },
 "rifleammo.png":
 {
-	"frame": {"x":4550,"y":2,"w":50,"h":50},
+	"frame": {"x":5232,"y":2,"w":50,"h":50},
 	"rotated": false,
 	"trimmed": false,
 	"spriteSourceSize": {"x":0,"y":0,"w":50,"h":50},
@@ -74,7 +98,7 @@
 },
 "scorpion.png":
 {
-	"frame": {"x":4602,"y":2,"w":192,"h":128},
+	"frame": {"x":5284,"y":2,"w":192,"h":128},
 	"rotated": false,
 	"trimmed": false,
 	"spriteSourceSize": {"x":0,"y":0,"w":192,"h":128},
@@ -82,7 +106,7 @@
 },
 "shotgun.png":
 {
-	"frame": {"x":4796,"y":2,"w":256,"h":256},
+	"frame": {"x":5478,"y":2,"w":256,"h":256},
 	"rotated": false,
 	"trimmed": false,
 	"spriteSourceSize": {"x":0,"y":0,"w":256,"h":256},
@@ -90,7 +114,7 @@
 },
 "shotgunammo.png":
 {
-	"frame": {"x":5054,"y":2,"w":50,"h":50},
+	"frame": {"x":5736,"y":2,"w":50,"h":50},
 	"rotated": false,
 	"trimmed": false,
 	"spriteSourceSize": {"x":0,"y":0,"w":50,"h":50},
@@ -98,7 +122,7 @@
 },
 "zombie_attack.png":
 {
-	"frame": {"x":5106,"y":2,"w":2862,"h":294},
+	"frame": {"x":2,"y":516,"w":2862,"h":294},
 	"rotated": false,
 	"trimmed": false,
 	"spriteSourceSize": {"x":0,"y":0,"w":2862,"h":294},
@@ -106,7 +130,7 @@
 },
 "zombie_move.png":
 {
-	"frame": {"x":2,"y":516,"w":4896,"h":311},
+	"frame": {"x":2866,"y":516,"w":4896,"h":311},
 	"rotated": false,
 	"trimmed": false,
 	"spriteSourceSize": {"x":0,"y":0,"w":4896,"h":311},
@@ -115,10 +139,10 @@
 "meta": {
 	"app": "http://www.texturepacker.com",
 	"version": "1.0",
-	"image": "Sprites.png",
+	"image": "ItemsAndEnemiesImages.png",
 	"format": "RGBA8888",
 	"size": {"w":8192,"h":1024},
 	"scale": "1",
-	"smartupdate": "$TexturePacker:SmartUpdate:3b2dbfb13f53ce5a5679b5ad72f6d11e$"
+	"smartupdate": "$TexturePacker:SmartUpdate:8953c1e64fa80ad322b643c817220f1d$"
 }
 }

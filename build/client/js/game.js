@@ -302,6 +302,8 @@ document.onkeydown = function (event) {
         socket.emit('keyPress', { inputId: '3', state: true });
     else if (event.keyCode === 52)
         socket.emit('keyPress', { inputId: '4', state: true });
+    else if (event.keyCode === 53)
+        socket.emit('keyPress', { inputId: '5', state: true });
     else if (event.keyCode === 32) {
         socket.emit('keyPress', { inputId: 'space', state: true });
         return false;

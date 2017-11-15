@@ -72,13 +72,13 @@ class PlayerClient {
             if (this.weapon == "pistol") {
                 correction = 1.1;
             }
-            if (this.weapon == "shotgun") {
+            if (this.weapon == "shotgun" || this.weapon == "flamethrower") {
                 correction = 1.4;
             }
             let frame = images_1.jsonPlayer["frames"]["player_" + this.weapon + "_meeleattack.png"]["frame"];
             let frameWidth = frame["w"] / spriteColumns;
             let frameHeight = frame["h"] / spriteRows;
-            canvas_1.camera.drawImage(images_2.Img["Player"], frameWidth, frameHeight, aimAngle, directionMod, walkingMod, x, y, this.width, this.height, frame["x"], frame["y"]);
+            canvas_1.camera.drawImage(images_2.Img["Player"], frameWidth, frameHeight, aimAngle, directionMod, walkingMod, x, y, this.width * correction, this.height * correction, frame["x"], frame["y"]);
             if (this.bodySpriteAnimCounter % spriteColumns >= (spriteColumns - 1)) {
                 this.bodySpriteAnimCounter = 0;
                 this.attackStarted = false;

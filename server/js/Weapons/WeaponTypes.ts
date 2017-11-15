@@ -73,6 +73,19 @@ reloadSpd: 5,
 recoil: false
 });
 
+new WeaponTypes({weapon: WeaponType.flamethrower, name: "flamethrower",
+attackRadius: 0,
+attackSpd: 4,
+attackMelee : false,
+shootDmg : 2,
+meleeDmg : 2,
+maxSpd : 10,
+shootSpeed : 30,
+reloadAmmo : 0,
+reloadSpd: -1,
+recoil: false
+});
+
 new WeaponTypes({weapon: WeaponType.shotgun, name: "shotgun",
 attackRadius: 3,
 attackSpd: 2,
