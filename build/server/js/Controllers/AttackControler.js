@@ -1,4 +1,6 @@
 Object.defineProperty(exports, "__esModule", { value: true });
+const enums_1 = require("./../enums");
+const Flame_1 = require("./../Effects/Flame");
 const Bullet_1 = require("./../Entities/Bullet");
 const WeaponCollection_1 = require("./../Weapons/WeaponCollection");
 const Counter_1 = require("./../Counter");
@@ -22,6 +24,8 @@ class AttackController {
             this._reloadCounter.count();
             this._attackCounter.count();
             this.performAttack();
+            if (this._pressingAttack == false)
+                this._flame.create = false;
         };
         this.performAttack = () => {
             if (!this._reloadCounter.isActive() && this._pressingAttack) {
@@ -54,10 +58,16 @@ class AttackController {
                 let shootSpeed = this._activeWeapon.shootSpeed;
                 let aimAngle = this.parent.movementController.aimAngle;
                 let attackRadius = this._activeWeapon.attackRadius;
-                this.shootBullet(this.parent.movementController.aimAngle, shootSpeed);
-                for (let i = 0; i < attackRadius; i++) {
-                    this.shootBullet(aimAngle + (i + 1) * 2, shootSpeed);
-                    this.shootBullet(aimAngle - (i + 1) * 2, shootSpeed);
+                if (this._activeWeapon.attackType == enums_1.AttackType.bullet) {
+                    this.shootBullet(this.parent.movementController.aimAngle, shootSpeed);
+                    for (let i = 0; i < attackRadius; i++) {
+                        this.shootBullet(aimAngle + (i + 1) * 2, shootSpeed);
+                        this.shootBullet(aimAngle - (i + 1) * 2, shootSpeed);
+                    }
+                }
+                if (this._activeWeapon.attackType == enums_1.AttackType.fire) {
+                    this._flame.create = true;
+                    this._flame.update();
                 }
             }
         };
@@ -89,6 +99,7 @@ class AttackController {
         this._activeWeapon = new WeaponCollection_1.SingleWeapon(this.parent, { weapon: "0", ammo: "20", parent: this.parent });
         if (param.atkSpd)
             this._attackCounter.setInc(param.atkSpd);
+        this._flame = new Flame_1.Flame({ parent: parent, map: this.parent.map, offset: 50, life: 30 });
         this.attackCounter.activate();
     }
     get melee() { return this._melee; }

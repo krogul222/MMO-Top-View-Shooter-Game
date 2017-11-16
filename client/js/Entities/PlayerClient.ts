@@ -1,3 +1,4 @@
+import { FireFlameClient } from './../FireFlameClient';
 import { jsonPlayer } from './../images';
 import { initPack } from './../../../server/js/globalVariables';
 import { Point } from './../../../server/js/GeometryAndPhysics';
@@ -30,6 +31,7 @@ export class PlayerClient{
     public weapon = "pistol";
     public ammo = 0;
     public ammoInGun = 0;
+    public flame:FireFlameClient = new FireFlameClient(this);
 
     constructor(initPack) {
         if(initPack.id) this.id = initPack.id;

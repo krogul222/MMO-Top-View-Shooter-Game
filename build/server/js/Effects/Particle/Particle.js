@@ -7,7 +7,7 @@ class Particle {
     constructor(param) {
         this.position = new GeometryAndPhysics_1.Point(0, 0);
         this.velocity = new GeometryAndPhysics_1.Point(0, 0);
-        this.size = 10;
+        this.size = 40;
         this.life = 0;
         this.maxLife = 10;
         this.toRemove = false;
@@ -22,7 +22,7 @@ class Particle {
                 for (let key in Enemy_1.Enemy.list) {
                     let enemy = Enemy_1.Enemy.list[key];
                     if (this.testCollision(enemy)) {
-                        enemy.lifeAndBodyController.wasHit(0.03 * this.life / this.maxLife);
+                        enemy.lifeAndBodyController.wasHit(1 * this.life / this.maxLife);
                     }
                 }
             }

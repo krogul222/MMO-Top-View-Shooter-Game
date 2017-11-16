@@ -13,6 +13,7 @@ export class Flame{
         speed: number = 3; 
         offset: number = 0;
         parent: Actor = null;
+        create: boolean = false;
         life: number = 60;
         map;
 
@@ -33,12 +34,12 @@ export class Flame{
         }
     
 
-        update = (create: boolean) => {
-            if(create){
+        update = () => {
+            if(this.create){
                 let angleInRad: number = 0;
                 let posWithOffset: Point = new Point(0, 0); 
 
-                for(let i = 0; i < 5; i++) {
+                for(let i = 0; i < 1; i++) {
                     
                     if(this.parent !== undefined){
                         angleInRad = ((this.parent.movementController.aimAngle+180)*Math.PI)/180;

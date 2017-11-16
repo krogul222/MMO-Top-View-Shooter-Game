@@ -11,12 +11,13 @@ class Flame {
         this.speed = 3;
         this.offset = 0;
         this.parent = null;
+        this.create = false;
         this.life = 60;
-        this.update = (create) => {
-            if (create) {
+        this.update = () => {
+            if (this.create) {
                 let angleInRad = 0;
                 let posWithOffset = new GeometryAndPhysics_1.Point(0, 0);
-                for (let i = 0; i < 5; i++) {
+                for (let i = 0; i < 1; i++) {
                     if (this.parent !== undefined) {
                         angleInRad = ((this.parent.movementController.aimAngle + 180) * Math.PI) / 180;
                         posWithOffset.x = this.parent.position.x - Math.cos(angleInRad) * this.offset;

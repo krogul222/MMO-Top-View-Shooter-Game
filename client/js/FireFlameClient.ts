@@ -12,11 +12,13 @@ export class FireFlameClient{
     angle: number = 0;
     position: Point = new Point(0, 0);
     speed: number = 5; 
+    parent;
 
-    constructor(position: Point, angle: number){
-        this.position.x = position.x;
-        this.position.y = position.y;
-        this.angle = angle;
+    constructor(parent){
+        this.parent = parent;
+        this.position.x = parent.position.x;
+        this.position.y = parent.position.y;
+        this.angle = this.parent.aimAngle+180;
     }
 
     draw = () => {
@@ -33,8 +35,8 @@ export class FireFlameClient{
             for(let i = 0; i < 10; i++) {
                 let p = new FireParticle(60);
                 //p.position.updatePosition(this.position.x, this.position.y);
-                let oldpos : Point = new Point(PlayerClient.list[selfId].position.x, PlayerClient.list[selfId].position.y);
-                let angle: number = PlayerClient.list[selfId].aimAngle+180;
+                let oldpos : Point = new Point(this.parent.position.x, this.parent.position.y);
+                let angle: number = this.parent.aimAngle+180;
 
                 oldpos.x -=  Math.cos((angle*Math.PI)/180)*50;
                 oldpos.y -=  Math.sin((angle*Math.PI)/180)*50;

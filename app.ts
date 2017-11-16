@@ -116,6 +116,8 @@ setInterval(function(){
     
     let packs = Entity.getFrameUpdateData();
     
+  //  Particle.update();
+
     let pack = {
         player: Player.update(),
         bullet: Bullet.update(),
@@ -124,14 +126,14 @@ setInterval(function(){
         smoke: Smoke.update()
        // upgrade: Upgrade.update()
     }
-
+/*
     let flame: Flame;
 
     for(let i in Flame.list){
         flame = Flame.list[i];
         flame.update(true);
     }
-    
+    */
     frameCount++;
     
     for(let i in SOCKET_LIST){

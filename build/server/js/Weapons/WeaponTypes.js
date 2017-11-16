@@ -1,5 +1,6 @@
 Object.defineProperty(exports, "__esModule", { value: true });
-const enums_1 = require("../enums");
+const enums_1 = require("./../enums");
+const enums_2 = require("../enums");
 class WeaponTypes {
     constructor(param) {
         this.name = "";
@@ -13,7 +14,7 @@ class WeaponTypes {
         this.recoil = false;
         this.maxSpd = 8;
         this.reloadAmmo = 0;
-        this._weapon = (param.weapon !== undefined) ? param.weapon : enums_1.WeaponType.knife;
+        this._weapon = (param.weapon !== undefined) ? param.weapon : enums_2.WeaponType.knife;
         this.attackRadius = (param.attackRadius !== undefined) ? param.attackRadius : 0;
         this.attackSpd = (param.attackSpd !== undefined) ? param.attackSpd : 0;
         this.attackMelee = (param.attackMelee !== undefined) ? param.attackMelee : true;
@@ -25,6 +26,7 @@ class WeaponTypes {
         this.reloadSpd = (param.reloadSpd !== undefined) ? param.reloadSpd : 0;
         this.recoil = (param.recoil !== undefined) ? param.recoil : false;
         this.name = (param.name !== undefined) ? param.name : "knife";
+        this.attackType = (param.attackType !== undefined) ? param.attackType : enums_1.AttackType.contact;
         WeaponTypes.list[param.weapon] = this;
     }
     get weapon() { return this._weapon; }
@@ -45,11 +47,11 @@ WeaponTypes.getWeaponIdbyName = (name) => {
             return weaponFromBank.weapon;
         }
     }
-    return enums_1.WeaponType.knife;
+    return enums_2.WeaponType.knife;
 };
 WeaponTypes.list = {};
 exports.WeaponTypes = WeaponTypes;
-new WeaponTypes({ weapon: enums_1.WeaponType.pistol, name: "pistol",
+new WeaponTypes({ weapon: enums_2.WeaponType.pistol, name: "pistol",
     attackRadius: 0,
     attackSpd: 4,
     attackMelee: false,
@@ -59,11 +61,12 @@ new WeaponTypes({ weapon: enums_1.WeaponType.pistol, name: "pistol",
     shootSpeed: 30,
     reloadAmmo: 6,
     reloadSpd: 5,
-    recoil: false
+    recoil: false,
+    attackType: enums_1.AttackType.bullet
 });
-new WeaponTypes({ weapon: enums_1.WeaponType.flamethrower, name: "flamethrower",
+new WeaponTypes({ weapon: enums_2.WeaponType.flamethrower, name: "flamethrower",
     attackRadius: 0,
-    attackSpd: 4,
+    attackSpd: 6,
     attackMelee: false,
     shootDmg: 2,
     meleeDmg: 2,
@@ -71,9 +74,10 @@ new WeaponTypes({ weapon: enums_1.WeaponType.flamethrower, name: "flamethrower",
     shootSpeed: 30,
     reloadAmmo: 0,
     reloadSpd: -1,
-    recoil: false
+    recoil: false,
+    attackType: enums_1.AttackType.fire
 });
-new WeaponTypes({ weapon: enums_1.WeaponType.shotgun, name: "shotgun",
+new WeaponTypes({ weapon: enums_2.WeaponType.shotgun, name: "shotgun",
     attackRadius: 3,
     attackSpd: 2,
     attackMelee: false,
@@ -83,9 +87,10 @@ new WeaponTypes({ weapon: enums_1.WeaponType.shotgun, name: "shotgun",
     shootSpeed: 25,
     reloadAmmo: 2,
     reloadSpd: 2,
-    recoil: false
+    recoil: false,
+    attackType: enums_1.AttackType.bullet
 });
-new WeaponTypes({ weapon: enums_1.WeaponType.knife, name: "knife",
+new WeaponTypes({ weapon: enums_2.WeaponType.knife, name: "knife",
     attackRadius: 0,
     attackSpd: 3,
     attackMelee: true,
@@ -94,9 +99,10 @@ new WeaponTypes({ weapon: enums_1.WeaponType.knife, name: "knife",
     maxSpd: 11,
     reloadAmmo: 0,
     reloadSpd: 0,
-    recoil: false
+    recoil: false,
+    attackType: enums_1.AttackType.contact
 });
-new WeaponTypes({ weapon: enums_1.WeaponType.rifle, name: "rifle",
+new WeaponTypes({ weapon: enums_2.WeaponType.rifle, name: "rifle",
     attackRadius: 0,
     attackSpd: 1,
     attackMelee: false,
@@ -106,9 +112,10 @@ new WeaponTypes({ weapon: enums_1.WeaponType.rifle, name: "rifle",
     shootSpeed: 40,
     reloadAmmo: 1,
     reloadSpd: 2,
-    recoil: true
+    recoil: true,
+    attackType: enums_1.AttackType.bullet
 });
-new WeaponTypes({ weapon: enums_1.WeaponType.claws, name: "claws",
+new WeaponTypes({ weapon: enums_2.WeaponType.claws, name: "claws",
     attackRadius: 0,
     attackSpd: 3,
     attackMelee: true,
@@ -116,6 +123,7 @@ new WeaponTypes({ weapon: enums_1.WeaponType.claws, name: "claws",
     meleeDmg: 5,
     reloadAmmo: 0,
     reloadSpd: 0,
-    recoil: false
+    recoil: false,
+    attackType: enums_1.AttackType.contact
 });
 //# sourceMappingURL=WeaponTypes.js.map

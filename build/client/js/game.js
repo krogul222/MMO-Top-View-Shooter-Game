@@ -1,10 +1,8 @@
 Object.defineProperty(exports, "__esModule", { value: true });
-const FireFlameClient_1 = require("./FireFlameClient");
 const SmokeClient_1 = require("./SmokeClient");
 const Particle_1 = require("./Particle");
 const Effects_1 = require("./Effects");
 const Filters_1 = require("./Filters");
-const GeometryAndPhysics_1 = require("./../../server/js/GeometryAndPhysics");
 const canvas_1 = require("./canvas");
 const MapControler_1 = require("./../../server/js/Controllers/MapControler");
 const GameSoundManager_1 = require("./GameSoundManager");
@@ -18,8 +16,7 @@ const Inventory_1 = require("../../server/js/Inventory/Inventory");
 const ParticleClient_1 = require("./Effects/ParticleClient");
 exports.selfId = 0;
 let smokeTest = false;
-let flameModeOn = false;
-let flameFire = false;
+let flameFire = true;
 exports.inventory = new Inventory_1.Inventory(socket, false, 0);
 MapControler_1.MapController.loadMaps();
 exports.currentMap = new MapClient_1.MapClient(null, "forest");
@@ -30,7 +27,6 @@ socket.on('updateInventory', function (items) {
 exports.gameSoundManager = new GameSoundManager_1.GameSoundManager();
 exports.canvasFilters = new Filters_1.Filters(ctx);
 exports.effects = new Effects_1.Effects(ctx);
-let flame = new FireFlameClient_1.FireFlameClient(new GeometryAndPhysics_1.Point(250, 250), 0);
 socket.on('mapData', function (data) {
     MapControler_1.MapController.updateMap(data);
     if (exports.currentMap.name == data.name) {
@@ -274,8 +270,10 @@ setInterval(function () {
         ParticleClient_1.ParticleClient.list[i].draw();
     }
     ctx.globalCompositeOperation = "source-over";
-    flame.update(flameFire);
-    flame.draw();
+    for (let i in PlayerClient_1.PlayerClient.list) {
+        PlayerClient_1.PlayerClient.list[i].flame.update(flameFire);
+        PlayerClient_1.PlayerClient.list[i].flame.draw();
+    }
     exports.effects.draw();
     exports.effects.update();
     for (let i in SmokeClient_1.SmokeClient.list) {
@@ -342,9 +340,6 @@ document.onkeydown = function (event) {
     if (event.keyCode === 66) {
         socket.emit('keyPress', { inputId: 'smoke' });
     }
-    if (event.keyCode === 70) {
-        flameModeOn = flameModeOn ? false : true;
-    }
     if (event.keyCode === 80) {
         let elt = document.getElementById("gameDiv");
         console.log("Requesting fullscreen for", elt);
@@ -376,20 +371,12 @@ document.onkeyup = function (event) {
         socket.emit('keyPress', { inputId: 'up', state: false });
 };
 document.onmousedown = function (event) {
-    if (flameModeOn) {
-        flameFire = true;
-    }
-    else {
-        socket.emit('keyPress', { inputId: 'attack', state: true });
-    }
+    flameFire = true;
+    socket.emit('keyPress', { inputId: 'attack', state: true });
 };
 document.onmouseup = function (event) {
-    if (flameModeOn) {
-        flameFire = false;
-    }
-    else {
-        socket.emit('keyPress', { inputId: 'attack', state: false });
-    }
+    flameFire = false;
+    socket.emit('keyPress', { inputId: 'attack', state: false });
 };
 document.onmousemove = function (event) {
     if (exports.selfId) {

@@ -61,6 +61,13 @@ var ParticleType;
     ParticleType[ParticleType["fire"] = 0] = "fire";
 })(ParticleType = exports.ParticleType || (exports.ParticleType = {}));
 ;
+var AttackType;
+(function (AttackType) {
+    AttackType[AttackType["bullet"] = 0] = "bullet";
+    AttackType[AttackType["fire"] = 1] = "fire";
+    AttackType[AttackType["contact"] = 2] = "contact";
+})(AttackType = exports.AttackType || (exports.AttackType = {}));
+;
 var MapObjectType;
 (function (MapObjectType) {
     MapObjectType[MapObjectType["GR_LU"] = 1] = "GR_LU";

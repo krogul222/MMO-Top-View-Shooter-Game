@@ -30,8 +30,7 @@ declare var gui: GUI;
 
 export var selfId: number = 0;
 let smokeTest: boolean = false;
-let flameModeOn = false;
-let flameFire = false;
+let flameFire = true;
 
 export let inventory = new Inventory(socket, false, 0);
 
@@ -49,7 +48,7 @@ export let gameSoundManager = new GameSoundManager();
 export let canvasFilters: Filters = new Filters(ctx);
 export let effects: Effects = new Effects(ctx);
 
-let flame = new FireFlameClient(new Point(250,250), 0);
+//let flame = new FireFlameClient(PlayerClient[selfId]);
 
 socket.on('mapData', function(data){
     MapController.updateMap(data);
@@ -344,8 +343,10 @@ setInterval(function(){
     }  
     ctx.globalCompositeOperation="source-over";
 
-    flame.update(flameFire);
-    flame.draw();
+    for(let i in PlayerClient.list){
+        PlayerClient.list[i].flame.update(flameFire);
+        PlayerClient.list[i].flame.draw();
+    }
     
     effects.draw();
     effects.update();
@@ -426,9 +427,9 @@ document.onkeydown = function(event){
         socket.emit('keyPress', {inputId:'smoke'});
     }
     
-    if(event.keyCode === 70){
+ /*   if(event.keyCode === 70){
         flameModeOn = flameModeOn ? false: true;
-    }
+    }*/
 
     if(event.keyCode === 80){
         let elt = document.getElementById("gameDiv");
@@ -461,20 +462,13 @@ document.onkeyup = function(event){
 
 document.onmousedown = function(event){
    // console.log("Left click PRESSED");
-   if(flameModeOn){
         flameFire = true;
-   } else {
         socket.emit('keyPress', {inputId:'attack', state:true});
-   }
-    
 }
+
 document.onmouseup = function(event){
-    if(flameModeOn){
-        flameFire = false;
-    } else{
-        socket.emit('keyPress', {inputId:'attack', state:false});
-    }
-    
+    flameFire = false;
+    socket.emit('keyPress', {inputId:'attack', state:false});
 }
 
 

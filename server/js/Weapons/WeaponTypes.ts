@@ -1,3 +1,4 @@
+import { AttackType } from './../enums';
 import { WeaponType } from "../enums";
 
 
@@ -13,6 +14,7 @@ export class WeaponTypes {
     reloadSpd: number = 30;
     recoil: boolean = false;
     _weapon: WeaponType;
+    attackType: AttackType;
     maxSpd: number = 8;
     reloadAmmo: number = 0; 
 
@@ -29,6 +31,7 @@ export class WeaponTypes {
         this.reloadSpd = (param.reloadSpd !== undefined) ? param.reloadSpd : 0;
         this.recoil = (param.recoil !== undefined) ? param.recoil : false;
         this.name = (param.name !== undefined) ? param.name : "knife";
+        this.attackType = (param.attackType !== undefined) ? param.attackType : AttackType.contact;
 
         WeaponTypes.list[param.weapon] = this;
     }
@@ -70,12 +73,13 @@ maxSpd : 10,
 shootSpeed : 30,
 reloadAmmo : 6,
 reloadSpd: 5,
-recoil: false
+recoil: false,
+attackType: AttackType.bullet
 });
 
 new WeaponTypes({weapon: WeaponType.flamethrower, name: "flamethrower",
 attackRadius: 0,
-attackSpd: 4,
+attackSpd: 6,
 attackMelee : false,
 shootDmg : 2,
 meleeDmg : 2,
@@ -83,7 +87,8 @@ maxSpd : 10,
 shootSpeed : 30,
 reloadAmmo : 0,
 reloadSpd: -1,
-recoil: false
+recoil: false,
+attackType: AttackType.fire
 });
 
 new WeaponTypes({weapon: WeaponType.shotgun, name: "shotgun",
@@ -96,7 +101,8 @@ maxSpd : 8,
 shootSpeed : 25,
 reloadAmmo : 2,
 reloadSpd: 2,
-recoil: false
+recoil: false,
+attackType: AttackType.bullet
 });
 
 new WeaponTypes({weapon: WeaponType.knife, name: "knife",
@@ -108,7 +114,8 @@ meleeDmg : 8,
 maxSpd : 11,
 reloadAmmo : 0,
 reloadSpd: 0,
-recoil: false
+recoil: false,
+attackType: AttackType.contact
 });
 
 new WeaponTypes({weapon: WeaponType.rifle, name: "rifle",
@@ -121,7 +128,8 @@ maxSpd : 8,
 shootSpeed : 40,
 reloadAmmo : 1,
 reloadSpd: 2,
-recoil: true
+recoil: true,
+attackType: AttackType.bullet
 });
 
 new WeaponTypes({weapon: WeaponType.claws , name: "claws",
@@ -132,5 +140,7 @@ shootDmg : 0,
 meleeDmg : 5,
 reloadAmmo : 0,
 reloadSpd: 0,
-recoil: false
+recoil: false,
+attackType: AttackType.contact
+
 });

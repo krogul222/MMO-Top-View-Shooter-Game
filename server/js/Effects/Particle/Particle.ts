@@ -9,7 +9,7 @@ declare var ctx: any;
 export class Particle{
     position: Point = new Point(0, 0);  // Set the initial x and y positions
     velocity: Point = new Point(0, 0);  // Set the initial velocity
-    size: number = 10;
+    size: number = 40;
     life: number = 0;
     maxLife: number = 10;
     toRemove: boolean = false;
@@ -49,7 +49,7 @@ export class Particle{
                 let enemy: Enemy = Enemy.list[key]; 
                 if(this.testCollision(enemy)){
                     //this.toRemove = true;
-                    enemy.lifeAndBodyController.wasHit(0.03*this.life/this.maxLife);
+                    enemy.lifeAndBodyController.wasHit(1*this.life/this.maxLife);
                 }
             }
         }

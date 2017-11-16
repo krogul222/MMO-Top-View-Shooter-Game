@@ -179,6 +179,7 @@ class SingleWeapon {
                     this.name = weaponProperties.name;
                     this._ammo = weaponCollection.weapons[i].ammo;
                     this._ammoInGun = weaponCollection.weapons[i].ammoInGun;
+                    this.attackType = weaponProperties.attackType;
                 }
             }
         };
@@ -186,6 +187,7 @@ class SingleWeapon {
             this._weapon = param.weapon;
             let weaponParameters = WeaponTypes_1.WeaponTypes.getWeaponParameters(this._weapon);
             this._ammoInGun = weaponParameters.reloadAmmo;
+            this.attackType = weaponParameters.attackType;
         }
         else {
             this._weapon = enums_1.WeaponType.knife;

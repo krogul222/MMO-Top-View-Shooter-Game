@@ -1,10 +1,8 @@
 Object.defineProperty(exports, "__esModule", { value: true });
-const game_1 = require("./game");
-const PlayerClient_1 = require("./Entities/PlayerClient");
 const GeometryAndPhysics_1 = require("./../../server/js/GeometryAndPhysics");
 const FireParticle_1 = require("./FireParticle");
 class FireFlameClient {
-    constructor(position, angle) {
+    constructor(parent) {
         this.particles = [];
         this.angle = 0;
         this.position = new GeometryAndPhysics_1.Point(0, 0);
@@ -20,8 +18,8 @@ class FireFlameClient {
             if (create) {
                 for (let i = 0; i < 10; i++) {
                     let p = new FireParticle_1.FireParticle(60);
-                    let oldpos = new GeometryAndPhysics_1.Point(PlayerClient_1.PlayerClient.list[game_1.selfId].position.x, PlayerClient_1.PlayerClient.list[game_1.selfId].position.y);
-                    let angle = PlayerClient_1.PlayerClient.list[game_1.selfId].aimAngle + 180;
+                    let oldpos = new GeometryAndPhysics_1.Point(this.parent.position.x, this.parent.position.y);
+                    let angle = this.parent.aimAngle + 180;
                     oldpos.x -= Math.cos((angle * Math.PI) / 180) * 50;
                     oldpos.y -= Math.sin((angle * Math.PI) / 180) * 50;
                     p.position.updatePosition(oldpos.x, oldpos.y);
@@ -43,9 +41,10 @@ class FireFlameClient {
                 }
             }
         };
-        this.position.x = position.x;
-        this.position.y = position.y;
-        this.angle = angle;
+        this.parent = parent;
+        this.position.x = parent.position.x;
+        this.position.y = parent.position.y;
+        this.angle = this.parent.aimAngle + 180;
     }
 }
 exports.FireFlameClient = FireFlameClient;

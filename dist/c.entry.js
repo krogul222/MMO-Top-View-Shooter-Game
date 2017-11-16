@@ -60,12 +60,12 @@
 /******/ 	__webpack_require__.p = "/dist/";
 /******/
 /******/ 	// Load entry module and return exports
-/******/ 	return __webpack_require__(__webpack_require__.s = 3);
+/******/ 	return __webpack_require__(__webpack_require__.s = 2);
 /******/ })
 /************************************************************************/
 /******/ ({
 
-/***/ 3:
+/***/ 2:
 /***/ (function(module, exports) {
 
 Object.defineProperty(exports, "__esModule", { value: true });

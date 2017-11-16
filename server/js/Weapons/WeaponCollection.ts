@@ -1,3 +1,4 @@
+import { AttackType } from './../enums';
 import { Actor } from './../Entities/Actor';
 import { WeaponTypes } from './WeaponTypes';
 import { WeaponType } from '../enums';
@@ -151,12 +152,14 @@ export class SingleWeapon {
         _weapon: WeaponType;
         _ammo: number;
         name: string = "";
+        attackType: AttackType;
 
         constructor (private parent: Actor, param) {
             if(param.weapon !== undefined) {
                 this._weapon = param.weapon; 
                 let weaponParameters: WeaponTypes = WeaponTypes.getWeaponParameters(this._weapon);
                 this._ammoInGun = weaponParameters.reloadAmmo;
+                this.attackType = weaponParameters.attackType;
             } else{
                 this._weapon = WeaponType.knife;
             }
@@ -234,6 +237,7 @@ export class SingleWeapon {
                     this.name = weaponProperties.name;
                     this._ammo = weaponCollection.weapons[i].ammo;
                     this._ammoInGun = weaponCollection.weapons[i].ammoInGun;
+                    this.attackType = weaponProperties.attackType;
                 }
             }
         }

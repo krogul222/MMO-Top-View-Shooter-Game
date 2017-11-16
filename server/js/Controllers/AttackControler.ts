@@ -1,3 +1,5 @@
+import { AttackType } from './../enums';
+import { Flame } from './../Effects/Flame';
 import { Bullet } from './../Entities/Bullet';
 import { Actor } from './../Entities/Actor';
 import { WeaponCollection, SingleWeapon } from './../Weapons/WeaponCollection';
@@ -16,12 +18,15 @@ export class AttackController {
     private _activeWeapon: SingleWeapon;
     private _weaponCollection: WeaponCollection;
     private _pressingAttack: boolean = false;
-
+    private _flame: Flame;
 
     constructor (private parent: Actor, param) {
         this._weaponCollection = new WeaponCollection(this.parent);
         this._activeWeapon = new SingleWeapon(this.parent, {weapon: "0", ammo: "20", parent: this.parent});
         if(param.atkSpd) this._attackCounter.setInc(param.atkSpd);
+
+        this._flame = new Flame({parent: parent, map: this.parent.map, offset: 50, life: 30});
+        
         //this.equip(WeaponType.knife);
         this.attackCounter.activate();
     }
@@ -38,6 +43,10 @@ export class AttackController {
         this._attackCounter.count();
 
         this.performAttack();
+
+        if(this._pressingAttack == false) this._flame.create = false;
+
+        
     }
 
     performAttack = () => {
@@ -75,13 +84,20 @@ export class AttackController {
             let aimAngle = this.parent.movementController.aimAngle;
             let attackRadius = this._activeWeapon.attackRadius;
 
-            this.shootBullet(this.parent.movementController.aimAngle, shootSpeed);
-
-            for(let i = 0; i < attackRadius; i++){
-                this.shootBullet(aimAngle+(i+1)*2, shootSpeed);
-                this.shootBullet(aimAngle-(i+1)*2, shootSpeed);
-
+            if(this._activeWeapon.attackType == AttackType.bullet){
+                this.shootBullet(this.parent.movementController.aimAngle, shootSpeed);
+                
+                            for(let i = 0; i < attackRadius; i++){
+                                this.shootBullet(aimAngle+(i+1)*2, shootSpeed);
+                                this.shootBullet(aimAngle-(i+1)*2, shootSpeed);
+                            }
             }
+
+            if(this._activeWeapon.attackType == AttackType.fire){
+                this._flame.create = true;
+                this._flame.update();
+            }
+
         }
     }
 

@@ -1,4 +1,5 @@
 Object.defineProperty(exports, "__esModule", { value: true });
+const FireFlameClient_1 = require("./../FireFlameClient");
 const images_1 = require("./../images");
 const GeometryAndPhysics_1 = require("./../../../server/js/GeometryAndPhysics");
 const game_1 = require("../game");
@@ -23,6 +24,7 @@ class PlayerClient {
         this.weapon = "pistol";
         this.ammo = 0;
         this.ammoInGun = 0;
+        this.flame = new FireFlameClient_1.FireFlameClient(this);
         this.draw = () => {
             if (PlayerClient.list[game_1.selfId].map !== this.map) {
                 return;
