@@ -4,6 +4,7 @@ const canvas_1 = require("./../canvas");
 const PlayerClient_1 = require("./PlayerClient");
 const GeometryAndPhysics_1 = require("../../../server/js/GeometryAndPhysics");
 const game_1 = require("../game");
+const FireFlameClient_1 = require("../FireFlameClient");
 class EnemyClient {
     constructor(initPack) {
         this.id = -1;
@@ -22,6 +23,8 @@ class EnemyClient {
         this.moving = false;
         this.reload = false;
         this.weapon = "pistol";
+        this.flame = new FireFlameClient_1.FireFlameClient(this);
+        this.burn = new FireFlameClient_1.FireFlameClient(this, true);
         this.draw = () => {
             if (PlayerClient_1.PlayerClient.list[game_1.selfId].map !== this.map) {
                 return;

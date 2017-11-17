@@ -49,7 +49,7 @@ MapController.getMapPack = (map) => {
 };
 MapController.loadMaps = () => {
     console.log("Pierwsza Map");
-    MapController.createMap("forest", 16, 20);
+    MapController.createMap("forest", 32, 20);
 };
 MapController.updateMap = (param) => {
     if (param !== undefined) {

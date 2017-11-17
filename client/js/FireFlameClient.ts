@@ -12,13 +12,16 @@ export class FireFlameClient{
     angle: number = 0;
     position: Point = new Point(0, 0);
     speed: number = 5; 
+    create: boolean = false;
+    burn: boolean = false;
     parent;
 
-    constructor(parent){
+    constructor(parent, burn: boolean = false){
         this.parent = parent;
         this.position.x = parent.position.x;
         this.position.y = parent.position.y;
         this.angle = this.parent.aimAngle+180;
+        this.burn = burn;
     }
 
     draw = () => {
@@ -30,16 +33,30 @@ export class FireFlameClient{
         ctx.globalCompositeOperation="source-over";
     }
 
-    update = (create: boolean) => {
-        if(create){
+    update = () => {
+        if(this.create){
             for(let i = 0; i < 10; i++) {
-                let p = new FireParticle(60);
+
+                let p:FireParticle;
+
+                if(this.burn){
+                    p = new FireParticle({maxLife: 10, size: 7});
+                } else{
+                    p = new FireParticle({maxLife: 60});
+                }
+                
                 //p.position.updatePosition(this.position.x, this.position.y);
                 let oldpos : Point = new Point(this.parent.position.x, this.parent.position.y);
                 let angle: number = this.parent.aimAngle+180;
 
-                oldpos.x -=  Math.cos((angle*Math.PI)/180)*50;
-                oldpos.y -=  Math.sin((angle*Math.PI)/180)*50;
+                if(this.burn){
+                    angle = Math.random()*360;
+                } else{
+                    oldpos.x -=  Math.cos((angle*Math.PI)/180)*50;
+                    oldpos.y -=  Math.sin((angle*Math.PI)/180)*50
+                }
+
+;
 
            //     let pos = camera.getScreenPosition(oldpos);
     

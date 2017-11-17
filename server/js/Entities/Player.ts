@@ -35,7 +35,7 @@ export class Player extends Actor {
         this.attackController.weaponCollection.setWeaponAmmo(WeaponType.shotgun, 100);
         this.attackController.weaponCollection.setWeaponAmmo(WeaponType.pistol, 200);
         this.attackController.weaponCollection.setWeaponAmmo(WeaponType.rifle, 100);
-        this.attackController.weaponCollection.setWeaponAmmo(WeaponType.flamethrower, 100);
+        this.attackController.weaponCollection.setWeaponAmmo(WeaponType.flamethrower, 400);
 
         this.inventory.addItem(ItemType.medicalkit,4);  
         this.inventory.useItem(WeaponType.shotgun);
@@ -56,7 +56,8 @@ export class Player extends Actor {
             attackStarted: this.attackController.attackStarted,
             attackMelee: this.attackController.melee,
             ammo: this.attackController.activeWeapon.ammo,
-            ammoInGun: this.attackController.activeWeapon.ammoInGun
+            ammoInGun: this.attackController.activeWeapon.ammoInGun,
+            burn: this.lifeAndBodyController.burn   
         };
     }
 
@@ -74,7 +75,9 @@ export class Player extends Actor {
             attackMelee: this.attackController.melee,
             ammo: this.attackController.activeWeapon.ammo,
             ammoInGun: this.attackController.activeWeapon.ammoInGun,
-            reload: this.attackController.reloadCounter.isActive()
+            reload: this.attackController.reloadCounter.isActive(),
+            pressingAttack: this.attackController.pressingAttack,
+            burn: this.lifeAndBodyController.burn   
         }
     }
 
@@ -92,8 +95,6 @@ export class Player extends Actor {
              type: "player", 
              hp: 40, 
              socket: socket});
-
-            let flame: Flame = new Flame({parent: player, map: map, offset: 50, life: 30});
 
         socket.on('changeWeapon', function(data){
             if(data.state == 'next') { player.attackController.weaponCollection.chooseNextWeaponWithAmmo() }

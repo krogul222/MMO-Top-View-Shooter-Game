@@ -1,4 +1,5 @@
 Object.defineProperty(exports, "__esModule", { value: true });
+const Player_1 = require("./../../Entities/Player");
 const globalVariables_1 = require("./../../globalVariables");
 const enums_1 = require("./../../enums");
 const GeometryAndPhysics_1 = require("./../../GeometryAndPhysics");
@@ -12,6 +13,7 @@ class Particle {
         this.maxLife = 10;
         this.toRemove = false;
         this.id = Math.random();
+        this.combatType = 'player';
         this.update = () => {
             this.position.x += this.velocity.x;
             this.position.y += this.velocity.y;
@@ -19,10 +21,46 @@ class Particle {
             if (this.life >= this.maxLife)
                 this.toRemove = true;
             if (this.type == enums_1.ParticleType.fire) {
-                for (let key in Enemy_1.Enemy.list) {
-                    let enemy = Enemy_1.Enemy.list[key];
-                    if (this.testCollision(enemy)) {
-                        enemy.lifeAndBodyController.wasHit(1 * this.life / this.maxLife);
+                switch (this.combatType) {
+                    case 'player': {
+                        for (let key in Enemy_1.Enemy.list) {
+                            let enemy = Enemy_1.Enemy.list[key];
+                            if (this.testCollision(enemy)) {
+                                enemy.lifeAndBodyController.wasHit(1 * this.life / this.maxLife);
+                                enemy.lifeAndBodyController.startBurn(100);
+                            }
+                        }
+                        let player = Player_1.Player.list[this.parent];
+                        for (let key in Player_1.Player.list) {
+                            if (Player_1.Player.list[key].id !== this.parent) {
+                                let enemyPlayer = Player_1.Player.list[key];
+                                if (this.testCollision(enemyPlayer)) {
+                                    enemyPlayer.lifeAndBodyController.wasHit(1 * this.life / this.maxLife);
+                                    enemyPlayer.lifeAndBodyController.startBurn(100);
+                                }
+                            }
+                        }
+                        break;
+                    }
+                    case 'enemy': {
+                        let enemy = Enemy_1.Enemy.list[this.parent];
+                        for (let key in Player_1.Player.list) {
+                            let player = Player_1.Player.list[key];
+                            if (this.testCollision(player)) {
+                                player.lifeAndBodyController.wasHit(1 * this.life / this.maxLife);
+                                player.lifeAndBodyController.startBurn(100);
+                            }
+                        }
+                        for (let key in Enemy_1.Enemy.list) {
+                            if (Enemy_1.Enemy.list[key].id !== this.parent) {
+                                let enemy = Enemy_1.Enemy.list[key];
+                                if (this.testCollision(enemy)) {
+                                    enemy.lifeAndBodyController.wasHit(1 * this.life / this.maxLife);
+                                    enemy.lifeAndBodyController.startBurn(100);
+                                }
+                            }
+                        }
+                        break;
                     }
                 }
             }
@@ -61,8 +99,9 @@ class Particle {
             this.velocity.x = param.velocity.x;
             this.velocity.y = param.velocity.y;
         }
+        this.parent = param.parent ? param.parent : -1;
+        this.combatType = param.combatType ? param.combatType : this.combatType;
         this.map = (param.map !== undefined) ? param.map : 0;
-        globalVariables_1.initPack.particle.push(this.getInitPack());
         Particle.list[this.id] = this;
     }
 }

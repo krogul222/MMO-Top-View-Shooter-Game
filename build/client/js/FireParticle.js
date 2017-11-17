@@ -2,7 +2,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const GeometryAndPhysics_1 = require("./../../server/js/GeometryAndPhysics");
 const canvas_1 = require("./canvas");
 class FireParticle {
-    constructor(maxLife) {
+    constructor(param) {
         this.position = new GeometryAndPhysics_1.Point(0, 0);
         this.velocity = new GeometryAndPhysics_1.Point(0, 0);
         this.size = 15;
@@ -20,7 +20,10 @@ class FireParticle {
             this.position.y += this.velocity.y;
             this.life++;
         };
-        this.maxLife = maxLife;
+        if (param.maxLife !== undefined)
+            this.maxLife = param.maxLife;
+        if (param.size !== undefined)
+            this.size = param.size;
     }
 }
 exports.FireParticle = FireParticle;

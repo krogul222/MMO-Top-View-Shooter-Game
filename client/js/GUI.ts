@@ -32,7 +32,7 @@ export class GUI {
             this.drawAmmo();
             this.drawFace();
             this.drawItems();
-            this.ctx.fillText('Hit points: '+PlayerClient.list[selfId].hp + '/'+PlayerClient.list[selfId].hpMax, 0, 0.6*this.height);
+            this.ctx.fillText('Hit points: '+Math.ceil(PlayerClient.list[selfId].hp) + '/'+PlayerClient.list[selfId].hpMax, 0, 0.6*this.height);
             this.drawMinimap();
         }
     }

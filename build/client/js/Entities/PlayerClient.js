@@ -25,6 +25,7 @@ class PlayerClient {
         this.ammo = 0;
         this.ammoInGun = 0;
         this.flame = new FireFlameClient_1.FireFlameClient(this);
+        this.burn = new FireFlameClient_1.FireFlameClient(this, true);
         this.draw = () => {
             if (PlayerClient.list[game_1.selfId].map !== this.map) {
                 return;

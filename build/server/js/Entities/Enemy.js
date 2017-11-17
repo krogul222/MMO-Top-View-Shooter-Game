@@ -43,7 +43,11 @@ class Enemy extends Actor_1.Actor {
             if (this.attackController.melee && Math.sqrt(diffX * diffX + diffY * diffY) < 50) {
                 this.attackController.pressingAttack = true;
             }
-            if (!this.attackController.melee && Math.sqrt(diffX * diffX + diffY * diffY) < 500) {
+            let distance = 500;
+            if (this.attackController.activeWeapon._weapon == enums_1.WeaponType.flamethrower) {
+                distance = 200;
+            }
+            if (!this.attackController.melee && Math.sqrt(diffX * diffX + diffY * diffY) < distance) {
                 this.attackController.pressingAttack = true;
             }
         };
@@ -66,7 +70,8 @@ class Enemy extends Actor_1.Actor {
                 attackStarted: this.attackController.attackStarted,
                 weapon: this.attackController.activeWeapon.name,
                 attackMelee: this.attackController.melee,
-                reload: this.attackController.reloadCounter.isActive()
+                reload: this.attackController.reloadCounter.isActive(),
+                burn: this.lifeAndBodyController.burn
             };
         };
         this.getUpdatePack = () => {
@@ -81,7 +86,9 @@ class Enemy extends Actor_1.Actor {
                 attackStarted: attackStartedTmp,
                 weapon: this.attackController.activeWeapon.name,
                 attackMelee: this.attackController.melee,
-                reload: this.attackController.reloadCounter.isActive()
+                reload: this.attackController.reloadCounter.isActive(),
+                pressingAttack: this.attackController.pressingAttack,
+                burn: this.lifeAndBodyController.burn
             };
         };
         this.giveWeapons = () => {
@@ -93,11 +100,13 @@ class Enemy extends Actor_1.Actor {
                 this.inventory.addItem(enums_1.WeaponType.pistol, 1);
                 this.inventory.addItem(enums_1.WeaponType.shotgun, 1);
                 this.inventory.addItem(enums_1.WeaponType.rifle, 1);
+                this.inventory.addItem(enums_1.WeaponType.flamethrower, 1);
                 this.attackController.weaponCollection.setWeaponAmmo(enums_1.WeaponType.shotgun, 10);
                 this.attackController.weaponCollection.setWeaponAmmo(enums_1.WeaponType.pistol, 20);
                 this.attackController.weaponCollection.setWeaponAmmo(enums_1.WeaponType.rifle, 5);
+                this.attackController.weaponCollection.setWeaponAmmo(enums_1.WeaponType.flamethrower, 200);
                 if (Math.random() < 0.6) {
-                    this.inventory.useItem(enums_1.WeaponType.pistol);
+                    this.inventory.useItem(enums_1.WeaponType.flamethrower);
                 }
                 else {
                     if (Math.random() < 0.5) {

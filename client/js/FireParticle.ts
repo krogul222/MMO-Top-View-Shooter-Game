@@ -9,8 +9,12 @@ export class FireParticle{
     life: number = 0;
     maxLife: number = 10;
 
-    constructor(maxLife: number){
-        this.maxLife = maxLife;
+    constructor(param){
+        if(param.maxLife !== undefined)
+            this.maxLife = param.maxLife;
+
+        if(param.size !== undefined)
+            this.size = param.size;
     }
 
     draw = () => {

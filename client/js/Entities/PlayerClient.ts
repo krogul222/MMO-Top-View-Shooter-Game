@@ -32,6 +32,7 @@ export class PlayerClient{
     public ammo = 0;
     public ammoInGun = 0;
     public flame:FireFlameClient = new FireFlameClient(this);
+    public burn:FireFlameClient = new FireFlameClient(this, true);
 
     constructor(initPack) {
         if(initPack.id) this.id = initPack.id;

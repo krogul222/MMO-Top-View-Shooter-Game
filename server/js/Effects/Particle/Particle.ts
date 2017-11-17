@@ -1,3 +1,4 @@
+import { Player } from './../../Entities/Player';
 import { Entity } from './../../Entities/Entity';
 import { initPack, removePack } from './../../globalVariables';
 import { ParticleType } from './../../enums';
@@ -15,6 +16,8 @@ export class Particle{
     toRemove: boolean = false;
     type: ParticleType;
     id: number = Math.random();
+    parent: number;
+    combatType: string = 'player';
     map;
 
     constructor(param){
@@ -32,9 +35,12 @@ export class Particle{
             this.velocity.y = param.velocity.y;
         }
 
+        this.parent = param.parent ? param.parent : -1;
+        this.combatType = param.combatType ? param.combatType : this.combatType;
+
         this.map = (param.map !== undefined) ? param.map : 0;
 
-        initPack.particle.push(this.getInitPack());
+       // initPack.particle.push(this.getInitPack());
         Particle.list[this.id] = this; 
     }
 
@@ -45,13 +51,65 @@ export class Particle{
         if(this.life >= this.maxLife) this.toRemove = true;
 
         if(this.type == ParticleType.fire){
-            for(let key in Enemy.list){          // check if enemy was hit
-                let enemy: Enemy = Enemy.list[key]; 
-                if(this.testCollision(enemy)){
-                    //this.toRemove = true;
-                    enemy.lifeAndBodyController.wasHit(1*this.life/this.maxLife);
+
+            switch(this.combatType){
+                case 'player': {   //bullet was shot by player
+                    
+                    for(let key in Enemy.list){          // check if enemy was hit
+                        let enemy: Enemy = Enemy.list[key]; 
+                        if(this.testCollision(enemy)){
+                            //this.toRemove = true;
+                            enemy.lifeAndBodyController.wasHit(1*this.life/this.maxLife);
+                            enemy.lifeAndBodyController.startBurn(100);
+                        }
+                    }
+
+                    let player: Player= Player.list[this.parent];
+
+                    for(let key in Player.list){         // check if player was hit
+                        if(Player.list[key].id !== this.parent){
+                            let enemyPlayer: Player = Player.list[key];
+                            if(this.testCollision(enemyPlayer)){
+                               // this.toRemove = true;
+                                enemyPlayer.lifeAndBodyController.wasHit(1*this.life/this.maxLife);
+                                enemyPlayer.lifeAndBodyController.startBurn(100);
+                            }
+                        }
+                    }
+                    
+                    break;
                 }
+
+                case 'enemy': {   //bullet was shot by enemy
+                    let enemy: Enemy = Enemy.list[this.parent];
+                    
+                                    for(let key in Player.list){
+                                        let player: Player = Player.list[key];
+                                        if(this.testCollision(player)){
+                                         //   this.toRemove = true;
+                                            player.lifeAndBodyController.wasHit(1*this.life/this.maxLife);
+                                            player.lifeAndBodyController.startBurn(100);
+                                        }
+                                    }
+
+
+                                    for(let key in Enemy.list){          // check if enemy was hit
+                                        if(Enemy.list[key].id !== this.parent){
+                                            let enemy: Enemy = Enemy.list[key]; 
+                                            if(this.testCollision(enemy)){
+                                                //this.toRemove = true;
+                                                enemy.lifeAndBodyController.wasHit(1*this.life/this.maxLife);
+                                                enemy.lifeAndBodyController.startBurn(100);
+                                            }
+                                        }
+                                    }
+                    break;
+                }
+
+
             }
+
+
         }
     }
 

@@ -30,6 +30,7 @@ export class Actor extends Entity {
 	update = () => {
         this.movementController.updateSpd();
         this.attackController.update();
+        this.lifeAndBodyController.update();
         this.updatePosition();
 	}
 

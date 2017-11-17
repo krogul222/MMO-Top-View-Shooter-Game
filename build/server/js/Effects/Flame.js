@@ -36,7 +36,7 @@ class Flame {
                     flame = (Math.random() * 2 * this.speed - this.speed) / 6;
                     velocity.x += Math.cos(angleInRad) * flame;
                     velocity.y += Math.sin(angleInRad) * flame;
-                    let p = new Particle_1.Particle({ position: posWithOffset, velocity: velocity, maxLife: this.life, type: enums_1.ParticleType.fire, map: this.map });
+                    let p = new Particle_1.Particle({ parent: this.parent.id, combatType: this.parent.type, position: posWithOffset, velocity: velocity, maxLife: this.life, type: enums_1.ParticleType.fire, map: this.map });
                     this.particles[p.id] = p;
                 }
             }

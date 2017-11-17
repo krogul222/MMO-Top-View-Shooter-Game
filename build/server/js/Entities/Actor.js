@@ -14,6 +14,7 @@ class Actor extends Entity_1.Entity {
         this.update = () => {
             this.movementController.updateSpd();
             this.attackController.update();
+            this.lifeAndBodyController.update();
             this.updatePosition();
         };
         this.getClosestPlayer = (distance, angleLimit) => {

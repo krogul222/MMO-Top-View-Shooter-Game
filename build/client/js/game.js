@@ -16,7 +16,6 @@ const Inventory_1 = require("../../server/js/Inventory/Inventory");
 const ParticleClient_1 = require("./Effects/ParticleClient");
 exports.selfId = 0;
 let smokeTest = false;
-let flameFire = true;
 exports.inventory = new Inventory_1.Inventory(socket, false, 0);
 MapControler_1.MapController.loadMaps();
 exports.currentMap = new MapClient_1.MapClient(null, "forest");
@@ -57,11 +56,6 @@ socket.on('init', function (data) {
             new UpgradeClient_1.UpgradeClient(data.upgrade[i]);
         }
     }
-    if (data.particle !== undefined) {
-        for (let i = 0, length = data.particle.length; i < length; i++) {
-            new ParticleClient_1.ParticleClient(data.particle[i]);
-        }
-    }
 });
 socket.on('update', function (data) {
     for (let i = 0, length = data.player.length; i < length; i++) {
@@ -74,6 +68,9 @@ socket.on('update', function (data) {
             }
             if (pack.hp !== undefined) {
                 p.hp = pack.hp;
+            }
+            if (pack.burn !== undefined) {
+                p.burn.create = pack.burn;
             }
             if (pack.weapon !== undefined) {
                 p.weapon = pack.weapon;
@@ -98,6 +95,15 @@ socket.on('update', function (data) {
                 }
                 else {
                     p.reload = false;
+                }
+            }
+            if (pack.pressingAttack !== undefined) {
+                console.log("Pressing attack " + pack.pressingAttack);
+                if (p.weapon == "flamethrower" && !p.attackMelee) {
+                    p.flame.create = pack.pressingAttack;
+                }
+                else {
+                    p.flame.create = false;
                 }
             }
             if (pack.attackStarted !== undefined) {
@@ -128,11 +134,23 @@ socket.on('update', function (data) {
             if (pack.attackMelee !== undefined) {
                 p.attackMelee = pack.attackMelee;
             }
+            if (pack.burn !== undefined) {
+                p.burn.create = pack.burn;
+            }
             if (pack.moving !== undefined) {
                 p.moving = pack.moving;
             }
             if (pack.aimAngle !== undefined) {
                 p.aimAngle = pack.aimAngle;
+            }
+            if (pack.pressingAttack !== undefined) {
+                console.log("Pressing attack " + pack.pressingAttack);
+                if (p.weapon == "flamethrower" && !p.attackMelee) {
+                    p.flame.create = pack.pressingAttack;
+                }
+                else {
+                    p.flame.create = false;
+                }
             }
             if (pack.reload !== undefined) {
                 if (pack.reload) {
@@ -160,16 +178,6 @@ socket.on('update', function (data) {
             if (pack.position !== undefined) {
                 b.position.x = pack.position.x;
                 b.position.y = pack.position.y;
-            }
-        }
-    }
-    for (let i = 0, length = data.particle.length; i < length; i++) {
-        let pack = data.particle[i];
-        let p = ParticleClient_1.ParticleClient.list[pack.id];
-        if (p) {
-            if (pack.position !== undefined) {
-                p.position.x = pack.position.x;
-                p.position.y = pack.position.y;
             }
         }
     }
@@ -271,8 +279,16 @@ setInterval(function () {
     }
     ctx.globalCompositeOperation = "source-over";
     for (let i in PlayerClient_1.PlayerClient.list) {
-        PlayerClient_1.PlayerClient.list[i].flame.update(flameFire);
+        PlayerClient_1.PlayerClient.list[i].flame.update();
         PlayerClient_1.PlayerClient.list[i].flame.draw();
+        PlayerClient_1.PlayerClient.list[i].burn.update();
+        PlayerClient_1.PlayerClient.list[i].burn.draw();
+    }
+    for (let i in EnemyClient_1.EnemyClient.list) {
+        EnemyClient_1.EnemyClient.list[i].flame.update();
+        EnemyClient_1.EnemyClient.list[i].flame.draw();
+        EnemyClient_1.EnemyClient.list[i].burn.update();
+        EnemyClient_1.EnemyClient.list[i].burn.draw();
     }
     exports.effects.draw();
     exports.effects.update();

@@ -3,6 +3,7 @@ import { camera } from './../canvas';
 import { PlayerClient } from './PlayerClient';
 import { Point } from "../../../server/js/GeometryAndPhysics";
 import { selfId } from '../game';
+import { FireFlameClient } from '../FireFlameClient';
 
 declare var mouseX: any;
 declare var mouseY: any;
@@ -28,7 +29,9 @@ export class EnemyClient{
     public moving: boolean = false;
     public reload = false;
     public weapon = "pistol";
-
+    public flame:FireFlameClient = new FireFlameClient(this);
+    public burn:FireFlameClient = new FireFlameClient(this, true);
+    
     constructor(initPack) {
         if(initPack.id) this.id = initPack.id;
         if(initPack.position) this.position = initPack.position;

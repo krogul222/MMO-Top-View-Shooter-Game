@@ -30,7 +30,6 @@ declare var gui: GUI;
 
 export var selfId: number = 0;
 let smokeTest: boolean = false;
-let flameFire = true;
 
 export let inventory = new Inventory(socket, false, 0);
 
@@ -47,8 +46,6 @@ export let gameSoundManager = new GameSoundManager();
 
 export let canvasFilters: Filters = new Filters(ctx);
 export let effects: Effects = new Effects(ctx);
-
-//let flame = new FireFlameClient(PlayerClient[selfId]);
 
 socket.on('mapData', function(data){
     MapController.updateMap(data);
@@ -84,12 +81,12 @@ socket.on('init', function(data){
             new UpgradeClient(data.upgrade[i]);  
         } 
     }
-
+/*
     if(data.particle !== undefined){
         for(let i = 0, length = data.particle.length; i < length; i++){
             new ParticleClient(data.particle[i]);  
         } 
-    }
+    }*/
 
 });
 
@@ -107,6 +104,10 @@ socket.on('update', function(data){
 
            if(pack.hp !== undefined){
                p.hp = pack.hp;
+           }
+
+           if(pack.burn !== undefined){
+            p.burn.create = pack.burn;
            }
 
            if(pack.weapon !== undefined){
@@ -140,13 +141,23 @@ socket.on('update', function(data){
                }
             }
 
+
+            if(pack.pressingAttack !== undefined){
+                console.log("Pressing attack " + pack.pressingAttack);
+                if(p.weapon == "flamethrower" && !p.attackMelee){
+                    p.flame.create = pack.pressingAttack;
+                } else{
+                    p.flame.create = false; 
+                }
+            }
+
             if(pack.attackStarted !== undefined){
                 if(pack.attackStarted){
                     if(p.reload) gameSoundManager.playWeaponReload(p.weapon);
                     gameSoundManager.playWeaponAttack(p.weapon, p.attackMelee);
                     p.attackStarted = true;
                     p.bodySpriteAnimCounter = 0;
-                }
+                } 
             }
            
        }
@@ -172,6 +183,10 @@ socket.on('update', function(data){
             if(pack.attackMelee !== undefined){
              p.attackMelee = pack.attackMelee;
              }
+
+             if(pack.burn !== undefined){
+                p.burn.create = pack.burn;
+            }
  
             if(pack.moving !== undefined){
                 p.moving = pack.moving;
@@ -180,6 +195,15 @@ socket.on('update', function(data){
                 p.aimAngle = pack.aimAngle;
             } 
  
+            if(pack.pressingAttack !== undefined){
+                console.log("Pressing attack " + pack.pressingAttack);
+                if(p.weapon == "flamethrower" && !p.attackMelee){
+                    p.flame.create = pack.pressingAttack;
+                } else{
+                    p.flame.create = false; 
+                }
+            }
+
             if(pack.reload !== undefined){
                 if(pack.reload){
                     p.reload = true;
@@ -213,6 +237,7 @@ socket.on('update', function(data){
         }
     }
 
+    /*
     for(let i = 0, length = data.particle.length; i < length ; i++){
         let pack = data.particle[i];
         let p = ParticleClient.list[pack.id];
@@ -222,7 +247,7 @@ socket.on('update', function(data){
                 p.position.y = pack.position.y;
             } 
         }
-    }
+    }*/
 
     for(let i = 0, length = data.smoke.length; i < length ; i++){
         let pack = data.smoke[i];
@@ -284,10 +309,6 @@ setInterval(function(){
     
     ctx.clearRect(0,0,WIDTH,HEIGHT);
     currentMap.draw();
-    
-    //canvasFilters.getImageFromCanvas();
-    //canvasFilters.bright(0);
-    //canvasFilters.blur();
 
     for(let i in PlayerClient.list){
         if(PlayerClient.list[i].moving){
@@ -344,8 +365,17 @@ setInterval(function(){
     ctx.globalCompositeOperation="source-over";
 
     for(let i in PlayerClient.list){
-        PlayerClient.list[i].flame.update(flameFire);
+        PlayerClient.list[i].flame.update();
         PlayerClient.list[i].flame.draw();
+        PlayerClient.list[i].burn.update();
+        PlayerClient.list[i].burn.draw();
+    }
+
+    for(let i in EnemyClient.list){
+        EnemyClient.list[i].flame.update();
+        EnemyClient.list[i].flame.draw();
+        EnemyClient.list[i].burn.update();
+        EnemyClient.list[i].burn.draw();
     }
     
     effects.draw();
@@ -427,9 +457,6 @@ document.onkeydown = function(event){
         socket.emit('keyPress', {inputId:'smoke'});
     }
     
- /*   if(event.keyCode === 70){
-        flameModeOn = flameModeOn ? false: true;
-    }*/
 
     if(event.keyCode === 80){
         let elt = document.getElementById("gameDiv");

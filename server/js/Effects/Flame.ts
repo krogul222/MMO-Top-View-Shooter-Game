@@ -63,7 +63,7 @@ export class Flame{
                     velocity.x += Math.cos(angleInRad)*flame;
                     velocity.y += Math.sin(angleInRad)*flame;
 
-                    let p = new Particle({position: posWithOffset, velocity: velocity, maxLife: this.life, type: ParticleType.fire, map: this.map});
+                    let p = new Particle({parent: this.parent.id, combatType: this.parent.type,position: posWithOffset, velocity: velocity, maxLife: this.life, type: ParticleType.fire, map: this.map});
                     
                     this.particles[p.id] = p;
                 }

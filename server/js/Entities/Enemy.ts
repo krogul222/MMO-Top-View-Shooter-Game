@@ -73,9 +73,16 @@ export class Enemy extends Actor {
 		    this.attackController.pressingAttack = true;
         } 
         
-        if(!this.attackController.melee && Math.sqrt(diffX*diffX+diffY*diffY)<500){
+        let distance = 500;
+
+        if(this.attackController.activeWeapon._weapon == WeaponType.flamethrower ){
+            distance = 200;
+        } 
+
+        if(!this.attackController.melee && Math.sqrt(diffX*diffX+diffY*diffY)<distance){
             this.attackController.pressingAttack = true;
         }
+
     }
 	onDeath = () => {
 		this.toRemove = true;
@@ -97,7 +104,8 @@ export class Enemy extends Actor {
            attackStarted: this.attackController.attackStarted,
            weapon: this.attackController.activeWeapon.name,
            attackMelee: this.attackController.melee,
-           reload: this.attackController.reloadCounter.isActive()    
+           reload: this.attackController.reloadCounter.isActive(),
+           burn: this.lifeAndBodyController.burn   
         };
     }
 
@@ -116,7 +124,9 @@ export class Enemy extends Actor {
            attackStarted: attackStartedTmp,
            weapon: this.attackController.activeWeapon.name,
            attackMelee: this.attackController.melee,
-           reload: this.attackController.reloadCounter.isActive()    
+           reload: this.attackController.reloadCounter.isActive(),
+           pressingAttack: this.attackController.pressingAttack,
+           burn: this.lifeAndBodyController.burn
         };
     }   
 
@@ -130,13 +140,15 @@ export class Enemy extends Actor {
             this.inventory.addItem(WeaponType.pistol,1);
             this.inventory.addItem(WeaponType.shotgun,1);
             this.inventory.addItem(WeaponType.rifle,1);
+            this.inventory.addItem(WeaponType.flamethrower,1);
                 
             this.attackController.weaponCollection.setWeaponAmmo(WeaponType.shotgun, 10);
             this.attackController.weaponCollection.setWeaponAmmo(WeaponType.pistol, 20);
             this.attackController.weaponCollection.setWeaponAmmo(WeaponType.rifle, 5);
+            this.attackController.weaponCollection.setWeaponAmmo(WeaponType.flamethrower, 200);
                 
             if(Math.random()<0.6){
-                this.inventory.useItem(WeaponType.pistol);
+                this.inventory.useItem(WeaponType.flamethrower);
             } else{
                 if(Math.random()< 0.5){
                     this.inventory.useItem(WeaponType.shotgun);

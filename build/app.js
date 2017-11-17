@@ -93,10 +93,10 @@ io.sockets.on('connection', function (socket) {
 MapControler_1.MapController.loadMaps();
 setInterval(function () {
     let packs = Entity_1.Entity.getFrameUpdateData();
+    Particle_1.Particle.update();
     let pack = {
         player: Player_1.Player.update(),
         bullet: Bullet_1.Bullet.update(),
-        particle: Particle_1.Particle.update(),
         enemy: Enemy_1.Enemy.update(),
         smoke: Smoke_1.Smoke.update()
     };

@@ -1,5 +1,4 @@
 Object.defineProperty(exports, "__esModule", { value: true });
-const Flame_1 = require("./../Effects/Flame");
 const Smoke_1 = require("./../Effects/Smoke");
 const globalVariables_1 = require("./../globalVariables");
 const Enemy_1 = require("./Enemy");
@@ -20,7 +19,7 @@ class Player extends Actor_1.Actor {
             this.attackController.weaponCollection.setWeaponAmmo(enums_1.WeaponType.shotgun, 100);
             this.attackController.weaponCollection.setWeaponAmmo(enums_1.WeaponType.pistol, 200);
             this.attackController.weaponCollection.setWeaponAmmo(enums_1.WeaponType.rifle, 100);
-            this.attackController.weaponCollection.setWeaponAmmo(enums_1.WeaponType.flamethrower, 100);
+            this.attackController.weaponCollection.setWeaponAmmo(enums_1.WeaponType.flamethrower, 400);
             this.inventory.addItem(enums_1.ItemType.medicalkit, 4);
             this.inventory.useItem(enums_1.WeaponType.shotgun);
         };
@@ -39,7 +38,8 @@ class Player extends Actor_1.Actor {
                 attackStarted: this.attackController.attackStarted,
                 attackMelee: this.attackController.melee,
                 ammo: this.attackController.activeWeapon.ammo,
-                ammoInGun: this.attackController.activeWeapon.ammoInGun
+                ammoInGun: this.attackController.activeWeapon.ammoInGun,
+                burn: this.lifeAndBodyController.burn
             };
         };
         this.getUpdatePack = () => {
@@ -56,7 +56,9 @@ class Player extends Actor_1.Actor {
                 attackMelee: this.attackController.melee,
                 ammo: this.attackController.activeWeapon.ammo,
                 ammoInGun: this.attackController.activeWeapon.ammoInGun,
-                reload: this.attackController.reloadCounter.isActive()
+                reload: this.attackController.reloadCounter.isActive(),
+                pressingAttack: this.attackController.pressingAttack,
+                burn: this.lifeAndBodyController.burn
             };
         };
         this.onDeath = () => {
@@ -98,7 +100,6 @@ Player.onConnect = (socket) => {
         hp: 40,
         socket: socket
     });
-    let flame = new Flame_1.Flame({ parent: player, map: map, offset: 50, life: 30 });
     socket.on('changeWeapon', function (data) {
         if (data.state == 'next') {
             player.attackController.weaponCollection.chooseNextWeaponWithAmmo();

@@ -77,7 +77,7 @@ export class MapClient {
                 }
             }
             canvasFilters.getImageFromCanvas();
-            canvasFilters.bright(-50);
+            canvasFilters.bright();
 
             for (let i = 0 ; i < size ; i++){
                 for (let j = 0; j < size; j++){
