@@ -81,7 +81,25 @@ export class Camera {
 
     } 
 
-    drawBar = (px,py, width, height, style) =>{
+    drawLine = (px, py, ex, ey, width, r, g, b, alpha) => {
+        let positionStart = this.getScreenPosition(new Point(px,py));
+        let positionEnd = this.getScreenPosition(new Point(ex,ey));
+
+
+        let grd=this.ctx.createLinearGradient(positionStart.x, positionStart.y, positionEnd.x, positionEnd.y);
+        grd.addColorStop(0,'rgba('+r+','+g+','+b+','+alpha+')');
+        grd.addColorStop(1,"transparent");
+
+        this.ctx.lineWidth = 4;
+        this.ctx.beginPath();
+        this.ctx.moveTo(positionStart.x, positionStart.y);
+        this.ctx.lineTo(positionEnd.x, positionEnd.y);
+       // this.ctx.strokeStyle ='rgba(255,255,255,'+alpha+')';
+        this.ctx.strokeStyle = grd;
+        this.ctx.stroke();
+    }
+
+    drawBar = (px,py, width, height, style) => {
 
         let position = this.getScreenPosition(new Point(px,py));
 

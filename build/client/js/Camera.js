@@ -62,6 +62,19 @@ class Camera {
             if (this.position.y > this.worldHeight - this.height)
                 this.position.y = this.worldHeight - this.height;
         };
+        this.drawLine = (px, py, ex, ey, width, r, g, b, alpha) => {
+            let positionStart = this.getScreenPosition(new GeometryAndPhysics_1.Point(px, py));
+            let positionEnd = this.getScreenPosition(new GeometryAndPhysics_1.Point(ex, ey));
+            let grd = this.ctx.createLinearGradient(positionStart.x, positionStart.y, positionEnd.x, positionEnd.y);
+            grd.addColorStop(0, 'rgba(' + r + ',' + g + ',' + b + ',' + alpha + ')');
+            grd.addColorStop(1, "transparent");
+            this.ctx.lineWidth = 4;
+            this.ctx.beginPath();
+            this.ctx.moveTo(positionStart.x, positionStart.y);
+            this.ctx.lineTo(positionEnd.x, positionEnd.y);
+            this.ctx.strokeStyle = grd;
+            this.ctx.stroke();
+        };
         this.drawBar = (px, py, width, height, style) => {
             let position = this.getScreenPosition(new GeometryAndPhysics_1.Point(px, py));
             if ((position.x <= this.width || position.x + width >= 0) && (position.y + height >= 0 && position.y <= this.height)) {

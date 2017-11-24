@@ -9,6 +9,7 @@ class EnemyClient {
     constructor(initPack) {
         this.id = -1;
         this.position = new GeometryAndPhysics_1.Point(250, 250);
+        this.startPosition = new GeometryAndPhysics_1.Point(250, 250);
         this.width = 0;
         this.height = 0;
         this.img = images_1.Img["zombie"];
@@ -100,6 +101,8 @@ class EnemyClient {
             this.id = initPack.id;
         if (initPack.position)
             this.position = initPack.position;
+        if (initPack.startPosition)
+            this.startPosition = initPack.startPosition;
         if (initPack.width)
             this.width = initPack.width;
         if (initPack.height)

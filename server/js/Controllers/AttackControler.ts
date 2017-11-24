@@ -110,7 +110,7 @@ export class AttackController {
     }
 
     shootBullet = (aimAngle, shootSpeed) => {
-        new Bullet({
+        let b: Bullet = new Bullet({
             parent: this.parent.id,
             combatType: this.parent.type,
             angle: aimAngle,
@@ -121,6 +121,16 @@ export class AttackController {
             height: 8, 
             shootspeed: shootSpeed
         });
+
+        let counter: number = 0;
+        while(!b.isToRemove){
+            b.update();
+            counter++;
+            if(counter == 1){
+                b.startPosition.x = b.position.x;
+                b.startPosition.y = b.position.y;
+            } 
+        }
     }
 
     getDamage = () => {

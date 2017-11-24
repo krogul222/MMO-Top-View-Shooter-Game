@@ -46,7 +46,8 @@ socket.on('init', function (data) {
         }
     }
     for (let i = 0, length = data.bullet.length; i < length; i++) {
-        new BulletClient_1.BulletClient(data.bullet[i]);
+        let b = new BulletClient_1.BulletClient(data.bullet[i]);
+        b.hit(data.bullet[i].hitCategory, data.bullet[i].hitEntityCategory, data.bullet[i].hitEntityId);
     }
     for (let i = 0, length = data.enemy.length; i < length; i++) {
         new EnemyClient_1.EnemyClient(data.enemy[i]);
@@ -111,7 +112,7 @@ socket.on('update', function (data) {
                     if (p.reload)
                         exports.gameSoundManager.playWeaponReload(p.weapon);
                     exports.gameSoundManager.playWeaponAttack(p.weapon, p.attackMelee);
-                    p.attackStarted = true;
+                    p.attackStarted = pack.attackStarted;
                     p.bodySpriteAnimCounter = 0;
                 }
             }
@@ -165,19 +166,9 @@ socket.on('update', function (data) {
                     if (p.reload)
                         exports.gameSoundManager.playWeaponReload(p.weapon);
                     exports.gameSoundManager.playWeaponAttack(p.weapon, p.attackMelee);
-                    p.attackStarted = true;
+                    p.attackStarted = pack.attackStarted;
                     p.spriteAnimCounter = 0;
                 }
-            }
-        }
-    }
-    for (let i = 0, length = data.bullet.length; i < length; i++) {
-        let pack = data.bullet[i];
-        let b = BulletClient_1.BulletClient.list[pack.id];
-        if (b) {
-            if (pack.position !== undefined) {
-                b.position.x = pack.position.x;
-                b.position.y = pack.position.y;
             }
         }
     }
@@ -249,6 +240,12 @@ setInterval(function () {
     }
     for (let i in BulletClient_1.BulletClient.list) {
         BulletClient_1.BulletClient.list[i].draw();
+        if (BulletClient_1.BulletClient.list[i].toRemove) {
+            delete BulletClient_1.BulletClient.list[i];
+        }
+        else {
+            BulletClient_1.BulletClient.list[i].update();
+        }
     }
     for (let i in UpgradeClient_1.UpgradeClient.list) {
         UpgradeClient_1.UpgradeClient.list[i].draw();

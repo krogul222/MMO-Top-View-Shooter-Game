@@ -19,15 +19,21 @@ export class BulletClient {
 
     id: number = -1;
     position: Point = new Point(250, 250);
+    startPosition: Point = new Point(250, 250);
     map = "forest";
     img :any = Img["bullet"];
     width: number = 32;
     height: number = 32;
-    hitCategory: any = 1;
+    hitCategory: any = 1; 
+    maxLife: number = 10;
+    life: number = this.maxLife;
+    toRemove: boolean = false;
 
     constructor(initPack) {
         this.id = (initPack.id !== undefined) ? initPack.id : -1;
         this.position = (initPack.position !== undefined) ? initPack.position : new Point(250, 250);
+        this.startPosition = (initPack.startPosition !== undefined) ? initPack.startPosition : new Point(250, 250);
+        
         this.width = (initPack.width !== undefined) ? initPack.width : 32;
         this.height = (initPack.height !== undefined) ? initPack.height : 32;
         this.hitCategory = (initPack.hitCategory !== undefined) ? initPack.hitCategory : 1;
@@ -40,12 +46,20 @@ export class BulletClient {
         if(PlayerClient.list[selfId].map !== this.map){
             return;  
         }
-        
-        let frame = jsonIAE["frames"][this.img+".png"]["frame"];
+        camera.drawLine(this.startPosition.x, this.startPosition.y, this.position.x, this.position.y, (this.life/this.maxLife)*4, 255, 255, 255, (this.life/this.maxLife));
+     /*   let frame = jsonIAE["frames"][this.img+".png"]["frame"];
         let frameWidth = frame["w"];
         let frameHeight = frame["h"];
 
         camera.drawImage(Img["IAE"], frameWidth, frameHeight, 0, 0, 0, this.position.x, this.position.y, this.width, this.height, frame["x"], frame["y"]);
+   
+    */ 
+    }
+
+    update = () => {
+        this.life--;
+
+        if(this.life <= 0) this.toRemove = true;
     }
 
     hit = (category, entityCategory, entityId) => {

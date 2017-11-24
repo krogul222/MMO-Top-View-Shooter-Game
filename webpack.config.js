@@ -3,9 +3,9 @@ const path = require('path');
 module.exports = {
     entry: {a: './client/js/game.ts', b: './client/js/canvas.ts', c:'./client/js/images.ts'},
     output: {
-        path: path.resolve(__dirname, 'dist'),  
+        path: path.resolve(__dirname, 'build/client/js'),  
         filename: "[name].entry.js",
-        publicPath: '/dist/'
+        publicPath: '/build/client/js'
     },
     resolve: {
         // Add `.ts` and `.tsx` as a resolvable extension.

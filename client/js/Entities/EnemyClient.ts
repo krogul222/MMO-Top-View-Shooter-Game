@@ -15,6 +15,7 @@ declare const HEIGHT: any;
 export class EnemyClient{
     public id: number = -1;
     public position: Point = new Point(250, 250);
+    public startPosition: Point = new Point(250, 250);
     public width: number = 0;
     public height: number = 0;
     public img: any = Img["zombie"];
@@ -35,6 +36,7 @@ export class EnemyClient{
     constructor(initPack) {
         if(initPack.id) this.id = initPack.id;
         if(initPack.position) this.position = initPack.position;
+        if(initPack.startPosition) this.startPosition = initPack.startPosition;
         if(initPack.width) this.width = initPack.width;
         if(initPack.height) this.height = initPack.height;
         if(initPack.weapon) this.weapon = initPack.weapon;

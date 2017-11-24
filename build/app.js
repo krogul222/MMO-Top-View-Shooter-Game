@@ -94,9 +94,9 @@ MapControler_1.MapController.loadMaps();
 setInterval(function () {
     let packs = Entity_1.Entity.getFrameUpdateData();
     Particle_1.Particle.update();
+    Bullet_1.Bullet.update();
     let pack = {
         player: Player_1.Player.update(),
-        bullet: Bullet_1.Bullet.update(),
         enemy: Enemy_1.Enemy.update(),
         smoke: Smoke_1.Smoke.update()
     };

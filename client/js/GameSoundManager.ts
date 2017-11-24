@@ -1,7 +1,7 @@
 declare var soundManager;
 
 export class GameSoundManager {
- 
+
     constructor(){
         this.loadSounds();
     }
@@ -12,6 +12,7 @@ export class GameSoundManager {
             soundManager.createSound('gunshot','/client/mp3/gunshot.mp3');
             soundManager.createSound('pistol_fire','/client/mp3/pistol_fire.mp3');
             soundManager.createSound('shotgun_fire','/client/mp3/shotgun_fire.mp3');
+            soundManager.createSound('flamethrower_fire','/client/mp3/flamethrower_fire.mp3');
             soundManager.createSound('rifle_fire','/client/mp3/rifle_fire.mp3');
             soundManager.createSound('knife_swing','/client/mp3/knife_swing.mp3');
             soundManager.createSound('gun_swing','/client/mp3/gun_swing.mp3');
@@ -25,15 +26,32 @@ export class GameSoundManager {
           }
     }
 
+    loopSound = (sound, stop: boolean) => {
+        sound.play({
+          onfinish: function() {
+              if(!stop){
+                this.loopSound(sound);
+              }
+          }
+        });
+      }
+
     playWeaponReload = (weapon: string) => {
         soundManager.play(weapon+"reload");
     }
 
-    playWeaponAttack = (weapon: string, melee: boolean) => {
+    playWeaponAttack = (weapon: string, melee: boolean, stop: boolean = true) => {
         if(melee){
             (weapon == "knife" || weapon == "claws") ? soundManager.play("knife_swing") : soundManager.play("gun_swing");
         }else {
-            soundManager.play(weapon+"_fire");
+            if(weapon == "flamethrower"){
+                //soundManager.play(weapon+"_fire");
+                let s = soundManager.getSoundById(weapon+"_fire");
+                this.loopSound(s, stop);
+            } else{
+                soundManager.play(weapon+"_fire");
+            }
+            
         }
     }
 

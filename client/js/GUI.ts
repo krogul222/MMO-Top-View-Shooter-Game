@@ -6,6 +6,7 @@ import { PlayerClient } from './Entities/PlayerClient';
 import { selfId, inventory, currentMap } from './game';
 import { ItemType, TerrainMaterial } from './../../server/js/enums';
 import { WeaponTypes } from '../../server/js/Weapons/WeaponTypes';
+import { EnemyClient } from './Entities/EnemyClient';
 
 export class GUI {
     width: number;
@@ -138,6 +139,17 @@ export class GUI {
                 data[(j+i*imgSize)*4+1] = Ga[material];
                 data[(j+i*imgSize)*4+2] = Ba[material];
                 data[(j+i*imgSize)*4+3] = 255;
+
+
+                for(let k in EnemyClient.list){
+                    let enemyPosition: Point = EnemyClient.list[k].position;
+                    if(Math.floor(enemyPosition.x/(TILE_SIZE*32)) == Math.floor(j/ratio) && Math.floor(enemyPosition.y/(TILE_SIZE*32)) == Math.floor(i/ratio)){
+                        data[(j+i*imgSize)*4] = 0;
+                        data[(j+i*imgSize)*4+1] = 0;
+                        data[(j+i*imgSize)*4+2] = 0;
+                        data[(j+i*imgSize)*4+3] = 255;
+                    }
+                }
 
                 if(Math.floor(playerPosition.x/(TILE_SIZE*32)) == Math.floor(j/ratio) && Math.floor(playerPosition.y/(TILE_SIZE*32)) == Math.floor(i/ratio)){
                     data[(j+i*imgSize)*4] = 255;

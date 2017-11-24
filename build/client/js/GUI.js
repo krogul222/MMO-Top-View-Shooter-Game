@@ -5,6 +5,7 @@ const PlayerClient_1 = require("./Entities/PlayerClient");
 const game_1 = require("./game");
 const enums_1 = require("./../../server/js/enums");
 const WeaponTypes_1 = require("../../server/js/Weapons/WeaponTypes");
+const EnemyClient_1 = require("./Entities/EnemyClient");
 class GUI {
     constructor(param) {
         this.draw = () => {
@@ -106,6 +107,15 @@ class GUI {
                     data[(j + i * imgSize) * 4 + 1] = Ga[material];
                     data[(j + i * imgSize) * 4 + 2] = Ba[material];
                     data[(j + i * imgSize) * 4 + 3] = 255;
+                    for (let k in EnemyClient_1.EnemyClient.list) {
+                        let enemyPosition = EnemyClient_1.EnemyClient.list[k].position;
+                        if (Math.floor(enemyPosition.x / (Constants_1.TILE_SIZE * 32)) == Math.floor(j / ratio) && Math.floor(enemyPosition.y / (Constants_1.TILE_SIZE * 32)) == Math.floor(i / ratio)) {
+                            data[(j + i * imgSize) * 4] = 0;
+                            data[(j + i * imgSize) * 4 + 1] = 0;
+                            data[(j + i * imgSize) * 4 + 2] = 0;
+                            data[(j + i * imgSize) * 4 + 3] = 255;
+                        }
+                    }
                     if (Math.floor(playerPosition.x / (Constants_1.TILE_SIZE * 32)) == Math.floor(j / ratio) && Math.floor(playerPosition.y / (Constants_1.TILE_SIZE * 32)) == Math.floor(i / ratio)) {
                         data[(j + i * imgSize) * 4] = 255;
                         data[(j + i * imgSize) * 4 + 1] = 0;

@@ -57,7 +57,7 @@
 /******/ 	__webpack_require__.o = function(object, property) { return Object.prototype.hasOwnProperty.call(object, property); };
 /******/
 /******/ 	// __webpack_public_path__
-/******/ 	__webpack_require__.p = "/dist/";
+/******/ 	__webpack_require__.p = "/build/client/js";
 /******/
 /******/ 	// Load entry module and return exports
 /******/ 	return __webpack_require__(__webpack_require__.s = 4);
@@ -274,7 +274,7 @@ exports.Img.GUI.src = '/client/TexturePacks/GUIImages.png';
 
 Object.defineProperty(exports, "__esModule", { value: true });
 const SmokeClient_1 = __webpack_require__(21);
-const Particle_1 = __webpack_require__(13);
+const Particle_1 = __webpack_require__(14);
 const Effects_1 = __webpack_require__(26);
 const Filters_1 = __webpack_require__(27);
 const canvas_1 = __webpack_require__(4);
@@ -284,7 +284,7 @@ const UpgradeClient_1 = __webpack_require__(35);
 const MapClient_1 = __webpack_require__(36);
 const PlayerClient_1 = __webpack_require__(5);
 const BulletClient_1 = __webpack_require__(37);
-const EnemyClient_1 = __webpack_require__(14);
+const EnemyClient_1 = __webpack_require__(12);
 const ExplosionClient_1 = __webpack_require__(15);
 const Inventory_1 = __webpack_require__(16);
 const ParticleClient_1 = __webpack_require__(47);
@@ -727,7 +727,7 @@ window.addEventListener('resize', function () {
 /***/ (function(module, exports, __webpack_require__) {
 
 Object.defineProperty(exports, "__esModule", { value: true });
-const FireFlameClient_1 = __webpack_require__(12);
+const FireFlameClient_1 = __webpack_require__(13);
 const images_1 = __webpack_require__(2);
 const GeometryAndPhysics_1 = __webpack_require__(0);
 const game_1 = __webpack_require__(3);
@@ -1675,143 +1675,12 @@ new WeaponTypes({ weapon: enums_2.WeaponType.claws, name: "claws",
 /***/ (function(module, exports, __webpack_require__) {
 
 Object.defineProperty(exports, "__esModule", { value: true });
-const GeometryAndPhysics_1 = __webpack_require__(0);
-const FireParticle_1 = __webpack_require__(22);
-class FireFlameClient {
-    constructor(parent, burn = false) {
-        this.particles = [];
-        this.angle = 0;
-        this.position = new GeometryAndPhysics_1.Point(0, 0);
-        this.speed = 5;
-        this.create = false;
-        this.burn = false;
-        this.draw = () => {
-            ctx.globalCompositeOperation = "lighter";
-            for (let i = 0; i < this.particles.length; i++) {
-                this.particles[i].draw();
-            }
-            ctx.globalCompositeOperation = "source-over";
-        };
-        this.update = () => {
-            if (this.create) {
-                for (let i = 0; i < 10; i++) {
-                    let p;
-                    if (this.burn) {
-                        p = new FireParticle_1.FireParticle({ maxLife: 10, size: 7 });
-                    }
-                    else {
-                        p = new FireParticle_1.FireParticle({ maxLife: 60 });
-                    }
-                    let oldpos = new GeometryAndPhysics_1.Point(this.parent.position.x, this.parent.position.y);
-                    let angle = this.parent.aimAngle + 180;
-                    if (this.burn) {
-                        angle = Math.random() * 360;
-                    }
-                    else {
-                        oldpos.x -= Math.cos((angle * Math.PI) / 180) * 50;
-                        oldpos.y -= Math.sin((angle * Math.PI) / 180) * 50;
-                    }
-                    ;
-                    p.position.updatePosition(oldpos.x, oldpos.y);
-                    let flame = (0 - Math.random() * 2 * this.speed);
-                    p.velocity.x = Math.cos((angle * Math.PI * 2) / 360) * flame;
-                    p.velocity.y = Math.sin((angle * Math.PI * 2) / 360) * flame;
-                    angle += 90;
-                    flame = (Math.random() * 2 * this.speed - this.speed) / 6;
-                    p.velocity.x += Math.cos((angle * Math.PI * 2) / 360) * flame;
-                    p.velocity.y += Math.sin((angle * Math.PI * 2) / 360) * flame;
-                    this.particles.push(p);
-                }
-            }
-            for (let i = 0; i < this.particles.length; i++) {
-                this.particles[i].update();
-                if (this.particles[i].life >= this.particles[i].maxLife) {
-                    this.particles.splice(i, 1);
-                    i--;
-                }
-            }
-        };
-        this.parent = parent;
-        this.position.x = parent.position.x;
-        this.position.y = parent.position.y;
-        this.angle = this.parent.aimAngle + 180;
-        this.burn = burn;
-    }
-}
-exports.FireFlameClient = FireFlameClient;
-
-
-/***/ }),
-/* 13 */
-/***/ (function(module, exports, __webpack_require__) {
-
-Object.defineProperty(exports, "__esModule", { value: true });
-const GeometryAndPhysics_1 = __webpack_require__(0);
-class Particle {
-    constructor(ctx) {
-        this.ctx = ctx;
-        this.position = new GeometryAndPhysics_1.Point(0, 0);
-        this.velocity = new GeometryAndPhysics_1.Point(0, 0);
-        this.radius = 5;
-        this.maxLifeTime = 100;
-        this.draw = () => {
-            if (this.image) {
-                this.ctx.globalAlpha = this.lifeTime / this.maxLifeTime;
-                this.ctx.drawImage(this.image, this.position.x - 128, this.position.y - 128);
-                this.ctx.globalAlpha = 1.0;
-                return;
-            }
-            this.ctx.beginPath();
-            this.ctx.arc(this.position.x, this.position.y, this.radius, 0, 2 * Math.PI, false);
-            this.ctx.fillStyle = "rgba(0, 255, 255, 1)";
-            this.ctx.fill();
-            this.ctx.closePath();
-        };
-        this.update = () => {
-            this.position.x += this.velocity.x;
-            this.position.y += this.velocity.y;
-            if (this.position.x >= WIDTH) {
-                this.velocity.x = -this.velocity.x;
-                this.position.x = WIDTH;
-            }
-            else if (this.position.x <= 0) {
-                this.velocity.x = -this.velocity.x;
-                this.position.x = 0;
-            }
-            if (this.position.y >= HEIGHT) {
-                this.velocity.y = -this.velocity.y;
-                this.position.y = HEIGHT;
-            }
-            else if (this.position.y <= 0) {
-                this.velocity.y = -this.velocity.y;
-                this.position.y = 0;
-            }
-            this.lifeTime--;
-        };
-        this.setImage = (image) => {
-            this.image = image;
-        };
-        let id = Math.random();
-        Particle.list[id] = this;
-        this.maxLifeTime += Math.random() * 800;
-        this.lifeTime = this.maxLifeTime;
-    }
-}
-Particle.list = {};
-exports.Particle = Particle;
-
-
-/***/ }),
-/* 14 */
-/***/ (function(module, exports, __webpack_require__) {
-
-Object.defineProperty(exports, "__esModule", { value: true });
 const images_1 = __webpack_require__(2);
 const canvas_1 = __webpack_require__(4);
 const PlayerClient_1 = __webpack_require__(5);
 const GeometryAndPhysics_1 = __webpack_require__(0);
 const game_1 = __webpack_require__(3);
-const FireFlameClient_1 = __webpack_require__(12);
+const FireFlameClient_1 = __webpack_require__(13);
 class EnemyClient {
     constructor(initPack) {
         this.id = -1;
@@ -1934,6 +1803,137 @@ class EnemyClient {
 }
 EnemyClient.list = {};
 exports.EnemyClient = EnemyClient;
+
+
+/***/ }),
+/* 13 */
+/***/ (function(module, exports, __webpack_require__) {
+
+Object.defineProperty(exports, "__esModule", { value: true });
+const GeometryAndPhysics_1 = __webpack_require__(0);
+const FireParticle_1 = __webpack_require__(22);
+class FireFlameClient {
+    constructor(parent, burn = false) {
+        this.particles = [];
+        this.angle = 0;
+        this.position = new GeometryAndPhysics_1.Point(0, 0);
+        this.speed = 5;
+        this.create = false;
+        this.burn = false;
+        this.draw = () => {
+            ctx.globalCompositeOperation = "lighter";
+            for (let i = 0; i < this.particles.length; i++) {
+                this.particles[i].draw();
+            }
+            ctx.globalCompositeOperation = "source-over";
+        };
+        this.update = () => {
+            if (this.create) {
+                for (let i = 0; i < 10; i++) {
+                    let p;
+                    if (this.burn) {
+                        p = new FireParticle_1.FireParticle({ maxLife: 10, size: 7 });
+                    }
+                    else {
+                        p = new FireParticle_1.FireParticle({ maxLife: 60 });
+                    }
+                    let oldpos = new GeometryAndPhysics_1.Point(this.parent.position.x, this.parent.position.y);
+                    let angle = this.parent.aimAngle + 180;
+                    if (this.burn) {
+                        angle = Math.random() * 360;
+                    }
+                    else {
+                        oldpos.x -= Math.cos((angle * Math.PI) / 180) * 50;
+                        oldpos.y -= Math.sin((angle * Math.PI) / 180) * 50;
+                    }
+                    ;
+                    p.position.updatePosition(oldpos.x, oldpos.y);
+                    let flame = (0 - Math.random() * 2 * this.speed);
+                    p.velocity.x = Math.cos((angle * Math.PI * 2) / 360) * flame;
+                    p.velocity.y = Math.sin((angle * Math.PI * 2) / 360) * flame;
+                    angle += 90;
+                    flame = (Math.random() * 2 * this.speed - this.speed) / 6;
+                    p.velocity.x += Math.cos((angle * Math.PI * 2) / 360) * flame;
+                    p.velocity.y += Math.sin((angle * Math.PI * 2) / 360) * flame;
+                    this.particles.push(p);
+                }
+            }
+            for (let i = 0; i < this.particles.length; i++) {
+                this.particles[i].update();
+                if (this.particles[i].life >= this.particles[i].maxLife) {
+                    this.particles.splice(i, 1);
+                    i--;
+                }
+            }
+        };
+        this.parent = parent;
+        this.position.x = parent.position.x;
+        this.position.y = parent.position.y;
+        this.angle = this.parent.aimAngle + 180;
+        this.burn = burn;
+    }
+}
+exports.FireFlameClient = FireFlameClient;
+
+
+/***/ }),
+/* 14 */
+/***/ (function(module, exports, __webpack_require__) {
+
+Object.defineProperty(exports, "__esModule", { value: true });
+const GeometryAndPhysics_1 = __webpack_require__(0);
+class Particle {
+    constructor(ctx) {
+        this.ctx = ctx;
+        this.position = new GeometryAndPhysics_1.Point(0, 0);
+        this.velocity = new GeometryAndPhysics_1.Point(0, 0);
+        this.radius = 5;
+        this.maxLifeTime = 100;
+        this.draw = () => {
+            if (this.image) {
+                this.ctx.globalAlpha = this.lifeTime / this.maxLifeTime;
+                this.ctx.drawImage(this.image, this.position.x - 128, this.position.y - 128);
+                this.ctx.globalAlpha = 1.0;
+                return;
+            }
+            this.ctx.beginPath();
+            this.ctx.arc(this.position.x, this.position.y, this.radius, 0, 2 * Math.PI, false);
+            this.ctx.fillStyle = "rgba(0, 255, 255, 1)";
+            this.ctx.fill();
+            this.ctx.closePath();
+        };
+        this.update = () => {
+            this.position.x += this.velocity.x;
+            this.position.y += this.velocity.y;
+            if (this.position.x >= WIDTH) {
+                this.velocity.x = -this.velocity.x;
+                this.position.x = WIDTH;
+            }
+            else if (this.position.x <= 0) {
+                this.velocity.x = -this.velocity.x;
+                this.position.x = 0;
+            }
+            if (this.position.y >= HEIGHT) {
+                this.velocity.y = -this.velocity.y;
+                this.position.y = HEIGHT;
+            }
+            else if (this.position.y <= 0) {
+                this.velocity.y = -this.velocity.y;
+                this.position.y = 0;
+            }
+            this.lifeTime--;
+        };
+        this.setImage = (image) => {
+            this.image = image;
+        };
+        let id = Math.random();
+        Particle.list[id] = this;
+        this.maxLifeTime += Math.random() * 800;
+        this.lifeTime = this.maxLifeTime;
+    }
+}
+Particle.list = {};
+exports.Particle = Particle;
 
 
 /***/ }),
@@ -2655,6 +2655,7 @@ const PlayerClient_1 = __webpack_require__(5);
 const game_1 = __webpack_require__(3);
 const enums_1 = __webpack_require__(1);
 const WeaponTypes_1 = __webpack_require__(11);
+const EnemyClient_1 = __webpack_require__(12);
 class GUI {
     constructor(param) {
         this.draw = () => {
@@ -2756,6 +2757,15 @@ class GUI {
                     data[(j + i * imgSize) * 4 + 1] = Ga[material];
                     data[(j + i * imgSize) * 4 + 2] = Ba[material];
                     data[(j + i * imgSize) * 4 + 3] = 255;
+                    for (let k in EnemyClient_1.EnemyClient.list) {
+                        let enemyPosition = EnemyClient_1.EnemyClient.list[k].position;
+                        if (Math.floor(enemyPosition.x / (Constants_1.TILE_SIZE * 32)) == Math.floor(j / ratio) && Math.floor(enemyPosition.y / (Constants_1.TILE_SIZE * 32)) == Math.floor(i / ratio)) {
+                            data[(j + i * imgSize) * 4] = 0;
+                            data[(j + i * imgSize) * 4 + 1] = 0;
+                            data[(j + i * imgSize) * 4 + 2] = 0;
+                            data[(j + i * imgSize) * 4 + 3] = 255;
+                        }
+                    }
                     if (Math.floor(playerPosition.x / (Constants_1.TILE_SIZE * 32)) == Math.floor(j / ratio) && Math.floor(playerPosition.y / (Constants_1.TILE_SIZE * 32)) == Math.floor(i / ratio)) {
                         data[(j + i * imgSize) * 4] = 255;
                         data[(j + i * imgSize) * 4 + 1] = 0;
@@ -2854,7 +2864,7 @@ exports.SmokeParticle = SmokeParticle;
 /***/ (function(module, exports, __webpack_require__) {
 
 Object.defineProperty(exports, "__esModule", { value: true });
-const Particle_1 = __webpack_require__(13);
+const Particle_1 = __webpack_require__(14);
 const enums_1 = __webpack_require__(1);
 const images_1 = __webpack_require__(2);
 class Effects {
@@ -3329,6 +3339,7 @@ class GameSoundManager {
                 soundManager.createSound('gunshot', '/client/mp3/gunshot.mp3');
                 soundManager.createSound('pistol_fire', '/client/mp3/pistol_fire.mp3');
                 soundManager.createSound('shotgun_fire', '/client/mp3/shotgun_fire.mp3');
+                soundManager.createSound('flamethrower_fire', '/client/mp3/flamethrower_fire.mp3');
                 soundManager.createSound('rifle_fire', '/client/mp3/rifle_fire.mp3');
                 soundManager.createSound('knife_swing', '/client/mp3/knife_swing.mp3');
                 soundManager.createSound('gun_swing', '/client/mp3/gun_swing.mp3');
@@ -3349,7 +3360,12 @@ class GameSoundManager {
                 (weapon == "knife" || weapon == "claws") ? soundManager.play("knife_swing") : soundManager.play("gun_swing");
             }
             else {
-                soundManager.play(weapon + "_fire");
+                if (weapon == "flamethrower") {
+                    soundManager.play(weapon + "_fire");
+                }
+                else {
+                    soundManager.play(weapon + "_fire");
+                }
             }
         };
         this.playHit = (category) => {
@@ -3492,7 +3508,7 @@ exports.MapClient = MapClient;
 Object.defineProperty(exports, "__esModule", { value: true });
 const images_1 = __webpack_require__(2);
 const game_1 = __webpack_require__(3);
-const EnemyClient_1 = __webpack_require__(14);
+const EnemyClient_1 = __webpack_require__(12);
 const GeometryAndPhysics_1 = __webpack_require__(0);
 const game_2 = __webpack_require__(3);
 const PlayerClient_1 = __webpack_require__(5);

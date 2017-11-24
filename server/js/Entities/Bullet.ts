@@ -1,3 +1,4 @@
+import { Point } from './../GeometryAndPhysics';
 import { Pack } from './../Pack';
 import { Enemy } from './Enemy';
 import { Actor } from './Actor';
@@ -20,9 +21,11 @@ export class Bullet extends Entity{
     private hitCategory: number = 0;
     private hitEntityCategory: string = "";
     private hitEntityId: number = -1;
+    public startPosition: Point;
 
     constructor(param) {
         super(Bullet.updateParam(param));
+        this.startPosition = new Point(this.position.x, this.position.y);
         this.mapController = new MapController(null);
         this.combatType = param.combatType ? param.combatType : this.combatType;
         this.angle = param.angle ? param.angle : this.angle;
@@ -35,10 +38,12 @@ export class Bullet extends Entity{
         
         this.parent = param.parent ? param.parent : -1;
         
-        initPack.bullet.push(this.getInitPack());
+       // initPack.bullet.push(this.getInitPack());
         Bullet.list[this.id] = this;
     }
 
+    get isToRemove() { return this.toRemove; }
+ 
     update = () => {
         this.updatePosition();
         if(this.timer++ > 100) this.toRemove = true;
@@ -102,12 +107,15 @@ export class Bullet extends Entity{
         return {
             id: this.id,
             position: this.position,
+            startPosition: this.startPosition,
             map: this.map,
             img: this.img,
             width: this.width,
             height: this.height,
             combatType: this.combatType,
-            hitCategory: this.hitCategory
+            hitCategory: this.hitCategory,
+            hitEntityCategory: this.hitEntityCategory,
+            hitEntityId: this.hitEntityId
         }
     }
 
@@ -120,18 +128,19 @@ export class Bullet extends Entity{
     }  
 
     static update = () =>{
-        let pack: any[] =[];
+      //  let pack: any[] =[];
         for(let i in Bullet.list){
             let bullet = Bullet.list[i];
-            bullet.update();
+            //bullet.update();
             if(bullet.toRemove){
+                initPack.bullet.push(bullet.getInitPack());
                 delete Bullet.list[i];
-                removePack.bullet.push({id: bullet.id, hitCategory: bullet.hitCategory, hitEntityCategory: bullet.hitEntityCategory, hitEntityId: bullet.hitEntityId});
+              //  removePack.bullet.push({id: bullet.id, hitCategory: bullet.hitCategory, hitEntityCategory: bullet.hitEntityCategory, hitEntityId: bullet.hitEntityId});
             } else {
-                pack.push(bullet.getUpdatePack());     
+               // pack.push(bullet.getUpdatePack());     
             }
         }
-        return pack;
+      //  return pack;
     }
 
     static getAllInitPack = function(){

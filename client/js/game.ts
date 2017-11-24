@@ -69,7 +69,8 @@ socket.on('init', function(data){
     }
 
    for(let i = 0, length = data.bullet.length; i < length; i++){
-        new BulletClient(data.bullet[i]);  
+        let b = new BulletClient(data.bullet[i]);  
+        b.hit(data.bullet[i].hitCategory, data.bullet[i].hitEntityCategory,data.bullet[i].hitEntityId);
     } 
 
     for(let i = 0, length = data.enemy.length; i < length; i++){
@@ -155,7 +156,7 @@ socket.on('update', function(data){
                 if(pack.attackStarted){
                     if(p.reload) gameSoundManager.playWeaponReload(p.weapon);
                     gameSoundManager.playWeaponAttack(p.weapon, p.attackMelee);
-                    p.attackStarted = true;
+                    p.attackStarted = pack.attackStarted;
                     p.bodySpriteAnimCounter = 0;
                 } 
             }
@@ -217,7 +218,7 @@ socket.on('update', function(data){
                  if(pack.attackStarted){
                     if(p.reload) gameSoundManager.playWeaponReload(p.weapon);
                     gameSoundManager.playWeaponAttack(p.weapon, p.attackMelee);
-                     p.attackStarted = true;
+                     p.attackStarted = pack.attackStarted;
                      p.spriteAnimCounter = 0;
                  }
              }
@@ -225,7 +226,7 @@ socket.on('update', function(data){
 
         }
     }
-
+/*
     for(let i = 0, length = data.bullet.length; i < length ; i++){
         let pack = data.bullet[i];
         let b = BulletClient.list[pack.id];
@@ -236,7 +237,7 @@ socket.on('update', function(data){
             } 
         }
     }
-
+*/
     /*
     for(let i = 0, length = data.particle.length; i < length ; i++){
         let pack = data.particle[i];
@@ -330,6 +331,11 @@ setInterval(function(){
     
     for(let i in BulletClient.list){
         BulletClient.list[i].draw();
+        if(BulletClient.list[i].toRemove){
+             delete BulletClient.list[i];
+        } else{
+            BulletClient.list[i].update();
+        }
     }  
 
     for(let i in UpgradeClient.list){

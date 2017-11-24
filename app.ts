@@ -117,10 +117,11 @@ setInterval(function(){
     let packs = Entity.getFrameUpdateData();
     
     Particle.update();
-
+    Bullet.update();
+    
     let pack = {
         player: Player.update(),
-        bullet: Bullet.update(),
+     //   bullet: Bullet.update(),
     //    particle: Particle.update(),
         enemy: Enemy.update(),
         smoke: Smoke.update()

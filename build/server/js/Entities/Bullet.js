@@ -1,4 +1,5 @@
 Object.defineProperty(exports, "__esModule", { value: true });
+const GeometryAndPhysics_1 = require("./../GeometryAndPhysics");
 const Enemy_1 = require("./Enemy");
 const Player_1 = require("./Player");
 const Entity_1 = require("./Entity");
@@ -71,12 +72,15 @@ class Bullet extends Entity_1.Entity {
             return {
                 id: this.id,
                 position: this.position,
+                startPosition: this.startPosition,
                 map: this.map,
                 img: this.img,
                 width: this.width,
                 height: this.height,
                 combatType: this.combatType,
-                hitCategory: this.hitCategory
+                hitCategory: this.hitCategory,
+                hitEntityCategory: this.hitEntityCategory,
+                hitEntityId: this.hitEntityId
             };
         };
         this.getUpdatePack = () => {
@@ -86,6 +90,7 @@ class Bullet extends Entity_1.Entity {
                 hitCategory: this.hitCategory
             };
         };
+        this.startPosition = new GeometryAndPhysics_1.Point(this.position.x, this.position.y);
         this.mapController = new MapControler_1.MapController(null);
         this.combatType = param.combatType ? param.combatType : this.combatType;
         this.angle = param.angle ? param.angle : this.angle;
@@ -96,24 +101,20 @@ class Bullet extends Entity_1.Entity {
         this.setSpdX(this.spdX);
         this.setSpdY(this.spdY);
         this.parent = param.parent ? param.parent : -1;
-        globalVariables_1.initPack.bullet.push(this.getInitPack());
         Bullet.list[this.id] = this;
     }
+    get isToRemove() { return this.toRemove; }
 }
 Bullet.update = () => {
-    let pack = [];
     for (let i in Bullet.list) {
         let bullet = Bullet.list[i];
-        bullet.update();
         if (bullet.toRemove) {
+            globalVariables_1.initPack.bullet.push(bullet.getInitPack());
             delete Bullet.list[i];
-            globalVariables_1.removePack.bullet.push({ id: bullet.id, hitCategory: bullet.hitCategory, hitEntityCategory: bullet.hitEntityCategory, hitEntityId: bullet.hitEntityId });
         }
         else {
-            pack.push(bullet.getUpdatePack());
         }
     }
-    return pack;
 };
 Bullet.getAllInitPack = function () {
     let bullets = [];

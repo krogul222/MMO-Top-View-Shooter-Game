@@ -78,7 +78,7 @@ class AttackController {
             console.log("BRON: " + weaponProperties.name + " " + "melee:" + weaponProperties.attackMelee);
         };
         this.shootBullet = (aimAngle, shootSpeed) => {
-            new Bullet_1.Bullet({
+            let b = new Bullet_1.Bullet({
                 parent: this.parent.id,
                 combatType: this.parent.type,
                 angle: aimAngle,
@@ -89,6 +89,15 @@ class AttackController {
                 height: 8,
                 shootspeed: shootSpeed
             });
+            let counter = 0;
+            while (!b.isToRemove) {
+                b.update();
+                counter++;
+                if (counter == 1) {
+                    b.startPosition.x = b.position.x;
+                    b.startPosition.y = b.position.y;
+                }
+            }
         };
         this.getDamage = () => {
             let damage = 0;
