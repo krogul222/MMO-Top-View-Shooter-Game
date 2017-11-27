@@ -142,9 +142,9 @@ setInterval(function(){
             socket.emit('init',packs.initPack);
             socket.emit('update',pack);
             socket.emit('remove',packs.removePack);
-            for(let i = 0, length = MapController.updatePack.length; i < length; i++) {
+         /*   for(let i = 0, length = MapController.updatePack.length; i < length; i++) {
                 socket.emit('mapData', MapController.updatePack[i]);
-            }
+            }*/
      }
     
     MapController.updatePack.length = 0;

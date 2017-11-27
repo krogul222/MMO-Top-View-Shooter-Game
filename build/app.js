@@ -106,9 +106,6 @@ setInterval(function () {
         socket.emit('init', packs.initPack);
         socket.emit('update', pack);
         socket.emit('remove', packs.removePack);
-        for (let i = 0, length = MapControler_1.MapController.updatePack.length; i < length; i++) {
-            socket.emit('mapData', MapControler_1.MapController.updatePack[i]);
-        }
     }
     MapControler_1.MapController.updatePack.length = 0;
     packs.initPack.player = [];
