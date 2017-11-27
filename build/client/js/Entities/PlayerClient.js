@@ -1,10 +1,10 @@
 Object.defineProperty(exports, "__esModule", { value: true });
-const FireFlameClient_1 = require("./../FireFlameClient");
-const images_1 = require("./../images");
 const GeometryAndPhysics_1 = require("./../../../server/js/GeometryAndPhysics");
-const game_1 = require("../game");
-const canvas_1 = require("../canvas");
-const images_2 = require("../images");
+const FireFlameClient_1 = require("../Effects/FireFlameClient");
+const game_1 = require("../game/game");
+const canvas_1 = require("../pregame/canvas");
+const images_1 = require("../images");
+const EnemyClient_1 = require("./EnemyClient");
 class PlayerClient {
     constructor(initPack) {
         this.id = -1;
@@ -81,7 +81,7 @@ class PlayerClient {
             let frame = images_1.jsonPlayer["frames"]["player_" + this.weapon + "_meeleattack.png"]["frame"];
             let frameWidth = frame["w"] / spriteColumns;
             let frameHeight = frame["h"] / spriteRows;
-            canvas_1.camera.drawImage(images_2.Img["Player"], frameWidth, frameHeight, aimAngle, directionMod, walkingMod, x, y, this.width * correction, this.height * correction, frame["x"], frame["y"]);
+            canvas_1.camera.drawImage(images_1.Img["Player"], frameWidth, frameHeight, aimAngle, directionMod, walkingMod, x, y, this.width * correction, this.height * correction, frame["x"], frame["y"]);
             if (this.bodySpriteAnimCounter % spriteColumns >= (spriteColumns - 1)) {
                 this.bodySpriteAnimCounter = 0;
                 this.attackStarted = false;
@@ -91,19 +91,31 @@ class PlayerClient {
             let frame = images_1.jsonPlayer["frames"]["player_" + this.weapon + ".png"]["frame"];
             let frameWidth = frame["w"] / spriteColumns;
             let frameHeight = frame["h"] / spriteRows;
-            canvas_1.camera.drawImage(images_2.Img["Player"], frameWidth, frameHeight, aimAngle, directionMod, walkingMod, x, y, this.width, this.height, frame["x"], frame["y"]);
+            canvas_1.camera.drawImage(images_1.Img["Player"], frameWidth, frameHeight, aimAngle, directionMod, walkingMod, x, y, this.width, this.height, frame["x"], frame["y"]);
         };
         this.drawReloadBodyWithGun = (spriteColumns, spriteRows, aimAngle, directionMod, walkingMod, x, y) => {
             let frame = images_1.jsonPlayer["frames"]["player_" + this.weapon + "_reload.png"]["frame"];
             let frameWidth = frame["w"] / spriteColumns;
             let frameHeight = frame["h"] / spriteRows;
-            canvas_1.camera.drawImage(images_2.Img["Player"], frameWidth, frameHeight, aimAngle, directionMod, walkingMod, x, y, this.width, this.height, frame["x"], frame["y"]);
+            canvas_1.camera.drawImage(images_1.Img["Player"], frameWidth, frameHeight, aimAngle, directionMod, walkingMod, x, y, this.width, this.height, frame["x"], frame["y"]);
         };
         this.drawWalk = (spriteColumns, spriteRows, aimAngle, directionMod, walkingMod, x, y) => {
             let frame = images_1.jsonPlayer["frames"]["walk.png"]["frame"];
             let frameWidth = frame["w"] / spriteColumns;
             let frameHeight = frame["h"] / spriteRows;
-            canvas_1.camera.drawImage(images_2.Img["Player"], frameWidth, frameHeight, aimAngle, directionMod, walkingMod, x, y, this.width / 2, this.height / 2, frame["x"], frame["y"]);
+            canvas_1.camera.drawImage(images_1.Img["Player"], frameWidth, frameHeight, aimAngle, directionMod, walkingMod, x, y, this.width / 2, this.height / 2, frame["x"], frame["y"]);
+        };
+        this.getEnemies = (distance) => {
+            let list = [];
+            let e;
+            let p = PlayerClient.list[game_1.selfId];
+            for (let i in EnemyClient_1.EnemyClient.list) {
+                e = EnemyClient_1.EnemyClient.list[i];
+                if ((e.position.x - p.position.x) < distance && (e.position.y - p.position.y) < distance) {
+                    list.push(i);
+                }
+            }
+            return list;
         };
         if (initPack.id)
             this.id = initPack.id;

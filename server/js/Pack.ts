@@ -11,6 +11,6 @@ export class Pack {
     public upgrade: any[] = [];
     public smoke: any[] = [];
     public particle: any[] = [];
-    
+
     constructor(){}
 }

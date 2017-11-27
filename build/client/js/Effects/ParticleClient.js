@@ -1,9 +1,9 @@
 Object.defineProperty(exports, "__esModule", { value: true });
-const canvas_1 = require("./../canvas");
+const game_1 = require("./../game/game");
 const GeometryAndPhysics_1 = require("./../../../server/js/GeometryAndPhysics");
 const enums_1 = require("./../../../server/js/enums");
 const PlayerClient_1 = require("../Entities/PlayerClient");
-const game_1 = require("../game");
+const canvas_1 = require("../pregame/canvas");
 class ParticleClient {
     constructor(param) {
         this.id = 0;

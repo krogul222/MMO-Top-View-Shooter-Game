@@ -1,10 +1,11 @@
-import { FireFlameClient } from './../FireFlameClient';
-import { jsonPlayer } from './../images';
 import { initPack } from './../../../server/js/globalVariables';
 import { Point } from './../../../server/js/GeometryAndPhysics';
-import { selfId } from '../game';
-import { camera } from '../canvas';
-import { Img } from '../images';
+import { FireFlameClient } from '../Effects/FireFlameClient';
+import { selfId } from '../game/game';
+import { camera } from '../pregame/canvas';
+import { jsonPlayer, Img } from '../images';
+import { EnemyClient } from './EnemyClient';
+
 
 declare var mouseX: any;
 declare var mouseY: any;
@@ -156,6 +157,20 @@ export class PlayerClient{
         
         camera.drawImage(Img["Player"], frameWidth, frameHeight, aimAngle, directionMod, walkingMod, x, y, this.width/2, this.height/2, frame["x"], frame["y"] );
 
+    }
+
+    getEnemies = (distance) => {
+        let list: string[] = [];
+        let e: EnemyClient;
+        let p: PlayerClient = PlayerClient.list[selfId]
+        for(let i in EnemyClient.list){
+            e = EnemyClient.list[i];
+            if((e.position.x-p.position.x)< distance && (e.position.y-p.position.y) < distance){
+                list.push(i);
+            }
+        }
+
+        return list;
     }
 
     static list: any = {};

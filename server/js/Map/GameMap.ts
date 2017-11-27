@@ -1,6 +1,7 @@
 import { MapTile } from './MapTile';
 import { Point } from '../GeometryAndPhysics';
 import { TILE_SIZE } from '../Constants';
+import { Enemy } from '../Entities/Enemy';
 
 
 export class GameMap {
@@ -22,6 +23,8 @@ export class GameMap {
         this._height = TILE_SIZE*32*this._size;
         this._width = TILE_SIZE*32*this._size;
     }
+
+    
 
     isPositionWall = (position: Point) =>{
 

@@ -8,6 +8,7 @@ import { MapTile } from '../Map/MapTile';
 import { TerrainMaterial, getRandomInt, randomEnum, TerrainMaterialWithoutWater, Orientation, CornerOrientation } from '../enums';
 import { Point } from '../GeometryAndPhysics';
 import { TILE_SIZE } from '../Constants';
+import { Enemy } from '../Entities/Enemy';
 
 export class MapController {
     static maps = {};
@@ -205,6 +206,8 @@ export class MapController {
 
 
         MapController.maps[name] = (new GameMap(name, mapTiles));
+
+
     }
 
     static getTileDistance = (x,y, tx, ty) =>{

@@ -1,9 +1,11 @@
-import { Img, jsonIAE } from './../images';
-import { camera } from './../canvas';
+import { selfId } from './../game/game';
+import { FireFlameClient } from './../Effects/FireFlameClient';
 import { PlayerClient } from './PlayerClient';
 import { Point } from "../../../server/js/GeometryAndPhysics";
-import { selfId } from '../game';
-import { FireFlameClient } from '../FireFlameClient';
+import { selfId } from '../game/game';
+import { camera } from '../pregame/canvas';
+import { Img, jsonIAE } from '../images';
+import { framesAttack, framesMove } from '../Constants/EnemyConstants';
 
 declare var mouseX: any;
 declare var mouseY: any;
@@ -53,45 +55,37 @@ export class EnemyClient{
     }
 
     draw = () => {
-        if(PlayerClient.list[selfId].map !== this.map){
+        let p: PlayerClient = PlayerClient.list[selfId];
+        if(p.map !== this.map){
             return;  
         }
 
+        if(p.position.x - this.position.x > WIDTH || p.position.y - this.position.y > HEIGHT ) return;
+
+
         let hpWidth = 30 * this.hp/this.hpMax;
         
-        let mainPlayer: PlayerClient = PlayerClient.list[selfId];
-        let mainPlayerx = mainPlayer.position.x;
-        let mainPlayery = mainPlayer.position.y;
-        let ex = this.position.x;
-        let ey = this.position.y;
-
-        let x: number = ex - (mainPlayerx-WIDTH/2);
-        x = x - (mouseX-WIDTH/2)/CAMERA_BOX_ADJUSTMENT;
-        let y: number = ey - (mainPlayery-HEIGHT/2);
-        y = y - (mouseY-HEIGHT/2)/CAMERA_BOX_ADJUSTMENT;  
-
-
         let frameWidth = 32;
         let frameHeight = 32;
 
         let aimAngle = this.aimAngle;
             
-        if(aimAngle < 0){ aimAngle = 360 + aimAngle; }
-            
-        let directionMod = 3;  //right
-        if(aimAngle >= 45 && aimAngle <135){
-            directionMod = 2;   //down
-        } else if(aimAngle >= 135 && aimAngle <225){
-            directionMod = 1;   //left
-        } else if(aimAngle >= 225 && aimAngle <315) {
-            directionMod = 0;   // up 
-        }
+        if(aimAngle < 0){ aimAngle = 360 + aimAngle; }   
+
             
         let walkingMod = Math.floor(this.spriteAnimCounter) % 6;
 
         if(this.kind == 'zombie'){
             this.drawTopViewSprite(this.position.x, this.position.y, aimAngle);            
         } else{
+            let directionMod = 3;  //right
+            if(aimAngle >= 45 && aimAngle <135){
+                directionMod = 2;   //down
+            } else if(aimAngle >= 135 && aimAngle <225){
+                directionMod = 1;   //left
+            } else if(aimAngle >= 225 && aimAngle <315) {
+                directionMod = 0;   // up 
+            }
             let frame = jsonIAE["frames"][this.kind+".png"]["frame"];
             frameWidth = frame["w"]/6;
             frameHeight = frame["h"]/4;

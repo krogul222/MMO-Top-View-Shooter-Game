@@ -1,9 +1,9 @@
 Object.defineProperty(exports, "__esModule", { value: true });
-const images_1 = require("./../images");
 const GeometryAndPhysics_1 = require("./../../../server/js/GeometryAndPhysics");
 const PlayerClient_1 = require("./PlayerClient");
-const game_1 = require("../game");
-const canvas_1 = require("../canvas");
+const game_1 = require("../game/game");
+const canvas_1 = require("../pregame/canvas");
+const images_1 = require("../images");
 class ExplosionClient {
     constructor(param) {
         this.id = Math.random();

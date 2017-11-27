@@ -1,12 +1,12 @@
-import { Img, jsonIAE } from './../images';
-import { gameSoundManager } from './../game';
+import { gameSoundManager } from './../game/game';
 import { EnemyClient } from './EnemyClient';
 import { initPack } from './../../../server/js/globalVariables';
 import { Point } from './../../../server/js/GeometryAndPhysics';
-import { selfId } from '../game';
 import { PlayerClient } from './PlayerClient';
 import { ExplosionClient } from './ExplosionClient';
-import { camera } from '../canvas';
+import { selfId } from '../game/game';
+import { camera } from '../pregame/canvas';
+import { Img } from '../images';
 
 declare var mouseX: any;
 declare var mouseY: any;

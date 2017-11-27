@@ -1,8 +1,9 @@
-import { camera } from './../canvas';
+import { selfId } from './../game/game';
 import { Point } from './../../../server/js/GeometryAndPhysics';
 import { ParticleType } from './../../../server/js/enums';
 import { PlayerClient } from '../Entities/PlayerClient';
-import { selfId } from '../game';
+import { camera } from '../pregame/canvas';
+
 
 declare var ctx: any;
 
@@ -31,7 +32,7 @@ export class ParticleClient{
 
         ParticleClient.list[this.id] = this; 
     }
-
+selfId
     draw = () => {
         if(PlayerClient.list[selfId].map !== this.map){
             return;  

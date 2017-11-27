@@ -10,7 +10,9 @@ import { WeaponType, ItemType } from '../enums';
 import { MapController } from '../Controllers/MapControler';
 import { GameMap } from '../Map/GameMap';
 
+
 export class Player extends Actor {
+    private updatePack = {};
 
     constructor(param) { 
         super(param);
@@ -18,12 +20,16 @@ export class Player extends Actor {
         Player.list[param.id] = this;
         this.giveItems();
 
-        for(let i = 0 ; i <1; i++){
-        Enemy.randomlyGenerate(this.map);
-        Enemy.randomlyGenerate(this.map);
-        Enemy.randomlyGenerate(this.map);
-        Enemy.randomlyGenerate(this.map);
+        if(Player.monsters){
+            for(let i = 0 ; i <10; i++){
+                Enemy.randomlyGenerate(this.map);
+                Enemy.randomlyGenerate(this.map);
+                Enemy.randomlyGenerate(this.map);
+                Enemy.randomlyGenerate(this.map);
+                }
+                Player.monsters = false;
         }
+
     } 
 
     giveItems = () => {
@@ -64,6 +70,74 @@ export class Player extends Actor {
     getUpdatePack = () => {
         let attackStartedTmp = this.attackController.attackStarted;
         this.attackController.attackStarted = false;
+
+        let newPack = {};
+        
+        this.updatePack['id'] = this.id;
+        newPack['id'] = this.id;
+        
+
+
+        if(this.updatePack['position'] !== this.position){
+            newPack['position'] = this.position;
+            this.updatePack['position'] = new Point(this.position.x, this.position.y);
+        }
+
+        if(this.updatePack['hp'] !== this.lifeAndBodyController.hp){
+            newPack['hp'] = this.lifeAndBodyController.hp;
+            this.updatePack['hp'] = this.lifeAndBodyController.hp;
+        }
+        if(this.updatePack['moving'] !== this.movementController.moving){
+            newPack['moving'] = this.movementController.moving;
+            this.updatePack['moving'] = this.movementController.moving;
+        }
+        if(this.updatePack['aimAngle'] !== this.movementController.aimAngle){
+            newPack['aimAngle'] = this.movementController.aimAngle;
+            this.updatePack['aimAngle'] = this.movementController.aimAngle;
+        }
+
+        if(this.updatePack['attackStarted'] !== attackStartedTmp){
+            newPack['attackStarted'] = attackStartedTmp;
+            this.updatePack['attackStarted'] = attackStartedTmp;
+        }
+
+        if(this.updatePack['weapon'] !== this.attackController.activeWeapon.name){
+            newPack['weapon'] = this.attackController.activeWeapon.name;
+            this.updatePack['weapon'] = this.attackController.activeWeapon.name;
+        }
+
+        if(this.updatePack['attackMelee'] !== this.attackController.melee){
+            newPack['attackMelee'] = this.attackController.melee;
+            this.updatePack['attackMelee'] = this.attackController.melee;
+        }
+
+        if(this.updatePack['ammo'] !== this.attackController.activeWeapon.ammo){
+            newPack['ammo'] = this.attackController.activeWeapon.ammo;
+            this.updatePack['ammo'] = this.attackController.activeWeapon.ammo;
+        }
+
+        if(this.updatePack['ammoInGun'] !== this.attackController.activeWeapon.ammoInGun){
+            newPack['ammoInGun'] = this.attackController.activeWeapon.ammoInGun;
+            this.updatePack['ammoInGun'] = this.attackController.activeWeapon.ammoInGun;
+        }
+
+        if(this.updatePack['reload'] !== this.attackController.reloadCounter.isActive()){
+            newPack['reload'] = this.attackController.reloadCounter.isActive();
+            this.updatePack['reload'] = this.attackController.reloadCounter.isActive();
+        }
+
+        if(this.updatePack['pressingAttack'] !== this.attackController.pressingAttack){
+            newPack['pressingAttack'] = this.attackController.pressingAttack;
+            this.updatePack['pressingAttack'] = this.attackController.pressingAttack;
+        }
+
+        if(this.updatePack['burn'] !== this.lifeAndBodyController.burn){
+            newPack['burn'] = this.lifeAndBodyController.burn;
+            this.updatePack['burn'] = this.lifeAndBodyController.burn;
+        }
+
+        return newPack;
+/*
         return {
             id: this.id,
             position: this.position,
@@ -78,7 +152,7 @@ export class Player extends Actor {
             reload: this.attackController.reloadCounter.isActive(),
             pressingAttack: this.attackController.pressingAttack,
             burn: this.lifeAndBodyController.burn   
-        }
+        }*/
     }
 
     static onConnect = (socket) => {
@@ -145,6 +219,19 @@ export class Player extends Actor {
         this.setPosition(position); 
     }
 
+    closeEnemies = (distance) => {
+        let ids: number[] = [];
+        let e: Enemy;
+        for(let i in Enemy.list){
+            e = Enemy.list[i];
+            if(e.getDistance(this) < distance){
+                ids.push(e.id);
+            }
+        }
+
+        return ids;
+    }
+
     static getAllInitPack = () => {
         let players: any[] = [];
         for(let i in Player.list) { players.push(Player.list[i].getInitPack()); }
@@ -165,6 +252,8 @@ export class Player extends Actor {
         }
         return pack;
     }
+
+    static monsters = true;
 
     static list = {};
 }

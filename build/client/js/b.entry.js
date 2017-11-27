@@ -60,7 +60,7 @@
 /******/ 	__webpack_require__.p = "/build/client/js";
 /******/
 /******/ 	// Load entry module and return exports
-/******/ 	return __webpack_require__(__webpack_require__.s = 4);
+/******/ 	return __webpack_require__(__webpack_require__.s = 3);
 /******/ })
 /************************************************************************/
 /******/ ([
@@ -241,55 +241,28 @@ exports.getRandomInt = getRandomInt;
 
 /***/ }),
 /* 2 */
-/***/ (function(module, exports) {
-
-Object.defineProperty(exports, "__esModule", { value: true });
-exports.Img = {};
-exports.Img.map = {};
-exports.Img.guibackground = new Image();
-exports.Img.guibackground.src = '/client/img/guibackground.jpg';
-exports.Img.smoke = new Image();
-exports.Img.smoke.src = '/client/img/smoke.png';
-socket.on('jsonImages', function (data) {
-    console.log(data.jsonGUI);
-    console.log(data.jsonPlayer);
-    exports.jsonPlayer = data.jsonPlayer;
-    exports.jsonGUI = data.jsonGUI;
-    exports.jsonIAE = data.jsonIAE;
-    exports.jsonMap = data.jsonMap;
-});
-exports.Img.Player = new Image();
-exports.Img.Player.src = '/client/TexturePacks/PlayerImages.png';
-exports.Img.Map = new Image();
-exports.Img.Map.src = '/client/TexturePacks/MapImages.png';
-exports.Img.IAE = new Image();
-exports.Img.IAE.src = '/client/TexturePacks/ItemsAndEnemiesImages.png';
-exports.Img.GUI = new Image();
-exports.Img.GUI.src = '/client/TexturePacks/GUIImages.png';
-
-
-/***/ }),
-/* 3 */
 /***/ (function(module, exports, __webpack_require__) {
 
 Object.defineProperty(exports, "__esModule", { value: true });
-const SmokeClient_1 = __webpack_require__(21);
-const Particle_1 = __webpack_require__(14);
-const Effects_1 = __webpack_require__(26);
-const Filters_1 = __webpack_require__(27);
-const canvas_1 = __webpack_require__(4);
-const MapControler_1 = __webpack_require__(7);
-const GameSoundManager_1 = __webpack_require__(34);
-const UpgradeClient_1 = __webpack_require__(35);
-const MapClient_1 = __webpack_require__(36);
 const PlayerClient_1 = __webpack_require__(5);
-const BulletClient_1 = __webpack_require__(37);
-const EnemyClient_1 = __webpack_require__(12);
-const ExplosionClient_1 = __webpack_require__(15);
+const Particle_1 = __webpack_require__(14);
+const ParticleClient_1 = __webpack_require__(39);
+const UpgradeClient_1 = __webpack_require__(40);
+const BulletClient_1 = __webpack_require__(41);
+const GameSoundManager_1 = __webpack_require__(42);
 const Inventory_1 = __webpack_require__(16);
-const ParticleClient_1 = __webpack_require__(47);
+const MapControler_1 = __webpack_require__(8);
+const MapClient_1 = __webpack_require__(43);
+const Filters_1 = __webpack_require__(44);
+const Effects_1 = __webpack_require__(45);
+const canvas_1 = __webpack_require__(3);
+const SmokeClient_1 = __webpack_require__(47);
+const EnemyClient_1 = __webpack_require__(9);
+const ExplosionClient_1 = __webpack_require__(20);
+let enemyDrawList = [];
 exports.selfId = 0;
 let smokeTest = false;
+let frame = 0;
 exports.inventory = new Inventory_1.Inventory(socket, false, 0);
 MapControler_1.MapController.loadMaps();
 exports.currentMap = new MapClient_1.MapClient(null, "forest");
@@ -494,6 +467,7 @@ setInterval(function () {
     if (!exports.selfId) {
         return;
     }
+    frame++;
     ctx.clearRect(0, 0, WIDTH, HEIGHT);
     exports.currentMap.draw();
     for (let i in PlayerClient_1.PlayerClient.list) {
@@ -524,16 +498,20 @@ setInterval(function () {
     for (let i in UpgradeClient_1.UpgradeClient.list) {
         UpgradeClient_1.UpgradeClient.list[i].draw();
     }
-    for (let i in EnemyClient_1.EnemyClient.list) {
-        if (EnemyClient_1.EnemyClient.list[i].moving || EnemyClient_1.EnemyClient.list[i].attackStarted) {
-            if (EnemyClient_1.EnemyClient.list[i].attackStarted) {
-                EnemyClient_1.EnemyClient.list[i].spriteAnimCounter += 0.8;
+    for (let k in enemyDrawList) {
+        let i = enemyDrawList[k];
+        if (EnemyClient_1.EnemyClient.list[i] !== undefined) {
+            if (EnemyClient_1.EnemyClient.list[i].moving || EnemyClient_1.EnemyClient.list[i].attackStarted) {
+                if (EnemyClient_1.EnemyClient.list[i].attackStarted) {
+                    EnemyClient_1.EnemyClient.list[i].spriteAnimCounter += 0.8;
+                }
+                else {
+                    EnemyClient_1.EnemyClient.list[i].spriteAnimCounter += 0.4;
+                }
             }
-            else {
-                EnemyClient_1.EnemyClient.list[i].spriteAnimCounter += 0.4;
-            }
+            EnemyClient_1.EnemyClient.list[i].draw();
         }
-        EnemyClient_1.EnemyClient.list[i].draw();
+        console.log("Enemy draw " + i);
     }
     for (let i in ExplosionClient_1.ExplosionClient.list) {
         ExplosionClient_1.ExplosionClient.list[i].spriteAnimCounter += 0.4;
@@ -544,30 +522,39 @@ setInterval(function () {
             ExplosionClient_1.ExplosionClient.list[i].draw();
         }
     }
-    ctx.globalCompositeOperation = "lighter";
-    for (let i in ParticleClient_1.ParticleClient.list) {
-        ParticleClient_1.ParticleClient.list[i].draw();
-    }
-    ctx.globalCompositeOperation = "source-over";
     for (let i in PlayerClient_1.PlayerClient.list) {
         PlayerClient_1.PlayerClient.list[i].flame.update();
         PlayerClient_1.PlayerClient.list[i].flame.draw();
         PlayerClient_1.PlayerClient.list[i].burn.update();
         PlayerClient_1.PlayerClient.list[i].burn.draw();
     }
-    for (let i in EnemyClient_1.EnemyClient.list) {
-        EnemyClient_1.EnemyClient.list[i].flame.update();
-        EnemyClient_1.EnemyClient.list[i].flame.draw();
-        EnemyClient_1.EnemyClient.list[i].burn.update();
-        EnemyClient_1.EnemyClient.list[i].burn.draw();
+    for (let k in enemyDrawList) {
+        let i = enemyDrawList[k];
+        if (EnemyClient_1.EnemyClient.list[i] !== undefined) {
+            EnemyClient_1.EnemyClient.list[i].flame.update();
+            EnemyClient_1.EnemyClient.list[i].flame.draw();
+            EnemyClient_1.EnemyClient.list[i].burn.update();
+            EnemyClient_1.EnemyClient.list[i].burn.draw();
+        }
     }
-    exports.effects.draw();
-    exports.effects.update();
     for (let i in SmokeClient_1.SmokeClient.list) {
         SmokeClient_1.SmokeClient.list[i].update();
         SmokeClient_1.SmokeClient.list[i].draw();
     }
+    console.log("FRAME " + frame % 40);
+    if ((frame % 40) == 0) {
+        console.log("UPDATE LIST");
+        enemyDrawList = updateEnemyDrawList();
+    }
 }, 40);
+let updateEnemyDrawList = () => {
+    if (!exports.selfId) {
+        return [];
+    }
+    let p = PlayerClient_1.PlayerClient.list[exports.selfId];
+    console.log("Wynik " + p.getEnemies(500));
+    return p.getEnemies(1000);
+};
 document.onkeydown = function (event) {
     if (event.keyCode === 68)
         socket.emit('keyPress', { inputId: 'right', state: true });
@@ -658,11 +645,9 @@ document.onkeyup = function (event) {
         socket.emit('keyPress', { inputId: 'up', state: false });
 };
 document.onmousedown = function (event) {
-    flameFire = true;
     socket.emit('keyPress', { inputId: 'attack', state: true });
 };
 document.onmouseup = function (event) {
-    flameFire = false;
     socket.emit('keyPress', { inputId: 'attack', state: false });
 };
 document.onmousemove = function (event) {
@@ -692,12 +677,12 @@ let updateMouse = () => {
 
 
 /***/ }),
-/* 4 */
+/* 3 */
 /***/ (function(module, exports, __webpack_require__) {
 
 Object.defineProperty(exports, "__esModule", { value: true });
-const Camera_1 = __webpack_require__(23);
-const GUI_1 = __webpack_require__(24);
+const Camera_1 = __webpack_require__(22);
+const GUI_1 = __webpack_require__(23);
 gui = new GUI_1.GUI({ ctx: ctxui, width: WIDTH, height: HEIGHTUI });
 exports.camera = new Camera_1.Camera(canvas, WIDTH, HEIGHT);
 let resizeCanvas = function () {
@@ -720,16 +705,45 @@ window.addEventListener('resize', function () {
 
 
 /***/ }),
+/* 4 */
+/***/ (function(module, exports) {
+
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.Img = {};
+exports.Img.map = {};
+exports.Img.guibackground = new Image();
+exports.Img.guibackground.src = '/client/img/guibackground.jpg';
+exports.Img.smoke = new Image();
+exports.Img.smoke.src = '/client/img/smoke.png';
+socket.on('jsonImages', function (data) {
+    console.log(data.jsonGUI);
+    console.log(data.jsonPlayer);
+    exports.jsonPlayer = data.jsonPlayer;
+    exports.jsonGUI = data.jsonGUI;
+    exports.jsonIAE = data.jsonIAE;
+    exports.jsonMap = data.jsonMap;
+});
+exports.Img.Player = new Image();
+exports.Img.Player.src = '/client/TexturePacks/PlayerImages.png';
+exports.Img.Map = new Image();
+exports.Img.Map.src = '/client/TexturePacks/MapImages.png';
+exports.Img.IAE = new Image();
+exports.Img.IAE.src = '/client/TexturePacks/ItemsAndEnemiesImages.png';
+exports.Img.GUI = new Image();
+exports.Img.GUI.src = '/client/TexturePacks/GUIImages.png';
+
+
+/***/ }),
 /* 5 */
 /***/ (function(module, exports, __webpack_require__) {
 
 Object.defineProperty(exports, "__esModule", { value: true });
-const FireFlameClient_1 = __webpack_require__(13);
-const images_1 = __webpack_require__(2);
 const GeometryAndPhysics_1 = __webpack_require__(0);
-const game_1 = __webpack_require__(3);
-const canvas_1 = __webpack_require__(4);
-const images_2 = __webpack_require__(2);
+const FireFlameClient_1 = __webpack_require__(13);
+const game_1 = __webpack_require__(2);
+const canvas_1 = __webpack_require__(3);
+const images_1 = __webpack_require__(4);
+const EnemyClient_1 = __webpack_require__(9);
 class PlayerClient {
     constructor(initPack) {
         this.id = -1;
@@ -806,7 +820,7 @@ class PlayerClient {
             let frame = images_1.jsonPlayer["frames"]["player_" + this.weapon + "_meeleattack.png"]["frame"];
             let frameWidth = frame["w"] / spriteColumns;
             let frameHeight = frame["h"] / spriteRows;
-            canvas_1.camera.drawImage(images_2.Img["Player"], frameWidth, frameHeight, aimAngle, directionMod, walkingMod, x, y, this.width * correction, this.height * correction, frame["x"], frame["y"]);
+            canvas_1.camera.drawImage(images_1.Img["Player"], frameWidth, frameHeight, aimAngle, directionMod, walkingMod, x, y, this.width * correction, this.height * correction, frame["x"], frame["y"]);
             if (this.bodySpriteAnimCounter % spriteColumns >= (spriteColumns - 1)) {
                 this.bodySpriteAnimCounter = 0;
                 this.attackStarted = false;
@@ -816,19 +830,31 @@ class PlayerClient {
             let frame = images_1.jsonPlayer["frames"]["player_" + this.weapon + ".png"]["frame"];
             let frameWidth = frame["w"] / spriteColumns;
             let frameHeight = frame["h"] / spriteRows;
-            canvas_1.camera.drawImage(images_2.Img["Player"], frameWidth, frameHeight, aimAngle, directionMod, walkingMod, x, y, this.width, this.height, frame["x"], frame["y"]);
+            canvas_1.camera.drawImage(images_1.Img["Player"], frameWidth, frameHeight, aimAngle, directionMod, walkingMod, x, y, this.width, this.height, frame["x"], frame["y"]);
         };
         this.drawReloadBodyWithGun = (spriteColumns, spriteRows, aimAngle, directionMod, walkingMod, x, y) => {
             let frame = images_1.jsonPlayer["frames"]["player_" + this.weapon + "_reload.png"]["frame"];
             let frameWidth = frame["w"] / spriteColumns;
             let frameHeight = frame["h"] / spriteRows;
-            canvas_1.camera.drawImage(images_2.Img["Player"], frameWidth, frameHeight, aimAngle, directionMod, walkingMod, x, y, this.width, this.height, frame["x"], frame["y"]);
+            canvas_1.camera.drawImage(images_1.Img["Player"], frameWidth, frameHeight, aimAngle, directionMod, walkingMod, x, y, this.width, this.height, frame["x"], frame["y"]);
         };
         this.drawWalk = (spriteColumns, spriteRows, aimAngle, directionMod, walkingMod, x, y) => {
             let frame = images_1.jsonPlayer["frames"]["walk.png"]["frame"];
             let frameWidth = frame["w"] / spriteColumns;
             let frameHeight = frame["h"] / spriteRows;
-            canvas_1.camera.drawImage(images_2.Img["Player"], frameWidth, frameHeight, aimAngle, directionMod, walkingMod, x, y, this.width / 2, this.height / 2, frame["x"], frame["y"]);
+            canvas_1.camera.drawImage(images_1.Img["Player"], frameWidth, frameHeight, aimAngle, directionMod, walkingMod, x, y, this.width / 2, this.height / 2, frame["x"], frame["y"]);
+        };
+        this.getEnemies = (distance) => {
+            let list = [];
+            let e;
+            let p = PlayerClient.list[game_1.selfId];
+            for (let i in EnemyClient_1.EnemyClient.list) {
+                e = EnemyClient_1.EnemyClient.list[i];
+                if ((e.position.x - p.position.x) < distance && (e.position.y - p.position.y) < distance) {
+                    list.push(i);
+                }
+            }
+            return list;
         };
         if (initPack.id)
             this.id = initPack.id;
@@ -949,6 +975,16 @@ exports.mapObjectCollisions[enums_1.MapObjectType.GR_ER] = [0, 0, 2, 0, 0, 0, 0,
 
 /***/ }),
 /* 7 */
+/***/ (function(module, exports, __webpack_require__) {
+
+Object.defineProperty(exports, "__esModule", { value: true });
+const Pack_1 = __webpack_require__(26);
+exports.initPack = new Pack_1.Pack();
+exports.removePack = new Pack_1.Pack();
+
+
+/***/ }),
+/* 8 */
 /***/ (function(module, exports, __webpack_require__) {
 
 Object.defineProperty(exports, "__esModule", { value: true });
@@ -1140,31 +1176,155 @@ exports.MapController = MapController;
 
 
 /***/ }),
-/* 8 */
-/***/ (function(module, exports, __webpack_require__) {
-
-Object.defineProperty(exports, "__esModule", { value: true });
-const Pack_1 = __webpack_require__(40);
-exports.initPack = new Pack_1.Pack();
-exports.removePack = new Pack_1.Pack();
-
-
-/***/ }),
 /* 9 */
 /***/ (function(module, exports, __webpack_require__) {
 
 Object.defineProperty(exports, "__esModule", { value: true });
-const Smoke_1 = __webpack_require__(39);
-const globalVariables_1 = __webpack_require__(8);
-const Enemy_1 = __webpack_require__(10);
-const Bullet_1 = __webpack_require__(19);
-const Actor_1 = __webpack_require__(17);
+const game_1 = __webpack_require__(2);
+const FireFlameClient_1 = __webpack_require__(13);
+const PlayerClient_1 = __webpack_require__(5);
+const GeometryAndPhysics_1 = __webpack_require__(0);
+const canvas_1 = __webpack_require__(3);
+const images_1 = __webpack_require__(4);
+const EnemyConstants_1 = __webpack_require__(24);
+class EnemyClient {
+    constructor(initPack) {
+        this.id = -1;
+        this.position = new GeometryAndPhysics_1.Point(250, 250);
+        this.startPosition = new GeometryAndPhysics_1.Point(250, 250);
+        this.width = 0;
+        this.height = 0;
+        this.img = images_1.Img["zombie"];
+        this.kind = "zombie";
+        this.hp = 1;
+        this.hpMax = 1;
+        this.map = "forest";
+        this.aimAngle = 0;
+        this.attackStarted = false;
+        this.attackMelee = false;
+        this.spriteAnimCounter = 0;
+        this.moving = false;
+        this.reload = false;
+        this.weapon = "pistol";
+        this.flame = new FireFlameClient_1.FireFlameClient(this);
+        this.burn = new FireFlameClient_1.FireFlameClient(this, true);
+        this.draw = () => {
+            let p = PlayerClient_1.PlayerClient.list[game_1.selfId];
+            if (p.map !== this.map) {
+                return;
+            }
+            if (p.position.x - this.position.x > WIDTH || p.position.y - this.position.y > HEIGHT)
+                return;
+            let hpWidth = 30 * this.hp / this.hpMax;
+            let frameWidth = 32;
+            let frameHeight = 32;
+            let aimAngle = this.aimAngle;
+            if (aimAngle < 0) {
+                aimAngle = 360 + aimAngle;
+            }
+            let walkingMod = Math.floor(this.spriteAnimCounter) % 6;
+            if (this.kind == 'zombie') {
+                this.drawTopViewSprite(this.position.x, this.position.y, aimAngle);
+            }
+            else {
+                let directionMod = 3;
+                if (aimAngle >= 45 && aimAngle < 135) {
+                    directionMod = 2;
+                }
+                else if (aimAngle >= 135 && aimAngle < 225) {
+                    directionMod = 1;
+                }
+                else if (aimAngle >= 225 && aimAngle < 315) {
+                    directionMod = 0;
+                }
+                let frame = images_1.jsonIAE["frames"][this.kind + ".png"]["frame"];
+                frameWidth = frame["w"] / 6;
+                frameHeight = frame["h"] / 4;
+                walkingMod = Math.floor(this.spriteAnimCounter) % 6;
+                canvas_1.camera.drawImage(images_1.Img["IAE"], frameWidth, frameHeight, 0, directionMod, walkingMod, this.position.x - this.width / 2, this.position.y - this.height / 2, this.width, this.height, frame["x"], frame["y"]);
+            }
+            canvas_1.camera.drawBar(this.position.x - hpWidth / 2, this.position.y - 40, hpWidth, 4, 'red');
+        };
+        this.drawTopViewSprite = (x, y, aimAngle) => {
+            if (this.attackStarted) {
+                this.drawTopViewSpriteAttack(x, y, aimAngle);
+            }
+            else {
+                this.drawTopViewSpriteWalk(x, y, aimAngle);
+            }
+        };
+        this.drawTopViewSpriteAttack = (x, y, aimAngle) => {
+            let spriteColumns = EnemyConstants_1.framesAttack[this.kind];
+            let spriteRows = 1;
+            let walkingMod = Math.floor(this.spriteAnimCounter) % spriteColumns;
+            let frame = images_1.jsonIAE["frames"][this.kind + "_attack.png"]["frame"];
+            let frameWidth = frame["w"] / spriteColumns;
+            let frameHeight = frame["h"] / spriteRows;
+            canvas_1.camera.drawImage(images_1.Img["IAE"], frameWidth, frameHeight, aimAngle, 0, walkingMod, x, y, this.width, this.height, frame["x"], frame["y"]);
+            if (this.spriteAnimCounter % spriteColumns >= (spriteColumns - 1)) {
+                this.spriteAnimCounter = 0;
+                this.attackStarted = false;
+            }
+        };
+        this.drawTopViewSpriteWalk = (x, y, aimAngle) => {
+            let walkingMod = Math.floor(this.spriteAnimCounter) % EnemyConstants_1.framesMove[this.kind];
+            let frame = images_1.jsonIAE["frames"][this.kind + "_move.png"]["frame"];
+            let frameWidth = frame["w"] / EnemyConstants_1.framesMove[this.kind];
+            let frameHeight = frame["h"];
+            canvas_1.camera.drawImage(images_1.Img["IAE"], frameWidth, frameHeight, aimAngle, 0, walkingMod, x, y, this.width, this.height, frame["x"], frame["y"]);
+        };
+        if (initPack.id)
+            this.id = initPack.id;
+        if (initPack.position)
+            this.position = initPack.position;
+        if (initPack.startPosition)
+            this.startPosition = initPack.startPosition;
+        if (initPack.width)
+            this.width = initPack.width;
+        if (initPack.height)
+            this.height = initPack.height;
+        if (initPack.weapon)
+            this.weapon = initPack.weapon;
+        if (initPack.img)
+            this.img = images_1.Img[initPack.img];
+        if (initPack.hp)
+            this.hp = initPack.hp;
+        if (initPack.hpMax)
+            this.hpMax = initPack.hpMax;
+        if (initPack.aimAngle)
+            this.aimAngle = initPack.aimAngle;
+        if (initPack.moving)
+            this.moving = initPack.moving;
+        if (initPack.attackStarted)
+            this.attackStarted = initPack.attackStarted;
+        if (initPack.attackMelee)
+            this.attackMelee = initPack.attackMelee;
+        if (initPack.kind)
+            this.kind = initPack.kind;
+        EnemyClient.list[initPack.id] = this;
+    }
+}
+EnemyClient.list = {};
+exports.EnemyClient = EnemyClient;
+
+
+/***/ }),
+/* 10 */
+/***/ (function(module, exports, __webpack_require__) {
+
+Object.defineProperty(exports, "__esModule", { value: true });
+const Smoke_1 = __webpack_require__(25);
+const globalVariables_1 = __webpack_require__(7);
+const Enemy_1 = __webpack_require__(11);
+const Bullet_1 = __webpack_require__(18);
+const Actor_1 = __webpack_require__(15);
 const GeometryAndPhysics_1 = __webpack_require__(0);
 const enums_1 = __webpack_require__(1);
-const MapControler_1 = __webpack_require__(7);
+const MapControler_1 = __webpack_require__(8);
 class Player extends Actor_1.Actor {
     constructor(param) {
         super(param);
+        this.updatePack = {};
         this.giveItems = () => {
             this.inventory.addItem(enums_1.ItemType.knife, 1);
             this.inventory.addItem(enums_1.ItemType.pistol, 1);
@@ -1200,21 +1360,58 @@ class Player extends Actor_1.Actor {
         this.getUpdatePack = () => {
             let attackStartedTmp = this.attackController.attackStarted;
             this.attackController.attackStarted = false;
-            return {
-                id: this.id,
-                position: this.position,
-                hp: this.lifeAndBodyController.hp,
-                moving: this.movementController.moving,
-                aimAngle: this.movementController.aimAngle,
-                attackStarted: attackStartedTmp,
-                weapon: this.attackController.activeWeapon.name,
-                attackMelee: this.attackController.melee,
-                ammo: this.attackController.activeWeapon.ammo,
-                ammoInGun: this.attackController.activeWeapon.ammoInGun,
-                reload: this.attackController.reloadCounter.isActive(),
-                pressingAttack: this.attackController.pressingAttack,
-                burn: this.lifeAndBodyController.burn
-            };
+            let newPack = {};
+            this.updatePack['id'] = this.id;
+            newPack['id'] = this.id;
+            if (this.updatePack['position'] !== this.position) {
+                newPack['position'] = this.position;
+                this.updatePack['position'] = new GeometryAndPhysics_1.Point(this.position.x, this.position.y);
+            }
+            if (this.updatePack['hp'] !== this.lifeAndBodyController.hp) {
+                newPack['hp'] = this.lifeAndBodyController.hp;
+                this.updatePack['hp'] = this.lifeAndBodyController.hp;
+            }
+            if (this.updatePack['moving'] !== this.movementController.moving) {
+                newPack['moving'] = this.movementController.moving;
+                this.updatePack['moving'] = this.movementController.moving;
+            }
+            if (this.updatePack['aimAngle'] !== this.movementController.aimAngle) {
+                newPack['aimAngle'] = this.movementController.aimAngle;
+                this.updatePack['aimAngle'] = this.movementController.aimAngle;
+            }
+            if (this.updatePack['attackStarted'] !== attackStartedTmp) {
+                newPack['attackStarted'] = attackStartedTmp;
+                this.updatePack['attackStarted'] = attackStartedTmp;
+            }
+            if (this.updatePack['weapon'] !== this.attackController.activeWeapon.name) {
+                newPack['weapon'] = this.attackController.activeWeapon.name;
+                this.updatePack['weapon'] = this.attackController.activeWeapon.name;
+            }
+            if (this.updatePack['attackMelee'] !== this.attackController.melee) {
+                newPack['attackMelee'] = this.attackController.melee;
+                this.updatePack['attackMelee'] = this.attackController.melee;
+            }
+            if (this.updatePack['ammo'] !== this.attackController.activeWeapon.ammo) {
+                newPack['ammo'] = this.attackController.activeWeapon.ammo;
+                this.updatePack['ammo'] = this.attackController.activeWeapon.ammo;
+            }
+            if (this.updatePack['ammoInGun'] !== this.attackController.activeWeapon.ammoInGun) {
+                newPack['ammoInGun'] = this.attackController.activeWeapon.ammoInGun;
+                this.updatePack['ammoInGun'] = this.attackController.activeWeapon.ammoInGun;
+            }
+            if (this.updatePack['reload'] !== this.attackController.reloadCounter.isActive()) {
+                newPack['reload'] = this.attackController.reloadCounter.isActive();
+                this.updatePack['reload'] = this.attackController.reloadCounter.isActive();
+            }
+            if (this.updatePack['pressingAttack'] !== this.attackController.pressingAttack) {
+                newPack['pressingAttack'] = this.attackController.pressingAttack;
+                this.updatePack['pressingAttack'] = this.attackController.pressingAttack;
+            }
+            if (this.updatePack['burn'] !== this.lifeAndBodyController.burn) {
+                newPack['burn'] = this.lifeAndBodyController.burn;
+                this.updatePack['burn'] = this.lifeAndBodyController.burn;
+            }
+            return newPack;
         };
         this.onDeath = () => {
             this.lifeAndBodyController.reset();
@@ -1229,14 +1426,28 @@ class Player extends Actor_1.Actor {
             }
             this.setPosition(position);
         };
+        this.closeEnemies = (distance) => {
+            let ids = [];
+            let e;
+            for (let i in Enemy_1.Enemy.list) {
+                e = Enemy_1.Enemy.list[i];
+                if (e.getDistance(this) < distance) {
+                    ids.push(e.id);
+                }
+            }
+            return ids;
+        };
         globalVariables_1.initPack.player.push(this.getInitPack());
         Player.list[param.id] = this;
         this.giveItems();
-        for (let i = 0; i < 1; i++) {
-            Enemy_1.Enemy.randomlyGenerate(this.map);
-            Enemy_1.Enemy.randomlyGenerate(this.map);
-            Enemy_1.Enemy.randomlyGenerate(this.map);
-            Enemy_1.Enemy.randomlyGenerate(this.map);
+        if (Player.monsters) {
+            for (let i = 0; i < 20; i++) {
+                Enemy_1.Enemy.randomlyGenerate(this.map);
+                Enemy_1.Enemy.randomlyGenerate(this.map);
+                Enemy_1.Enemy.randomlyGenerate(this.map);
+                Enemy_1.Enemy.randomlyGenerate(this.map);
+            }
+            Player.monsters = false;
         }
     }
 }
@@ -1321,28 +1532,29 @@ Player.update = () => {
     }
     return pack;
 };
+Player.monsters = true;
 Player.list = {};
 exports.Player = Player;
 
 
 /***/ }),
-/* 10 */
+/* 11 */
 /***/ (function(module, exports, __webpack_require__) {
 
 Object.defineProperty(exports, "__esModule", { value: true });
-const Actor_1 = __webpack_require__(17);
+const Actor_1 = __webpack_require__(15);
 const GeometryAndPhysics_1 = __webpack_require__(0);
-const globalVariables_1 = __webpack_require__(8);
+const globalVariables_1 = __webpack_require__(7);
 const enums_1 = __webpack_require__(1);
-const MapControler_1 = __webpack_require__(7);
+const MapControler_1 = __webpack_require__(8);
 class Enemy extends Actor_1.Actor {
     constructor(param) {
         super(param);
         this.toRemove = false;
         this.kind = "";
         this.counter = 0;
+        this.updatePack = {};
         this.extendedUpdate = () => {
-            this.update();
             if (this.playerToKill == undefined || this.counter % 40 === 0)
                 this.playerToKill = this.getClosestPlayer(10000, 360);
             let diffX = 0;
@@ -1351,11 +1563,14 @@ class Enemy extends Actor_1.Actor {
                 diffX = this.playerToKill.position.x - this.position.x;
                 diffY = this.playerToKill.position.y - this.position.y;
             }
-            if (this.counter % 10 === 0) {
-                this.updateAim(this.playerToKill, diffX, diffY);
-                this.updateKeyPress(this.playerToKill, diffX, diffY);
+            if (Math.sqrt(diffX * diffX + diffY * diffY) < 800) {
+                this.update();
+                if (this.counter % 10 === 0) {
+                    this.updateAim(this.playerToKill, diffX, diffY);
+                    this.updateKeyPress(this.playerToKill, diffX, diffY);
+                }
+                this.updateAttack(this.playerToKill, diffX, diffY);
             }
-            this.updateAttack(this.playerToKill, diffX, diffY);
             this.counter++;
         };
         this.updateAim = (player, diffX, diffY) => {
@@ -1408,19 +1623,52 @@ class Enemy extends Actor_1.Actor {
         this.getUpdatePack = () => {
             let attackStartedTmp = this.attackController.attackStarted;
             this.attackController.attackStarted = false;
-            return {
-                id: this.id,
-                position: this.position,
-                hp: this.lifeAndBodyController.hp,
-                moving: this.movementController.moving,
-                aimAngle: this.movementController.aimAngle,
-                attackStarted: attackStartedTmp,
-                weapon: this.attackController.activeWeapon.name,
-                attackMelee: this.attackController.melee,
-                reload: this.attackController.reloadCounter.isActive(),
-                pressingAttack: this.attackController.pressingAttack,
-                burn: this.lifeAndBodyController.burn
-            };
+            let newPack = {};
+            if (this.updatePack['position'] !== this.position) {
+                newPack['position'] = this.position;
+                this.updatePack['position'] = new GeometryAndPhysics_1.Point(this.position.x, this.position.y);
+            }
+            if (this.updatePack['hp'] !== this.lifeAndBodyController.hp) {
+                newPack['hp'] = this.lifeAndBodyController.hp;
+                this.updatePack['hp'] = this.lifeAndBodyController.hp;
+            }
+            if (this.updatePack['moving'] !== this.movementController.moving) {
+                newPack['moving'] = this.movementController.moving;
+                this.updatePack['moving'] = this.movementController.moving;
+            }
+            if (this.updatePack['aimAngle'] !== this.movementController.aimAngle) {
+                newPack['aimAngle'] = this.movementController.aimAngle;
+                this.updatePack['aimAngle'] = this.movementController.aimAngle;
+            }
+            if (this.updatePack['attackStarted'] !== attackStartedTmp) {
+                newPack['attackStarted'] = attackStartedTmp;
+                this.updatePack['attackStarted'] = attackStartedTmp;
+            }
+            if (this.updatePack['weapon'] !== this.attackController.activeWeapon.name) {
+                newPack['weapon'] = this.attackController.activeWeapon.name;
+                this.updatePack['weapon'] = this.attackController.activeWeapon.name;
+            }
+            if (this.updatePack['attackMelee'] !== this.attackController.melee) {
+                newPack['attackMelee'] = this.attackController.melee;
+                this.updatePack['attackMelee'] = this.attackController.melee;
+            }
+            if (this.updatePack['reload'] !== this.attackController.reloadCounter.isActive()) {
+                newPack['reload'] = this.attackController.reloadCounter.isActive();
+                this.updatePack['reload'] = this.attackController.reloadCounter.isActive();
+            }
+            if (this.updatePack['pressingAttack'] !== this.attackController.pressingAttack) {
+                newPack['pressingAttack'] = this.attackController.pressingAttack;
+                this.updatePack['pressingAttack'] = this.attackController.pressingAttack;
+            }
+            if (this.updatePack['burn'] !== this.lifeAndBodyController.burn) {
+                newPack['burn'] = this.lifeAndBodyController.burn;
+                this.updatePack['burn'] = this.lifeAndBodyController.burn;
+            }
+            if (newPack !== {}) {
+                this.updatePack['id'] = this.id;
+                newPack['id'] = this.id;
+            }
+            return newPack;
         };
         this.giveWeapons = () => {
             if (this.kind == 'zombie') {
@@ -1534,7 +1782,7 @@ exports.Enemy = Enemy;
 
 
 /***/ }),
-/* 11 */
+/* 12 */
 /***/ (function(module, exports, __webpack_require__) {
 
 Object.defineProperty(exports, "__esModule", { value: true });
@@ -1668,150 +1916,12 @@ new WeaponTypes({ weapon: enums_2.WeaponType.claws, name: "claws",
 
 
 /***/ }),
-/* 12 */
-/***/ (function(module, exports, __webpack_require__) {
-
-Object.defineProperty(exports, "__esModule", { value: true });
-const images_1 = __webpack_require__(2);
-const canvas_1 = __webpack_require__(4);
-const PlayerClient_1 = __webpack_require__(5);
-const GeometryAndPhysics_1 = __webpack_require__(0);
-const game_1 = __webpack_require__(3);
-const FireFlameClient_1 = __webpack_require__(13);
-class EnemyClient {
-    constructor(initPack) {
-        this.id = -1;
-        this.position = new GeometryAndPhysics_1.Point(250, 250);
-        this.startPosition = new GeometryAndPhysics_1.Point(250, 250);
-        this.width = 0;
-        this.height = 0;
-        this.img = images_1.Img["zombie"];
-        this.kind = "zombie";
-        this.hp = 1;
-        this.hpMax = 1;
-        this.map = "forest";
-        this.aimAngle = 0;
-        this.attackStarted = false;
-        this.attackMelee = false;
-        this.spriteAnimCounter = 0;
-        this.moving = false;
-        this.reload = false;
-        this.weapon = "pistol";
-        this.flame = new FireFlameClient_1.FireFlameClient(this);
-        this.burn = new FireFlameClient_1.FireFlameClient(this, true);
-        this.draw = () => {
-            if (PlayerClient_1.PlayerClient.list[game_1.selfId].map !== this.map) {
-                return;
-            }
-            let hpWidth = 30 * this.hp / this.hpMax;
-            let mainPlayer = PlayerClient_1.PlayerClient.list[game_1.selfId];
-            let mainPlayerx = mainPlayer.position.x;
-            let mainPlayery = mainPlayer.position.y;
-            let ex = this.position.x;
-            let ey = this.position.y;
-            let x = ex - (mainPlayerx - WIDTH / 2);
-            x = x - (mouseX - WIDTH / 2) / CAMERA_BOX_ADJUSTMENT;
-            let y = ey - (mainPlayery - HEIGHT / 2);
-            y = y - (mouseY - HEIGHT / 2) / CAMERA_BOX_ADJUSTMENT;
-            let frameWidth = 32;
-            let frameHeight = 32;
-            let aimAngle = this.aimAngle;
-            if (aimAngle < 0) {
-                aimAngle = 360 + aimAngle;
-            }
-            let directionMod = 3;
-            if (aimAngle >= 45 && aimAngle < 135) {
-                directionMod = 2;
-            }
-            else if (aimAngle >= 135 && aimAngle < 225) {
-                directionMod = 1;
-            }
-            else if (aimAngle >= 225 && aimAngle < 315) {
-                directionMod = 0;
-            }
-            let walkingMod = Math.floor(this.spriteAnimCounter) % 6;
-            if (this.kind == 'zombie') {
-                this.drawTopViewSprite(this.position.x, this.position.y, aimAngle);
-            }
-            else {
-                let frame = images_1.jsonIAE["frames"][this.kind + ".png"]["frame"];
-                frameWidth = frame["w"] / 6;
-                frameHeight = frame["h"] / 4;
-                walkingMod = Math.floor(this.spriteAnimCounter) % 6;
-                canvas_1.camera.drawImage(images_1.Img["IAE"], frameWidth, frameHeight, 0, directionMod, walkingMod, this.position.x - this.width / 2, this.position.y - this.height / 2, this.width, this.height, frame["x"], frame["y"]);
-            }
-            canvas_1.camera.drawBar(this.position.x - hpWidth / 2, this.position.y - 40, hpWidth, 4, 'red');
-        };
-        this.drawTopViewSprite = (x, y, aimAngle) => {
-            if (this.attackStarted) {
-                this.drawTopViewSpriteAttack(x, y, aimAngle);
-            }
-            else {
-                this.drawTopViewSpriteWalk(x, y, aimAngle);
-            }
-        };
-        this.drawTopViewSpriteAttack = (x, y, aimAngle) => {
-            let spriteColumns = framesAttack[this.kind];
-            let spriteRows = 1;
-            let walkingMod = Math.floor(this.spriteAnimCounter) % spriteColumns;
-            let frame = images_1.jsonIAE["frames"][this.kind + "_attack.png"]["frame"];
-            let frameWidth = frame["w"] / spriteColumns;
-            let frameHeight = frame["h"] / spriteRows;
-            canvas_1.camera.drawImage(images_1.Img["IAE"], frameWidth, frameHeight, aimAngle, 0, walkingMod, x, y, this.width, this.height, frame["x"], frame["y"]);
-            if (this.spriteAnimCounter % spriteColumns >= (spriteColumns - 1)) {
-                this.spriteAnimCounter = 0;
-                this.attackStarted = false;
-            }
-        };
-        this.drawTopViewSpriteWalk = (x, y, aimAngle) => {
-            let walkingMod = Math.floor(this.spriteAnimCounter) % framesMove[this.kind];
-            let frame = images_1.jsonIAE["frames"][this.kind + "_move.png"]["frame"];
-            let frameWidth = frame["w"] / framesMove[this.kind];
-            let frameHeight = frame["h"];
-            canvas_1.camera.drawImage(images_1.Img["IAE"], frameWidth, frameHeight, aimAngle, 0, walkingMod, x, y, this.width, this.height, frame["x"], frame["y"]);
-        };
-        if (initPack.id)
-            this.id = initPack.id;
-        if (initPack.position)
-            this.position = initPack.position;
-        if (initPack.startPosition)
-            this.startPosition = initPack.startPosition;
-        if (initPack.width)
-            this.width = initPack.width;
-        if (initPack.height)
-            this.height = initPack.height;
-        if (initPack.weapon)
-            this.weapon = initPack.weapon;
-        if (initPack.img)
-            this.img = images_1.Img[initPack.img];
-        if (initPack.hp)
-            this.hp = initPack.hp;
-        if (initPack.hpMax)
-            this.hpMax = initPack.hpMax;
-        if (initPack.aimAngle)
-            this.aimAngle = initPack.aimAngle;
-        if (initPack.moving)
-            this.moving = initPack.moving;
-        if (initPack.attackStarted)
-            this.attackStarted = initPack.attackStarted;
-        if (initPack.attackMelee)
-            this.attackMelee = initPack.attackMelee;
-        if (initPack.kind)
-            this.kind = initPack.kind;
-        EnemyClient.list[initPack.id] = this;
-    }
-}
-EnemyClient.list = {};
-exports.EnemyClient = EnemyClient;
-
-
-/***/ }),
 /* 13 */
 /***/ (function(module, exports, __webpack_require__) {
 
 Object.defineProperty(exports, "__esModule", { value: true });
 const GeometryAndPhysics_1 = __webpack_require__(0);
-const FireParticle_1 = __webpack_require__(22);
+const FireParticle_1 = __webpack_require__(21);
 class FireFlameClient {
     constructor(parent, burn = false) {
         this.particles = [];
@@ -1881,57 +1991,127 @@ exports.FireFlameClient = FireFlameClient;
 /***/ (function(module, exports, __webpack_require__) {
 
 Object.defineProperty(exports, "__esModule", { value: true });
+const Player_1 = __webpack_require__(10);
+const globalVariables_1 = __webpack_require__(7);
+const enums_1 = __webpack_require__(1);
 const GeometryAndPhysics_1 = __webpack_require__(0);
+const Enemy_1 = __webpack_require__(11);
 class Particle {
-    constructor(ctx) {
-        this.ctx = ctx;
+    constructor(param) {
         this.position = new GeometryAndPhysics_1.Point(0, 0);
         this.velocity = new GeometryAndPhysics_1.Point(0, 0);
-        this.radius = 5;
-        this.maxLifeTime = 100;
-        this.draw = () => {
-            if (this.image) {
-                this.ctx.globalAlpha = this.lifeTime / this.maxLifeTime;
-                this.ctx.drawImage(this.image, this.position.x - 128, this.position.y - 128);
-                this.ctx.globalAlpha = 1.0;
-                return;
-            }
-            this.ctx.beginPath();
-            this.ctx.arc(this.position.x, this.position.y, this.radius, 0, 2 * Math.PI, false);
-            this.ctx.fillStyle = "rgba(0, 255, 255, 1)";
-            this.ctx.fill();
-            this.ctx.closePath();
-        };
+        this.size = 40;
+        this.life = 0;
+        this.maxLife = 10;
+        this.toRemove = false;
+        this.id = Math.random();
+        this.combatType = 'player';
         this.update = () => {
             this.position.x += this.velocity.x;
             this.position.y += this.velocity.y;
-            if (this.position.x >= WIDTH) {
-                this.velocity.x = -this.velocity.x;
-                this.position.x = WIDTH;
+            this.life++;
+            if (this.life >= this.maxLife)
+                this.toRemove = true;
+            if (this.type == enums_1.ParticleType.fire) {
+                switch (this.combatType) {
+                    case 'player': {
+                        for (let key in Enemy_1.Enemy.list) {
+                            let enemy = Enemy_1.Enemy.list[key];
+                            if (this.testCollision(enemy)) {
+                                enemy.lifeAndBodyController.wasHit(1 * this.life / this.maxLife);
+                                enemy.lifeAndBodyController.startBurn(100);
+                            }
+                        }
+                        let player = Player_1.Player.list[this.parent];
+                        for (let key in Player_1.Player.list) {
+                            if (Player_1.Player.list[key].id !== this.parent) {
+                                let enemyPlayer = Player_1.Player.list[key];
+                                if (this.testCollision(enemyPlayer)) {
+                                    enemyPlayer.lifeAndBodyController.wasHit(1 * this.life / this.maxLife);
+                                    enemyPlayer.lifeAndBodyController.startBurn(100);
+                                }
+                            }
+                        }
+                        break;
+                    }
+                    case 'enemy': {
+                        let enemy = Enemy_1.Enemy.list[this.parent];
+                        for (let key in Player_1.Player.list) {
+                            let player = Player_1.Player.list[key];
+                            if (this.testCollision(player)) {
+                                player.lifeAndBodyController.wasHit(1 * this.life / this.maxLife);
+                                player.lifeAndBodyController.startBurn(100);
+                            }
+                        }
+                        for (let key in Enemy_1.Enemy.list) {
+                            if (Enemy_1.Enemy.list[key].id !== this.parent) {
+                                let enemy = Enemy_1.Enemy.list[key];
+                                if (this.testCollision(enemy)) {
+                                    enemy.lifeAndBodyController.wasHit(1 * this.life / this.maxLife);
+                                    enemy.lifeAndBodyController.startBurn(100);
+                                }
+                            }
+                        }
+                        break;
+                    }
+                }
             }
-            else if (this.position.x <= 0) {
-                this.velocity.x = -this.velocity.x;
-                this.position.x = 0;
-            }
-            if (this.position.y >= HEIGHT) {
-                this.velocity.y = -this.velocity.y;
-                this.position.y = HEIGHT;
-            }
-            else if (this.position.y <= 0) {
-                this.velocity.y = -this.velocity.y;
-                this.position.y = 0;
-            }
-            this.lifeTime--;
         };
-        this.setImage = (image) => {
-            this.image = image;
+        this.testCollision = (entity) => {
+            let pos1 = new GeometryAndPhysics_1.Point(this.position.x - (this.size / 4), this.position.y - (this.size / 4));
+            let pos2 = new GeometryAndPhysics_1.Point(entity.position.x - (entity.width / 4), entity.position.y - (entity.height / 4));
+            let rect1 = new GeometryAndPhysics_1.Rectangle(pos1, new GeometryAndPhysics_1.Size(this.size / 2, this.size / 2));
+            let rect2 = new GeometryAndPhysics_1.Rectangle(pos2, new GeometryAndPhysics_1.Size(entity.width / 2, entity.height / 2));
+            return GeometryAndPhysics_1.testCollisionRectRect(rect1, rect2);
         };
-        let id = Math.random();
-        Particle.list[id] = this;
-        this.maxLifeTime += Math.random() * 800;
-        this.lifeTime = this.maxLifeTime;
+        this.getInitPack = () => {
+            return {
+                id: this.id,
+                position: this.position,
+                map: this.map,
+                size: this.size,
+                type: this.type,
+                maxLife: this.maxLife
+            };
+        };
+        this.getUpdatePack = () => {
+            return {
+                id: this.id,
+                position: this.position,
+                life: this.life
+            };
+        };
+        this.maxLife = (param.maxLife !== undefined) ? param.maxLife : 60;
+        this.type = (param.type !== undefined) ? param.type : enums_1.ParticleType.fire;
+        if (param.position !== undefined) {
+            this.position.x = param.position.x;
+            this.position.y = param.position.y;
+        }
+        if (param.velocity !== undefined) {
+            this.velocity.x = param.velocity.x;
+            this.velocity.y = param.velocity.y;
+        }
+        this.parent = param.parent ? param.parent : -1;
+        this.combatType = param.combatType ? param.combatType : this.combatType;
+        this.map = (param.map !== undefined) ? param.map : 0;
+        Particle.list[this.id] = this;
     }
 }
+Particle.update = () => {
+    let pack = [];
+    for (let i in Particle.list) {
+        let particle = Particle.list[i];
+        particle.update();
+        if (particle.toRemove) {
+            delete Particle.list[i];
+            globalVariables_1.removePack.particle.push({ id: particle.id });
+        }
+        else {
+            pack.push(particle.getUpdatePack());
+        }
+    }
+    return pack;
+};
 Particle.list = {};
 exports.Particle = Particle;
 
@@ -1941,48 +2121,101 @@ exports.Particle = Particle;
 /***/ (function(module, exports, __webpack_require__) {
 
 Object.defineProperty(exports, "__esModule", { value: true });
-const images_1 = __webpack_require__(2);
+const Inventory_1 = __webpack_require__(16);
+const MapControler_1 = __webpack_require__(8);
+const MovementController_1 = __webpack_require__(34);
+const AttackControler_1 = __webpack_require__(35);
+const LifeAndBodyController_1 = __webpack_require__(38);
+const Entity_1 = __webpack_require__(19);
+const Player_1 = __webpack_require__(10);
+const Enemy_1 = __webpack_require__(11);
 const GeometryAndPhysics_1 = __webpack_require__(0);
-const PlayerClient_1 = __webpack_require__(5);
-const game_1 = __webpack_require__(3);
-const canvas_1 = __webpack_require__(4);
-class ExplosionClient {
+class Actor extends Entity_1.Entity {
     constructor(param) {
-        this.id = Math.random();
-        this.position = new GeometryAndPhysics_1.Point(0, 0);
-        this.width = 32;
-        this.height = 32;
-        this.spriteAnimCounter = 0;
-        this.draw = () => {
-            if (PlayerClient_1.PlayerClient.list[game_1.selfId].map !== this.map) {
-                return;
+        super(param);
+        this.update = () => {
+            this.movementController.updateSpd();
+            this.attackController.update();
+            this.lifeAndBodyController.update();
+            this.updatePosition();
+        };
+        this.getClosestPlayer = (distance, angleLimit) => {
+            let closestEnemyIndex = "0";
+            let closestEnemyDistance = 100000;
+            let pangle = this.movementController.aimAngle;
+            pangle = (pangle < 0) ? pangle + 360 : pangle;
+            for (let i in Player_1.Player.list) {
+                let enemy = Player_1.Player.list[i];
+                if (enemy !== this) {
+                    let angle = GeometryAndPhysics_1.calculateAngleBetweenEntities(this, enemy);
+                    let maxDistance = Math.sqrt(enemy.width * enemy.width / 4 + enemy.height * enemy.height / 4) + distance;
+                    let distanceFromEnemy = this.getDistance(enemy);
+                    if (distanceFromEnemy < maxDistance) {
+                        if ((angle < (pangle + angleLimit)) && (angle > pangle - angleLimit)) {
+                            if (closestEnemyDistance > distanceFromEnemy) {
+                                closestEnemyDistance = distanceFromEnemy;
+                                closestEnemyIndex = i;
+                            }
+                        }
+                    }
+                }
             }
-            let frame = images_1.jsonIAE["frames"][this.img + ".png"]["frame"];
-            let frameWidth = frame["w"] / this.animColumns;
-            let frameHeight = frame["h"] / this.animRows;
-            let spriteColumn = Math.floor(this.spriteAnimCounter) % this.animColumns;
-            let spriteRow = Math.floor(this.spriteAnimCounter / this.animColumns);
-            canvas_1.camera.drawImage(images_1.Img["IAE"], frameWidth, frameHeight, 0, spriteRow, spriteColumn, this.position.x - this.width / 2, this.position.y - this.height / 2, this.width, this.height, frame["x"], frame["y"]);
+            if (closestEnemyIndex == "-1")
+                return null;
+            return Player_1.Player.list[closestEnemyIndex];
         };
-        this.isCompleted = () => {
-            if (this.spriteAnimCounter > (this.animRows * this.animColumns))
-                return true;
-            else
-                return false;
+        this.getClosestEnemy = (distance, angleLimit) => {
+            let closestEnemyIndex = "-1";
+            let closestEnemyDistance = 100000;
+            let pangle = this.movementController.aimAngle;
+            pangle = (pangle < 0) ? pangle + 360 : pangle;
+            for (let i in Enemy_1.Enemy.list) {
+                let enemy = Enemy_1.Enemy.list[i];
+                let angle = GeometryAndPhysics_1.calculateAngleBetweenEntities(this, enemy);
+                let maxDistance = Math.sqrt(enemy.width * enemy.width / 4 + enemy.height * enemy.height / 4) + distance;
+                let distanceFromEnemy = this.getDistance(enemy);
+                if (distanceFromEnemy < maxDistance) {
+                    if ((angle < (pangle + angleLimit)) && (angle > pangle - angleLimit)) {
+                        if (closestEnemyDistance > distanceFromEnemy) {
+                            closestEnemyDistance = distanceFromEnemy;
+                            closestEnemyIndex = i;
+                        }
+                    }
+                }
+            }
+            if (closestEnemyIndex == "-1")
+                return null;
+            return Enemy_1.Enemy.list[closestEnemyIndex];
         };
-        this.position = param.position ? param.position : this.position;
-        this.width = param.width ? param.width : this.width;
-        this.height = param.height ? param.height : this.height;
-        this.map = param.map ? param.map : this.map;
-        this.img = param.img ? param.img : this.img;
-        this.category = param.category ? param.category : this.category;
-        this.animRows = param.spriteRows ? param.spriteRows : this.animRows;
-        this.animColumns = param.spriteColumns ? param.spriteColumns : this.animColumns;
-        ExplosionClient.list[this.id] = this;
+        this.getClosestPlayerorEnemy = (distance, angleLimit) => {
+            let enemy = this.getClosestEnemy(distance, angleLimit);
+            let player = this.getClosestPlayer(distance, angleLimit);
+            if (this.getDistance(enemy) < this.getDistance(player)) {
+                if (enemy !== null) {
+                    return enemy;
+                }
+                else {
+                    return null;
+                }
+            }
+            else {
+                if (player !== null) {
+                    return player;
+                }
+                else {
+                    return null;
+                }
+            }
+        };
+        this.onDeath = () => { };
+        this.lifeAndBodyController = new LifeAndBodyController_1.LifeAndBodyController(this, param);
+        this.attackController = new AttackControler_1.AttackController(this, param);
+        this.movementController = new MovementController_1.MovementController(this, param);
+        this.mapController = new MapControler_1.MapController(param);
+        this.inventory = new Inventory_1.Inventory(param.socket, true, this);
     }
 }
-ExplosionClient.list = {};
-exports.ExplosionClient = ExplosionClient;
+exports.Actor = Actor;
 
 
 /***/ }),
@@ -1990,8 +2223,8 @@ exports.ExplosionClient = ExplosionClient;
 /***/ (function(module, exports, __webpack_require__) {
 
 Object.defineProperty(exports, "__esModule", { value: true });
-const Item_1 = __webpack_require__(38);
-const Player_1 = __webpack_require__(9);
+const Item_1 = __webpack_require__(27);
+const Player_1 = __webpack_require__(10);
 class Inventory {
     constructor(socket, server, owner) {
         this.items = [];
@@ -2088,108 +2321,6 @@ exports.Inventory = Inventory;
 
 /***/ }),
 /* 17 */
-/***/ (function(module, exports, __webpack_require__) {
-
-Object.defineProperty(exports, "__esModule", { value: true });
-const Inventory_1 = __webpack_require__(16);
-const MapControler_1 = __webpack_require__(7);
-const MovementController_1 = __webpack_require__(41);
-const AttackControler_1 = __webpack_require__(42);
-const LifeAndBodyController_1 = __webpack_require__(46);
-const Entity_1 = __webpack_require__(20);
-const Player_1 = __webpack_require__(9);
-const Enemy_1 = __webpack_require__(10);
-const GeometryAndPhysics_1 = __webpack_require__(0);
-class Actor extends Entity_1.Entity {
-    constructor(param) {
-        super(param);
-        this.update = () => {
-            this.movementController.updateSpd();
-            this.attackController.update();
-            this.lifeAndBodyController.update();
-            this.updatePosition();
-        };
-        this.getClosestPlayer = (distance, angleLimit) => {
-            let closestEnemyIndex = "0";
-            let closestEnemyDistance = 100000;
-            let pangle = this.movementController.aimAngle;
-            pangle = (pangle < 0) ? pangle + 360 : pangle;
-            for (let i in Player_1.Player.list) {
-                let enemy = Player_1.Player.list[i];
-                if (enemy !== this) {
-                    let angle = GeometryAndPhysics_1.calculateAngleBetweenEntities(this, enemy);
-                    let maxDistance = Math.sqrt(enemy.width * enemy.width / 4 + enemy.height * enemy.height / 4) + distance;
-                    let distanceFromEnemy = this.getDistance(enemy);
-                    if (distanceFromEnemy < maxDistance) {
-                        if ((angle < (pangle + angleLimit)) && (angle > pangle - angleLimit)) {
-                            if (closestEnemyDistance > distanceFromEnemy) {
-                                closestEnemyDistance = distanceFromEnemy;
-                                closestEnemyIndex = i;
-                            }
-                        }
-                    }
-                }
-            }
-            if (closestEnemyIndex == "-1")
-                return null;
-            return Player_1.Player.list[closestEnemyIndex];
-        };
-        this.getClosestEnemy = (distance, angleLimit) => {
-            let closestEnemyIndex = "-1";
-            let closestEnemyDistance = 100000;
-            let pangle = this.movementController.aimAngle;
-            pangle = (pangle < 0) ? pangle + 360 : pangle;
-            for (let i in Enemy_1.Enemy.list) {
-                let enemy = Enemy_1.Enemy.list[i];
-                let angle = GeometryAndPhysics_1.calculateAngleBetweenEntities(this, enemy);
-                let maxDistance = Math.sqrt(enemy.width * enemy.width / 4 + enemy.height * enemy.height / 4) + distance;
-                let distanceFromEnemy = this.getDistance(enemy);
-                if (distanceFromEnemy < maxDistance) {
-                    if ((angle < (pangle + angleLimit)) && (angle > pangle - angleLimit)) {
-                        if (closestEnemyDistance > distanceFromEnemy) {
-                            closestEnemyDistance = distanceFromEnemy;
-                            closestEnemyIndex = i;
-                        }
-                    }
-                }
-            }
-            if (closestEnemyIndex == "-1")
-                return null;
-            return Enemy_1.Enemy.list[closestEnemyIndex];
-        };
-        this.getClosestPlayerorEnemy = (distance, angleLimit) => {
-            let enemy = this.getClosestEnemy(distance, angleLimit);
-            let player = this.getClosestPlayer(distance, angleLimit);
-            if (this.getDistance(enemy) < this.getDistance(player)) {
-                if (enemy !== null) {
-                    return enemy;
-                }
-                else {
-                    return null;
-                }
-            }
-            else {
-                if (player !== null) {
-                    return player;
-                }
-                else {
-                    return null;
-                }
-            }
-        };
-        this.onDeath = () => { };
-        this.lifeAndBodyController = new LifeAndBodyController_1.LifeAndBodyController(this, param);
-        this.attackController = new AttackControler_1.AttackController(this, param);
-        this.movementController = new MovementController_1.MovementController(this, param);
-        this.mapController = new MapControler_1.MapController(param);
-        this.inventory = new Inventory_1.Inventory(param.socket, true, this);
-    }
-}
-exports.Actor = Actor;
-
-
-/***/ }),
-/* 18 */
 /***/ (function(module, exports) {
 
 Object.defineProperty(exports, "__esModule", { value: true });
@@ -2225,16 +2356,16 @@ exports.Counter = Counter;
 
 
 /***/ }),
-/* 19 */
+/* 18 */
 /***/ (function(module, exports, __webpack_require__) {
 
 Object.defineProperty(exports, "__esModule", { value: true });
 const GeometryAndPhysics_1 = __webpack_require__(0);
-const Enemy_1 = __webpack_require__(10);
-const Player_1 = __webpack_require__(9);
-const Entity_1 = __webpack_require__(20);
-const globalVariables_1 = __webpack_require__(8);
-const MapControler_1 = __webpack_require__(7);
+const Enemy_1 = __webpack_require__(11);
+const Player_1 = __webpack_require__(10);
+const Entity_1 = __webpack_require__(19);
+const globalVariables_1 = __webpack_require__(7);
+const MapControler_1 = __webpack_require__(8);
 class Bullet extends Entity_1.Entity {
     constructor(param) {
         super(Bullet.updateParam(param));
@@ -2362,12 +2493,12 @@ exports.Bullet = Bullet;
 
 
 /***/ }),
-/* 20 */
+/* 19 */
 /***/ (function(module, exports, __webpack_require__) {
 
 Object.defineProperty(exports, "__esModule", { value: true });
 const GeometryAndPhysics_1 = __webpack_require__(0);
-const globalVariables_1 = __webpack_require__(8);
+const globalVariables_1 = __webpack_require__(7);
 const Constants_1 = __webpack_require__(6);
 class Entity {
     constructor(param) {
@@ -2424,76 +2555,61 @@ exports.Entity = Entity;
 
 
 /***/ }),
-/* 21 */
+/* 20 */
 /***/ (function(module, exports, __webpack_require__) {
 
 Object.defineProperty(exports, "__esModule", { value: true });
-const PlayerClient_1 = __webpack_require__(5);
 const GeometryAndPhysics_1 = __webpack_require__(0);
-const images_1 = __webpack_require__(2);
-const SmokeParticle_1 = __webpack_require__(25);
-const game_1 = __webpack_require__(3);
-class SmokeClient {
-    constructor(initPack) {
+const PlayerClient_1 = __webpack_require__(5);
+const game_1 = __webpack_require__(2);
+const canvas_1 = __webpack_require__(3);
+const images_1 = __webpack_require__(4);
+class ExplosionClient {
+    constructor(param) {
+        this.id = Math.random();
         this.position = new GeometryAndPhysics_1.Point(0, 0);
-        this.id = -1;
-        this.radius = 10;
-        this.maxRadius = 10;
-        this.particles = [];
+        this.width = 32;
+        this.height = 32;
+        this.spriteAnimCounter = 0;
         this.draw = () => {
             if (PlayerClient_1.PlayerClient.list[game_1.selfId].map !== this.map) {
                 return;
             }
-            for (let i = 0; i < this.particles.length; i++) {
-                this.particles[i].draw();
-            }
+            let frame = images_1.jsonIAE["frames"][this.img + ".png"]["frame"];
+            let frameWidth = frame["w"] / this.animColumns;
+            let frameHeight = frame["h"] / this.animRows;
+            let spriteColumn = Math.floor(this.spriteAnimCounter) % this.animColumns;
+            let spriteRow = Math.floor(this.spriteAnimCounter / this.animColumns);
+            canvas_1.camera.drawImage(images_1.Img["IAE"], frameWidth, frameHeight, 0, spriteRow, spriteColumn, this.position.x - this.width / 2, this.position.y - this.height / 2, this.width, this.height, frame["x"], frame["y"]);
         };
-        this.update = () => {
-            for (let i = 0; i < this.particles.length; i++) {
-                this.particles[i].update();
-            }
+        this.isCompleted = () => {
+            if (this.spriteAnimCounter > (this.animRows * this.animColumns))
+                return true;
+            else
+                return false;
         };
-        this.updateRadius = () => {
-            for (let i = 0; i < this.particles.length; i++) {
-                this.particles[i].radius = this.radius;
-            }
-        };
-        if (initPack.id)
-            this.id = initPack.id;
-        if (initPack.position)
-            this.position = initPack.position;
-        if (initPack.radius)
-            this.radius = initPack.radius;
-        if (initPack.maxRadius)
-            this.maxRadius = initPack.maxRadius;
-        if (initPack.map)
-            this.map = initPack.map;
-        if (initPack.time)
-            this.time = initPack.time;
-        for (var i = 0; i < 50; ++i) {
-            let center = new GeometryAndPhysics_1.Point(this.position.x, this.position.y);
-            this.particles[i] = new SmokeParticle_1.SmokeParticle(ctx, this.position, this.radius, this.maxRadius, center, this.time);
-            let pos = GeometryAndPhysics_1.getRandomInCircle(this.position, this.radius);
-            this.particles[i].position.x = pos.x;
-            this.particles[i].position.y = pos.y;
-            this.particles[i].velocity.updatePosition(Math.random() * 6 - 3, Math.random() * 6 - 3);
-            this.particles[i].setImage(images_1.Img["smoke"]);
-        }
-        console.log("SMOKE");
-        SmokeClient.list[this.id] = this;
+        this.position = param.position ? param.position : this.position;
+        this.width = param.width ? param.width : this.width;
+        this.height = param.height ? param.height : this.height;
+        this.map = param.map ? param.map : this.map;
+        this.img = param.img ? param.img : this.img;
+        this.category = param.category ? param.category : this.category;
+        this.animRows = param.spriteRows ? param.spriteRows : this.animRows;
+        this.animColumns = param.spriteColumns ? param.spriteColumns : this.animColumns;
+        ExplosionClient.list[this.id] = this;
     }
 }
-SmokeClient.list = {};
-exports.SmokeClient = SmokeClient;
+ExplosionClient.list = {};
+exports.ExplosionClient = ExplosionClient;
 
 
 /***/ }),
-/* 22 */
+/* 21 */
 /***/ (function(module, exports, __webpack_require__) {
 
 Object.defineProperty(exports, "__esModule", { value: true });
+const canvas_1 = __webpack_require__(3);
 const GeometryAndPhysics_1 = __webpack_require__(0);
-const canvas_1 = __webpack_require__(4);
 class FireParticle {
     constructor(param) {
         this.position = new GeometryAndPhysics_1.Point(0, 0);
@@ -2523,7 +2639,7 @@ exports.FireParticle = FireParticle;
 
 
 /***/ }),
-/* 23 */
+/* 22 */
 /***/ (function(module, exports, __webpack_require__) {
 
 Object.defineProperty(exports, "__esModule", { value: true });
@@ -2659,17 +2775,17 @@ exports.Camera = Camera;
 
 
 /***/ }),
-/* 24 */
+/* 23 */
 /***/ (function(module, exports, __webpack_require__) {
 
 Object.defineProperty(exports, "__esModule", { value: true });
-const images_1 = __webpack_require__(2);
-const Constants_1 = __webpack_require__(6);
+const EnemyClient_1 = __webpack_require__(9);
 const PlayerClient_1 = __webpack_require__(5);
-const game_1 = __webpack_require__(3);
+const game_1 = __webpack_require__(2);
+const WeaponTypes_1 = __webpack_require__(12);
 const enums_1 = __webpack_require__(1);
-const WeaponTypes_1 = __webpack_require__(11);
-const EnemyClient_1 = __webpack_require__(12);
+const Constants_1 = __webpack_require__(6);
+const images_1 = __webpack_require__(4);
 class GUI {
     constructor(param) {
         this.draw = () => {
@@ -2804,181 +2920,179 @@ exports.GUI = GUI;
 
 
 /***/ }),
+/* 24 */
+/***/ (function(module, exports) {
+
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.framesMove = {};
+exports.framesAttack = {};
+exports.framesMove['zombie'] = 17;
+exports.framesAttack['zombie'] = 9;
+
+
+/***/ }),
 /* 25 */
 /***/ (function(module, exports, __webpack_require__) {
 
 Object.defineProperty(exports, "__esModule", { value: true });
-const GeometryAndPhysics_1 = __webpack_require__(0);
-const canvas_1 = __webpack_require__(4);
-class SmokeParticle {
-    constructor(ctx, position, radius, maxRadius, center, time) {
-        this.ctx = ctx;
-        this.position = new GeometryAndPhysics_1.Point(0, 0);
-        this.velocity = new GeometryAndPhysics_1.Point(0, 0);
-        this.center = new GeometryAndPhysics_1.Point(0, 0);
-        this.radius = 5;
-        this.maxRadius = 5;
-        this.maxLifeTime = 0;
-        this.draw = () => {
-            if (this.image) {
-                this.ctx.globalAlpha = this.lifeTime / this.maxLifeTime;
-                canvas_1.camera.drawSimpleImage(this.image, this.position.x, this.position.y);
-                this.ctx.globalAlpha = 1.0;
-                return;
-            }
-            this.ctx.beginPath();
-            this.ctx.arc(this.position.x, this.position.y, 5, 0, 2 * Math.PI, false);
-            this.ctx.fillStyle = "rgba(0, 255, 255, 1)";
-            this.ctx.fill();
-            this.ctx.closePath();
-        };
-        this.update = () => {
-            this.position.x += this.velocity.x;
-            this.position.y += this.velocity.y;
-            if (this.position.x >= this.center.x + this.radius) {
-                this.velocity.x = -this.velocity.x;
-                this.position.x = this.center.x + this.radius;
-            }
-            else if (this.position.x <= this.center.x - this.radius) {
-                this.velocity.x = -this.velocity.x;
-                this.position.x = this.center.x - this.radius;
-            }
-            if (this.position.y >= this.center.y + this.radius) {
-                this.velocity.y = -this.velocity.y;
-                this.position.y = this.center.y + this.radius;
-            }
-            else if (this.position.y <= this.center.y - this.radius) {
-                this.velocity.y = -this.velocity.y;
-                this.position.y = this.center.y - this.radius;
-            }
-            if (this.lifeTime > 0)
-                this.lifeTime--;
-        };
-        this.setImage = (image) => {
-            this.image = image;
-        };
-        let id = Math.random();
-        this.position.x = position.x;
-        this.position.y = position.y;
-        this.center.x = center.x;
-        this.center.y = center.y;
-        this.radius = radius;
+const globalVariables_1 = __webpack_require__(7);
+class Smoke {
+    constructor(position, maxRadius, time, speed, map) {
+        this.position = position;
         this.maxRadius = maxRadius;
-        SmokeParticle.list[id] = this;
-        this.maxLifeTime = time;
-        this.lifeTime = this.maxLifeTime;
+        this.time = time;
+        this.speed = speed;
+        this.map = map;
+        this.id = Math.random();
+        this.radius = 10;
+        this.grow = true;
+        this.update = () => {
+            if (this.time > 0) {
+                if (this.grow) {
+                    if (this.radius >= this.maxRadius) {
+                        this.grow = false;
+                    }
+                    this.radius += this.speed;
+                }
+                else {
+                    if (this.time * this.speed - this.maxRadius <= 0 && this.radius > 0) {
+                        this.radius -= this.speed;
+                    }
+                }
+                this.time--;
+            }
+        };
+        this.getInitPack = () => {
+            return {
+                id: this.id,
+                position: this.position,
+                radius: this.radius,
+                map: this.map,
+                maxRadius: this.maxRadius,
+                time: this.time
+            };
+        };
+        this.getUpdatePack = () => {
+            return {
+                id: this.id,
+                radius: this.radius
+            };
+        };
+        Smoke.list[this.id] = this;
+        globalVariables_1.initPack.smoke.push(this.getInitPack());
     }
 }
-SmokeParticle.list = {};
-exports.SmokeParticle = SmokeParticle;
+Smoke.update = () => {
+    let pack = [];
+    for (let i in Smoke.list) {
+        let smoke = Smoke.list[i];
+        smoke.update();
+        if (smoke.time == 0) {
+            delete Smoke.list[i];
+            globalVariables_1.removePack.smoke.push(smoke.id);
+        }
+        else {
+            pack.push(smoke.getUpdatePack());
+        }
+    }
+    return pack;
+};
+Smoke.list = {};
+exports.Smoke = Smoke;
 
 
 /***/ }),
 /* 26 */
-/***/ (function(module, exports, __webpack_require__) {
+/***/ (function(module, exports) {
 
 Object.defineProperty(exports, "__esModule", { value: true });
-const Particle_1 = __webpack_require__(14);
-const enums_1 = __webpack_require__(1);
-const images_1 = __webpack_require__(2);
-class Effects {
-    constructor(ctx) {
-        this.ctx = ctx;
-        this.maxVelocity = 2;
-        this.initSmoke = (particleCount) => {
-            for (var i = 0; i < particleCount; ++i) {
-                let particle = new Particle_1.Particle(this.ctx);
-                particle.position.updatePosition(enums_1.getRandomInt(0, WIDTH), enums_1.getRandomInt(0, HEIGHT));
-                particle.velocity.updatePosition(this.generateRandom(-this.maxVelocity, this.maxVelocity), this.generateRandom(-this.maxVelocity, this.maxVelocity));
-                particle.setImage(images_1.Img["smoke"]);
-            }
-        };
-        this.decreaseSmoke = (particleCount) => {
-            let count = 0;
-            for (let i in Particle_1.Particle.list) {
-                if (count < particleCount) {
-                    delete Particle_1.Particle.list[i];
-                }
-                else {
-                    return;
-                }
-                count++;
-            }
-        };
-        this.generateRandom = (min, max) => {
-            return Math.random() * (max - min) + min;
-        };
-        this.draw = () => {
-            for (let i in Particle_1.Particle.list) {
-                Particle_1.Particle.list[i].draw();
-            }
-        };
-        this.update = () => {
-            for (let i in Particle_1.Particle.list) {
-                Particle_1.Particle.list[i].update();
-                if (Particle_1.Particle.list[i].lifeTime <= 0) {
-                    delete Particle_1.Particle.list[i];
-                }
-            }
-        };
+var initPack = { player: [], bullet: [], enemy: [], upgrade: [] };
+class Pack {
+    constructor() {
+        this.player = [];
+        this.bullet = [];
+        this.enemy = [];
+        this.upgrade = [];
+        this.smoke = [];
+        this.particle = [];
     }
 }
-exports.Effects = Effects;
+exports.Pack = Pack;
 
 
 /***/ }),
 /* 27 */
-/***/ (function(module, exports) {
+/***/ (function(module, exports, __webpack_require__) {
 
 Object.defineProperty(exports, "__esModule", { value: true });
-class Filters {
-    constructor(ctx) {
-        this.ctx = ctx;
-        this.bAdjustment = -50;
-        this.getImageFromCanvas = () => {
-            this.imageData = this.ctx.getImageData(0, 0, WIDTH, HEIGHT);
-            this.data = this.imageData.data;
-        };
-        this.invert = () => {
-            for (var i = 0; i < this.data.length; i += 4) {
-                this.data[i] = 255 - this.data[i];
-                this.data[i + 1] = 255 - this.data[i + 1];
-                this.data[i + 2] = 255 - this.data[i + 2];
-            }
-            this.ctx.putImageData(this.imageData, 0, 0);
-        };
-        this.bright = () => {
-            for (var i = 0; i < this.data.length; i += 4) {
-                this.data[i] += this.bAdjustment;
-                this.data[i + 1] += this.bAdjustment;
-                this.data[i + 2] += this.bAdjustment;
-            }
-            this.ctx.putImageData(this.imageData, 0, 0);
-        };
-        this.blur = () => {
-            let r, g, b, a;
-            for (var i = 0; i < this.data.length; i += 4) {
-                r = 0;
-                g = 0;
-                b = 0;
-                for (var j = -1; j < 2; j++) {
-                    for (var k = -1; k < 2; k++) {
-                        if ((i + j + k * WIDTH * 4) > 0 && (i + j + k * WIDTH * 4) < this.data.length) {
-                            r += this.data[i + j + k * WIDTH * 4] / 9;
-                            g += this.data[i + j + k * WIDTH * 4] / 9;
-                            b += this.data[i + j + k * WIDTH * 4] / 9;
-                        }
-                    }
-                }
-                this.data[i] = r;
-                this.data[i + 1] = g;
-                this.data[i + 2] = b;
-            }
-            this.ctx.putImageData(this.imageData, 0, 0);
-        };
+const enums_1 = __webpack_require__(1);
+class Item {
+    constructor(id, name, event, add, remove, info) {
+        this.id = id;
+        this.name = name;
+        this.event = event;
+        this.add = add;
+        this.remove = remove;
+        this.info = info;
+        Item.list[this.id] = this;
     }
 }
-exports.Filters = Filters;
+Item.list = {};
+exports.Item = Item;
+new Item(enums_1.ItemType.medicalkit, "Medical Kit", function (player) {
+    player.lifeAndBodyController.heal(10);
+    player.inventory.removeItem(enums_1.ItemType.medicalkit, 1);
+}, function (actor, amount) { }, function (actor, amount) { }, function (actor) {
+    return "";
+});
+new Item(enums_1.WeaponType.pistol, "Pistol", function (actor) {
+    actor.attackController.equip(enums_1.WeaponType.pistol);
+}, function (actor, amount) {
+    actor.attackController.weaponCollection.addWeapon(enums_1.WeaponType.pistol, amount);
+}, function (actor, amount) {
+    actor.attackController.weaponCollection.removeWeapon(enums_1.WeaponType.pistol, amount);
+}, function (actor) {
+});
+new Item(enums_1.WeaponType.flamethrower, "Flamethrower", function (actor) {
+    actor.attackController.equip(enums_1.WeaponType.flamethrower);
+}, function (actor, amount) {
+    actor.attackController.weaponCollection.addWeapon(enums_1.WeaponType.flamethrower, amount);
+}, function (actor, amount) {
+    actor.attackController.weaponCollection.removeWeapon(enums_1.WeaponType.flamethrower, amount);
+}, function (actor) {
+});
+new Item(enums_1.WeaponType.knife, "Knife", function (actor) {
+    actor.attackController.equip(enums_1.WeaponType.knife);
+}, function (actor, amount) {
+    actor.attackController.weaponCollection.addWeapon(enums_1.WeaponType.knife, amount);
+}, function (actor, amount) {
+    actor.attackController.weaponCollection.removeWeapon(enums_1.WeaponType.knife, amount);
+}, function (actor) {
+});
+new Item(enums_1.WeaponType.shotgun, "Shotgun", function (actor) {
+    actor.attackController.equip(enums_1.WeaponType.shotgun);
+}, function (actor, amount) {
+    actor.attackController.weaponCollection.addWeapon(enums_1.WeaponType.shotgun, amount);
+}, function (actor, amount) {
+    actor.attackController.weaponCollection.removeWeapon(enums_1.WeaponType.shotgun, amount);
+}, function (actor) {
+});
+new Item(enums_1.WeaponType.rifle, "Rifle", function (actor) {
+    actor.attackController.equip(enums_1.WeaponType.rifle);
+}, function (actor, amount) {
+    actor.attackController.weaponCollection.addWeapon(enums_1.WeaponType.rifle, amount);
+}, function (actor, amount) {
+    actor.attackController.weaponCollection.removeWeapon(enums_1.WeaponType.rifle, amount);
+}, function (actor) {
+});
+new Item(enums_1.WeaponType.claws, "Claws", function (actor) {
+    actor.attackController.equip(enums_1.WeaponType.claws);
+}, function (actor, amount) {
+    actor.attackController.weaponCollection.addWeapon(enums_1.WeaponType.claws, amount);
+}, function (actor, amount) {
+    actor.attackController.weaponCollection.removeWeapon(enums_1.WeaponType.claws, amount);
+}, function (actor) {
+});
 
 
 /***/ }),
@@ -3343,435 +3457,11 @@ exports.MapTile = MapTile;
 
 /***/ }),
 /* 34 */
-/***/ (function(module, exports) {
-
-Object.defineProperty(exports, "__esModule", { value: true });
-class GameSoundManager {
-    constructor() {
-        this.loadSounds = () => {
-            soundManager.onload = function () {
-                soundManager.createSound('gunshot', '/client/mp3/gunshot.mp3');
-                soundManager.createSound('pistol_fire', '/client/mp3/pistol_fire.mp3');
-                soundManager.createSound('shotgun_fire', '/client/mp3/shotgun_fire.mp3');
-                soundManager.createSound('flamethrower_fire', '/client/mp3/flamethrower_fire.mp3');
-                soundManager.createSound('rifle_fire', '/client/mp3/rifle_fire.mp3');
-                soundManager.createSound('knife_swing', '/client/mp3/knife_swing.mp3');
-                soundManager.createSound('gun_swing', '/client/mp3/gun_swing.mp3');
-                soundManager.createSound('squishy1', '/client/mp3/squishy1.mp3');
-                soundManager.createSound('squishy2', '/client/mp3/squishy2.mp3');
-                soundManager.createSound('pain', '/client/mp3/pain.mp3');
-                soundManager.createSound('death1', '/client/mp3/death.mp3');
-                soundManager.createSound('shotgunreload', '/client/mp3/shotgunreload.mp3');
-                soundManager.createSound('pistolreload', '/client/mp3/pistolreload.mp3');
-                soundManager.createSound('riflereload', '/client/mp3/riflereload.mp3');
-            };
-        };
-        this.loopSound = (sound, stop) => {
-            sound.play({
-                onfinish: function () {
-                    if (!stop) {
-                        this.loopSound(sound);
-                    }
-                }
-            });
-        };
-        this.playWeaponReload = (weapon) => {
-            soundManager.play(weapon + "reload");
-        };
-        this.playWeaponAttack = (weapon, melee, stop = true) => {
-            if (melee) {
-                (weapon == "knife" || weapon == "claws") ? soundManager.play("knife_swing") : soundManager.play("gun_swing");
-            }
-            else {
-                if (weapon == "flamethrower") {
-                    let s = soundManager.getSoundById(weapon + "_fire");
-                    this.loopSound(s, stop);
-                }
-                else {
-                    soundManager.play(weapon + "_fire");
-                }
-            }
-        };
-        this.playHit = (category) => {
-            if (category == "player")
-                soundManager.play("pain");
-            if (category == "enemy") {
-                (Math.random() < 0.5) ? soundManager.play("squishy1") : soundManager.play("squishy2");
-            }
-        };
-        this.playDeath = (kind) => {
-            console.log("KILLED " + kind);
-            if (kind == "zombie")
-                soundManager.play("death1");
-        };
-        this.loadSounds();
-    }
-}
-exports.GameSoundManager = GameSoundManager;
-
-
-/***/ }),
-/* 35 */
 /***/ (function(module, exports, __webpack_require__) {
 
 Object.defineProperty(exports, "__esModule", { value: true });
-const images_1 = __webpack_require__(2);
-const GeometryAndPhysics_1 = __webpack_require__(0);
-const PlayerClient_1 = __webpack_require__(5);
-const game_1 = __webpack_require__(3);
-const canvas_1 = __webpack_require__(4);
-class UpgradeClient {
-    constructor(param) {
-        this.position = new GeometryAndPhysics_1.Point(0, 0);
-        this.id = -1;
-        this.draw = () => {
-            if (PlayerClient_1.PlayerClient.list[game_1.selfId].map !== this.map) {
-                return;
-            }
-            let frame = images_1.jsonIAE["frames"][this.img + ".png"]["frame"];
-            let frameWidth = frame["w"];
-            let frameHeight = frame["h"];
-            canvas_1.camera.drawImage(images_1.Img["IAE"], frameWidth, frameHeight, 0, 0, 0, this.position.x - this.width / 2, this.position.y - this.height / 2, this.width, this.height, frame["x"], frame["y"]);
-        };
-        this.id = param.id ? param.id : this.id;
-        this.position = param.position ? param.position : this.position;
-        this.width = param.width ? param.width : this.width;
-        this.height = param.height ? param.height : this.height;
-        this.map = param.map ? param.map : this.map;
-        this.img = param.img ? param.img : this.img;
-        this.category = param.category ? param.category : this.category;
-        this.kind = param.kind ? param.kind : this.kind;
-        UpgradeClient.list[this.id] = this;
-    }
-}
-UpgradeClient.list = {};
-exports.UpgradeClient = UpgradeClient;
-
-
-/***/ }),
-/* 36 */
-/***/ (function(module, exports, __webpack_require__) {
-
-Object.defineProperty(exports, "__esModule", { value: true });
-const images_1 = __webpack_require__(2);
-const Constants_1 = __webpack_require__(6);
-const PlayerClient_1 = __webpack_require__(5);
-const game_1 = __webpack_require__(3);
-const enums_1 = __webpack_require__(1);
-const Constants_2 = __webpack_require__(6);
-const canvas_1 = __webpack_require__(4);
-class MapClient {
-    constructor(map, name) {
-        this.image = new Image();
-        this.name = "";
-        this.reloadMap = (map) => {
-            this.map = map;
-            this.name = map.name;
-        };
-        this.draw = () => {
-            if (this.map) {
-                let mainPlayer = PlayerClient_1.PlayerClient.list[game_1.selfId];
-                let mainPlayerx = mainPlayer.position.x;
-                let mainPlayery = mainPlayer.position.y;
-                let x = WIDTH / 2 - mainPlayerx;
-                x = x - (mouseX - WIDTH / 2) / CAMERA_BOX_ADJUSTMENT;
-                let y = HEIGHT / 2 - mainPlayery;
-                y = y - (mouseY - HEIGHT / 2) / CAMERA_BOX_ADJUSTMENT;
-                let size = this.map.size;
-                let material = enums_1.TerrainMaterial.dirt;
-                let imgWidth = 1;
-                let imgHeight = 1;
-                let frame = images_1.jsonMap["frames"];
-                let mapFrame = frame;
-                let frameWidth = 32;
-                let frameHeight = 32;
-                for (let i = 0; i < size; i++) {
-                    for (let j = 0; j < size; j++) {
-                        material = this.map.mapTiles[i][j].material;
-                        mapFrame = frame[Constants_2.mapTileImageName[material] + ".png"]["frame"];
-                        imgWidth = mapFrame["w"];
-                        imgHeight = mapFrame["h"];
-                        canvas_1.camera.drawImage(images_1.Img["Map"], imgWidth, imgHeight, 0, 0, 0, (imgWidth - 1) * j, (imgHeight - 1) * i, imgWidth, imgHeight, mapFrame["x"], mapFrame["y"]);
-                        for (let k = 0; k < 4; k++) {
-                            if (this.map.mapTiles[i][j].sides[k] > 0) {
-                                mapFrame = frame[Constants_1.mapTileSideImageName[k][this.map.mapTiles[i][j].sides[k]] + ".png"]["frame"];
-                                imgWidth = mapFrame["w"];
-                                imgHeight = mapFrame["h"];
-                                canvas_1.camera.drawImage(images_1.Img["Map"], imgWidth, imgHeight, 0, 0, 0, (imgWidth - 1) * j, (imgHeight - 1) * i, imgWidth, imgHeight, mapFrame["x"], mapFrame["y"]);
-                            }
-                        }
-                    }
-                }
-                game_1.canvasFilters.getImageFromCanvas();
-                game_1.canvasFilters.bright();
-                for (let i = 0; i < size; i++) {
-                    for (let j = 0; j < size; j++) {
-                        for (let k = 0; k < this.map.mapTiles[i][j].objects.length; k++) {
-                            if (this.map.mapTiles[i][j].objects[k] > 0) {
-                                mapFrame = frame[Constants_1.mapObjectImageName[this.map.mapTiles[i][j].objects[k]] + ".png"]["frame"];
-                                imgWidth = mapFrame["w"];
-                                imgHeight = mapFrame["h"];
-                                canvas_1.camera.drawImage(images_1.Img["Map"], imgWidth, imgHeight, 0, 0, 0, (imgWidth - 1) * j, (imgHeight - 1) * i, imgWidth, imgHeight, mapFrame["x"], mapFrame["y"]);
-                            }
-                        }
-                    }
-                }
-            }
-        };
-        this.map = map;
-        this.name = name;
-    }
-}
-exports.MapClient = MapClient;
-
-
-/***/ }),
-/* 37 */
-/***/ (function(module, exports, __webpack_require__) {
-
-Object.defineProperty(exports, "__esModule", { value: true });
-const images_1 = __webpack_require__(2);
-const game_1 = __webpack_require__(3);
-const EnemyClient_1 = __webpack_require__(12);
-const GeometryAndPhysics_1 = __webpack_require__(0);
-const game_2 = __webpack_require__(3);
-const PlayerClient_1 = __webpack_require__(5);
-const ExplosionClient_1 = __webpack_require__(15);
-const canvas_1 = __webpack_require__(4);
-class BulletClient {
-    constructor(initPack) {
-        this.id = -1;
-        this.position = new GeometryAndPhysics_1.Point(250, 250);
-        this.startPosition = new GeometryAndPhysics_1.Point(250, 250);
-        this.map = "forest";
-        this.img = images_1.Img["bullet"];
-        this.width = 32;
-        this.height = 32;
-        this.hitCategory = 1;
-        this.maxLife = 10;
-        this.life = this.maxLife;
-        this.toRemove = false;
-        this.draw = () => {
-            if (PlayerClient_1.PlayerClient.list[game_2.selfId].map !== this.map) {
-                return;
-            }
-            canvas_1.camera.drawLine(this.startPosition.x, this.startPosition.y, this.position.x, this.position.y, (this.life / this.maxLife) * 4, 255, 255, 255, (this.life / this.maxLife));
-        };
-        this.update = () => {
-            this.life--;
-            if (this.life <= 0)
-                this.toRemove = true;
-        };
-        this.hit = (category, entityCategory, entityId) => {
-            let x = this.position.x;
-            let y = this.position.y;
-            if (entityCategory == "player") {
-                if (PlayerClient_1.PlayerClient.list[entityId]) {
-                    x = PlayerClient_1.PlayerClient.list[entityId].x + (1 - Math.round(2 * Math.random())) * Math.floor(Math.random() * PlayerClient_1.PlayerClient.list[entityId].width / 4);
-                    y = PlayerClient_1.PlayerClient.list[entityId].y + (1 - Math.round(2 * Math.random())) * Math.floor(Math.random() * PlayerClient_1.PlayerClient.list[entityId].height / 4);
-                }
-            }
-            if (entityCategory == "enemy") {
-                if (EnemyClient_1.EnemyClient.list[entityId]) {
-                    x = EnemyClient_1.EnemyClient.list[entityId].x + (1 - Math.round(2 * Math.random())) * Math.floor(Math.random() * EnemyClient_1.EnemyClient.list[entityId].width / 4);
-                    y = EnemyClient_1.EnemyClient.list[entityId].y + (1 - Math.round(2 * Math.random())) * Math.floor(Math.random() * EnemyClient_1.EnemyClient.list[entityId].height / 4);
-                }
-            }
-            game_1.gameSoundManager.playHit(entityCategory);
-            if (category == 1) {
-                new ExplosionClient_1.ExplosionClient({ position: this.position, map: this.map, img: "blood", width: 48, height: 48, category: category, spriteRows: 1, spriteColumns: 6 });
-            }
-            else if (category == 2) {
-                new ExplosionClient_1.ExplosionClient({ position: this.position, map: this.map, img: "explosion1", width: 64, height: 64, category: category, spriteRows: 4, spriteColumns: 10 });
-            }
-        };
-        this.id = (initPack.id !== undefined) ? initPack.id : -1;
-        this.position = (initPack.position !== undefined) ? initPack.position : new GeometryAndPhysics_1.Point(250, 250);
-        this.startPosition = (initPack.startPosition !== undefined) ? initPack.startPosition : new GeometryAndPhysics_1.Point(250, 250);
-        this.width = (initPack.width !== undefined) ? initPack.width : 32;
-        this.height = (initPack.height !== undefined) ? initPack.height : 32;
-        this.hitCategory = (initPack.hitCategory !== undefined) ? initPack.hitCategory : 1;
-        this.img = (initPack.img !== undefined) ? initPack.img : "bullet";
-        this.map = (initPack.map !== undefined) ? initPack.map : "forest";
-        BulletClient.list[this.id] = this;
-    }
-}
-BulletClient.list = {};
-exports.BulletClient = BulletClient;
-
-
-/***/ }),
-/* 38 */
-/***/ (function(module, exports, __webpack_require__) {
-
-Object.defineProperty(exports, "__esModule", { value: true });
-const enums_1 = __webpack_require__(1);
-class Item {
-    constructor(id, name, event, add, remove, info) {
-        this.id = id;
-        this.name = name;
-        this.event = event;
-        this.add = add;
-        this.remove = remove;
-        this.info = info;
-        Item.list[this.id] = this;
-    }
-}
-Item.list = {};
-exports.Item = Item;
-new Item(enums_1.ItemType.medicalkit, "Medical Kit", function (player) {
-    player.lifeAndBodyController.heal(10);
-    player.inventory.removeItem(enums_1.ItemType.medicalkit, 1);
-}, function (actor, amount) { }, function (actor, amount) { }, function (actor) {
-    return "";
-});
-new Item(enums_1.WeaponType.pistol, "Pistol", function (actor) {
-    actor.attackController.equip(enums_1.WeaponType.pistol);
-}, function (actor, amount) {
-    actor.attackController.weaponCollection.addWeapon(enums_1.WeaponType.pistol, amount);
-}, function (actor, amount) {
-    actor.attackController.weaponCollection.removeWeapon(enums_1.WeaponType.pistol, amount);
-}, function (actor) {
-});
-new Item(enums_1.WeaponType.flamethrower, "Flamethrower", function (actor) {
-    actor.attackController.equip(enums_1.WeaponType.flamethrower);
-}, function (actor, amount) {
-    actor.attackController.weaponCollection.addWeapon(enums_1.WeaponType.flamethrower, amount);
-}, function (actor, amount) {
-    actor.attackController.weaponCollection.removeWeapon(enums_1.WeaponType.flamethrower, amount);
-}, function (actor) {
-});
-new Item(enums_1.WeaponType.knife, "Knife", function (actor) {
-    actor.attackController.equip(enums_1.WeaponType.knife);
-}, function (actor, amount) {
-    actor.attackController.weaponCollection.addWeapon(enums_1.WeaponType.knife, amount);
-}, function (actor, amount) {
-    actor.attackController.weaponCollection.removeWeapon(enums_1.WeaponType.knife, amount);
-}, function (actor) {
-});
-new Item(enums_1.WeaponType.shotgun, "Shotgun", function (actor) {
-    actor.attackController.equip(enums_1.WeaponType.shotgun);
-}, function (actor, amount) {
-    actor.attackController.weaponCollection.addWeapon(enums_1.WeaponType.shotgun, amount);
-}, function (actor, amount) {
-    actor.attackController.weaponCollection.removeWeapon(enums_1.WeaponType.shotgun, amount);
-}, function (actor) {
-});
-new Item(enums_1.WeaponType.rifle, "Rifle", function (actor) {
-    actor.attackController.equip(enums_1.WeaponType.rifle);
-}, function (actor, amount) {
-    actor.attackController.weaponCollection.addWeapon(enums_1.WeaponType.rifle, amount);
-}, function (actor, amount) {
-    actor.attackController.weaponCollection.removeWeapon(enums_1.WeaponType.rifle, amount);
-}, function (actor) {
-});
-new Item(enums_1.WeaponType.claws, "Claws", function (actor) {
-    actor.attackController.equip(enums_1.WeaponType.claws);
-}, function (actor, amount) {
-    actor.attackController.weaponCollection.addWeapon(enums_1.WeaponType.claws, amount);
-}, function (actor, amount) {
-    actor.attackController.weaponCollection.removeWeapon(enums_1.WeaponType.claws, amount);
-}, function (actor) {
-});
-
-
-/***/ }),
-/* 39 */
-/***/ (function(module, exports, __webpack_require__) {
-
-Object.defineProperty(exports, "__esModule", { value: true });
-const globalVariables_1 = __webpack_require__(8);
-class Smoke {
-    constructor(position, maxRadius, time, speed, map) {
-        this.position = position;
-        this.maxRadius = maxRadius;
-        this.time = time;
-        this.speed = speed;
-        this.map = map;
-        this.id = Math.random();
-        this.radius = 10;
-        this.grow = true;
-        this.update = () => {
-            if (this.time > 0) {
-                if (this.grow) {
-                    if (this.radius >= this.maxRadius) {
-                        this.grow = false;
-                    }
-                    this.radius += this.speed;
-                }
-                else {
-                    if (this.time * this.speed - this.maxRadius <= 0 && this.radius > 0) {
-                        this.radius -= this.speed;
-                    }
-                }
-                this.time--;
-            }
-        };
-        this.getInitPack = () => {
-            return {
-                id: this.id,
-                position: this.position,
-                radius: this.radius,
-                map: this.map,
-                maxRadius: this.maxRadius,
-                time: this.time
-            };
-        };
-        this.getUpdatePack = () => {
-            return {
-                id: this.id,
-                radius: this.radius
-            };
-        };
-        Smoke.list[this.id] = this;
-        globalVariables_1.initPack.smoke.push(this.getInitPack());
-    }
-}
-Smoke.update = () => {
-    let pack = [];
-    for (let i in Smoke.list) {
-        let smoke = Smoke.list[i];
-        smoke.update();
-        if (smoke.time == 0) {
-            delete Smoke.list[i];
-            globalVariables_1.removePack.smoke.push(smoke.id);
-        }
-        else {
-            pack.push(smoke.getUpdatePack());
-        }
-    }
-    return pack;
-};
-Smoke.list = {};
-exports.Smoke = Smoke;
-
-
-/***/ }),
-/* 40 */
-/***/ (function(module, exports) {
-
-Object.defineProperty(exports, "__esModule", { value: true });
-var initPack = { player: [], bullet: [], enemy: [], upgrade: [] };
-class Pack {
-    constructor() {
-        this.player = [];
-        this.bullet = [];
-        this.enemy = [];
-        this.upgrade = [];
-        this.smoke = [];
-        this.particle = [];
-    }
-}
-exports.Pack = Pack;
-
-
-/***/ }),
-/* 41 */
-/***/ (function(module, exports, __webpack_require__) {
-
-Object.defineProperty(exports, "__esModule", { value: true });
-const MapControler_1 = __webpack_require__(7);
-const Counter_1 = __webpack_require__(18);
+const MapControler_1 = __webpack_require__(8);
+const Counter_1 = __webpack_require__(17);
 const GeometryAndPhysics_1 = __webpack_require__(0);
 class MovementController {
     constructor(parent, param) {
@@ -3877,16 +3567,16 @@ exports.MovementController = MovementController;
 
 
 /***/ }),
-/* 42 */
+/* 35 */
 /***/ (function(module, exports, __webpack_require__) {
 
 Object.defineProperty(exports, "__esModule", { value: true });
 const enums_1 = __webpack_require__(1);
-const Flame_1 = __webpack_require__(43);
-const Bullet_1 = __webpack_require__(19);
-const WeaponCollection_1 = __webpack_require__(45);
-const Counter_1 = __webpack_require__(18);
-const WeaponTypes_1 = __webpack_require__(11);
+const Flame_1 = __webpack_require__(36);
+const Bullet_1 = __webpack_require__(18);
+const WeaponCollection_1 = __webpack_require__(37);
+const Counter_1 = __webpack_require__(17);
+const WeaponTypes_1 = __webpack_require__(12);
 const GeometryAndPhysics_1 = __webpack_require__(0);
 class AttackController {
     constructor(parent, param) {
@@ -4007,13 +3697,13 @@ exports.AttackController = AttackController;
 
 
 /***/ }),
-/* 43 */
+/* 36 */
 /***/ (function(module, exports, __webpack_require__) {
 
 Object.defineProperty(exports, "__esModule", { value: true });
 const enums_1 = __webpack_require__(1);
 const GeometryAndPhysics_1 = __webpack_require__(0);
-const Particle_1 = __webpack_require__(44);
+const Particle_1 = __webpack_require__(14);
 class Flame {
     constructor(param) {
         this.id = Math.random();
@@ -4070,141 +3760,11 @@ exports.Flame = Flame;
 
 
 /***/ }),
-/* 44 */
+/* 37 */
 /***/ (function(module, exports, __webpack_require__) {
 
 Object.defineProperty(exports, "__esModule", { value: true });
-const Player_1 = __webpack_require__(9);
-const globalVariables_1 = __webpack_require__(8);
-const enums_1 = __webpack_require__(1);
-const GeometryAndPhysics_1 = __webpack_require__(0);
-const Enemy_1 = __webpack_require__(10);
-class Particle {
-    constructor(param) {
-        this.position = new GeometryAndPhysics_1.Point(0, 0);
-        this.velocity = new GeometryAndPhysics_1.Point(0, 0);
-        this.size = 40;
-        this.life = 0;
-        this.maxLife = 10;
-        this.toRemove = false;
-        this.id = Math.random();
-        this.combatType = 'player';
-        this.update = () => {
-            this.position.x += this.velocity.x;
-            this.position.y += this.velocity.y;
-            this.life++;
-            if (this.life >= this.maxLife)
-                this.toRemove = true;
-            if (this.type == enums_1.ParticleType.fire) {
-                switch (this.combatType) {
-                    case 'player': {
-                        for (let key in Enemy_1.Enemy.list) {
-                            let enemy = Enemy_1.Enemy.list[key];
-                            if (this.testCollision(enemy)) {
-                                enemy.lifeAndBodyController.wasHit(1 * this.life / this.maxLife);
-                                enemy.lifeAndBodyController.startBurn(100);
-                            }
-                        }
-                        let player = Player_1.Player.list[this.parent];
-                        for (let key in Player_1.Player.list) {
-                            if (Player_1.Player.list[key].id !== this.parent) {
-                                let enemyPlayer = Player_1.Player.list[key];
-                                if (this.testCollision(enemyPlayer)) {
-                                    enemyPlayer.lifeAndBodyController.wasHit(1 * this.life / this.maxLife);
-                                    enemyPlayer.lifeAndBodyController.startBurn(100);
-                                }
-                            }
-                        }
-                        break;
-                    }
-                    case 'enemy': {
-                        let enemy = Enemy_1.Enemy.list[this.parent];
-                        for (let key in Player_1.Player.list) {
-                            let player = Player_1.Player.list[key];
-                            if (this.testCollision(player)) {
-                                player.lifeAndBodyController.wasHit(1 * this.life / this.maxLife);
-                                player.lifeAndBodyController.startBurn(100);
-                            }
-                        }
-                        for (let key in Enemy_1.Enemy.list) {
-                            if (Enemy_1.Enemy.list[key].id !== this.parent) {
-                                let enemy = Enemy_1.Enemy.list[key];
-                                if (this.testCollision(enemy)) {
-                                    enemy.lifeAndBodyController.wasHit(1 * this.life / this.maxLife);
-                                    enemy.lifeAndBodyController.startBurn(100);
-                                }
-                            }
-                        }
-                        break;
-                    }
-                }
-            }
-        };
-        this.testCollision = (entity) => {
-            let pos1 = new GeometryAndPhysics_1.Point(this.position.x - (this.size / 4), this.position.y - (this.size / 4));
-            let pos2 = new GeometryAndPhysics_1.Point(entity.position.x - (entity.width / 4), entity.position.y - (entity.height / 4));
-            let rect1 = new GeometryAndPhysics_1.Rectangle(pos1, new GeometryAndPhysics_1.Size(this.size / 2, this.size / 2));
-            let rect2 = new GeometryAndPhysics_1.Rectangle(pos2, new GeometryAndPhysics_1.Size(entity.width / 2, entity.height / 2));
-            return GeometryAndPhysics_1.testCollisionRectRect(rect1, rect2);
-        };
-        this.getInitPack = () => {
-            return {
-                id: this.id,
-                position: this.position,
-                map: this.map,
-                size: this.size,
-                type: this.type,
-                maxLife: this.maxLife
-            };
-        };
-        this.getUpdatePack = () => {
-            return {
-                id: this.id,
-                position: this.position,
-                life: this.life
-            };
-        };
-        this.maxLife = (param.maxLife !== undefined) ? param.maxLife : 60;
-        this.type = (param.type !== undefined) ? param.type : enums_1.ParticleType.fire;
-        if (param.position !== undefined) {
-            this.position.x = param.position.x;
-            this.position.y = param.position.y;
-        }
-        if (param.velocity !== undefined) {
-            this.velocity.x = param.velocity.x;
-            this.velocity.y = param.velocity.y;
-        }
-        this.parent = param.parent ? param.parent : -1;
-        this.combatType = param.combatType ? param.combatType : this.combatType;
-        this.map = (param.map !== undefined) ? param.map : 0;
-        Particle.list[this.id] = this;
-    }
-}
-Particle.update = () => {
-    let pack = [];
-    for (let i in Particle.list) {
-        let particle = Particle.list[i];
-        particle.update();
-        if (particle.toRemove) {
-            delete Particle.list[i];
-            globalVariables_1.removePack.particle.push({ id: particle.id });
-        }
-        else {
-            pack.push(particle.getUpdatePack());
-        }
-    }
-    return pack;
-};
-Particle.list = {};
-exports.Particle = Particle;
-
-
-/***/ }),
-/* 45 */
-/***/ (function(module, exports, __webpack_require__) {
-
-Object.defineProperty(exports, "__esModule", { value: true });
-const WeaponTypes_1 = __webpack_require__(11);
+const WeaponTypes_1 = __webpack_require__(12);
 const enums_1 = __webpack_require__(1);
 class WeaponCollection {
     constructor(owner) {
@@ -4414,7 +3974,7 @@ exports.SingleWeapon = SingleWeapon;
 
 
 /***/ }),
-/* 46 */
+/* 38 */
 /***/ (function(module, exports) {
 
 Object.defineProperty(exports, "__esModule", { value: true });
@@ -4463,15 +4023,15 @@ exports.LifeAndBodyController = LifeAndBodyController;
 
 
 /***/ }),
-/* 47 */
+/* 39 */
 /***/ (function(module, exports, __webpack_require__) {
 
 Object.defineProperty(exports, "__esModule", { value: true });
-const canvas_1 = __webpack_require__(4);
+const game_1 = __webpack_require__(2);
 const GeometryAndPhysics_1 = __webpack_require__(0);
 const enums_1 = __webpack_require__(1);
 const PlayerClient_1 = __webpack_require__(5);
-const game_1 = __webpack_require__(3);
+const canvas_1 = __webpack_require__(3);
 class ParticleClient {
     constructor(param) {
         this.id = 0;
@@ -4508,6 +4068,565 @@ class ParticleClient {
 }
 ParticleClient.list = {};
 exports.ParticleClient = ParticleClient;
+
+
+/***/ }),
+/* 40 */
+/***/ (function(module, exports, __webpack_require__) {
+
+Object.defineProperty(exports, "__esModule", { value: true });
+const GeometryAndPhysics_1 = __webpack_require__(0);
+const PlayerClient_1 = __webpack_require__(5);
+const game_1 = __webpack_require__(2);
+const canvas_1 = __webpack_require__(3);
+const images_1 = __webpack_require__(4);
+class UpgradeClient {
+    constructor(param) {
+        this.position = new GeometryAndPhysics_1.Point(0, 0);
+        this.id = -1;
+        this.draw = () => {
+            if (PlayerClient_1.PlayerClient.list[game_1.selfId].map !== this.map) {
+                return;
+            }
+            let frame = images_1.jsonIAE["frames"][this.img + ".png"]["frame"];
+            let frameWidth = frame["w"];
+            let frameHeight = frame["h"];
+            canvas_1.camera.drawImage(images_1.Img["IAE"], frameWidth, frameHeight, 0, 0, 0, this.position.x - this.width / 2, this.position.y - this.height / 2, this.width, this.height, frame["x"], frame["y"]);
+        };
+        this.id = param.id ? param.id : this.id;
+        this.position = param.position ? param.position : this.position;
+        this.width = param.width ? param.width : this.width;
+        this.height = param.height ? param.height : this.height;
+        this.map = param.map ? param.map : this.map;
+        this.img = param.img ? param.img : this.img;
+        this.category = param.category ? param.category : this.category;
+        this.kind = param.kind ? param.kind : this.kind;
+        UpgradeClient.list[this.id] = this;
+    }
+}
+UpgradeClient.list = {};
+exports.UpgradeClient = UpgradeClient;
+
+
+/***/ }),
+/* 41 */
+/***/ (function(module, exports, __webpack_require__) {
+
+Object.defineProperty(exports, "__esModule", { value: true });
+const game_1 = __webpack_require__(2);
+const EnemyClient_1 = __webpack_require__(9);
+const GeometryAndPhysics_1 = __webpack_require__(0);
+const PlayerClient_1 = __webpack_require__(5);
+const ExplosionClient_1 = __webpack_require__(20);
+const game_2 = __webpack_require__(2);
+const canvas_1 = __webpack_require__(3);
+const images_1 = __webpack_require__(4);
+class BulletClient {
+    constructor(initPack) {
+        this.id = -1;
+        this.position = new GeometryAndPhysics_1.Point(250, 250);
+        this.startPosition = new GeometryAndPhysics_1.Point(250, 250);
+        this.map = "forest";
+        this.img = images_1.Img["bullet"];
+        this.width = 32;
+        this.height = 32;
+        this.hitCategory = 1;
+        this.maxLife = 10;
+        this.life = this.maxLife;
+        this.toRemove = false;
+        this.draw = () => {
+            if (PlayerClient_1.PlayerClient.list[game_2.selfId].map !== this.map) {
+                return;
+            }
+            canvas_1.camera.drawLine(this.startPosition.x, this.startPosition.y, this.position.x, this.position.y, (this.life / this.maxLife) * 4, 255, 255, 255, (this.life / this.maxLife));
+        };
+        this.update = () => {
+            this.life--;
+            if (this.life <= 0)
+                this.toRemove = true;
+        };
+        this.hit = (category, entityCategory, entityId) => {
+            let x = this.position.x;
+            let y = this.position.y;
+            if (entityCategory == "player") {
+                if (PlayerClient_1.PlayerClient.list[entityId]) {
+                    x = PlayerClient_1.PlayerClient.list[entityId].x + (1 - Math.round(2 * Math.random())) * Math.floor(Math.random() * PlayerClient_1.PlayerClient.list[entityId].width / 4);
+                    y = PlayerClient_1.PlayerClient.list[entityId].y + (1 - Math.round(2 * Math.random())) * Math.floor(Math.random() * PlayerClient_1.PlayerClient.list[entityId].height / 4);
+                }
+            }
+            if (entityCategory == "enemy") {
+                if (EnemyClient_1.EnemyClient.list[entityId]) {
+                    x = EnemyClient_1.EnemyClient.list[entityId].x + (1 - Math.round(2 * Math.random())) * Math.floor(Math.random() * EnemyClient_1.EnemyClient.list[entityId].width / 4);
+                    y = EnemyClient_1.EnemyClient.list[entityId].y + (1 - Math.round(2 * Math.random())) * Math.floor(Math.random() * EnemyClient_1.EnemyClient.list[entityId].height / 4);
+                }
+            }
+            game_1.gameSoundManager.playHit(entityCategory);
+            if (category == 1) {
+                new ExplosionClient_1.ExplosionClient({ position: this.position, map: this.map, img: "blood", width: 48, height: 48, category: category, spriteRows: 1, spriteColumns: 6 });
+            }
+            else if (category == 2) {
+                new ExplosionClient_1.ExplosionClient({ position: this.position, map: this.map, img: "explosion1", width: 64, height: 64, category: category, spriteRows: 4, spriteColumns: 10 });
+            }
+        };
+        this.id = (initPack.id !== undefined) ? initPack.id : -1;
+        this.position = (initPack.position !== undefined) ? initPack.position : new GeometryAndPhysics_1.Point(250, 250);
+        this.startPosition = (initPack.startPosition !== undefined) ? initPack.startPosition : new GeometryAndPhysics_1.Point(250, 250);
+        this.width = (initPack.width !== undefined) ? initPack.width : 32;
+        this.height = (initPack.height !== undefined) ? initPack.height : 32;
+        this.hitCategory = (initPack.hitCategory !== undefined) ? initPack.hitCategory : 1;
+        this.img = (initPack.img !== undefined) ? initPack.img : "bullet";
+        this.map = (initPack.map !== undefined) ? initPack.map : "forest";
+        BulletClient.list[this.id] = this;
+    }
+}
+BulletClient.list = {};
+exports.BulletClient = BulletClient;
+
+
+/***/ }),
+/* 42 */
+/***/ (function(module, exports) {
+
+Object.defineProperty(exports, "__esModule", { value: true });
+class GameSoundManager {
+    constructor() {
+        this.loadSounds = () => {
+            soundManager.onload = function () {
+                soundManager.createSound('gunshot', '/client/mp3/gunshot.mp3');
+                soundManager.createSound('pistol_fire', '/client/mp3/pistol_fire.mp3');
+                soundManager.createSound('shotgun_fire', '/client/mp3/shotgun_fire.mp3');
+                soundManager.createSound('flamethrower_fire', '/client/mp3/flamethrower_fire.mp3');
+                soundManager.createSound('rifle_fire', '/client/mp3/rifle_fire.mp3');
+                soundManager.createSound('knife_swing', '/client/mp3/knife_swing.mp3');
+                soundManager.createSound('gun_swing', '/client/mp3/gun_swing.mp3');
+                soundManager.createSound('squishy1', '/client/mp3/squishy1.mp3');
+                soundManager.createSound('squishy2', '/client/mp3/squishy2.mp3');
+                soundManager.createSound('pain', '/client/mp3/pain.mp3');
+                soundManager.createSound('death1', '/client/mp3/death.mp3');
+                soundManager.createSound('shotgunreload', '/client/mp3/shotgunreload.mp3');
+                soundManager.createSound('pistolreload', '/client/mp3/pistolreload.mp3');
+                soundManager.createSound('riflereload', '/client/mp3/riflereload.mp3');
+            };
+        };
+        this.loopSound = (sound, stop) => {
+            sound.play({
+                onfinish: function () {
+                    if (!stop) {
+                        this.loopSound(sound);
+                    }
+                }
+            });
+        };
+        this.playWeaponReload = (weapon) => {
+            soundManager.play(weapon + "reload");
+        };
+        this.playWeaponAttack = (weapon, melee, stop = true) => {
+            if (melee) {
+                (weapon == "knife" || weapon == "claws") ? soundManager.play("knife_swing") : soundManager.play("gun_swing");
+            }
+            else {
+                if (weapon == "flamethrower") {
+                    let s = soundManager.getSoundById(weapon + "_fire");
+                    this.loopSound(s, stop);
+                }
+                else {
+                    soundManager.play(weapon + "_fire");
+                }
+            }
+        };
+        this.playHit = (category) => {
+            if (category == "player")
+                soundManager.play("pain");
+            if (category == "enemy") {
+                (Math.random() < 0.5) ? soundManager.play("squishy1") : soundManager.play("squishy2");
+            }
+        };
+        this.playDeath = (kind) => {
+            console.log("KILLED " + kind);
+            if (kind == "zombie")
+                soundManager.play("death1");
+        };
+        this.loadSounds();
+    }
+}
+exports.GameSoundManager = GameSoundManager;
+
+
+/***/ }),
+/* 43 */
+/***/ (function(module, exports, __webpack_require__) {
+
+Object.defineProperty(exports, "__esModule", { value: true });
+const PlayerClient_1 = __webpack_require__(5);
+const enums_1 = __webpack_require__(1);
+const Constants_1 = __webpack_require__(6);
+const canvas_1 = __webpack_require__(3);
+const game_1 = __webpack_require__(2);
+const images_1 = __webpack_require__(4);
+class MapClient {
+    constructor(map, name) {
+        this.image = new Image();
+        this.name = "";
+        this.reloadMap = (map) => {
+            this.map = map;
+            this.name = map.name;
+        };
+        this.draw = () => {
+            if (this.map) {
+                let mainPlayer = PlayerClient_1.PlayerClient.list[game_1.selfId];
+                let mainPlayerx = mainPlayer.position.x;
+                let mainPlayery = mainPlayer.position.y;
+                let x = WIDTH / 2 - mainPlayerx;
+                x = x - (mouseX - WIDTH / 2) / CAMERA_BOX_ADJUSTMENT;
+                let y = HEIGHT / 2 - mainPlayery;
+                y = y - (mouseY - HEIGHT / 2) / CAMERA_BOX_ADJUSTMENT;
+                let size = this.map.size;
+                let material = enums_1.TerrainMaterial.dirt;
+                let imgWidth = 1;
+                let imgHeight = 1;
+                let frame = images_1.jsonMap["frames"];
+                let mapFrame = frame;
+                let frameWidth = 32;
+                let frameHeight = 32;
+                for (let i = 0; i < size; i++) {
+                    for (let j = 0; j < size; j++) {
+                        material = this.map.mapTiles[i][j].material;
+                        mapFrame = frame[Constants_1.mapTileImageName[material] + ".png"]["frame"];
+                        imgWidth = mapFrame["w"];
+                        imgHeight = mapFrame["h"];
+                        canvas_1.camera.drawImage(images_1.Img["Map"], imgWidth, imgHeight, 0, 0, 0, (imgWidth - 1) * j, (imgHeight - 1) * i, imgWidth, imgHeight, mapFrame["x"], mapFrame["y"]);
+                        for (let k = 0; k < 4; k++) {
+                            if (this.map.mapTiles[i][j].sides[k] > 0) {
+                                mapFrame = frame[Constants_1.mapTileSideImageName[k][this.map.mapTiles[i][j].sides[k]] + ".png"]["frame"];
+                                imgWidth = mapFrame["w"];
+                                imgHeight = mapFrame["h"];
+                                canvas_1.camera.drawImage(images_1.Img["Map"], imgWidth, imgHeight, 0, 0, 0, (imgWidth - 1) * j, (imgHeight - 1) * i, imgWidth, imgHeight, mapFrame["x"], mapFrame["y"]);
+                            }
+                        }
+                    }
+                }
+                game_1.canvasFilters.getImageFromCanvas();
+                game_1.canvasFilters.bright();
+                for (let i = 0; i < size; i++) {
+                    for (let j = 0; j < size; j++) {
+                        for (let k = 0; k < this.map.mapTiles[i][j].objects.length; k++) {
+                            if (this.map.mapTiles[i][j].objects[k] > 0) {
+                                mapFrame = frame[Constants_1.mapObjectImageName[this.map.mapTiles[i][j].objects[k]] + ".png"]["frame"];
+                                imgWidth = mapFrame["w"];
+                                imgHeight = mapFrame["h"];
+                                canvas_1.camera.drawImage(images_1.Img["Map"], imgWidth, imgHeight, 0, 0, 0, (imgWidth - 1) * j, (imgHeight - 1) * i, imgWidth, imgHeight, mapFrame["x"], mapFrame["y"]);
+                            }
+                        }
+                    }
+                }
+            }
+        };
+        this.map = map;
+        this.name = name;
+    }
+}
+exports.MapClient = MapClient;
+
+
+/***/ }),
+/* 44 */
+/***/ (function(module, exports) {
+
+Object.defineProperty(exports, "__esModule", { value: true });
+class Filters {
+    constructor(ctx) {
+        this.ctx = ctx;
+        this.bAdjustment = -50;
+        this.getImageFromCanvas = () => {
+            this.imageData = this.ctx.getImageData(0, 0, WIDTH, HEIGHT);
+            this.data = this.imageData.data;
+        };
+        this.invert = () => {
+            for (var i = 0; i < this.data.length; i += 4) {
+                this.data[i] = 255 - this.data[i];
+                this.data[i + 1] = 255 - this.data[i + 1];
+                this.data[i + 2] = 255 - this.data[i + 2];
+            }
+            this.ctx.putImageData(this.imageData, 0, 0);
+        };
+        this.bright = () => {
+            for (var i = 0; i < this.data.length; i += 4) {
+                this.data[i] += this.bAdjustment;
+                this.data[i + 1] += this.bAdjustment;
+                this.data[i + 2] += this.bAdjustment;
+            }
+            this.ctx.putImageData(this.imageData, 0, 0);
+        };
+        this.blur = () => {
+            let r, g, b, a;
+            for (var i = 0; i < this.data.length; i += 4) {
+                r = 0;
+                g = 0;
+                b = 0;
+                for (var j = -1; j < 2; j++) {
+                    for (var k = -1; k < 2; k++) {
+                        if ((i + j + k * WIDTH * 4) > 0 && (i + j + k * WIDTH * 4) < this.data.length) {
+                            r += this.data[i + j + k * WIDTH * 4] / 9;
+                            g += this.data[i + j + k * WIDTH * 4] / 9;
+                            b += this.data[i + j + k * WIDTH * 4] / 9;
+                        }
+                    }
+                }
+                this.data[i] = r;
+                this.data[i + 1] = g;
+                this.data[i + 2] = b;
+            }
+            this.ctx.putImageData(this.imageData, 0, 0);
+        };
+    }
+}
+exports.Filters = Filters;
+
+
+/***/ }),
+/* 45 */
+/***/ (function(module, exports, __webpack_require__) {
+
+Object.defineProperty(exports, "__esModule", { value: true });
+const Particle_1 = __webpack_require__(46);
+const images_1 = __webpack_require__(4);
+class Effects {
+    constructor(ctx) {
+        this.ctx = ctx;
+        this.maxVelocity = 2;
+        this.initSmoke = (particleCount) => {
+            for (var i = 0; i < particleCount; ++i) {
+                let particle = new Particle_1.Particle(this.ctx);
+                particle.position.updatePosition(this.generateRandom(0, WIDTH), this.generateRandom(0, HEIGHT));
+                particle.velocity.updatePosition(this.generateRandom(-this.maxVelocity, this.maxVelocity), this.generateRandom(-this.maxVelocity, this.maxVelocity));
+                particle.setImage(images_1.Img["smoke"]);
+            }
+        };
+        this.decreaseSmoke = (particleCount) => {
+            let count = 0;
+            for (let i in Particle_1.Particle.list) {
+                if (count < particleCount) {
+                    delete Particle_1.Particle.list[i];
+                }
+                else {
+                    return;
+                }
+                count++;
+            }
+        };
+        this.generateRandom = (min, max) => {
+            return Math.random() * (max - min) + min;
+        };
+        this.draw = () => {
+            for (let i in Particle_1.Particle.list) {
+                Particle_1.Particle.list[i].draw();
+            }
+        };
+        this.update = () => {
+            for (let i in Particle_1.Particle.list) {
+                Particle_1.Particle.list[i].update();
+                if (Particle_1.Particle.list[i].lifeTime <= 0) {
+                    delete Particle_1.Particle.list[i];
+                }
+            }
+        };
+    }
+}
+exports.Effects = Effects;
+
+
+/***/ }),
+/* 46 */
+/***/ (function(module, exports, __webpack_require__) {
+
+Object.defineProperty(exports, "__esModule", { value: true });
+const GeometryAndPhysics_1 = __webpack_require__(0);
+class Particle {
+    constructor(ctx) {
+        this.ctx = ctx;
+        this.position = new GeometryAndPhysics_1.Point(0, 0);
+        this.velocity = new GeometryAndPhysics_1.Point(0, 0);
+        this.radius = 5;
+        this.maxLifeTime = 100;
+        this.draw = () => {
+            if (this.image) {
+                this.ctx.globalAlpha = this.lifeTime / this.maxLifeTime;
+                this.ctx.drawImage(this.image, this.position.x - 128, this.position.y - 128);
+                this.ctx.globalAlpha = 1.0;
+                return;
+            }
+            this.ctx.beginPath();
+            this.ctx.arc(this.position.x, this.position.y, this.radius, 0, 2 * Math.PI, false);
+            this.ctx.fillStyle = "rgba(0, 255, 255, 1)";
+            this.ctx.fill();
+            this.ctx.closePath();
+        };
+        this.update = () => {
+            this.position.x += this.velocity.x;
+            this.position.y += this.velocity.y;
+            if (this.position.x >= WIDTH) {
+                this.velocity.x = -this.velocity.x;
+                this.position.x = WIDTH;
+            }
+            else if (this.position.x <= 0) {
+                this.velocity.x = -this.velocity.x;
+                this.position.x = 0;
+            }
+            if (this.position.y >= HEIGHT) {
+                this.velocity.y = -this.velocity.y;
+                this.position.y = HEIGHT;
+            }
+            else if (this.position.y <= 0) {
+                this.velocity.y = -this.velocity.y;
+                this.position.y = 0;
+            }
+            this.lifeTime--;
+        };
+        this.setImage = (image) => {
+            this.image = image;
+        };
+        let id = Math.random();
+        Particle.list[id] = this;
+        this.maxLifeTime += Math.random() * 800;
+        this.lifeTime = this.maxLifeTime;
+    }
+}
+Particle.list = {};
+exports.Particle = Particle;
+
+
+/***/ }),
+/* 47 */
+/***/ (function(module, exports, __webpack_require__) {
+
+Object.defineProperty(exports, "__esModule", { value: true });
+const SmokeParticle_1 = __webpack_require__(48);
+const GeometryAndPhysics_1 = __webpack_require__(0);
+const game_1 = __webpack_require__(2);
+const PlayerClient_1 = __webpack_require__(5);
+const images_1 = __webpack_require__(4);
+class SmokeClient {
+    constructor(initPack) {
+        this.position = new GeometryAndPhysics_1.Point(0, 0);
+        this.id = -1;
+        this.radius = 10;
+        this.maxRadius = 10;
+        this.particles = [];
+        this.draw = () => {
+            if (PlayerClient_1.PlayerClient.list[game_1.selfId].map !== this.map) {
+                return;
+            }
+            for (let i = 0; i < this.particles.length; i++) {
+                this.particles[i].draw();
+            }
+        };
+        this.update = () => {
+            for (let i = 0; i < this.particles.length; i++) {
+                this.particles[i].update();
+            }
+        };
+        this.updateRadius = () => {
+            for (let i = 0; i < this.particles.length; i++) {
+                this.particles[i].radius = this.radius;
+            }
+        };
+        if (initPack.id)
+            this.id = initPack.id;
+        if (initPack.position)
+            this.position = initPack.position;
+        if (initPack.radius)
+            this.radius = initPack.radius;
+        if (initPack.maxRadius)
+            this.maxRadius = initPack.maxRadius;
+        if (initPack.map)
+            this.map = initPack.map;
+        if (initPack.time)
+            this.time = initPack.time;
+        for (var i = 0; i < 50; ++i) {
+            let center = new GeometryAndPhysics_1.Point(this.position.x, this.position.y);
+            this.particles[i] = new SmokeParticle_1.SmokeParticle(ctx, this.position, this.radius, this.maxRadius, center, this.time);
+            let pos = GeometryAndPhysics_1.getRandomInCircle(this.position, this.radius);
+            this.particles[i].position.x = pos.x;
+            this.particles[i].position.y = pos.y;
+            this.particles[i].velocity.updatePosition(Math.random() * 6 - 3, Math.random() * 6 - 3);
+            this.particles[i].setImage(images_1.Img["smoke"]);
+        }
+        console.log("SMOKE");
+        SmokeClient.list[this.id] = this;
+    }
+}
+SmokeClient.list = {};
+exports.SmokeClient = SmokeClient;
+
+
+/***/ }),
+/* 48 */
+/***/ (function(module, exports, __webpack_require__) {
+
+Object.defineProperty(exports, "__esModule", { value: true });
+const canvas_1 = __webpack_require__(3);
+const GeometryAndPhysics_1 = __webpack_require__(0);
+class SmokeParticle {
+    constructor(ctx, position, radius, maxRadius, center, time) {
+        this.ctx = ctx;
+        this.position = new GeometryAndPhysics_1.Point(0, 0);
+        this.velocity = new GeometryAndPhysics_1.Point(0, 0);
+        this.center = new GeometryAndPhysics_1.Point(0, 0);
+        this.radius = 5;
+        this.maxRadius = 5;
+        this.maxLifeTime = 0;
+        this.draw = () => {
+            if (this.image) {
+                this.ctx.globalAlpha = this.lifeTime / this.maxLifeTime;
+                canvas_1.camera.drawSimpleImage(this.image, this.position.x, this.position.y);
+                this.ctx.globalAlpha = 1.0;
+                return;
+            }
+            this.ctx.beginPath();
+            this.ctx.arc(this.position.x, this.position.y, 5, 0, 2 * Math.PI, false);
+            this.ctx.fillStyle = "rgba(0, 255, 255, 1)";
+            this.ctx.fill();
+            this.ctx.closePath();
+        };
+        this.update = () => {
+            this.position.x += this.velocity.x;
+            this.position.y += this.velocity.y;
+            if (this.position.x >= this.center.x + this.radius) {
+                this.velocity.x = -this.velocity.x;
+                this.position.x = this.center.x + this.radius;
+            }
+            else if (this.position.x <= this.center.x - this.radius) {
+                this.velocity.x = -this.velocity.x;
+                this.position.x = this.center.x - this.radius;
+            }
+            if (this.position.y >= this.center.y + this.radius) {
+                this.velocity.y = -this.velocity.y;
+                this.position.y = this.center.y + this.radius;
+            }
+            else if (this.position.y <= this.center.y - this.radius) {
+                this.velocity.y = -this.velocity.y;
+                this.position.y = this.center.y - this.radius;
+            }
+            if (this.lifeTime > 0)
+                this.lifeTime--;
+        };
+        this.setImage = (image) => {
+            this.image = image;
+        };
+        let id = Math.random();
+        this.position.x = position.x;
+        this.position.y = position.y;
+        this.center.x = center.x;
+        this.center.y = center.y;
+        this.radius = radius;
+        this.maxRadius = maxRadius;
+        SmokeParticle.list[id] = this;
+        this.maxLifeTime = time;
+        this.lifeTime = this.maxLifeTime;
+    }
+}
+SmokeParticle.list = {};
+exports.SmokeParticle = SmokeParticle;
 
 
 /***/ })

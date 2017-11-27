@@ -1,12 +1,12 @@
 Object.defineProperty(exports, "__esModule", { value: true });
-const images_1 = require("./../images");
-const game_1 = require("./../game");
+const game_1 = require("./../game/game");
 const EnemyClient_1 = require("./EnemyClient");
 const GeometryAndPhysics_1 = require("./../../../server/js/GeometryAndPhysics");
-const game_2 = require("../game");
 const PlayerClient_1 = require("./PlayerClient");
 const ExplosionClient_1 = require("./ExplosionClient");
-const canvas_1 = require("../canvas");
+const game_2 = require("../game/game");
+const canvas_1 = require("../pregame/canvas");
+const images_1 = require("../images");
 class BulletClient {
     constructor(initPack) {
         this.id = -1;

@@ -10,6 +10,7 @@ const MapControler_1 = require("../Controllers/MapControler");
 class Player extends Actor_1.Actor {
     constructor(param) {
         super(param);
+        this.updatePack = {};
         this.giveItems = () => {
             this.inventory.addItem(enums_1.ItemType.knife, 1);
             this.inventory.addItem(enums_1.ItemType.pistol, 1);
@@ -45,21 +46,58 @@ class Player extends Actor_1.Actor {
         this.getUpdatePack = () => {
             let attackStartedTmp = this.attackController.attackStarted;
             this.attackController.attackStarted = false;
-            return {
-                id: this.id,
-                position: this.position,
-                hp: this.lifeAndBodyController.hp,
-                moving: this.movementController.moving,
-                aimAngle: this.movementController.aimAngle,
-                attackStarted: attackStartedTmp,
-                weapon: this.attackController.activeWeapon.name,
-                attackMelee: this.attackController.melee,
-                ammo: this.attackController.activeWeapon.ammo,
-                ammoInGun: this.attackController.activeWeapon.ammoInGun,
-                reload: this.attackController.reloadCounter.isActive(),
-                pressingAttack: this.attackController.pressingAttack,
-                burn: this.lifeAndBodyController.burn
-            };
+            let newPack = {};
+            this.updatePack['id'] = this.id;
+            newPack['id'] = this.id;
+            if (this.updatePack['position'] !== this.position) {
+                newPack['position'] = this.position;
+                this.updatePack['position'] = new GeometryAndPhysics_1.Point(this.position.x, this.position.y);
+            }
+            if (this.updatePack['hp'] !== this.lifeAndBodyController.hp) {
+                newPack['hp'] = this.lifeAndBodyController.hp;
+                this.updatePack['hp'] = this.lifeAndBodyController.hp;
+            }
+            if (this.updatePack['moving'] !== this.movementController.moving) {
+                newPack['moving'] = this.movementController.moving;
+                this.updatePack['moving'] = this.movementController.moving;
+            }
+            if (this.updatePack['aimAngle'] !== this.movementController.aimAngle) {
+                newPack['aimAngle'] = this.movementController.aimAngle;
+                this.updatePack['aimAngle'] = this.movementController.aimAngle;
+            }
+            if (this.updatePack['attackStarted'] !== attackStartedTmp) {
+                newPack['attackStarted'] = attackStartedTmp;
+                this.updatePack['attackStarted'] = attackStartedTmp;
+            }
+            if (this.updatePack['weapon'] !== this.attackController.activeWeapon.name) {
+                newPack['weapon'] = this.attackController.activeWeapon.name;
+                this.updatePack['weapon'] = this.attackController.activeWeapon.name;
+            }
+            if (this.updatePack['attackMelee'] !== this.attackController.melee) {
+                newPack['attackMelee'] = this.attackController.melee;
+                this.updatePack['attackMelee'] = this.attackController.melee;
+            }
+            if (this.updatePack['ammo'] !== this.attackController.activeWeapon.ammo) {
+                newPack['ammo'] = this.attackController.activeWeapon.ammo;
+                this.updatePack['ammo'] = this.attackController.activeWeapon.ammo;
+            }
+            if (this.updatePack['ammoInGun'] !== this.attackController.activeWeapon.ammoInGun) {
+                newPack['ammoInGun'] = this.attackController.activeWeapon.ammoInGun;
+                this.updatePack['ammoInGun'] = this.attackController.activeWeapon.ammoInGun;
+            }
+            if (this.updatePack['reload'] !== this.attackController.reloadCounter.isActive()) {
+                newPack['reload'] = this.attackController.reloadCounter.isActive();
+                this.updatePack['reload'] = this.attackController.reloadCounter.isActive();
+            }
+            if (this.updatePack['pressingAttack'] !== this.attackController.pressingAttack) {
+                newPack['pressingAttack'] = this.attackController.pressingAttack;
+                this.updatePack['pressingAttack'] = this.attackController.pressingAttack;
+            }
+            if (this.updatePack['burn'] !== this.lifeAndBodyController.burn) {
+                newPack['burn'] = this.lifeAndBodyController.burn;
+                this.updatePack['burn'] = this.lifeAndBodyController.burn;
+            }
+            return newPack;
         };
         this.onDeath = () => {
             this.lifeAndBodyController.reset();
@@ -74,14 +112,28 @@ class Player extends Actor_1.Actor {
             }
             this.setPosition(position);
         };
+        this.closeEnemies = (distance) => {
+            let ids = [];
+            let e;
+            for (let i in Enemy_1.Enemy.list) {
+                e = Enemy_1.Enemy.list[i];
+                if (e.getDistance(this) < distance) {
+                    ids.push(e.id);
+                }
+            }
+            return ids;
+        };
         globalVariables_1.initPack.player.push(this.getInitPack());
         Player.list[param.id] = this;
         this.giveItems();
-        for (let i = 0; i < 1; i++) {
-            Enemy_1.Enemy.randomlyGenerate(this.map);
-            Enemy_1.Enemy.randomlyGenerate(this.map);
-            Enemy_1.Enemy.randomlyGenerate(this.map);
-            Enemy_1.Enemy.randomlyGenerate(this.map);
+        if (Player.monsters) {
+            for (let i = 0; i < 10; i++) {
+                Enemy_1.Enemy.randomlyGenerate(this.map);
+                Enemy_1.Enemy.randomlyGenerate(this.map);
+                Enemy_1.Enemy.randomlyGenerate(this.map);
+                Enemy_1.Enemy.randomlyGenerate(this.map);
+            }
+            Player.monsters = false;
         }
     }
 }
@@ -166,6 +218,7 @@ Player.update = () => {
     }
     return pack;
 };
+Player.monsters = true;
 Player.list = {};
 exports.Player = Player;
 //# sourceMappingURL=Player.js.map

@@ -2,8 +2,9 @@ export var jsonPlayer;
 export var jsonGUI; 
 export var jsonIAE; 
 export var jsonMap; 
-
+declare var socket;
 export var Img: any = {};
+
 Img.map = {}
 
 Img.guibackground = new Image();

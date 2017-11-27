@@ -14,7 +14,7 @@ export class Enemy extends Actor {
     private kind: string = "";
     private playerToKill: Player;
     private counter: number = 0;
-
+    private updatePack = {};
     static globalMapControler = new MapController(null); 
     public superUpdate;
 
@@ -29,7 +29,6 @@ export class Enemy extends Actor {
     } 
 
     extendedUpdate = () => {
-        this.update();
         
         if( this.playerToKill == undefined || this.counter % 40 === 0)
             this.playerToKill = this.getClosestPlayer(10000, 360);
@@ -42,12 +41,17 @@ export class Enemy extends Actor {
 		    diffY = this.playerToKill.position.y - this.position.y;
         }
 
-        if(  this.counter % 10 === 0){
-            this.updateAim(this.playerToKill, diffX, diffY);
-            this.updateKeyPress(this.playerToKill, diffX, diffY);
+        if(Math.sqrt(diffX*diffX+diffY*diffY)<800){
+            this.update();
+            
+                    if(  this.counter % 10 === 0){
+                        this.updateAim(this.playerToKill, diffX, diffY);
+                        this.updateKeyPress(this.playerToKill, diffX, diffY);
+                    }
+            
+                    this.updateAttack(this.playerToKill, diffX, diffY);
         }
 
-        this.updateAttack(this.playerToKill, diffX, diffY);
         this.counter++;
 	}
 
@@ -115,6 +119,62 @@ export class Enemy extends Actor {
         
         this.attackController.attackStarted = false;
         
+        let newPack = {};
+
+        if(this.updatePack['position'] !== this.position){
+            newPack['position'] = this.position;
+            this.updatePack['position'] = new Point(this.position.x, this.position.y);
+        }
+        if(this.updatePack['hp'] !== this.lifeAndBodyController.hp){
+            newPack['hp'] = this.lifeAndBodyController.hp;
+            this.updatePack['hp'] = this.lifeAndBodyController.hp;
+        }
+        if(this.updatePack['moving'] !== this.movementController.moving){
+            newPack['moving'] = this.movementController.moving;
+            this.updatePack['moving'] = this.movementController.moving;
+        }
+        if(this.updatePack['aimAngle'] !== this.movementController.aimAngle){
+            newPack['aimAngle'] = this.movementController.aimAngle;
+            this.updatePack['aimAngle'] = this.movementController.aimAngle;
+        }
+
+        if(this.updatePack['attackStarted'] !== attackStartedTmp){
+            newPack['attackStarted'] = attackStartedTmp;
+            this.updatePack['attackStarted'] = attackStartedTmp;
+        }
+
+        if(this.updatePack['weapon'] !== this.attackController.activeWeapon.name){
+            newPack['weapon'] = this.attackController.activeWeapon.name;
+            this.updatePack['weapon'] = this.attackController.activeWeapon.name;
+        }
+
+        if(this.updatePack['attackMelee'] !== this.attackController.melee){
+            newPack['attackMelee'] = this.attackController.melee;
+            this.updatePack['attackMelee'] = this.attackController.melee;
+        }
+
+        if(this.updatePack['reload'] !== this.attackController.reloadCounter.isActive()){
+            newPack['reload'] = this.attackController.reloadCounter.isActive();
+            this.updatePack['reload'] = this.attackController.reloadCounter.isActive();
+        }
+
+        if(this.updatePack['pressingAttack'] !== this.attackController.pressingAttack){
+            newPack['pressingAttack'] = this.attackController.pressingAttack;
+            this.updatePack['pressingAttack'] = this.attackController.pressingAttack;
+        }
+
+        if(this.updatePack['burn'] !== this.lifeAndBodyController.burn){
+            newPack['burn'] = this.lifeAndBodyController.burn;
+            this.updatePack['burn'] = this.lifeAndBodyController.burn;
+        }
+
+        if(newPack !== {}){
+            this.updatePack['id'] = this.id;
+            newPack['id'] = this.id;
+        }
+
+        return newPack;
+        /*
         return {
            id: this.id,
            position: this.position,
@@ -127,7 +187,7 @@ export class Enemy extends Actor {
            reload: this.attackController.reloadCounter.isActive(),
            pressingAttack: this.attackController.pressingAttack,
            burn: this.lifeAndBodyController.burn
-        };
+        };*/
     }   
 
     giveWeapons = () => {

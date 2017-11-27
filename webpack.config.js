@@ -1,7 +1,7 @@
 const path = require('path');
 
 module.exports = {
-    entry: {a: './client/js/game.ts', b: './client/js/canvas.ts', c:'./client/js/images.ts'},
+    entry: {a: './client/js/game/game.ts', b: './client/js/pregame/canvas.ts', c:'./client/js/images.ts'},
     output: {
         path: path.resolve(__dirname, 'build/client/js'),  
         filename: "[name].entry.js",

@@ -1,10 +1,11 @@
 Object.defineProperty(exports, "__esModule", { value: true });
-const images_1 = require("./../images");
-const canvas_1 = require("./../canvas");
+const game_1 = require("./../game/game");
+const FireFlameClient_1 = require("./../Effects/FireFlameClient");
 const PlayerClient_1 = require("./PlayerClient");
 const GeometryAndPhysics_1 = require("../../../server/js/GeometryAndPhysics");
-const game_1 = require("../game");
-const FireFlameClient_1 = require("../FireFlameClient");
+const canvas_1 = require("../pregame/canvas");
+const images_1 = require("../images");
+const EnemyConstants_1 = require("../Constants/EnemyConstants");
 class EnemyClient {
     constructor(initPack) {
         this.id = -1;
@@ -27,40 +28,34 @@ class EnemyClient {
         this.flame = new FireFlameClient_1.FireFlameClient(this);
         this.burn = new FireFlameClient_1.FireFlameClient(this, true);
         this.draw = () => {
-            if (PlayerClient_1.PlayerClient.list[game_1.selfId].map !== this.map) {
+            let p = PlayerClient_1.PlayerClient.list[game_1.selfId];
+            if (p.map !== this.map) {
                 return;
             }
+            if (p.position.x - this.position.x > WIDTH || p.position.y - this.position.y > HEIGHT)
+                return;
             let hpWidth = 30 * this.hp / this.hpMax;
-            let mainPlayer = PlayerClient_1.PlayerClient.list[game_1.selfId];
-            let mainPlayerx = mainPlayer.position.x;
-            let mainPlayery = mainPlayer.position.y;
-            let ex = this.position.x;
-            let ey = this.position.y;
-            let x = ex - (mainPlayerx - WIDTH / 2);
-            x = x - (mouseX - WIDTH / 2) / CAMERA_BOX_ADJUSTMENT;
-            let y = ey - (mainPlayery - HEIGHT / 2);
-            y = y - (mouseY - HEIGHT / 2) / CAMERA_BOX_ADJUSTMENT;
             let frameWidth = 32;
             let frameHeight = 32;
             let aimAngle = this.aimAngle;
             if (aimAngle < 0) {
                 aimAngle = 360 + aimAngle;
             }
-            let directionMod = 3;
-            if (aimAngle >= 45 && aimAngle < 135) {
-                directionMod = 2;
-            }
-            else if (aimAngle >= 135 && aimAngle < 225) {
-                directionMod = 1;
-            }
-            else if (aimAngle >= 225 && aimAngle < 315) {
-                directionMod = 0;
-            }
             let walkingMod = Math.floor(this.spriteAnimCounter) % 6;
             if (this.kind == 'zombie') {
                 this.drawTopViewSprite(this.position.x, this.position.y, aimAngle);
             }
             else {
+                let directionMod = 3;
+                if (aimAngle >= 45 && aimAngle < 135) {
+                    directionMod = 2;
+                }
+                else if (aimAngle >= 135 && aimAngle < 225) {
+                    directionMod = 1;
+                }
+                else if (aimAngle >= 225 && aimAngle < 315) {
+                    directionMod = 0;
+                }
                 let frame = images_1.jsonIAE["frames"][this.kind + ".png"]["frame"];
                 frameWidth = frame["w"] / 6;
                 frameHeight = frame["h"] / 4;
@@ -78,7 +73,7 @@ class EnemyClient {
             }
         };
         this.drawTopViewSpriteAttack = (x, y, aimAngle) => {
-            let spriteColumns = framesAttack[this.kind];
+            let spriteColumns = EnemyConstants_1.framesAttack[this.kind];
             let spriteRows = 1;
             let walkingMod = Math.floor(this.spriteAnimCounter) % spriteColumns;
             let frame = images_1.jsonIAE["frames"][this.kind + "_attack.png"]["frame"];
@@ -91,9 +86,9 @@ class EnemyClient {
             }
         };
         this.drawTopViewSpriteWalk = (x, y, aimAngle) => {
-            let walkingMod = Math.floor(this.spriteAnimCounter) % framesMove[this.kind];
+            let walkingMod = Math.floor(this.spriteAnimCounter) % EnemyConstants_1.framesMove[this.kind];
             let frame = images_1.jsonIAE["frames"][this.kind + "_move.png"]["frame"];
-            let frameWidth = frame["w"] / framesMove[this.kind];
+            let frameWidth = frame["w"] / EnemyConstants_1.framesMove[this.kind];
             let frameHeight = frame["h"];
             canvas_1.camera.drawImage(images_1.Img["IAE"], frameWidth, frameHeight, aimAngle, 0, walkingMod, x, y, this.width, this.height, frame["x"], frame["y"]);
         };

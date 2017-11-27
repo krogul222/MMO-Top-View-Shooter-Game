@@ -1,8 +1,9 @@
-import { Img, jsonIAE } from './../images';
 import { Point } from './../../../server/js/GeometryAndPhysics';
 import { PlayerClient } from './PlayerClient';
-import { selfId } from '../game';
-import { camera } from '../canvas';
+import { selfId } from '../game/game';
+import { camera } from '../pregame/canvas';
+import { jsonIAE, Img } from '../images';
+
 
 declare var mouseX: any;
 declare var mouseY: any;
