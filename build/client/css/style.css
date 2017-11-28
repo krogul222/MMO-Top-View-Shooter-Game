@@ -68,9 +68,8 @@ body{
     margin-right: auto ;
 }
 
-#form{
+#box{
     width : 300px; 
-    heiight : 300px; 
     background-color : rgba(0,0,0,0.5); 
     margin :0 auto; 
     border-radius : 15px; 
