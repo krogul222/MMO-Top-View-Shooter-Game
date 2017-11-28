@@ -33,6 +33,7 @@ socket.on('mapData', function (data) {
     if (exports.currentMap.name == data.name) {
         exports.currentMap.reloadMap(MapControler_1.MapController.getMap(data.name));
         canvas_1.camera.updateWorldSize(exports.currentMap.map.width, exports.currentMap.map.height);
+        gui.createMinimap();
     }
 });
 socket.on('init', function (data) {
@@ -120,56 +121,58 @@ socket.on('update', function (data) {
             }
         }
     }
-    for (let i = 0, length = data.enemy.length; i < length; i++) {
-        let pack = data.enemy[i];
-        let p = EnemyClient_1.EnemyClient.list[pack.id];
-        if (p) {
-            if (pack.position !== undefined) {
-                p.position.x = pack.position.x;
-                p.position.y = pack.position.y;
-            }
-            if (pack.hp !== undefined) {
-                p.hp = pack.hp;
-            }
-            if (pack.weapon !== undefined) {
-                p.weapon = pack.weapon;
-            }
-            if (pack.attackMelee !== undefined) {
-                p.attackMelee = pack.attackMelee;
-            }
-            if (pack.burn !== undefined) {
-                p.burn.create = pack.burn;
-            }
-            if (pack.moving !== undefined) {
-                p.moving = pack.moving;
-            }
-            if (pack.aimAngle !== undefined) {
-                p.aimAngle = pack.aimAngle;
-            }
-            if (pack.pressingAttack !== undefined) {
-                console.log("Pressing attack " + pack.pressingAttack);
-                if (p.weapon == "flamethrower" && !p.attackMelee) {
-                    p.flame.create = pack.pressingAttack;
+    if (data.enemy !== undefined) {
+        for (let i = 0, length = data.enemy.length; i < length; i++) {
+            let pack = data.enemy[i];
+            let p = EnemyClient_1.EnemyClient.list[pack.id];
+            if (p) {
+                if (pack.position !== undefined) {
+                    p.position.x = pack.position.x;
+                    p.position.y = pack.position.y;
                 }
-                else {
-                    p.flame.create = false;
+                if (pack.hp !== undefined) {
+                    p.hp = pack.hp;
                 }
-            }
-            if (pack.reload !== undefined) {
-                if (pack.reload) {
-                    p.reload = true;
+                if (pack.weapon !== undefined) {
+                    p.weapon = pack.weapon;
                 }
-                else {
-                    p.reload = false;
+                if (pack.attackMelee !== undefined) {
+                    p.attackMelee = pack.attackMelee;
                 }
-            }
-            if (pack.attackStarted !== undefined) {
-                if (pack.attackStarted) {
-                    if (p.reload)
-                        exports.gameSoundManager.playWeaponReload(p.weapon);
-                    exports.gameSoundManager.playWeaponAttack(p.weapon, p.attackMelee);
-                    p.attackStarted = pack.attackStarted;
-                    p.spriteAnimCounter = 0;
+                if (pack.burn !== undefined) {
+                    p.burn.create = pack.burn;
+                }
+                if (pack.moving !== undefined) {
+                    p.moving = pack.moving;
+                }
+                if (pack.aimAngle !== undefined) {
+                    p.aimAngle = pack.aimAngle;
+                }
+                if (pack.pressingAttack !== undefined) {
+                    console.log("Pressing attack " + pack.pressingAttack);
+                    if (p.weapon == "flamethrower" && !p.attackMelee) {
+                        p.flame.create = pack.pressingAttack;
+                    }
+                    else {
+                        p.flame.create = false;
+                    }
+                }
+                if (pack.reload !== undefined) {
+                    if (pack.reload) {
+                        p.reload = true;
+                    }
+                    else {
+                        p.reload = false;
+                    }
+                }
+                if (pack.attackStarted !== undefined) {
+                    if (pack.attackStarted) {
+                        if (p.reload)
+                            exports.gameSoundManager.playWeaponReload(p.weapon);
+                        exports.gameSoundManager.playWeaponAttack(p.weapon, p.attackMelee);
+                        p.attackStarted = pack.attackStarted;
+                        p.spriteAnimCounter = 0;
+                    }
                 }
             }
         }

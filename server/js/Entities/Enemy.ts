@@ -41,7 +41,7 @@ export class Enemy extends Actor {
 		    diffY = this.playerToKill.position.y - this.position.y;
         }
 
-        if(Math.sqrt(diffX*diffX+diffY*diffY)<800){
+        if(Math.abs(diffX) < 800 && Math.abs(diffY) < 800){
             this.update();
             
                     if(  this.counter % 10 === 0){
@@ -208,7 +208,7 @@ export class Enemy extends Actor {
             this.attackController.weaponCollection.setWeaponAmmo(WeaponType.flamethrower, 200);
                 
             if(Math.random()<0.6){
-                this.inventory.useItem(WeaponType.flamethrower);
+                this.inventory.useItem(WeaponType.pistol);
             } else{
                 if(Math.random()< 0.5){
                     this.inventory.useItem(WeaponType.shotgun);
@@ -221,7 +221,7 @@ export class Enemy extends Actor {
 
     static update = () => {
         let pack: any[] =[];
-        
+        let updPack;
         for(let i in Enemy.list){
             let enemy = Enemy.list[i];
             enemy.extendedUpdate();
@@ -230,7 +230,10 @@ export class Enemy extends Actor {
                 Enemy.randomlyGenerate('forest');
                 removePack.enemy.push(enemy.id);
             } else {
-                pack.push(enemy.getUpdatePack());   
+                updPack = enemy.getUpdatePack();
+                if(updPack !== {}){
+                    pack.push(updPack); 
+                }
             }
         }
         return pack;

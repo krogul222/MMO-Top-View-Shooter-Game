@@ -63,7 +63,7 @@ export class MapController {
 
     static loadMaps = () => {
         console.log("Pierwsza Map");
-        MapController.createMap("forest", 32,20);
+        MapController.createMap("forest", 16,20);
       //  console.log("Druga Map");
      //   MapController.createMap("forest2", 16,20);
     }

@@ -9,6 +9,7 @@ import { Particle } from './server/js/Effects/Particle/Particle';
 import { Flame } from './server/js/Effects/Flame';
 var express = require('express');
 var mongojs = require('mongojs');
+var path = require('path');
 
 var jsonGUI = require('./server/TexturePacks/GUIImages.json');
 var jsonPlayer = require('./server/TexturePacks/PlayerImages.json');
@@ -27,7 +28,7 @@ app.get('/',function(request,response){
 
 app.use('/client', express.static(__dirname+'/client'));
 
-var listener = server.listen(process.env.PORT || 2000, function() {
+var listener = server.listen(process.env.PORT || 3000, function() {
   console.log('Example app listening on port ', listener.address().port);
 });
 

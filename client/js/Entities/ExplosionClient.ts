@@ -40,10 +40,15 @@ export class ExplosionClient {
     }
 
     draw = () => {
-        if(PlayerClient.list[selfId].map !== this.map){
+
+        let p: PlayerClient = PlayerClient.list[selfId];
+        
+        if(p.map !== this.map){
             return;  
         }
-
+        
+        if(p.position.x - this.position.x > WIDTH || p.position.y - this.position.y > HEIGHT ) return;
+                
         let frame = jsonIAE["frames"][this.img+".png"]["frame"];
 
         let frameWidth = frame["w"]/this.animColumns;

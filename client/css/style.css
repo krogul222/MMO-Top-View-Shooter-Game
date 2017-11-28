@@ -1,0 +1,79 @@
+
+body{
+    bgcolor:black;
+}
+
+#top{
+    border-top-color : #a6e145;
+}
+
+#mid{
+   border-top-color : green;  
+}
+
+#dwn1{
+    border-top-color: yellow;
+}
+
+#dwn2{
+    border-top-color: red;
+}
+
+#frstDiv{
+    height:130px;
+    width :290px;
+}
+
+#mainBar{
+	height: 40px;
+	width: 100%;
+	background-color : rgba(0,0,0,0.5);
+	box-shadow: 0 0 15px #558010;
+	border-radius: 10px;
+}
+
+#mainBarUl li {
+	list-style-type: none;
+	display: inline;
+	padding-right: 10px;
+	padding-left: 10px;
+	line-height: 40px;
+}
+
+#mainBarUl li a {
+	text-decoration: none;
+	color: white;
+}
+
+#mainBarUl li a:hover{
+	color: yellow;
+}
+
+#log{
+	float: right;
+	padding-right: 50px;
+}
+
+#reg{
+	float: right;
+	padding-right: 50px;
+}
+
+#frsDivTop{
+    height:100%;
+    width:100%;
+    background-color: black;
+    margin-left: auto ;
+    margin-right: auto ;
+}
+
+#form{
+    width : 300px; 
+    heiight : 300px; 
+    background-color : rgba(0,0,0,0.5); 
+    margin :0 auto; 
+    border-radius : 15px; 
+    box-shadow: 0 0 15px #ffff99; 
+    padding-bottom: 20px; 
+    padding-top: 25px;
+}

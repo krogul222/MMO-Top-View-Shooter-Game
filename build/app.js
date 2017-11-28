@@ -8,6 +8,7 @@ const Enemy_1 = require("./server/js/Entities/Enemy");
 const Particle_1 = require("./server/js/Effects/Particle/Particle");
 var express = require('express');
 var mongojs = require('mongojs');
+var path = require('path');
 var jsonGUI = require('./server/TexturePacks/GUIImages.json');
 var jsonPlayer = require('./server/TexturePacks/PlayerImages.json');
 var jsonMap = require('./server/TexturePacks/MapImages.json');
@@ -20,7 +21,7 @@ app.get('/', function (request, response) {
     response.sendFile(__dirname + '/client/index.html');
 });
 app.use('/client', express.static(__dirname + '/client'));
-var listener = server.listen(process.env.PORT || 2000, function () {
+var listener = server.listen(process.env.PORT || 3000, function () {
     console.log('Example app listening on port ', listener.address().port);
 });
 console.log("Server started.");

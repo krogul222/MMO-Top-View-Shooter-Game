@@ -27,9 +27,12 @@ class PlayerClient {
         this.flame = new FireFlameClient_1.FireFlameClient(this);
         this.burn = new FireFlameClient_1.FireFlameClient(this, true);
         this.draw = () => {
-            if (PlayerClient.list[game_1.selfId].map !== this.map) {
+            let p = PlayerClient.list[game_1.selfId];
+            if (p.map !== this.map) {
                 return;
             }
+            if (p.position.x - this.position.x > WIDTH || p.position.y - this.position.y > HEIGHT)
+                return;
             let spriteRows = 1;
             let spriteColumns = 20;
             let hpWidth = 30 * this.hp / this.hpMax;

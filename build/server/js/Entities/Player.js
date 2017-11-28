@@ -11,6 +11,7 @@ class Player extends Actor_1.Actor {
     constructor(param) {
         super(param);
         this.updatePack = {};
+        this.counter = 0;
         this.giveItems = () => {
             this.inventory.addItem(enums_1.ItemType.knife, 1);
             this.inventory.addItem(enums_1.ItemType.pistol, 1);
@@ -42,6 +43,16 @@ class Player extends Actor_1.Actor {
                 ammoInGun: this.attackController.activeWeapon.ammoInGun,
                 burn: this.lifeAndBodyController.burn
             };
+        };
+        this.extendedUpdate = () => {
+            this.update();
+            this.counter++;
+            if (this.counter % 40) {
+                this.closeEnemiesArr = this.closeEnemies(800);
+            }
+        };
+        this.getCloseEnemies = () => {
+            return this.closeEnemiesArr;
         };
         this.getUpdatePack = () => {
             let attackStartedTmp = this.attackController.attackStarted;
@@ -117,7 +128,7 @@ class Player extends Actor_1.Actor {
             let e;
             for (let i in Enemy_1.Enemy.list) {
                 e = Enemy_1.Enemy.list[i];
-                if (e.getDistance(this) < distance) {
+                if (Math.abs(e.position.x - this.position.x) < distance && Math.abs(e.position.y - this.position.y) < distance) {
                     ids.push(e.id);
                 }
             }
@@ -213,7 +224,7 @@ Player.update = () => {
     let pack = [];
     for (let i in Player.list) {
         let player = Player.list[i];
-        player.update();
+        player.extendedUpdate();
         pack.push(player.getUpdatePack());
     }
     return pack;

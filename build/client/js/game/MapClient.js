@@ -47,8 +47,6 @@ class MapClient {
                         }
                     }
                 }
-                game_1.canvasFilters.getImageFromCanvas();
-                game_1.canvasFilters.bright();
                 for (let i = 0; i < size; i++) {
                     for (let j = 0; j < size; j++) {
                         for (let k = 0; k < this.map.mapTiles[i][j].objects.length; k++) {

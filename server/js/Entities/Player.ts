@@ -13,6 +13,8 @@ import { GameMap } from '../Map/GameMap';
 
 export class Player extends Actor {
     private updatePack = {};
+    private closeEnemiesArr: number[];
+    private counter: number = 0;
 
     constructor(param) { 
         super(param);
@@ -65,6 +67,19 @@ export class Player extends Actor {
             ammoInGun: this.attackController.activeWeapon.ammoInGun,
             burn: this.lifeAndBodyController.burn   
         };
+    }
+
+    extendedUpdate = () => {
+        this.update();
+        this.counter++;
+
+        if(this.counter % 40){
+            this.closeEnemiesArr = this.closeEnemies(800);
+        }
+    }
+
+    getCloseEnemies = () => {
+        return this.closeEnemiesArr;
     }
 
     getUpdatePack = () => {
@@ -224,7 +239,7 @@ export class Player extends Actor {
         let e: Enemy;
         for(let i in Enemy.list){
             e = Enemy.list[i];
-            if(e.getDistance(this) < distance){
+            if(Math.abs(e.position.x - this.position.x) < distance && Math.abs(e.position.y - this.position.y) < distance){
                 ids.push(e.id);
             }
         }
@@ -247,7 +262,7 @@ export class Player extends Actor {
         let pack: any[] =[];
         for(let i in Player.list){
             let player = Player.list[i];
-            player.update();
+            player.extendedUpdate();
             pack.push(player.getUpdatePack());
         }
         return pack;

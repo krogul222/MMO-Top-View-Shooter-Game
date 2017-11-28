@@ -19,17 +19,19 @@ class Bullet extends Entity_1.Entity {
         this.hitEntityId = -1;
         this.update = () => {
             this.updatePosition();
-            if (this.timer++ > 100)
+            if (this.timer++ > 50)
                 this.toRemove = true;
             switch (this.combatType) {
                 case 'player': {
                     let player = Player_1.Player.list[this.parent];
-                    for (let key in Enemy_1.Enemy.list) {
-                        let enemy = Enemy_1.Enemy.list[key];
+                    let closeEnemies = player.getCloseEnemies();
+                    for (let key in closeEnemies) {
+                        let enemy = Enemy_1.Enemy.list[closeEnemies[key]];
                         if (this.testCollision(enemy)) {
                             this.toRemove = true;
                             enemy.lifeAndBodyController.wasHit(player.attackController.getDamage());
                             this.setHitProperties(1, "enemy", enemy.id);
+                            break;
                         }
                     }
                     for (let key in Player_1.Player.list) {

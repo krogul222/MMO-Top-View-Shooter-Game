@@ -9,9 +9,12 @@ class UpgradeClient {
         this.position = new GeometryAndPhysics_1.Point(0, 0);
         this.id = -1;
         this.draw = () => {
-            if (PlayerClient_1.PlayerClient.list[game_1.selfId].map !== this.map) {
+            let p = PlayerClient_1.PlayerClient.list[game_1.selfId];
+            if (p.map !== this.map) {
                 return;
             }
+            if (p.position.x - this.position.x > WIDTH || p.position.y - this.position.y > HEIGHT)
+                return;
             let frame = images_1.jsonIAE["frames"][this.img + ".png"]["frame"];
             let frameWidth = frame["w"];
             let frameHeight = frame["h"];

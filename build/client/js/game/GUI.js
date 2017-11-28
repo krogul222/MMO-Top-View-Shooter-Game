@@ -1,5 +1,4 @@
 Object.defineProperty(exports, "__esModule", { value: true });
-const EnemyClient_1 = require("./../Entities/EnemyClient");
 const PlayerClient_1 = require("./../Entities/PlayerClient");
 const game_1 = require("./game");
 const WeaponTypes_1 = require("../../../server/js/Weapons/WeaponTypes");
@@ -8,6 +7,8 @@ const Constants_1 = require("../../../server/js/Constants");
 const images_1 = require("../images");
 class GUI {
     constructor(param) {
+        this.minimapSize = 64;
+        this.counter = 0;
         this.draw = () => {
             this.ctx.clearRect(0, 0, this.width, this.height);
             let pat = this.ctx.createPattern(images_1.Img["guibackground"], "repeat-x");
@@ -79,12 +80,14 @@ class GUI {
                 this.ctx.drawImage(images_1.Img["GUI"], frame["x"] + facex * frameWidth, frame["y"] + facey * frameHeight, frameWidth, frameHeight, (this.width - 0.8 * this.height) / 2, (this.height - 0.8 * this.height) / 2, 0.8 * this.height, 0.8 * this.height);
             }
         };
-        this.drawMinimap = () => {
+        this.createMinimap = () => {
             let sizeY = game_1.currentMap.map.mapTiles.length;
             let sizeX = game_1.currentMap.map.mapTiles[0].length;
-            let imgSize = 64;
-            var imgData = this.ctx.createImageData(imgSize, imgSize);
-            var data = imgData.data;
+            let imgSize = this.minimapSize;
+            this.minimap = this.ctx.createImageData(imgSize, imgSize);
+            this.minimapEntities = this.ctx.createImageData(imgSize, imgSize);
+            let data = this.minimap.data;
+            let dataEntities = this.minimapEntities.data;
             let ratio = imgSize / game_1.currentMap.map.size;
             let Ra = [];
             let Ga = [];
@@ -99,7 +102,6 @@ class GUI {
             Ba[enums_1.TerrainMaterial.water] = 255;
             Ba[enums_1.TerrainMaterial.stone] = 128;
             let material;
-            let playerPosition = PlayerClient_1.PlayerClient.list[game_1.selfId].position;
             for (let i = 0; i < imgSize; i++) {
                 for (let j = 0; j < imgSize; j++) {
                     material = game_1.currentMap.map.mapTiles[Math.floor(i / ratio)][Math.floor(j / ratio)].material;
@@ -107,26 +109,38 @@ class GUI {
                     data[(j + i * imgSize) * 4 + 1] = Ga[material];
                     data[(j + i * imgSize) * 4 + 2] = Ba[material];
                     data[(j + i * imgSize) * 4 + 3] = 255;
-                    for (let k in EnemyClient_1.EnemyClient.list) {
-                        let enemyPosition = EnemyClient_1.EnemyClient.list[k].position;
-                        if (Math.floor(enemyPosition.x / (Constants_1.TILE_SIZE * 32)) == Math.floor(j / ratio) && Math.floor(enemyPosition.y / (Constants_1.TILE_SIZE * 32)) == Math.floor(i / ratio)) {
-                            data[(j + i * imgSize) * 4] = 0;
-                            data[(j + i * imgSize) * 4 + 1] = 0;
-                            data[(j + i * imgSize) * 4 + 2] = 0;
-                            data[(j + i * imgSize) * 4 + 3] = 255;
-                        }
-                    }
-                    if (Math.floor(playerPosition.x / (Constants_1.TILE_SIZE * 32)) == Math.floor(j / ratio) && Math.floor(playerPosition.y / (Constants_1.TILE_SIZE * 32)) == Math.floor(i / ratio)) {
-                        data[(j + i * imgSize) * 4] = 255;
-                        data[(j + i * imgSize) * 4 + 1] = 0;
-                        data[(j + i * imgSize) * 4 + 2] = 0;
-                        data[(j + i * imgSize) * 4 + 3] = 255;
-                    }
                 }
             }
-            let px = Math.floor(PlayerClient_1.PlayerClient.list[game_1.selfId].position.x / (Constants_1.TILE_SIZE * 32 * sizeX) * imgSize);
-            let py = Math.floor(PlayerClient_1.PlayerClient.list[game_1.selfId].position.y / (Constants_1.TILE_SIZE * 32 * sizeY) * imgSize);
-            this.ctx.putImageData(imgData, 5 * (this.width) / 6, (this.height - imgSize) / 2);
+        };
+        this.updateMinimap = () => {
+            if (this.minimapEntities !== undefined) {
+                let imgSize = this.minimapSize;
+                this.minimapEntities = this.ctx.createImageData(imgSize, imgSize);
+                let playerPosition = PlayerClient_1.PlayerClient.list[game_1.selfId].position;
+                let ratio = imgSize / game_1.currentMap.map.size;
+                let data = this.minimapEntities.data;
+                let j = Math.floor((playerPosition.x / (Constants_1.TILE_SIZE * 32)) * ratio);
+                let i = Math.floor((playerPosition.y / (Constants_1.TILE_SIZE * 32)) * ratio);
+                data[(j + i * imgSize) * 4] = 255;
+                data[(j + i * imgSize) * 4 + 1] = 0;
+                data[(j + i * imgSize) * 4 + 2] = 0;
+                data[(j + i * imgSize) * 4 + 3] = 255;
+                var tempCanvas = document.createElement("canvas");
+                var tempCtx = tempCanvas.getContext("2d");
+                tempCanvas.width = imgSize;
+                tempCanvas.height = imgSize;
+                tempCtx.putImageData(this.minimapEntities, 0, 0);
+                this.minimapEntitiesImg = new Image();
+                this.minimapEntitiesImg.src = tempCanvas.toDataURL();
+            }
+        };
+        this.drawMinimap = () => {
+            if (this.minimap !== undefined) {
+                this.ctx.putImageData(this.minimap, 5 * (this.width) / 6, (this.height - this.minimapSize) / 2);
+            }
+            if (this.minimapEntitiesImg !== undefined) {
+                this.ctx.drawImage(this.minimapEntitiesImg, 5 * (this.width) / 6, (this.height - this.minimapSize) / 2);
+            }
         };
         if (param.ctx !== undefined)
             this.ctx = param.ctx;

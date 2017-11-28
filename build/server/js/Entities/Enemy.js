@@ -20,7 +20,7 @@ class Enemy extends Actor_1.Actor {
                 diffX = this.playerToKill.position.x - this.position.x;
                 diffY = this.playerToKill.position.y - this.position.y;
             }
-            if (Math.sqrt(diffX * diffX + diffY * diffY) < 800) {
+            if (Math.abs(diffX) < 800 && Math.abs(diffY) < 800) {
                 this.update();
                 if (this.counter % 10 === 0) {
                     this.updateAim(this.playerToKill, diffX, diffY);
@@ -142,7 +142,7 @@ class Enemy extends Actor_1.Actor {
                 this.attackController.weaponCollection.setWeaponAmmo(enums_1.WeaponType.rifle, 5);
                 this.attackController.weaponCollection.setWeaponAmmo(enums_1.WeaponType.flamethrower, 200);
                 if (Math.random() < 0.6) {
-                    this.inventory.useItem(enums_1.WeaponType.flamethrower);
+                    this.inventory.useItem(enums_1.WeaponType.pistol);
                 }
                 else {
                     if (Math.random() < 0.5) {
@@ -165,6 +165,7 @@ class Enemy extends Actor_1.Actor {
 Enemy.globalMapControler = new MapControler_1.MapController(null);
 Enemy.update = () => {
     let pack = [];
+    let updPack;
     for (let i in Enemy.list) {
         let enemy = Enemy.list[i];
         enemy.extendedUpdate();
@@ -174,7 +175,10 @@ Enemy.update = () => {
             globalVariables_1.removePack.enemy.push(enemy.id);
         }
         else {
-            pack.push(enemy.getUpdatePack());
+            updPack = enemy.getUpdatePack();
+            if (updPack !== {}) {
+                pack.push(updPack);
+            }
         }
     }
     return pack;

@@ -1,9 +1,45 @@
-<body style = "margin:0px">
+<head>
+        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-alpha.6/css/bootstrap.min.css" integrity="sha384-rwoIResjU2yc3z8GV/NPeZWAv56rSmLldC3R/AZzGRnGxQQKnKkoFVhFQhNUwEyJ" crossorigin="anonymous">
+        <link rel="stylesheet" type="text/css" href="client/css/style.css">
+        <script src="https://code.jquery.com/jquery-3.1.1.slim.min.js" integrity="sha384-A7FZj7v+d/sdmMqp/nOQwliLvUsJfDHW+k9Omg/a/EheAdgtzNs3hpfag6Ed950n" crossorigin="anonymous"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/tether/1.4.0/js/tether.min.js" integrity="sha384-DztdAPBWPRXSA/3eYEEUWrWCy7G5KFbe8fFjk5JAIxUYHKkDx6Qin1DkWx51bBrb" crossorigin="anonymous"></script>
+        <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-alpha.6/js/bootstrap.min.js" integrity="sha384-vBWWzlZJ8ea9aCX4pEW3rVHjgjt7zpkNpZk+02D9phzyeVkE+jo0ieGizqPLForn" crossorigin="anonymous"></script>
+</head>
+
+<body>
     <div id ="signDiv">
-        Username: <input id = "signDiv-username" type = "text"> <br>
+
+        <div id="mainBar">
+                    <ul id="mainBarUl">
+                        <li><a href="#">Home</a></li>
+                        <li><a href="#" id="ab">About Us</a></li>
+                        <li><a href="#">Contact Us</a></li>
+                        <li><a href="#" id="log">Login</a></li>
+                        <li><a href="#" id="reg" data-toggle="modal" data-target="#myModal">Register</a></li>
+                    </ul>
+        </div>
+
+        <div align="center">
+    		    <br/><br/>
+    		    <div id="form" style=" ">
+    				<form action="" method="" autocomplete="off">
+    					<h2 style="color : white; font-family:Calligrapher;">Brykiet</h2><br>
+    					<input type="text" id="signDiv-username" placeholder="Login" autofocus="autofocus" style="border-radius : 10px; padding : 5px" >
+    					<br/><br/>
+    					<input type="password" id="signDiv-password" placeholder="Password" style="border-radius : 10px;padding : 5px" ><br><br>
+    					<!-- <a href="#"><button class="btn btn-primary"><strong>Login</strong></button></a> -->
+    					<input type="submit" id="signDiv-signIn" value="Login" class="btn btn-primary">
+    				</form><br/><br/>
+    				
+    				<p align="center"><a href="#" style="color:white;">Forgot your Password?</a></p>
+    				
+    			</div>
+    		</div>
+
+    <!--    Username: <input id = "signDiv-username" type = "text"> <br>
         Password: <input id = "signDiv-password" type = "password"> <br>
         <button id = "signDiv-signIn">Sign In</button>
-        <button id = "signDiv-signUp">Sign Up</button>
+        <button id = "signDiv-signUp">Sign Up</button> -->
     </div>
 
     <div id="gameDiv" style="display:none;">

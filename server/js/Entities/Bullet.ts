@@ -46,17 +46,29 @@ export class Bullet extends Entity{
  
     update = () => {
         this.updatePosition();
-        if(this.timer++ > 100) this.toRemove = true;
+        if(this.timer++ > 50) this.toRemove = true;
         switch(this.combatType){
             case 'player': {   //bullet was shot by player
                 let player: Player= Player.list[this.parent];
-
+                let closeEnemies = player.getCloseEnemies();
+                /*
                 for(let key in Enemy.list){          // check if enemy was hit
                     let enemy: Enemy = Enemy.list[key]; 
                     if(this.testCollision(enemy)){
                         this.toRemove = true;
                         enemy.lifeAndBodyController.wasHit(player.attackController.getDamage());
                         this.setHitProperties(1, "enemy", enemy.id);
+                    }
+                }
+*/
+
+                for(let key in closeEnemies){          // check if enemy was hit
+                    let enemy: Enemy = Enemy.list[closeEnemies[key]]; 
+                    if(this.testCollision(enemy)){
+                        this.toRemove = true;
+                        enemy.lifeAndBodyController.wasHit(player.attackController.getDamage());
+                        this.setHitProperties(1, "enemy", enemy.id);
+                        break;
                     }
                 }
 
