@@ -2,6 +2,8 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.Img = {};
 let gameDiv = document.getElementById("gameDiv");
 let loadingDiv = document.getElementById("loadingDiv");
+let loadingProgressDiv = document.getElementById("loadingProgressDiv");
+let loadingProgressPercent = document.getElementById("loadingProgressPercent");
 exports.Img.map = {};
 exports.Img.guibackground = new Image();
 exports.Img.guibackground.src = '/client/img/guibackground.jpg';
@@ -44,6 +46,8 @@ exports.Img.GUI.onload = function () {
 function imgLoaded() {
     imagesLoaded++;
     console.log("Img loaded " + imagesLoaded);
+    loadingProgressDiv.style.width = (imagesLoaded / ALL_IMAGES) * 100 + '%';
+    loadingProgressPercent.textContent = Math.round((imagesLoaded / ALL_IMAGES) * 100) + '%';
     if (imagesLoaded == ALL_IMAGES) {
         gameDiv.style.display = 'inline-block';
         loadingDiv.style.display = 'none';

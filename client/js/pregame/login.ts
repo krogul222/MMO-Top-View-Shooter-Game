@@ -24,7 +24,7 @@ socket.on('signInResponse', function(data){
     if(data.success){
         signDiv.style.display = 'none';
         if(imagesLoaded !== ALL_IMAGES){
-            loadingDiv.style.display = 'inline-block';
+            loadingDiv.style.display = 'inline';
         } else{
             socket.emit('joinedGame');
         }

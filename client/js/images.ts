@@ -11,7 +11,8 @@ declare var ALL_IMAGES;
 
 let gameDiv = (<HTMLInputElement>document.getElementById("gameDiv"));
 let loadingDiv = (<HTMLInputElement>document.getElementById("loadingDiv"));
-
+let loadingProgressDiv = (<HTMLInputElement>document.getElementById("loadingProgressDiv"));
+let loadingProgressPercent = (<HTMLInputElement>document.getElementById("loadingProgressPercent"));
 Img.map = {}
 
 Img.guibackground = new Image();
@@ -65,6 +66,8 @@ Img.GUI.onload = function(){
 function imgLoaded() {
     imagesLoaded++; 
     console.log("Img loaded "+ imagesLoaded);
+    loadingProgressDiv.style.width = (imagesLoaded/ALL_IMAGES)*100 + '%';
+    loadingProgressPercent.textContent = Math.round((imagesLoaded/ALL_IMAGES)*100) + '%';
     if(imagesLoaded == ALL_IMAGES) {
         gameDiv.style.display = 'inline-block';
         loadingDiv.style.display = 'none';

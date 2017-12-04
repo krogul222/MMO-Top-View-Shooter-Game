@@ -40,8 +40,17 @@
         <button id = "signDiv-signUp">Sign Up</button> -->
     </div>
 
-    <div id="loadingDiv" style="display:none;">
-        <h2 style="color : white; font-family:Calligrapher;">Loading</h2><br>
+    <div align="center" id="loadingDiv" style="display:none">
+        <br><br>
+        <h2 style="color : white; font-family:Calligrapher;text-align:center">Loading</h2><br>
+        <div class="container">
+            <div class="progress">
+                <div id="loadingProgressDiv" class="progress-bar progress-bar-striped active" role="progressbar" aria-valuenow="0"
+                aria-valuemin="0" aria-valuemax="100" style="width:0%">
+                    <span id = "loadingProgressPercent">0%</span>
+                </div>
+            </div>
+        </div>
     </div>
 
     <div id="gameDiv" style="display:none;">
