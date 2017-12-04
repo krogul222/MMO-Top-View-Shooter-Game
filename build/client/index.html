@@ -40,6 +40,10 @@
         <button id = "signDiv-signUp">Sign Up</button> -->
     </div>
 
+    <div id="loadingDiv" style="display:none;">
+        <h2 style="color : white; font-family:Calligrapher;">Loading</h2><br>
+    </div>
+
     <div id="gameDiv" style="display:none;">
         <canvas id="canvas" width=500 height="500" style="border:1px solid #000000;cursor:crosshair"></canvas>
         <canvas id="canvasui" width=500 height="100" style="border:1px solid #000000;cursor:crosshair"></canvas>
@@ -57,7 +61,9 @@
 <script src='/client/js/pregame/jquery-3.2.1.min.js'></script>
 <script src="/client/js/sound/soundmanager.js"></script>
 <script>
-    var socket = io();   
+    var socket = io();  
+    var imagesLoaded = 0;
+    var ALL_IMAGES = 6; 
     var WIDTH = 500;
     var HEIGHT = 500;
     var HEIGHTUI = 100;
@@ -69,7 +75,7 @@
     const TILE_SIZE = 32;
 </script>
 
-<script src="/client/js/pregame/login.js"></script>
+<script src="/client/js/d.entry.js"></script>
 <script src="/client/js/pregame/chat.js"></script>
 
 <script>

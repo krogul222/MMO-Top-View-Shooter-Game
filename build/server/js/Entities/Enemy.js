@@ -158,6 +158,7 @@ class Enemy extends Actor_1.Actor {
         if (param.kind)
             this.kind = param.kind;
         this.attackController.pressingAttack = true;
+        this.attackController.accuracy = 15;
         this.giveWeapons();
         globalVariables_1.initPack.enemy.push(this.getInitPack());
     }

@@ -14,6 +14,7 @@ class AttackController {
         this._reloadCounter = new Counter_1.Counter(50);
         this._attackCounter = new Counter_1.Counter(25);
         this._pressingAttack = false;
+        this._accuracy = 0;
         this.update = () => {
             this._reloadCounter.setInc(this._activeWeapon.reloadSpd);
             this._attackCounter.setInc(this._activeWeapon.attackSpd);
@@ -56,10 +57,11 @@ class AttackController {
         this.distanceAttack = () => {
             if (this._activeWeapon.shoot(1)) {
                 let shootSpeed = this._activeWeapon.shootSpeed;
-                let aimAngle = this.parent.movementController.aimAngle;
+                let accuracy = (Math.random() - 0.5) * this._accuracy;
+                let aimAngle = this.parent.movementController.aimAngle + accuracy;
                 let attackRadius = this._activeWeapon.attackRadius;
                 if (this._activeWeapon.attackType == enums_1.AttackType.bullet) {
-                    this.shootBullet(this.parent.movementController.aimAngle, shootSpeed);
+                    this.shootBullet(aimAngle, shootSpeed);
                     for (let i = 0; i < attackRadius; i++) {
                         this.shootBullet(aimAngle + (i + 1) * 2, shootSpeed);
                         this.shootBullet(aimAngle - (i + 1) * 2, shootSpeed);
@@ -120,6 +122,7 @@ class AttackController {
     get attackStarted() { return this._attackStarted; }
     set pressingAttack(value) { this._pressingAttack = value; }
     set attackStarted(value) { this._attackStarted = value; }
+    set accuracy(value) { this._accuracy = value; }
 }
 exports.AttackController = AttackController;
 //# sourceMappingURL=AttackControler.js.map

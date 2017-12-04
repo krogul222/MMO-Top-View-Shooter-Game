@@ -23,6 +23,7 @@ export class Enemy extends Actor {
         Enemy.list[param.id] = this;
         if(param.kind) this.kind = param.kind;
         this.attackController.pressingAttack = true;
+        this.attackController.accuracy = 15;
 
         this.giveWeapons();
         initPack.enemy.push(this.getInitPack());
@@ -174,20 +175,6 @@ export class Enemy extends Actor {
         }
 
         return newPack;
-        /*
-        return {
-           id: this.id,
-           position: this.position,
-           hp: this.lifeAndBodyController.hp,
-           moving: this.movementController.moving,
-           aimAngle: this.movementController.aimAngle,
-           attackStarted: attackStartedTmp,
-           weapon: this.attackController.activeWeapon.name,
-           attackMelee: this.attackController.melee,
-           reload: this.attackController.reloadCounter.isActive(),
-           pressingAttack: this.attackController.pressingAttack,
-           burn: this.lifeAndBodyController.burn
-        };*/
     }   
 
     giveWeapons = () => {

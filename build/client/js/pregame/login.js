@@ -1,4 +1,5 @@
 let signDiv = document.getElementById("signDiv");
+let loadingDiv = document.getElementById("loadingDiv");
 let signDivUsername = document.getElementById("signDiv-username");
 let signDivPassword = document.getElementById("signDiv-password");
 let signDivSignIn = document.getElementById("signDiv-signIn");
@@ -9,7 +10,9 @@ signDivSignIn.onclick = function () {
 socket.on('signInResponse', function (data) {
     if (data.success) {
         signDiv.style.display = 'none';
-        gameDiv.style.display = 'inline-block';
+        if (imagesLoaded == ALL_IMAGES) {
+            loadingDiv.style.display = 'inline-block';
+        }
     }
     else {
         alert("Sign in unsuccessful.");

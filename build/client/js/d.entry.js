@@ -60,65 +60,42 @@
 /******/ 	__webpack_require__.p = "/build/client/js";
 /******/
 /******/ 	// Load entry module and return exports
-/******/ 	return __webpack_require__(__webpack_require__.s = 4);
+/******/ 	return __webpack_require__(__webpack_require__.s = 49);
 /******/ })
 /************************************************************************/
 /******/ ({
 
-/***/ 4:
+/***/ 49:
 /***/ (function(module, exports) {
 
-Object.defineProperty(exports, "__esModule", { value: true });
-exports.Img = {};
-let gameDiv = document.getElementById("gameDiv");
+let signDiv = document.getElementById("signDiv");
 let loadingDiv = document.getElementById("loadingDiv");
-exports.Img.map = {};
-exports.Img.guibackground = new Image();
-exports.Img.guibackground.src = '/client/img/guibackground.jpg';
-exports.Img.guibackground.onload = function () {
-    imgLoaded();
+let signDivUsername = document.getElementById("signDiv-username");
+let signDivPassword = document.getElementById("signDiv-password");
+let signDivSignIn = document.getElementById("signDiv-signIn");
+let signDivSignUp = document.getElementById("signDiv-signUp");
+signDivSignIn.onclick = function () {
+    socket.emit('signIn', { username: signDivUsername.value, password: signDivPassword.value });
 };
-exports.Img.smoke = new Image();
-exports.Img.smoke.src = '/client/img/smoke.png';
-exports.Img.smoke.onload = function () {
-    imgLoaded();
-};
-socket.on('jsonImages', function (data) {
-    console.log(data.jsonGUI);
-    console.log(data.jsonPlayer);
-    exports.jsonPlayer = data.jsonPlayer;
-    exports.jsonGUI = data.jsonGUI;
-    exports.jsonIAE = data.jsonIAE;
-    exports.jsonMap = data.jsonMap;
-});
-exports.Img.Player = new Image();
-exports.Img.Player.src = '/client/TexturePacks/PlayerImages.png';
-exports.Img.Player.onload = function () {
-    imgLoaded();
-};
-exports.Img.Map = new Image();
-exports.Img.Map.src = '/client/TexturePacks/MapImages.png';
-exports.Img.Map.onload = function () {
-    imgLoaded();
-};
-exports.Img.IAE = new Image();
-exports.Img.IAE.src = '/client/TexturePacks/ItemsAndEnemiesImages.png';
-exports.Img.IAE.onload = function () {
-    imgLoaded();
-};
-exports.Img.GUI = new Image();
-exports.Img.GUI.src = '/client/TexturePacks/GUIImages.png';
-exports.Img.GUI.onload = function () {
-    imgLoaded();
-};
-function imgLoaded() {
-    imagesLoaded++;
-    console.log("Img loaded " + imagesLoaded);
-    if (imagesLoaded == ALL_IMAGES) {
-        gameDiv.style.display = 'inline-block';
-        loadingDiv.style.display = 'none';
+socket.on('signInResponse', function (data) {
+    if (data.success) {
+        signDiv.style.display = 'none';
+        if (imagesLoaded !== ALL_IMAGES) {
+            loadingDiv.style.display = 'inline-block';
+        }
     }
-}
+    else {
+        alert("Sign in unsuccessful.");
+    }
+});
+socket.on('signUpResponse', function (data) {
+    if (data.success) {
+        alert("Sign in successful.");
+    }
+    else {
+        alert("Sign in unsuccessful.");
+    }
+});
 
 
 /***/ })

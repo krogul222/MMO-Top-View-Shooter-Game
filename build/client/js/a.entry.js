@@ -713,11 +713,19 @@ window.addEventListener('resize', function () {
 
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.Img = {};
+let gameDiv = document.getElementById("gameDiv");
+let loadingDiv = document.getElementById("loadingDiv");
 exports.Img.map = {};
 exports.Img.guibackground = new Image();
 exports.Img.guibackground.src = '/client/img/guibackground.jpg';
+exports.Img.guibackground.onload = function () {
+    imgLoaded();
+};
 exports.Img.smoke = new Image();
 exports.Img.smoke.src = '/client/img/smoke.png';
+exports.Img.smoke.onload = function () {
+    imgLoaded();
+};
 socket.on('jsonImages', function (data) {
     console.log(data.jsonGUI);
     console.log(data.jsonPlayer);
@@ -728,12 +736,32 @@ socket.on('jsonImages', function (data) {
 });
 exports.Img.Player = new Image();
 exports.Img.Player.src = '/client/TexturePacks/PlayerImages.png';
+exports.Img.Player.onload = function () {
+    imgLoaded();
+};
 exports.Img.Map = new Image();
 exports.Img.Map.src = '/client/TexturePacks/MapImages.png';
+exports.Img.Map.onload = function () {
+    imgLoaded();
+};
 exports.Img.IAE = new Image();
 exports.Img.IAE.src = '/client/TexturePacks/ItemsAndEnemiesImages.png';
+exports.Img.IAE.onload = function () {
+    imgLoaded();
+};
 exports.Img.GUI = new Image();
 exports.Img.GUI.src = '/client/TexturePacks/GUIImages.png';
+exports.Img.GUI.onload = function () {
+    imgLoaded();
+};
+function imgLoaded() {
+    imagesLoaded++;
+    console.log("Img loaded " + imagesLoaded);
+    if (imagesLoaded == ALL_IMAGES) {
+        gameDiv.style.display = 'inline-block';
+        loadingDiv.style.display = 'none';
+    }
+}
 
 
 /***/ }),
@@ -1585,6 +1613,7 @@ class Enemy extends Actor_1.Actor {
         if (param.kind)
             this.kind = param.kind;
         this.attackController.pressingAttack = true;
+        this.attackController.accuracy = 15;
         this.giveWeapons();
         globalVariables_1.initPack.enemy.push(this.getInitPack());
     }
@@ -3626,6 +3655,7 @@ class AttackController {
         this._reloadCounter = new Counter_1.Counter(50);
         this._attackCounter = new Counter_1.Counter(25);
         this._pressingAttack = false;
+        this._accuracy = 0;
         this.update = () => {
             this._reloadCounter.setInc(this._activeWeapon.reloadSpd);
             this._attackCounter.setInc(this._activeWeapon.attackSpd);
@@ -3668,10 +3698,11 @@ class AttackController {
         this.distanceAttack = () => {
             if (this._activeWeapon.shoot(1)) {
                 let shootSpeed = this._activeWeapon.shootSpeed;
-                let aimAngle = this.parent.movementController.aimAngle;
+                let accuracy = (Math.random() - 0.5) * this._accuracy;
+                let aimAngle = this.parent.movementController.aimAngle + accuracy;
                 let attackRadius = this._activeWeapon.attackRadius;
                 if (this._activeWeapon.attackType == enums_1.AttackType.bullet) {
-                    this.shootBullet(this.parent.movementController.aimAngle, shootSpeed);
+                    this.shootBullet(aimAngle, shootSpeed);
                     for (let i = 0; i < attackRadius; i++) {
                         this.shootBullet(aimAngle + (i + 1) * 2, shootSpeed);
                         this.shootBullet(aimAngle - (i + 1) * 2, shootSpeed);
@@ -3732,6 +3763,7 @@ class AttackController {
     get attackStarted() { return this._attackStarted; }
     set pressingAttack(value) { this._pressingAttack = value; }
     set attackStarted(value) { this._attackStarted = value; }
+    set accuracy(value) { this._accuracy = value; }
 }
 exports.AttackController = AttackController;
 

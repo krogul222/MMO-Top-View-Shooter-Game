@@ -19,6 +19,7 @@ export class AttackController {
     private _weaponCollection: WeaponCollection;
     private _pressingAttack: boolean = false;
     private _flame: Flame;
+    private _accuracy: number = 0;
 
     constructor (private parent: Actor, param) {
         this._weaponCollection = new WeaponCollection(this.parent);
@@ -81,11 +82,13 @@ export class AttackController {
     distanceAttack = () => {
         if(this._activeWeapon.shoot(1)){
             let shootSpeed = this._activeWeapon.shootSpeed;
-            let aimAngle = this.parent.movementController.aimAngle;
+            let accuracy = (Math.random()-0.5)*this._accuracy;
+            let aimAngle = this.parent.movementController.aimAngle+accuracy;
             let attackRadius = this._activeWeapon.attackRadius;
 
             if(this._activeWeapon.attackType == AttackType.bullet){
-                this.shootBullet(this.parent.movementController.aimAngle, shootSpeed);
+
+                this.shootBullet(aimAngle, shootSpeed);
                 
                             for(let i = 0; i < attackRadius; i++){
                                 this.shootBullet(aimAngle+(i+1)*2, shootSpeed);
@@ -151,5 +154,7 @@ export class AttackController {
 
     set pressingAttack(value: boolean) { this._pressingAttack = value; }
     set attackStarted(value: boolean) { this._attackStarted = value; }
+
+    set accuracy(value: number) { this._accuracy = value; }
 
 }
