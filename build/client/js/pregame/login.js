@@ -25,7 +25,8 @@ socket.on('signInResponse', function (data) {
     if (data.success) {
         signDiv.style.display = 'none';
         gameMenuDiv.style.display = 'inline-block';
-        gameMenuDivContainer.style.display = 'inline';
+        gameMenuDivContainer.style.display = 'block';
+        gameMenuDivContainer.style.margin = 'auto';
     }
     else {
         alert("Sign in unsuccessful.");
