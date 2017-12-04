@@ -74,19 +74,29 @@ let signDivUsername = document.getElementById("signDiv-username");
 let signDivPassword = document.getElementById("signDiv-password");
 let signDivSignIn = document.getElementById("signDiv-signIn");
 let signDivSignUp = document.getElementById("signDiv-signUp");
+let gameMenuDiv = document.getElementById("gameMenuDiv");
+let quickGame = document.getElementById("quickGame");
+let gameMenuDivContainer = document.getElementById("gameMenuDivContainer");
 signDivSignIn.onclick = function () {
     socket.emit('signIn', { username: signDivUsername.value, password: signDivPassword.value });
+};
+quickGame.onclick = function () {
+    canJoinGame = true;
+    gameMenuDiv.style.display = 'none';
+    gameMenuDivContainer.style.display = 'none';
+    if (imagesLoaded !== ALL_IMAGES) {
+        loadingDiv.style.display = 'inline';
+    }
+    else {
+        socket.emit('joinedGame');
+    }
 };
 socket.on('signInResponse', function (data) {
     if (data.success) {
         signDiv.style.display = 'none';
-        if (imagesLoaded !== ALL_IMAGES) {
-            loadingDiv.style.display = 'inline';
-        }
-        else {
-            socket.emit('joinedGame');
-        }
-        signedIn = true;
+        gameMenuDiv.style.display = 'inline-block';
+        gameMenuDivContainer.style.display = 'block';
+        gameMenuDivContainer.style.margin = 'auto';
     }
     else {
         alert("Sign in unsuccessful.");

@@ -77,3 +77,13 @@ body{
     padding-bottom: 20px; 
     padding-top: 25px;
 }
+
+.box{
+    width : 300px; 
+    background-color : rgba(0,0,0,0.5); 
+    margin :0 auto; 
+    border-radius : 15px; 
+    box-shadow: 0 0 15px #ffff99; 
+    padding-bottom: 20px; 
+    padding-top: 25px;
+}

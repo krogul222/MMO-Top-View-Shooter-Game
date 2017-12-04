@@ -4,16 +4,28 @@ let signDivUsername = (<HTMLInputElement>document.getElementById("signDiv-userna
 let signDivPassword = (<HTMLInputElement>document.getElementById("signDiv-password"));
 let signDivSignIn = (<HTMLInputElement>document.getElementById("signDiv-signIn"));
 let signDivSignUp = (<HTMLInputElement>document.getElementById("signDiv-signUp"));
-
+let gameMenuDiv = (<HTMLInputElement>document.getElementById("gameMenuDiv"));
+let quickGame =  (<HTMLInputElement>document.getElementById("quickGame"));
+let gameMenuDivContainer =  (<HTMLInputElement>document.getElementById("gameMenuDivContainer"));
 declare var socket: any;
 declare var gameDiv: any;
-
+declare var canJoinGame;
 declare var imagesLoaded;
 declare var ALL_IMAGES;
-declare var signedIn;
 
 signDivSignIn.onclick = function(){
     socket.emit('signIn', {username:signDivUsername.value, password: signDivPassword.value});
+}
+
+quickGame.onclick = function(){
+        canJoinGame = true;
+        gameMenuDiv.style.display = 'none';
+        gameMenuDivContainer.style.display = 'none';
+        if(imagesLoaded !== ALL_IMAGES){
+            loadingDiv.style.display = 'inline';
+        } else{
+            socket.emit('joinedGame');
+        }
 }
 /*
 signDivSignUp.onclick = function(){
@@ -23,12 +35,15 @@ signDivSignUp.onclick = function(){
 socket.on('signInResponse', function(data){
     if(data.success){
         signDiv.style.display = 'none';
-        if(imagesLoaded !== ALL_IMAGES){
+        gameMenuDiv.style.display = 'inline-block';
+        gameMenuDivContainer.style.display = 'block';
+        gameMenuDivContainer.style.margin = 'auto';
+  /*      if(imagesLoaded !== ALL_IMAGES){
             loadingDiv.style.display = 'inline';
         } else{
             socket.emit('joinedGame');
-        }
-        signedIn = true;
+        }*/
+
         //gameDiv.style.display = 'inline-block';
     } else {
         alert("Sign in unsuccessful.");

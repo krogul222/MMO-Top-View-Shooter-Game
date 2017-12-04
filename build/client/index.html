@@ -32,7 +32,23 @@
     				<p align="center"><a href="#" style="color:white;">Forgot your Password?</a></p>
     				
     			</div>
-    	</div>
+        </div>
+        
+</div>
+<div align="center" id="gameMenuDivContainer" class="container text-center" style="display:none">
+    <br/><br/>
+    <div align="center" class="box" id="gameMenuDiv" style="display:none">
+            <h2 style="color : white; font-family:Calligrapher;">Brykiet</h2><br>
+
+            <!-- <a href="#"><button class="btn btn-primary"><strong>Login</strong></button></a> -->
+            <button id = "createGame" class="btn btn-danger">Create Game</button><br><br>
+            <button id = "joinGame" class="btn btn-danger">Join Game</button>
+            <br><br><br>
+        <!-- <input type="submit" id="signDiv-signIn" value="Login" class="btn btn-primary"> -->
+        <button id = "quickGame" class="btn btn-primary">Quick Game</button>
+        <br/><br/>
+    </div>
+</div>
 <!--
         Username: <input id = "signDiv-username" type = "text"> <br>
         Password: <input id = "signDiv-password" type = "password"> <br>
@@ -80,7 +96,7 @@
     var mouseY = 0;
     var mouseWheelCount = 0;
     var mouseWheelTrigger = 2;
-    var signedIn = false;
+    var canJoinGame = false;
     const CAMERA_BOX_ADJUSTMENT = 4;
     const TILE_SIZE = 32;
 </script>
