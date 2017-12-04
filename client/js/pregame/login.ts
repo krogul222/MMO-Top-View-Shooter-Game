@@ -6,6 +6,7 @@ let signDivSignIn = (<HTMLInputElement>document.getElementById("signDiv-signIn")
 let signDivSignUp = (<HTMLInputElement>document.getElementById("signDiv-signUp"));
 let gameMenuDiv = (<HTMLInputElement>document.getElementById("gameMenuDiv"));
 let quickGame =  (<HTMLInputElement>document.getElementById("quickGame"));
+let mainBar =   (<HTMLInputElement>document.getElementById("mainBar"));
 let gameMenuDivContainer =  (<HTMLInputElement>document.getElementById("gameMenuDivContainer"));
 declare var socket: any;
 declare var gameDiv: any;
@@ -21,6 +22,7 @@ quickGame.onclick = function(){
         canJoinGame = true;
         gameMenuDiv.style.display = 'none';
         gameMenuDivContainer.style.display = 'none';
+        mainBar.style.display = 'none';
         if(imagesLoaded !== ALL_IMAGES){
             loadingDiv.style.display = 'inline';
         } else{

@@ -76,6 +76,7 @@ let signDivSignIn = document.getElementById("signDiv-signIn");
 let signDivSignUp = document.getElementById("signDiv-signUp");
 let gameMenuDiv = document.getElementById("gameMenuDiv");
 let quickGame = document.getElementById("quickGame");
+let mainBar = document.getElementById("mainBar");
 let gameMenuDivContainer = document.getElementById("gameMenuDivContainer");
 signDivSignIn.onclick = function () {
     socket.emit('signIn', { username: signDivUsername.value, password: signDivPassword.value });
@@ -84,6 +85,7 @@ quickGame.onclick = function () {
     canJoinGame = true;
     gameMenuDiv.style.display = 'none';
     gameMenuDivContainer.style.display = 'none';
+    mainBar.style.display = 'none';
     if (imagesLoaded !== ALL_IMAGES) {
         loadingDiv.style.display = 'inline';
     }
