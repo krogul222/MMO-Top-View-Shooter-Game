@@ -760,6 +760,8 @@ function imgLoaded() {
     if (imagesLoaded == ALL_IMAGES) {
         gameDiv.style.display = 'inline-block';
         loadingDiv.style.display = 'none';
+        if (signedIn)
+            socket.emit('joinedGame');
     }
 }
 

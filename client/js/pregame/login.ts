@@ -10,6 +10,7 @@ declare var gameDiv: any;
 
 declare var imagesLoaded;
 declare var ALL_IMAGES;
+declare var signedIn;
 
 signDivSignIn.onclick = function(){
     socket.emit('signIn', {username:signDivUsername.value, password: signDivPassword.value});
@@ -24,8 +25,10 @@ socket.on('signInResponse', function(data){
         signDiv.style.display = 'none';
         if(imagesLoaded !== ALL_IMAGES){
             loadingDiv.style.display = 'inline-block';
+        } else{
+            socket.emit('joinedGame');
         }
-
+        signedIn = true;
         //gameDiv.style.display = 'inline-block';
     } else {
         alert("Sign in unsuccessful.");

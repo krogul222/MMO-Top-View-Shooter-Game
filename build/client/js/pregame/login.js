@@ -10,9 +10,13 @@ signDivSignIn.onclick = function () {
 socket.on('signInResponse', function (data) {
     if (data.success) {
         signDiv.style.display = 'none';
-        if (imagesLoaded == ALL_IMAGES) {
+        if (imagesLoaded !== ALL_IMAGES) {
             loadingDiv.style.display = 'inline-block';
         }
+        else {
+            socket.emit('joinedGame');
+        }
+        signedIn = true;
     }
     else {
         alert("Sign in unsuccessful.");

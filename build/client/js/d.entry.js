@@ -83,6 +83,10 @@ socket.on('signInResponse', function (data) {
         if (imagesLoaded !== ALL_IMAGES) {
             loadingDiv.style.display = 'inline-block';
         }
+        else {
+            socket.emit('joinedGame');
+        }
+        signedIn = true;
     }
     else {
         alert("Sign in unsuccessful.");

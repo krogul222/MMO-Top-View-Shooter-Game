@@ -3,6 +3,7 @@ export var jsonGUI;
 export var jsonIAE; 
 export var jsonMap; 
 declare var socket;
+declare var signedIn;
 export var Img: any = {};
 
 declare var imagesLoaded;
@@ -67,6 +68,7 @@ function imgLoaded() {
     if(imagesLoaded == ALL_IMAGES) {
         gameDiv.style.display = 'inline-block';
         loadingDiv.style.display = 'none';
+        if(signedIn) socket.emit('joinedGame');
     }
 }
 
