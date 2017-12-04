@@ -72,13 +72,16 @@ io.sockets.on('connection', function(socket){
     socket.on('signIn',function(data){
         isValidPassword(data, function(res){
             if(res){
-                Player.onConnect(socket);
                 socket.emit('signInResponse',{success: true});
            } else{
                 socket.emit('signInResponse',{success: false});
            }
         });
     });   
+
+    socket.on('joinedGame',function(data){
+        Player.onConnect(socket);
+    });
     
     socket.on('signUp',function(data){
         isUsernameTaken(data, function(res){
