@@ -52,7 +52,7 @@ export class Upgrade extends Entity{
     static update = () => {
         let pack: any = [];
         
-        if(frameCount % 750 === 0) Upgrade.randomlyGenerate('forest'); //every 10 sec
+        if(frameCount % 200 === 0) Upgrade.randomlyGenerate('forest'); //every 10 sec
 
         for(let key in Upgrade.list){
             let upgrade: Upgrade = Upgrade.list[key];

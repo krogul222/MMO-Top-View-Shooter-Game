@@ -949,6 +949,7 @@ exports.imageName[enums_1.ItemType.shotgun] = "shotgun";
 exports.imageName[enums_1.ItemType.rifle] = "rifle";
 exports.imageName[enums_1.ItemType.medicalkit] = "medicalkit";
 exports.imageName[enums_1.ItemType.knife] = "knife";
+exports.imageName[enums_1.ItemType.flamethrower] = "flamethrower";
 exports.imageName[enums_1.WeaponAmmoType.pistol] = "pistolammo";
 exports.imageName[enums_1.WeaponAmmoType.shotgun] = "shotgunammo";
 exports.imageName[enums_1.WeaponAmmoType.rifle] = "rifleammo";
@@ -4169,6 +4170,7 @@ class UpgradeClient {
             }
             if (p.position.x - this.position.x > WIDTH || p.position.y - this.position.y > HEIGHT)
                 return;
+            console.log(this.img);
             let frame = images_1.jsonIAE["frames"][this.img + ".png"]["frame"];
             let frameWidth = frame["w"];
             let frameHeight = frame["h"];

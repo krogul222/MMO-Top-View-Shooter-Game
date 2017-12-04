@@ -16,6 +16,7 @@ imageName[ ItemType.shotgun ] = "shotgun";
 imageName[ ItemType.rifle ] = "rifle";
 imageName[ ItemType.medicalkit ] = "medicalkit";
 imageName[ ItemType.knife ] = "knife";
+imageName[ ItemType.flamethrower ] = "flamethrower";
 
 //imageName[ WeaponAmmoType.knife ] = "knifeammo";
 imageName[ WeaponAmmoType.pistol ] = "pistolammo";

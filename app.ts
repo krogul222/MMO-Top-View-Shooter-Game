@@ -122,7 +122,7 @@ setInterval(function(){
     
     Particle.update();
     Bullet.update();
-    
+    Upgrade.update();
     let pack = {
         player: Player.update(),
      //   bullet: Bullet.update(),

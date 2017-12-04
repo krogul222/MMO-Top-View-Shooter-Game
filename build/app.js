@@ -5,6 +5,7 @@ const Player_1 = require("./server/js/Entities/Player");
 const Entity_1 = require("./server/js/Entities/Entity");
 const Bullet_1 = require("./server/js/Entities/Bullet");
 const Enemy_1 = require("./server/js/Entities/Enemy");
+const Upgrade_1 = require("./server/js/Entities/Upgrade");
 const Particle_1 = require("./server/js/Effects/Particle/Particle");
 var express = require('express');
 var mongojs = require('mongojs');
@@ -98,6 +99,7 @@ setInterval(function () {
     let packs = Entity_1.Entity.getFrameUpdateData();
     Particle_1.Particle.update();
     Bullet_1.Bullet.update();
+    Upgrade_1.Upgrade.update();
     let pack = {
         player: Player_1.Player.update(),
         enemy: Enemy_1.Enemy.update(),

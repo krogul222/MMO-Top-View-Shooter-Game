@@ -46,7 +46,7 @@ export class UpgradeClient {
         
         if(p.position.x - this.position.x > WIDTH || p.position.y - this.position.y > HEIGHT ) return;
                 
-
+        console.log(this.img);
         let frame = jsonIAE["frames"][this.img+".png"]["frame"];
         let frameWidth = frame["w"];
         let frameHeight = frame["h"];
