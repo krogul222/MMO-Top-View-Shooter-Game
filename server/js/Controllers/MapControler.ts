@@ -76,8 +76,9 @@ export class MapController {
 
     static updateMap = (param) => {
         if(param !== undefined){
+            console.log("MAPY:");
             for (let i in MapController.maps) {
-               // console.log("UPDATE2");
+                console.log(MapController.maps[i].name+" ");
                 if(param.name == MapController.maps[i].name){
                     let gameMap: GameMap = MapController.maps[i];
                     

@@ -1,3 +1,4 @@
+import { GameController } from './server/js/Controllers/GameController';
 import { Smoke } from './server/js/Effects/Smoke';
 import { MapController } from './server/js/Controllers/MapControler';
 import { Player } from './server/js/Entities/Player';
@@ -82,6 +83,10 @@ io.sockets.on('connection', function(socket){
     socket.on('joinedGame',function(data){
         Player.onConnect(socket);
     });
+
+    socket.on('createdGame',function(data){
+        Player.onConnect(socket, true);
+    });
     
     socket.on('signUp',function(data){
         isUsernameTaken(data, function(res){
@@ -122,7 +127,7 @@ setInterval(function(){
     
     Particle.update();
     Bullet.update();
-    Upgrade.update();
+   // Upgrade.update();
     let pack = {
         player: Player.update(),
      //   bullet: Bullet.update(),
@@ -140,7 +145,8 @@ setInterval(function(){
     }
     */
     frameCount++;
-    
+
+    /*
     for(let i in SOCKET_LIST){
             let socket = SOCKET_LIST[i];
             socket.emit('init',packs.initPack);
@@ -150,6 +156,26 @@ setInterval(function(){
                 socket.emit('mapData', MapController.updatePack[i]);
             }
      }
+*/
+
+     // Game Controller
+     for(let i in GameController.list){
+        let game: GameController = GameController.list[i];
+        for(let j in game.socketList){
+            let socket = SOCKET_LIST[j];
+            if(socket !== undefined){
+                socket.emit('init',packs.initPack);
+                socket.emit('update',pack);
+                socket.emit('remove',packs.removePack);
+            }
+            /*for(let i = 0, length = MapController.updatePack.length; i < length; i++) {
+                socket.emit('mapData', MapController.updatePack[i]);
+            }*/
+        }
+
+    }
+
+
     
     MapController.updatePack.length = 0;
     packs.initPack.player = [];

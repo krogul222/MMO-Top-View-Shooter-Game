@@ -53,7 +53,9 @@ MapController.loadMaps = () => {
 };
 MapController.updateMap = (param) => {
     if (param !== undefined) {
+        console.log("MAPY:");
         for (let i in MapController.maps) {
+            console.log(MapController.maps[i].name + " ");
             if (param.name == MapController.maps[i].name) {
                 let gameMap = MapController.maps[i];
                 let str = param.material;

@@ -23,7 +23,7 @@ export class Enemy extends Actor {
         Enemy.list[param.id] = this;
         if(param.kind) this.kind = param.kind;
         this.attackController.pressingAttack = true;
-        this.attackController.accuracy = 15;
+        this.attackController.accuracy = 30;
 
         this.giveWeapons();
         initPack.enemy.push(this.getInitPack());
@@ -78,7 +78,7 @@ export class Enemy extends Actor {
 		    this.attackController.pressingAttack = true;
         } 
         
-        let distance = 500;
+        let distance = 400;
 
         if(this.attackController.activeWeapon._weapon == WeaponType.flamethrower ){
             distance = 200;
@@ -213,8 +213,9 @@ export class Enemy extends Actor {
             let enemy = Enemy.list[i];
             enemy.extendedUpdate();
             if(enemy.toRemove){
+                let map = enemy.map;
                 delete Enemy.list[i];
-                Enemy.randomlyGenerate('forest');
+                Enemy.randomlyGenerate(map);
                 removePack.enemy.push(enemy.id);
             } else {
                 updPack = enemy.getUpdatePack();

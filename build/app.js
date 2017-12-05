@@ -1,11 +1,11 @@
 Object.defineProperty(exports, "__esModule", { value: true });
+const GameController_1 = require("./server/js/Controllers/GameController");
 const Smoke_1 = require("./server/js/Effects/Smoke");
 const MapControler_1 = require("./server/js/Controllers/MapControler");
 const Player_1 = require("./server/js/Entities/Player");
 const Entity_1 = require("./server/js/Entities/Entity");
 const Bullet_1 = require("./server/js/Entities/Bullet");
 const Enemy_1 = require("./server/js/Entities/Enemy");
-const Upgrade_1 = require("./server/js/Entities/Upgrade");
 const Particle_1 = require("./server/js/Effects/Particle/Particle");
 var express = require('express');
 var mongojs = require('mongojs');
@@ -64,6 +64,9 @@ io.sockets.on('connection', function (socket) {
     socket.on('joinedGame', function (data) {
         Player_1.Player.onConnect(socket);
     });
+    socket.on('createdGame', function (data) {
+        Player_1.Player.onConnect(socket, true);
+    });
     socket.on('signUp', function (data) {
         isUsernameTaken(data, function (res) {
             if (res) {
@@ -99,20 +102,21 @@ setInterval(function () {
     let packs = Entity_1.Entity.getFrameUpdateData();
     Particle_1.Particle.update();
     Bullet_1.Bullet.update();
-    Upgrade_1.Upgrade.update();
     let pack = {
         player: Player_1.Player.update(),
         enemy: Enemy_1.Enemy.update(),
         smoke: Smoke_1.Smoke.update()
     };
     exports.frameCount++;
-    for (let i in SOCKET_LIST) {
-        let socket = SOCKET_LIST[i];
-        socket.emit('init', packs.initPack);
-        socket.emit('update', pack);
-        socket.emit('remove', packs.removePack);
-        for (let i = 0, length = MapControler_1.MapController.updatePack.length; i < length; i++) {
-            socket.emit('mapData', MapControler_1.MapController.updatePack[i]);
+    for (let i in GameController_1.GameController.list) {
+        let game = GameController_1.GameController.list[i];
+        for (let j in game.socketList) {
+            let socket = SOCKET_LIST[j];
+            if (socket !== undefined) {
+                socket.emit('init', packs.initPack);
+                socket.emit('update', pack);
+                socket.emit('remove', packs.removePack);
+            }
         }
     }
     MapControler_1.MapController.updatePack.length = 0;

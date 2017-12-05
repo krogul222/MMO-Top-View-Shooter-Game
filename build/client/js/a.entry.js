@@ -246,17 +246,17 @@ exports.getRandomInt = getRandomInt;
 Object.defineProperty(exports, "__esModule", { value: true });
 const PlayerClient_1 = __webpack_require__(5);
 const Particle_1 = __webpack_require__(14);
-const ParticleClient_1 = __webpack_require__(39);
-const UpgradeClient_1 = __webpack_require__(40);
-const BulletClient_1 = __webpack_require__(41);
-const GameSoundManager_1 = __webpack_require__(42);
+const ParticleClient_1 = __webpack_require__(40);
+const UpgradeClient_1 = __webpack_require__(41);
+const BulletClient_1 = __webpack_require__(42);
+const GameSoundManager_1 = __webpack_require__(43);
 const Inventory_1 = __webpack_require__(16);
-const MapControler_1 = __webpack_require__(8);
-const MapClient_1 = __webpack_require__(43);
-const Filters_1 = __webpack_require__(44);
-const Effects_1 = __webpack_require__(45);
+const MapControler_1 = __webpack_require__(7);
+const MapClient_1 = __webpack_require__(44);
+const Filters_1 = __webpack_require__(45);
+const Effects_1 = __webpack_require__(46);
 const canvas_1 = __webpack_require__(3);
-const SmokeClient_1 = __webpack_require__(47);
+const SmokeClient_1 = __webpack_require__(48);
 const EnemyClient_1 = __webpack_require__(12);
 const ExplosionClient_1 = __webpack_require__(20);
 let enemyDrawList = [];
@@ -274,12 +274,11 @@ exports.gameSoundManager = new GameSoundManager_1.GameSoundManager();
 exports.canvasFilters = new Filters_1.Filters(ctx);
 exports.effects = new Effects_1.Effects(ctx);
 socket.on('mapData', function (data) {
+    MapControler_1.MapController.createMap(data.name, 16, 20);
     MapControler_1.MapController.updateMap(data);
-    if (exports.currentMap.name == data.name) {
-        exports.currentMap.reloadMap(MapControler_1.MapController.getMap(data.name));
-        canvas_1.camera.updateWorldSize(exports.currentMap.map.width, exports.currentMap.map.height);
-        gui.createMinimap();
-    }
+    exports.currentMap.reloadMap(MapControler_1.MapController.getMap(data.name));
+    canvas_1.camera.updateWorldSize(exports.currentMap.map.width, exports.currentMap.map.height);
+    gui.createMinimap();
 });
 socket.on('init', function (data) {
     if (data.selfId) {
@@ -921,6 +920,8 @@ class PlayerClient {
             this.attackMelee = initPack.attackMelee;
         if (initPack.ammo)
             this.ammo = initPack.ammo;
+        if (initPack.map)
+            this.map = initPack.map;
         if (initPack.ammoInGun)
             this.ammoInGun = initPack.ammoInGun;
         PlayerClient.list[initPack.id] = this;
@@ -1019,20 +1020,10 @@ exports.mapObjectCollisions[enums_1.MapObjectType.GR_ER] = [0, 0, 2, 0, 0, 0, 0,
 /***/ (function(module, exports, __webpack_require__) {
 
 Object.defineProperty(exports, "__esModule", { value: true });
-const Pack_1 = __webpack_require__(26);
-exports.initPack = new Pack_1.Pack();
-exports.removePack = new Pack_1.Pack();
-
-
-/***/ }),
-/* 8 */
-/***/ (function(module, exports, __webpack_require__) {
-
-Object.defineProperty(exports, "__esModule", { value: true });
-const SpawnObjectMapChecker_1 = __webpack_require__(28);
-const GroundRing_1 = __webpack_require__(29);
-const GameMap_1 = __webpack_require__(32);
-const MapTile_1 = __webpack_require__(33);
+const SpawnObjectMapChecker_1 = __webpack_require__(26);
+const GroundRing_1 = __webpack_require__(27);
+const GameMap_1 = __webpack_require__(30);
+const MapTile_1 = __webpack_require__(31);
 const enums_1 = __webpack_require__(1);
 const GeometryAndPhysics_1 = __webpack_require__(0);
 const Constants_1 = __webpack_require__(6);
@@ -1083,7 +1074,9 @@ MapController.loadMaps = () => {
 };
 MapController.updateMap = (param) => {
     if (param !== undefined) {
+        console.log("MAPY:");
         for (let i in MapController.maps) {
+            console.log(MapController.maps[i].name + " ");
             if (param.name == MapController.maps[i].name) {
                 let gameMap = MapController.maps[i];
                 let str = param.material;
@@ -1217,18 +1210,29 @@ exports.MapController = MapController;
 
 
 /***/ }),
+/* 8 */
+/***/ (function(module, exports, __webpack_require__) {
+
+Object.defineProperty(exports, "__esModule", { value: true });
+const Pack_1 = __webpack_require__(33);
+exports.initPack = new Pack_1.Pack();
+exports.removePack = new Pack_1.Pack();
+
+
+/***/ }),
 /* 9 */
 /***/ (function(module, exports, __webpack_require__) {
 
 Object.defineProperty(exports, "__esModule", { value: true });
-const Smoke_1 = __webpack_require__(25);
-const globalVariables_1 = __webpack_require__(7);
+const GameController_1 = __webpack_require__(25);
+const Smoke_1 = __webpack_require__(32);
+const globalVariables_1 = __webpack_require__(8);
 const Enemy_1 = __webpack_require__(10);
 const Bullet_1 = __webpack_require__(18);
 const Actor_1 = __webpack_require__(15);
 const GeometryAndPhysics_1 = __webpack_require__(0);
 const enums_1 = __webpack_require__(1);
-const MapControler_1 = __webpack_require__(8);
+const MapControler_1 = __webpack_require__(7);
 class Player extends Actor_1.Actor {
     constructor(param) {
         super(param);
@@ -1370,13 +1374,21 @@ class Player extends Actor_1.Actor {
         }
     }
 }
-Player.onConnect = (socket) => {
+Player.onConnect = (socket, createdGame = false) => {
+    let gameId = -1;
     let map = 'forest';
+    if (createdGame == true) {
+        let game = new GameController_1.GameController();
+        game.addSocket(socket);
+        gameId = game.id;
+        map = game.map;
+    }
     let player = new Player({
         id: socket.id,
         maxSpdX: 12,
         maxSpdY: 12,
         map: map,
+        game: gameId,
         img: 'player',
         atkSpd: 7,
         width: 50,
@@ -1428,8 +1440,16 @@ Player.onConnect = (socket) => {
             MapControler_1.MapController.updatePack.push(MapControler_1.MapController.getMapPack(data.map));
         }
     });
-    socket.emit('init', { player: Player.getAllInitPack(), bullet: Bullet_1.Bullet.getAllInitPack(), enemy: Enemy_1.Enemy.getAllInitPack(), selfId: socket.id });
-    socket.emit('mapData', MapControler_1.MapController.getMapPack("forest"));
+    if (createdGame == false) {
+        socket.emit('init', { player: Player.getAllInitPack(), bullet: Bullet_1.Bullet.getAllInitPack(), enemy: Enemy_1.Enemy.getAllInitPack(), selfId: socket.id });
+        socket.emit('mapData', MapControler_1.MapController.getMapPack("forest"));
+    }
+    else {
+        let game = GameController_1.GameController.list[player.game];
+        game.addPlayer(player);
+        socket.emit('init', { player: Player.getAllInitPack(), bullet: Bullet_1.Bullet.getAllInitPack(), enemy: Enemy_1.Enemy.getAllInitPack(), selfId: socket.id });
+        socket.emit('mapData', MapControler_1.MapController.getMapPack(game.map));
+    }
 };
 Player.getAllInitPack = () => {
     let players = [];
@@ -1463,9 +1483,9 @@ exports.Player = Player;
 Object.defineProperty(exports, "__esModule", { value: true });
 const Actor_1 = __webpack_require__(15);
 const GeometryAndPhysics_1 = __webpack_require__(0);
-const globalVariables_1 = __webpack_require__(7);
+const globalVariables_1 = __webpack_require__(8);
 const enums_1 = __webpack_require__(1);
-const MapControler_1 = __webpack_require__(8);
+const MapControler_1 = __webpack_require__(7);
 class Enemy extends Actor_1.Actor {
     constructor(param) {
         super(param);
@@ -1508,7 +1528,7 @@ class Enemy extends Actor_1.Actor {
             if (this.attackController.melee && Math.sqrt(diffX * diffX + diffY * diffY) < 50) {
                 this.attackController.pressingAttack = true;
             }
-            let distance = 500;
+            let distance = 400;
             if (this.attackController.activeWeapon._weapon == enums_1.WeaponType.flamethrower) {
                 distance = 200;
             }
@@ -1620,7 +1640,7 @@ class Enemy extends Actor_1.Actor {
         if (param.kind)
             this.kind = param.kind;
         this.attackController.pressingAttack = true;
-        this.attackController.accuracy = 15;
+        this.attackController.accuracy = 30;
         this.giveWeapons();
         globalVariables_1.initPack.enemy.push(this.getInitPack());
     }
@@ -1633,8 +1653,9 @@ Enemy.update = () => {
         let enemy = Enemy.list[i];
         enemy.extendedUpdate();
         if (enemy.toRemove) {
+            let map = enemy.map;
             delete Enemy.list[i];
-            Enemy.randomlyGenerate('forest');
+            Enemy.randomlyGenerate(map);
             globalVariables_1.removePack.enemy.push(enemy.id);
         }
         else {
@@ -1965,6 +1986,8 @@ class EnemyClient {
             this.attackMelee = initPack.attackMelee;
         if (initPack.kind)
             this.kind = initPack.kind;
+        if (initPack.map)
+            this.map = initPack.map;
         EnemyClient.list[initPack.id] = this;
     }
 }
@@ -2049,7 +2072,7 @@ exports.FireFlameClient = FireFlameClient;
 
 Object.defineProperty(exports, "__esModule", { value: true });
 const Player_1 = __webpack_require__(9);
-const globalVariables_1 = __webpack_require__(7);
+const globalVariables_1 = __webpack_require__(8);
 const enums_1 = __webpack_require__(1);
 const GeometryAndPhysics_1 = __webpack_require__(0);
 const Enemy_1 = __webpack_require__(10);
@@ -2179,10 +2202,10 @@ exports.Particle = Particle;
 
 Object.defineProperty(exports, "__esModule", { value: true });
 const Inventory_1 = __webpack_require__(16);
-const MapControler_1 = __webpack_require__(8);
-const MovementController_1 = __webpack_require__(34);
-const AttackControler_1 = __webpack_require__(35);
-const LifeAndBodyController_1 = __webpack_require__(38);
+const MapControler_1 = __webpack_require__(7);
+const MovementController_1 = __webpack_require__(35);
+const AttackControler_1 = __webpack_require__(36);
+const LifeAndBodyController_1 = __webpack_require__(39);
 const Entity_1 = __webpack_require__(19);
 const Player_1 = __webpack_require__(9);
 const Enemy_1 = __webpack_require__(10);
@@ -2280,7 +2303,7 @@ exports.Actor = Actor;
 /***/ (function(module, exports, __webpack_require__) {
 
 Object.defineProperty(exports, "__esModule", { value: true });
-const Item_1 = __webpack_require__(27);
+const Item_1 = __webpack_require__(34);
 const Player_1 = __webpack_require__(9);
 class Inventory {
     constructor(socket, server, owner) {
@@ -2421,8 +2444,8 @@ const GeometryAndPhysics_1 = __webpack_require__(0);
 const Enemy_1 = __webpack_require__(10);
 const Player_1 = __webpack_require__(9);
 const Entity_1 = __webpack_require__(19);
-const globalVariables_1 = __webpack_require__(7);
-const MapControler_1 = __webpack_require__(8);
+const globalVariables_1 = __webpack_require__(8);
+const MapControler_1 = __webpack_require__(7);
 class Bullet extends Entity_1.Entity {
     constructor(param) {
         super(Bullet.updateParam(param));
@@ -2557,7 +2580,7 @@ exports.Bullet = Bullet;
 
 Object.defineProperty(exports, "__esModule", { value: true });
 const GeometryAndPhysics_1 = __webpack_require__(0);
-const globalVariables_1 = __webpack_require__(7);
+const globalVariables_1 = __webpack_require__(8);
 const Constants_1 = __webpack_require__(6);
 class Entity {
     constructor(param) {
@@ -2569,6 +2592,7 @@ class Entity {
         this._map = "forest";
         this._type = "entity";
         this._img = "";
+        this._game = -1;
         this.updatePosition = () => this._position.changePosition(this._speed.x * Constants_1.GAME_SPEED_TOOLINGFACTOR, this._speed.y * Constants_1.GAME_SPEED_TOOLINGFACTOR);
         this.update = () => this.updatePosition();
         this.getDistance = (entity) => {
@@ -2594,6 +2618,9 @@ class Entity {
             this._map = param.map ? param.map : this._map;
             this._type = param.type ? param.type : this._type;
             this._img = param.img ? param.img : this._img;
+            if (param.game !== undefined) {
+                this._game = param.game;
+            }
         }
     }
     get type() { return this._type; }
@@ -2604,6 +2631,7 @@ class Entity {
     get speed() { return this._speed; }
     get id() { return this._id; }
     get img() { return this._img; }
+    get game() { return this._game; }
     setPosition(position) {
         this._position.x = position.x;
         this._position.y = position.y;
@@ -3011,168 +3039,31 @@ exports.framesAttack['zombie'] = 9;
 /***/ (function(module, exports, __webpack_require__) {
 
 Object.defineProperty(exports, "__esModule", { value: true });
-const globalVariables_1 = __webpack_require__(7);
-class Smoke {
-    constructor(position, maxRadius, time, speed, map) {
-        this.position = position;
-        this.maxRadius = maxRadius;
-        this.time = time;
-        this.speed = speed;
-        this.map = map;
+const MapControler_1 = __webpack_require__(7);
+class GameController {
+    constructor() {
+        this.socketList = {};
+        this.players = {};
+        this.map = "forest";
+        this.addSocket = (socket) => {
+            this.socketList[socket.id] = socket;
+        };
+        this.addPlayer = (player) => {
+            this.players[player.id] = player;
+        };
         this.id = Math.random();
-        this.radius = 10;
-        this.grow = true;
-        this.update = () => {
-            if (this.time > 0) {
-                if (this.grow) {
-                    if (this.radius >= this.maxRadius) {
-                        this.grow = false;
-                    }
-                    this.radius += this.speed;
-                }
-                else {
-                    if (this.time * this.speed - this.maxRadius <= 0 && this.radius > 0) {
-                        this.radius -= this.speed;
-                    }
-                }
-                this.time--;
-            }
-        };
-        this.getInitPack = () => {
-            return {
-                id: this.id,
-                position: this.position,
-                radius: this.radius,
-                map: this.map,
-                maxRadius: this.maxRadius,
-                time: this.time
-            };
-        };
-        this.getUpdatePack = () => {
-            return {
-                id: this.id,
-                radius: this.radius
-            };
-        };
-        Smoke.list[this.id] = this;
-        globalVariables_1.initPack.smoke.push(this.getInitPack());
+        this.map = "22";
+        MapControler_1.MapController.createMap(this.map, 16, 20);
+        MapControler_1.MapController.updatePack.push(MapControler_1.MapController.getMapPack(this.map));
+        GameController.list[this.id] = this;
     }
 }
-Smoke.update = () => {
-    let pack = [];
-    for (let i in Smoke.list) {
-        let smoke = Smoke.list[i];
-        smoke.update();
-        if (smoke.time == 0) {
-            delete Smoke.list[i];
-            globalVariables_1.removePack.smoke.push(smoke.id);
-        }
-        else {
-            pack.push(smoke.getUpdatePack());
-        }
-    }
-    return pack;
-};
-Smoke.list = {};
-exports.Smoke = Smoke;
+GameController.list = {};
+exports.GameController = GameController;
 
 
 /***/ }),
 /* 26 */
-/***/ (function(module, exports) {
-
-Object.defineProperty(exports, "__esModule", { value: true });
-var initPack = { player: [], bullet: [], enemy: [], upgrade: [] };
-class Pack {
-    constructor() {
-        this.player = [];
-        this.bullet = [];
-        this.enemy = [];
-        this.upgrade = [];
-        this.smoke = [];
-        this.particle = [];
-    }
-}
-exports.Pack = Pack;
-
-
-/***/ }),
-/* 27 */
-/***/ (function(module, exports, __webpack_require__) {
-
-Object.defineProperty(exports, "__esModule", { value: true });
-const enums_1 = __webpack_require__(1);
-class Item {
-    constructor(id, name, event, add, remove, info) {
-        this.id = id;
-        this.name = name;
-        this.event = event;
-        this.add = add;
-        this.remove = remove;
-        this.info = info;
-        Item.list[this.id] = this;
-    }
-}
-Item.list = {};
-exports.Item = Item;
-new Item(enums_1.ItemType.medicalkit, "Medical Kit", function (player) {
-    player.lifeAndBodyController.heal(10);
-    player.inventory.removeItem(enums_1.ItemType.medicalkit, 1);
-}, function (actor, amount) { }, function (actor, amount) { }, function (actor) {
-    return "";
-});
-new Item(enums_1.WeaponType.pistol, "Pistol", function (actor) {
-    actor.attackController.equip(enums_1.WeaponType.pistol);
-}, function (actor, amount) {
-    actor.attackController.weaponCollection.addWeapon(enums_1.WeaponType.pistol, amount);
-}, function (actor, amount) {
-    actor.attackController.weaponCollection.removeWeapon(enums_1.WeaponType.pistol, amount);
-}, function (actor) {
-});
-new Item(enums_1.WeaponType.flamethrower, "Flamethrower", function (actor) {
-    actor.attackController.equip(enums_1.WeaponType.flamethrower);
-}, function (actor, amount) {
-    actor.attackController.weaponCollection.addWeapon(enums_1.WeaponType.flamethrower, amount);
-}, function (actor, amount) {
-    actor.attackController.weaponCollection.removeWeapon(enums_1.WeaponType.flamethrower, amount);
-}, function (actor) {
-});
-new Item(enums_1.WeaponType.knife, "Knife", function (actor) {
-    actor.attackController.equip(enums_1.WeaponType.knife);
-}, function (actor, amount) {
-    actor.attackController.weaponCollection.addWeapon(enums_1.WeaponType.knife, amount);
-}, function (actor, amount) {
-    actor.attackController.weaponCollection.removeWeapon(enums_1.WeaponType.knife, amount);
-}, function (actor) {
-});
-new Item(enums_1.WeaponType.shotgun, "Shotgun", function (actor) {
-    actor.attackController.equip(enums_1.WeaponType.shotgun);
-}, function (actor, amount) {
-    actor.attackController.weaponCollection.addWeapon(enums_1.WeaponType.shotgun, amount);
-}, function (actor, amount) {
-    actor.attackController.weaponCollection.removeWeapon(enums_1.WeaponType.shotgun, amount);
-}, function (actor) {
-});
-new Item(enums_1.WeaponType.rifle, "Rifle", function (actor) {
-    actor.attackController.equip(enums_1.WeaponType.rifle);
-}, function (actor, amount) {
-    actor.attackController.weaponCollection.addWeapon(enums_1.WeaponType.rifle, amount);
-}, function (actor, amount) {
-    actor.attackController.weaponCollection.removeWeapon(enums_1.WeaponType.rifle, amount);
-}, function (actor) {
-});
-new Item(enums_1.WeaponType.claws, "Claws", function (actor) {
-    actor.attackController.equip(enums_1.WeaponType.claws);
-}, function (actor, amount) {
-    actor.attackController.weaponCollection.addWeapon(enums_1.WeaponType.claws, amount);
-}, function (actor, amount) {
-    actor.attackController.weaponCollection.removeWeapon(enums_1.WeaponType.claws, amount);
-}, function (actor) {
-});
-
-
-/***/ }),
-/* 28 */
 /***/ (function(module, exports, __webpack_require__) {
 
 Object.defineProperty(exports, "__esModule", { value: true });
@@ -3290,11 +3181,11 @@ exports.SpawnObjectMapChecker = SpawnObjectMapChecker;
 
 
 /***/ }),
-/* 29 */
+/* 27 */
 /***/ (function(module, exports, __webpack_require__) {
 
 Object.defineProperty(exports, "__esModule", { value: true });
-const MapObject_1 = __webpack_require__(30);
+const MapObject_1 = __webpack_require__(28);
 const GeometryAndPhysics_1 = __webpack_require__(0);
 const enums_1 = __webpack_require__(1);
 class GroundRing extends MapObject_1.MapObject {
@@ -3374,11 +3265,11 @@ exports.GroundRing = GroundRing;
 
 
 /***/ }),
-/* 30 */
+/* 28 */
 /***/ (function(module, exports, __webpack_require__) {
 
 Object.defineProperty(exports, "__esModule", { value: true });
-const ObjectTile_1 = __webpack_require__(31);
+const ObjectTile_1 = __webpack_require__(29);
 class MapObject {
     constructor() {
         this.objectTiles = [];
@@ -3391,7 +3282,7 @@ exports.MapObject = MapObject;
 
 
 /***/ }),
-/* 31 */
+/* 29 */
 /***/ (function(module, exports, __webpack_require__) {
 
 Object.defineProperty(exports, "__esModule", { value: true });
@@ -3413,7 +3304,7 @@ exports.ObjectTile = ObjectTile;
 
 
 /***/ }),
-/* 32 */
+/* 30 */
 /***/ (function(module, exports, __webpack_require__) {
 
 Object.defineProperty(exports, "__esModule", { value: true });
@@ -3460,7 +3351,7 @@ exports.GameMap = GameMap;
 
 
 /***/ }),
-/* 33 */
+/* 31 */
 /***/ (function(module, exports, __webpack_require__) {
 
 Object.defineProperty(exports, "__esModule", { value: true });
@@ -3532,11 +3423,176 @@ exports.MapTile = MapTile;
 
 
 /***/ }),
+/* 32 */
+/***/ (function(module, exports, __webpack_require__) {
+
+Object.defineProperty(exports, "__esModule", { value: true });
+const globalVariables_1 = __webpack_require__(8);
+class Smoke {
+    constructor(position, maxRadius, time, speed, map) {
+        this.position = position;
+        this.maxRadius = maxRadius;
+        this.time = time;
+        this.speed = speed;
+        this.map = map;
+        this.id = Math.random();
+        this.radius = 10;
+        this.grow = true;
+        this.update = () => {
+            if (this.time > 0) {
+                if (this.grow) {
+                    if (this.radius >= this.maxRadius) {
+                        this.grow = false;
+                    }
+                    this.radius += this.speed;
+                }
+                else {
+                    if (this.time * this.speed - this.maxRadius <= 0 && this.radius > 0) {
+                        this.radius -= this.speed;
+                    }
+                }
+                this.time--;
+            }
+        };
+        this.getInitPack = () => {
+            return {
+                id: this.id,
+                position: this.position,
+                radius: this.radius,
+                map: this.map,
+                maxRadius: this.maxRadius,
+                time: this.time
+            };
+        };
+        this.getUpdatePack = () => {
+            return {
+                id: this.id,
+                radius: this.radius
+            };
+        };
+        Smoke.list[this.id] = this;
+        globalVariables_1.initPack.smoke.push(this.getInitPack());
+    }
+}
+Smoke.update = () => {
+    let pack = [];
+    for (let i in Smoke.list) {
+        let smoke = Smoke.list[i];
+        smoke.update();
+        if (smoke.time == 0) {
+            delete Smoke.list[i];
+            globalVariables_1.removePack.smoke.push(smoke.id);
+        }
+        else {
+            pack.push(smoke.getUpdatePack());
+        }
+    }
+    return pack;
+};
+Smoke.list = {};
+exports.Smoke = Smoke;
+
+
+/***/ }),
+/* 33 */
+/***/ (function(module, exports) {
+
+Object.defineProperty(exports, "__esModule", { value: true });
+var initPack = { player: [], bullet: [], enemy: [], upgrade: [] };
+class Pack {
+    constructor() {
+        this.player = [];
+        this.bullet = [];
+        this.enemy = [];
+        this.upgrade = [];
+        this.smoke = [];
+        this.particle = [];
+    }
+}
+exports.Pack = Pack;
+
+
+/***/ }),
 /* 34 */
 /***/ (function(module, exports, __webpack_require__) {
 
 Object.defineProperty(exports, "__esModule", { value: true });
-const MapControler_1 = __webpack_require__(8);
+const enums_1 = __webpack_require__(1);
+class Item {
+    constructor(id, name, event, add, remove, info) {
+        this.id = id;
+        this.name = name;
+        this.event = event;
+        this.add = add;
+        this.remove = remove;
+        this.info = info;
+        Item.list[this.id] = this;
+    }
+}
+Item.list = {};
+exports.Item = Item;
+new Item(enums_1.ItemType.medicalkit, "Medical Kit", function (player) {
+    player.lifeAndBodyController.heal(10);
+    player.inventory.removeItem(enums_1.ItemType.medicalkit, 1);
+}, function (actor, amount) { }, function (actor, amount) { }, function (actor) {
+    return "";
+});
+new Item(enums_1.WeaponType.pistol, "Pistol", function (actor) {
+    actor.attackController.equip(enums_1.WeaponType.pistol);
+}, function (actor, amount) {
+    actor.attackController.weaponCollection.addWeapon(enums_1.WeaponType.pistol, amount);
+}, function (actor, amount) {
+    actor.attackController.weaponCollection.removeWeapon(enums_1.WeaponType.pistol, amount);
+}, function (actor) {
+});
+new Item(enums_1.WeaponType.flamethrower, "Flamethrower", function (actor) {
+    actor.attackController.equip(enums_1.WeaponType.flamethrower);
+}, function (actor, amount) {
+    actor.attackController.weaponCollection.addWeapon(enums_1.WeaponType.flamethrower, amount);
+}, function (actor, amount) {
+    actor.attackController.weaponCollection.removeWeapon(enums_1.WeaponType.flamethrower, amount);
+}, function (actor) {
+});
+new Item(enums_1.WeaponType.knife, "Knife", function (actor) {
+    actor.attackController.equip(enums_1.WeaponType.knife);
+}, function (actor, amount) {
+    actor.attackController.weaponCollection.addWeapon(enums_1.WeaponType.knife, amount);
+}, function (actor, amount) {
+    actor.attackController.weaponCollection.removeWeapon(enums_1.WeaponType.knife, amount);
+}, function (actor) {
+});
+new Item(enums_1.WeaponType.shotgun, "Shotgun", function (actor) {
+    actor.attackController.equip(enums_1.WeaponType.shotgun);
+}, function (actor, amount) {
+    actor.attackController.weaponCollection.addWeapon(enums_1.WeaponType.shotgun, amount);
+}, function (actor, amount) {
+    actor.attackController.weaponCollection.removeWeapon(enums_1.WeaponType.shotgun, amount);
+}, function (actor) {
+});
+new Item(enums_1.WeaponType.rifle, "Rifle", function (actor) {
+    actor.attackController.equip(enums_1.WeaponType.rifle);
+}, function (actor, amount) {
+    actor.attackController.weaponCollection.addWeapon(enums_1.WeaponType.rifle, amount);
+}, function (actor, amount) {
+    actor.attackController.weaponCollection.removeWeapon(enums_1.WeaponType.rifle, amount);
+}, function (actor) {
+});
+new Item(enums_1.WeaponType.claws, "Claws", function (actor) {
+    actor.attackController.equip(enums_1.WeaponType.claws);
+}, function (actor, amount) {
+    actor.attackController.weaponCollection.addWeapon(enums_1.WeaponType.claws, amount);
+}, function (actor, amount) {
+    actor.attackController.weaponCollection.removeWeapon(enums_1.WeaponType.claws, amount);
+}, function (actor) {
+});
+
+
+/***/ }),
+/* 35 */
+/***/ (function(module, exports, __webpack_require__) {
+
+Object.defineProperty(exports, "__esModule", { value: true });
+const MapControler_1 = __webpack_require__(7);
 const Counter_1 = __webpack_require__(17);
 const GeometryAndPhysics_1 = __webpack_require__(0);
 class MovementController {
@@ -3643,14 +3699,14 @@ exports.MovementController = MovementController;
 
 
 /***/ }),
-/* 35 */
+/* 36 */
 /***/ (function(module, exports, __webpack_require__) {
 
 Object.defineProperty(exports, "__esModule", { value: true });
 const enums_1 = __webpack_require__(1);
-const Flame_1 = __webpack_require__(36);
+const Flame_1 = __webpack_require__(37);
 const Bullet_1 = __webpack_require__(18);
-const WeaponCollection_1 = __webpack_require__(37);
+const WeaponCollection_1 = __webpack_require__(38);
 const Counter_1 = __webpack_require__(17);
 const WeaponTypes_1 = __webpack_require__(11);
 const GeometryAndPhysics_1 = __webpack_require__(0);
@@ -3776,7 +3832,7 @@ exports.AttackController = AttackController;
 
 
 /***/ }),
-/* 36 */
+/* 37 */
 /***/ (function(module, exports, __webpack_require__) {
 
 Object.defineProperty(exports, "__esModule", { value: true });
@@ -3839,7 +3895,7 @@ exports.Flame = Flame;
 
 
 /***/ }),
-/* 37 */
+/* 38 */
 /***/ (function(module, exports, __webpack_require__) {
 
 Object.defineProperty(exports, "__esModule", { value: true });
@@ -4053,7 +4109,7 @@ exports.SingleWeapon = SingleWeapon;
 
 
 /***/ }),
-/* 38 */
+/* 39 */
 /***/ (function(module, exports) {
 
 Object.defineProperty(exports, "__esModule", { value: true });
@@ -4102,7 +4158,7 @@ exports.LifeAndBodyController = LifeAndBodyController;
 
 
 /***/ }),
-/* 39 */
+/* 40 */
 /***/ (function(module, exports, __webpack_require__) {
 
 Object.defineProperty(exports, "__esModule", { value: true });
@@ -4150,7 +4206,7 @@ exports.ParticleClient = ParticleClient;
 
 
 /***/ }),
-/* 40 */
+/* 41 */
 /***/ (function(module, exports, __webpack_require__) {
 
 Object.defineProperty(exports, "__esModule", { value: true });
@@ -4192,7 +4248,7 @@ exports.UpgradeClient = UpgradeClient;
 
 
 /***/ }),
-/* 41 */
+/* 42 */
 /***/ (function(module, exports, __webpack_require__) {
 
 Object.defineProperty(exports, "__esModule", { value: true });
@@ -4260,6 +4316,7 @@ class BulletClient {
         this.img = (initPack.img !== undefined) ? initPack.img : "bullet";
         this.map = (initPack.map !== undefined) ? initPack.map : "forest";
         BulletClient.list[this.id] = this;
+        console.log("BULLET " + this.map);
     }
 }
 BulletClient.list = {};
@@ -4267,7 +4324,7 @@ exports.BulletClient = BulletClient;
 
 
 /***/ }),
-/* 42 */
+/* 43 */
 /***/ (function(module, exports) {
 
 Object.defineProperty(exports, "__esModule", { value: true });
@@ -4336,7 +4393,7 @@ exports.GameSoundManager = GameSoundManager;
 
 
 /***/ }),
-/* 43 */
+/* 44 */
 /***/ (function(module, exports, __webpack_require__) {
 
 Object.defineProperty(exports, "__esModule", { value: true });
@@ -4410,7 +4467,7 @@ exports.MapClient = MapClient;
 
 
 /***/ }),
-/* 44 */
+/* 45 */
 /***/ (function(module, exports) {
 
 Object.defineProperty(exports, "__esModule", { value: true });
@@ -4465,11 +4522,11 @@ exports.Filters = Filters;
 
 
 /***/ }),
-/* 45 */
+/* 46 */
 /***/ (function(module, exports, __webpack_require__) {
 
 Object.defineProperty(exports, "__esModule", { value: true });
-const Particle_1 = __webpack_require__(46);
+const Particle_1 = __webpack_require__(47);
 const images_1 = __webpack_require__(4);
 class Effects {
     constructor(ctx) {
@@ -4517,7 +4574,7 @@ exports.Effects = Effects;
 
 
 /***/ }),
-/* 46 */
+/* 47 */
 /***/ (function(module, exports, __webpack_require__) {
 
 Object.defineProperty(exports, "__esModule", { value: true });
@@ -4577,11 +4634,11 @@ exports.Particle = Particle;
 
 
 /***/ }),
-/* 47 */
+/* 48 */
 /***/ (function(module, exports, __webpack_require__) {
 
 Object.defineProperty(exports, "__esModule", { value: true });
-const SmokeParticle_1 = __webpack_require__(48);
+const SmokeParticle_1 = __webpack_require__(49);
 const GeometryAndPhysics_1 = __webpack_require__(0);
 const game_1 = __webpack_require__(2);
 const PlayerClient_1 = __webpack_require__(5);
@@ -4641,7 +4698,7 @@ exports.SmokeClient = SmokeClient;
 
 
 /***/ }),
-/* 48 */
+/* 49 */
 /***/ (function(module, exports, __webpack_require__) {
 
 Object.defineProperty(exports, "__esModule", { value: true });

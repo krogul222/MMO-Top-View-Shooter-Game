@@ -30,6 +30,7 @@ export class BulletClient {
     toRemove: boolean = false;
 
     constructor(initPack) {
+        
         this.id = (initPack.id !== undefined) ? initPack.id : -1;
         this.position = (initPack.position !== undefined) ? initPack.position : new Point(250, 250);
         this.startPosition = (initPack.startPosition !== undefined) ? initPack.startPosition : new Point(250, 250);
@@ -40,6 +41,7 @@ export class BulletClient {
         this.img = (initPack.img !== undefined) ? initPack.img : "bullet";
         this.map = (initPack.map !== undefined) ? initPack.map : "forest";
         BulletClient.list[this.id] = this;
+        console.log("BULLET "+this.map);
     }
 
     draw = () => {

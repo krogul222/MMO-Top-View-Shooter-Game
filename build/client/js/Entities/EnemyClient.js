@@ -120,6 +120,8 @@ class EnemyClient {
             this.attackMelee = initPack.attackMelee;
         if (initPack.kind)
             this.kind = initPack.kind;
+        if (initPack.map)
+            this.map = initPack.map;
         EnemyClient.list[initPack.id] = this;
     }
 }

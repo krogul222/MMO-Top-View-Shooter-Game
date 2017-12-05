@@ -50,6 +50,7 @@ export class EnemyClient{
         if(initPack.attackStarted) this.attackStarted = initPack.attackStarted;
         if(initPack.attackMelee) this.attackMelee = initPack.attackMelee;
         if(initPack.kind) this.kind = initPack.kind;
+        if(initPack.map) this.map = initPack.map;
 
         EnemyClient.list[initPack.id] = this;
     }

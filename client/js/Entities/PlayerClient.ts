@@ -50,6 +50,7 @@ export class PlayerClient{
         if(initPack.attackStarted) this.attackStarted = initPack.attackStarted;
         if(initPack.attackMelee) this.attackMelee = initPack.attackMelee;
         if(initPack.ammo) this.ammo = initPack.ammo;
+        if(initPack.map) this.map = initPack.map;
         if(initPack.ammoInGun) this.ammoInGun = initPack.ammoInGun;
 
         PlayerClient.list[initPack.id] = this;

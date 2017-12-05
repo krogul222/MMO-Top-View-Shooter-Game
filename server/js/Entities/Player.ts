@@ -1,3 +1,4 @@
+import { GameController } from './../Controllers/GameController';
 import { Flame } from './../Effects/Flame';
 import { Smoke } from './../Effects/Smoke';
 import { initPack, removePack } from './../globalVariables';
@@ -170,13 +171,27 @@ export class Player extends Actor {
         }*/
     }
 
-    static onConnect = (socket) => {
+    static onConnect = (socket, createdGame: boolean = false) => {
+
+        let gameId: number = -1;
+
+
+
         let map = 'forest';
-        let player = new Player({
+
+        if(createdGame == true) {
+            let game = new GameController();
+            game.addSocket(socket);
+            gameId = game.id;
+            map = game.map;
+        }
+
+        let player:Player = new Player({
              id: socket.id,
              maxSpdX: 12,
              maxSpdY: 12,
              map: map,
+             game: gameId,
              img: 'player',
              atkSpd: 7,
              width: 50, 
@@ -213,8 +228,15 @@ export class Player extends Actor {
             } 
         });
 
-        socket.emit('init',{player: Player.getAllInitPack(),bullet:Bullet.getAllInitPack(),enemy:Enemy.getAllInitPack(),selfId:socket.id});
-        socket.emit('mapData', MapController.getMapPack("forest"));
+        if(createdGame == false) {
+            socket.emit('init',{player: Player.getAllInitPack(),bullet:Bullet.getAllInitPack(),enemy:Enemy.getAllInitPack(),selfId:socket.id});
+            socket.emit('mapData', MapController.getMapPack("forest"));
+        } else {
+            let game: GameController = GameController.list[player.game];
+            game.addPlayer(player);
+            socket.emit('init',{player: Player.getAllInitPack(),bullet:Bullet.getAllInitPack(),enemy:Enemy.getAllInitPack(),selfId:socket.id});
+            socket.emit('mapData', MapController.getMapPack(game.map));
+        }
     }
 
     onDeath = () => {

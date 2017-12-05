@@ -46,7 +46,7 @@ class Enemy extends Actor_1.Actor {
             if (this.attackController.melee && Math.sqrt(diffX * diffX + diffY * diffY) < 50) {
                 this.attackController.pressingAttack = true;
             }
-            let distance = 500;
+            let distance = 400;
             if (this.attackController.activeWeapon._weapon == enums_1.WeaponType.flamethrower) {
                 distance = 200;
             }
@@ -158,7 +158,7 @@ class Enemy extends Actor_1.Actor {
         if (param.kind)
             this.kind = param.kind;
         this.attackController.pressingAttack = true;
-        this.attackController.accuracy = 15;
+        this.attackController.accuracy = 30;
         this.giveWeapons();
         globalVariables_1.initPack.enemy.push(this.getInitPack());
     }
@@ -171,8 +171,9 @@ Enemy.update = () => {
         let enemy = Enemy.list[i];
         enemy.extendedUpdate();
         if (enemy.toRemove) {
+            let map = enemy.map;
             delete Enemy.list[i];
-            Enemy.randomlyGenerate('forest');
+            Enemy.randomlyGenerate(map);
             globalVariables_1.removePack.enemy.push(enemy.id);
         }
         else {

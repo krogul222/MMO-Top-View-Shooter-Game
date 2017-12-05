@@ -63,6 +63,7 @@ class BulletClient {
         this.img = (initPack.img !== undefined) ? initPack.img : "bullet";
         this.map = (initPack.map !== undefined) ? initPack.map : "forest";
         BulletClient.list[this.id] = this;
+        console.log("BULLET " + this.map);
     }
 }
 BulletClient.list = {};

@@ -49,12 +49,13 @@ export let canvasFilters: Filters = new Filters(ctx);
 export let effects: Effects = new Effects(ctx);
 
 socket.on('mapData', function(data){
-    MapController.updateMap(data);
-    if(currentMap.name == data.name){
+        MapController.createMap(data.name, 16,20);
+        MapController.updateMap(data);
+  //  if(currentMap.name == data.name){
         currentMap.reloadMap(MapController.getMap(data.name));
         camera.updateWorldSize(currentMap.map.width, currentMap.map.height);
         gui.createMinimap();
-    }
+   // }
 });
 
 socket.on('init', function(data){

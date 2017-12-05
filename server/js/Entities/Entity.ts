@@ -13,6 +13,7 @@ export class Entity {
     private _map: string = "forest";
     private _type: string = "entity";
     private _img: string = "";
+    private _game: number = -1;
 
     constructor(param){
         if(param){
@@ -24,6 +25,10 @@ export class Entity {
             this._map = param.map ? param.map : this._map;
             this._type = param.type ? param.type : this._type;
             this._img = param.img ? param.img : this._img;
+            
+            if(param.game !== undefined){
+                this._game = param.game;
+            }
         }
     }
 
@@ -55,6 +60,7 @@ export class Entity {
     get speed() { return this._speed; }
     get id() { return this._id; }
     get img() { return this._img; }
+    get game() { return this._game; }
     setSpdX = ( speedX ) => { this._speed.x = speedX;}
     setSpdY = ( speedY ) => { this._speed.y = speedY;}
     static getFrameUpdateData = () => {return {removePack: removePack, initPack: initPack};}

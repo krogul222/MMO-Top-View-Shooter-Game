@@ -12,6 +12,7 @@ class Entity {
         this._map = "forest";
         this._type = "entity";
         this._img = "";
+        this._game = -1;
         this.updatePosition = () => this._position.changePosition(this._speed.x * Constants_1.GAME_SPEED_TOOLINGFACTOR, this._speed.y * Constants_1.GAME_SPEED_TOOLINGFACTOR);
         this.update = () => this.updatePosition();
         this.getDistance = (entity) => {
@@ -37,6 +38,9 @@ class Entity {
             this._map = param.map ? param.map : this._map;
             this._type = param.type ? param.type : this._type;
             this._img = param.img ? param.img : this._img;
+            if (param.game !== undefined) {
+                this._game = param.game;
+            }
         }
     }
     get type() { return this._type; }
@@ -47,6 +51,7 @@ class Entity {
     get speed() { return this._speed; }
     get id() { return this._id; }
     get img() { return this._img; }
+    get game() { return this._game; }
     setPosition(position) {
         this._position.x = position.x;
         this._position.y = position.y;

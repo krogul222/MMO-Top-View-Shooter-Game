@@ -1,4 +1,5 @@
 Object.defineProperty(exports, "__esModule", { value: true });
+const GameController_1 = require("./../Controllers/GameController");
 const Smoke_1 = require("./../Effects/Smoke");
 const globalVariables_1 = require("./../globalVariables");
 const Enemy_1 = require("./Enemy");
@@ -148,13 +149,21 @@ class Player extends Actor_1.Actor {
         }
     }
 }
-Player.onConnect = (socket) => {
+Player.onConnect = (socket, createdGame = false) => {
+    let gameId = -1;
     let map = 'forest';
+    if (createdGame == true) {
+        let game = new GameController_1.GameController();
+        game.addSocket(socket);
+        gameId = game.id;
+        map = game.map;
+    }
     let player = new Player({
         id: socket.id,
         maxSpdX: 12,
         maxSpdY: 12,
         map: map,
+        game: gameId,
         img: 'player',
         atkSpd: 7,
         width: 50,
@@ -206,8 +215,16 @@ Player.onConnect = (socket) => {
             MapControler_1.MapController.updatePack.push(MapControler_1.MapController.getMapPack(data.map));
         }
     });
-    socket.emit('init', { player: Player.getAllInitPack(), bullet: Bullet_1.Bullet.getAllInitPack(), enemy: Enemy_1.Enemy.getAllInitPack(), selfId: socket.id });
-    socket.emit('mapData', MapControler_1.MapController.getMapPack("forest"));
+    if (createdGame == false) {
+        socket.emit('init', { player: Player.getAllInitPack(), bullet: Bullet_1.Bullet.getAllInitPack(), enemy: Enemy_1.Enemy.getAllInitPack(), selfId: socket.id });
+        socket.emit('mapData', MapControler_1.MapController.getMapPack("forest"));
+    }
+    else {
+        let game = GameController_1.GameController.list[player.game];
+        game.addPlayer(player);
+        socket.emit('init', { player: Player.getAllInitPack(), bullet: Bullet_1.Bullet.getAllInitPack(), enemy: Enemy_1.Enemy.getAllInitPack(), selfId: socket.id });
+        socket.emit('mapData', MapControler_1.MapController.getMapPack(game.map));
+    }
 };
 Player.getAllInitPack = () => {
     let players = [];

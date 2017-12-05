@@ -60,12 +60,12 @@
 /******/ 	__webpack_require__.p = "/build/client/js";
 /******/
 /******/ 	// Load entry module and return exports
-/******/ 	return __webpack_require__(__webpack_require__.s = 49);
+/******/ 	return __webpack_require__(__webpack_require__.s = 50);
 /******/ })
 /************************************************************************/
 /******/ ({
 
-/***/ 49:
+/***/ 50:
 /***/ (function(module, exports) {
 
 let signDiv = document.getElementById("signDiv");
@@ -76,10 +76,23 @@ let signDivSignIn = document.getElementById("signDiv-signIn");
 let signDivSignUp = document.getElementById("signDiv-signUp");
 let gameMenuDiv = document.getElementById("gameMenuDiv");
 let quickGame = document.getElementById("quickGame");
+let createGame = document.getElementById("createGame");
 let mainBar = document.getElementById("mainBar");
 let gameMenuDivContainer = document.getElementById("gameMenuDivContainer");
 signDivSignIn.onclick = function () {
     socket.emit('signIn', { username: signDivUsername.value, password: signDivPassword.value });
+};
+createGame.onclick = function () {
+    canJoinGame = true;
+    gameMenuDiv.style.display = 'none';
+    gameMenuDivContainer.style.display = 'none';
+    mainBar.style.display = 'none';
+    if (imagesLoaded !== ALL_IMAGES) {
+        loadingDiv.style.display = 'inline';
+    }
+    else {
+        socket.emit('createdGame');
+    }
 };
 quickGame.onclick = function () {
     canJoinGame = true;
