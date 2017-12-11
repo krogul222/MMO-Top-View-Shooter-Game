@@ -39,7 +39,7 @@ createGame.onclick = function(){
         socket.emit('createdGame');
     }
 }
-
+/*
 quickGame.onclick = function(){
         canJoinGame = true;
         gameMenuDiv.style.display = 'none';
@@ -50,7 +50,7 @@ quickGame.onclick = function(){
         } else{
             socket.emit('joinedGame');
         }
-}
+}*/
 
 joinGameMenuBtn.onclick = function(){
     gameMenuDiv.style.display = 'none';

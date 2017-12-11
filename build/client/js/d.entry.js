@@ -100,18 +100,6 @@ createGame.onclick = function () {
         socket.emit('createdGame');
     }
 };
-quickGame.onclick = function () {
-    canJoinGame = true;
-    gameMenuDiv.style.display = 'none';
-    gameMenuDivContainer.style.display = 'none';
-    mainBar.style.display = 'none';
-    if (imagesLoaded !== ALL_IMAGES) {
-        loadingDiv.style.display = 'inline';
-    }
-    else {
-        socket.emit('joinedGame');
-    }
-};
 joinGameMenuBtn.onclick = function () {
     gameMenuDiv.style.display = 'none';
     gameMenuDivContainer.style.display = 'none';
