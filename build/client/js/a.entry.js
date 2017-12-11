@@ -1374,13 +1374,19 @@ class Player extends Actor_1.Actor {
         }
     }
 }
-Player.onConnect = (socket, createdGame = false) => {
-    let gameId = -1;
+Player.onConnect = (socket, createdGame = false, gID = -1) => {
+    let gameId = gID;
+    console.log("Nowy SOCKET " + socket.id);
     let map = 'forest';
     if (createdGame == true) {
         let game = new GameController_1.GameController();
         game.addSocket(socket);
         gameId = game.id;
+        map = game.map;
+    }
+    else {
+        console.log("GAMEID " + gameId);
+        let game = GameController_1.GameController.list[gameId];
         map = game.map;
     }
     let player = new Player({
@@ -1441,12 +1447,18 @@ Player.onConnect = (socket, createdGame = false) => {
         }
     });
     if (createdGame == false) {
+        console.log("GAMEID " + gameId);
+        let game = GameController_1.GameController.list[gameId];
+        game.addPlayer(player);
+        game.addSocket(socket);
+        console.log("Socket in Player " + socket.id);
         socket.emit('init', { player: Player.getAllInitPack(), bullet: Bullet_1.Bullet.getAllInitPack(), enemy: Enemy_1.Enemy.getAllInitPack(), selfId: socket.id });
-        socket.emit('mapData', MapControler_1.MapController.getMapPack("forest"));
+        socket.emit('mapData', MapControler_1.MapController.getMapPack(game.map));
     }
     else {
-        let game = GameController_1.GameController.list[player.game];
+        let game = GameController_1.GameController.list[gameId];
         game.addPlayer(player);
+        console.log("Socket in Player " + socket.id);
         socket.emit('init', { player: Player.getAllInitPack(), bullet: Bullet_1.Bullet.getAllInitPack(), enemy: Enemy_1.Enemy.getAllInitPack(), selfId: socket.id });
         socket.emit('mapData', MapControler_1.MapController.getMapPack(game.map));
     }
@@ -3046,13 +3058,15 @@ class GameController {
         this.players = {};
         this.map = "forest";
         this.addSocket = (socket) => {
-            this.socketList[socket.id] = socket;
+            this.socketList[socket.id] = socket.id;
+            console.log("SOCKET ADDED " + this.socketList[socket.id]);
         };
         this.addPlayer = (player) => {
             this.players[player.id] = player;
+            console.log("PLAYER ADDED TO GAME");
         };
         this.id = Math.random();
-        this.map = "22";
+        this.map = this.id;
         MapControler_1.MapController.createMap(this.map, 16, 20);
         MapControler_1.MapController.updatePack.push(MapControler_1.MapController.getMapPack(this.map));
         GameController.list[this.id] = this;

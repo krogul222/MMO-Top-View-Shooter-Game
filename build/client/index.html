@@ -42,11 +42,9 @@
             <h2 style="color : white; font-family:Calligrapher;">Brykiet</h2><br>
 
             <!-- <a href="#"><button class="btn btn-primary"><strong>Login</strong></button></a> -->
-            <button id = "createGame" class="btn btn-danger">Create Game</button><br><br>
-            <button id = "joinGame" class="btn btn-danger">Join Game</button>
+            <button id = "createGame" class="btn btn-primary">Create Game</button><br><br>
+            <button id = "joinGameMenuBtn" class="btn btn-primary">Join Game</button>
             <br><br><br>
-        <!-- <input type="submit" id="signDiv-signIn" value="Login" class="btn btn-primary"> -->
-        <button id = "quickGame" class="btn btn-primary">Quick Game</button>
         <br/><br/>
     </div>
 </div>
@@ -74,9 +72,32 @@
         <br><br>
         <h2 style="color : white; font-family:Calligrapher;text-align:center">Available Games</h2><br>
         <div class="container">
-            <ul id="GameList">
-            </ul>
-        </div>
+            <table id="availableGamesList" class="table table-hover table-inverse">
+                <thead>
+                  <tr>
+                    <th>#</th>
+                    <th>Game Name</th>
+                  </tr>
+                </thead>  
+                <tbody id="availableGamesListTbody">
+                    <tr>
+                      <th scope="row">1</th>
+                      <td>Mark</td>
+                    </tr>
+                    <tr>
+                      <th scope="row">2</th>
+                      <td>Jacob</td>
+                    </tr>
+                    <tr>
+                      <th scope="row">3</th>
+                      <td colspan="2">Larry the Bird</td>
+                    </tr>
+                  </tbody>
+                </table>
+                  <br>
+            <button id = "joinGameBtn" class="btn btn-primary">Join</button>
+            <button id = "backToGameMenuBtn" class="btn btn-primary">Back</button>
+        </div> 
     </div>
 
     <div id="gameDiv" style="display:none;">

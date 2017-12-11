@@ -17,6 +17,7 @@
     "ts-loader": "^2.3.7"
   },
   "devDependencies": {
+    "@types/jquery": "^3.2.16",
     "@types/node": "^8.0.33"
   },
   "scripts": {

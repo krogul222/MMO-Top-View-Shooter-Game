@@ -6,10 +6,12 @@ class GameController {
         this.players = {};
         this.map = "forest";
         this.addSocket = (socket) => {
-            this.socketList[socket.id] = socket;
+            this.socketList[socket.id] = socket.id;
+            console.log("SOCKET ADDED " + this.socketList[socket.id]);
         };
         this.addPlayer = (player) => {
             this.players[player.id] = player;
+            console.log("PLAYER ADDED TO GAME");
         };
         this.id = Math.random();
         this.map = this.id;

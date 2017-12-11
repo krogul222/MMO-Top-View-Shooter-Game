@@ -62,7 +62,12 @@ io.sockets.on('connection', function (socket) {
         });
     });
     socket.on('joinedGame', function (data) {
-        Player_1.Player.onConnect(socket);
+        if (data.gameId !== undefined) {
+            Player_1.Player.onConnect(socket, false, data.gameId);
+        }
+        else {
+            Player_1.Player.onConnect(socket);
+        }
     });
     socket.on('createdGame', function (data) {
         Player_1.Player.onConnect(socket, true);
@@ -95,6 +100,14 @@ io.sockets.on('connection', function (socket) {
         }
         let res = eval(data);
         socket.emit('evalAnswer', res);
+    });
+    socket.on('getListOfGames', function (data) {
+        let pack = [];
+        for (let i in GameController_1.GameController.list) {
+            let game = GameController_1.GameController.list[i];
+            pack.push({ id: game.id });
+        }
+        socket.emit('ListOfGames', pack);
     });
 });
 MapControler_1.MapController.loadMaps();

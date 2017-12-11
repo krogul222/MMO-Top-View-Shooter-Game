@@ -20,11 +20,13 @@ export class GameController{
     }
 
     addSocket = (socket) => {
-        this.socketList[socket.id] = socket;
+        this.socketList[socket.id] = socket.id;
+        console.log("SOCKET ADDED " + this.socketList[socket.id]);
     }
     
     addPlayer = (player) => {
         this.players[player.id] = player;
+        console.log("PLAYER ADDED TO GAME");
     }
 
     static list = {};

@@ -171,10 +171,10 @@ export class Player extends Actor {
         }*/
     }
 
-    static onConnect = (socket, createdGame: boolean = false) => {
+    static onConnect = (socket, createdGame: boolean = false, gID: number = -1) => {
 
-        let gameId: number = -1;
-
+        let gameId: number = gID;
+        console.log("Nowy SOCKET " + socket.id);
 
 
         let map = 'forest';
@@ -183,6 +183,10 @@ export class Player extends Actor {
             let game = new GameController();
             game.addSocket(socket);
             gameId = game.id;
+            map = game.map;
+        } else{
+            console.log("GAMEID "+gameId);
+            let game: GameController = GameController.list[gameId];
             map = game.map;
         }
 
@@ -229,11 +233,17 @@ export class Player extends Actor {
         });
 
         if(createdGame == false) {
-            socket.emit('init',{player: Player.getAllInitPack(),bullet:Bullet.getAllInitPack(),enemy:Enemy.getAllInitPack(),selfId:socket.id});
-            socket.emit('mapData', MapController.getMapPack("forest"));
-        } else {
-            let game: GameController = GameController.list[player.game];
+            console.log("GAMEID "+gameId);
+            let game: GameController = GameController.list[gameId];
             game.addPlayer(player);
+            game.addSocket(socket);
+            console.log("Socket in Player "+socket.id);
+            socket.emit('init',{player: Player.getAllInitPack(),bullet:Bullet.getAllInitPack(),enemy:Enemy.getAllInitPack(),selfId:socket.id});
+            socket.emit('mapData', MapController.getMapPack(game.map));
+        } else {
+            let game: GameController = GameController.list[gameId];
+            game.addPlayer(player);
+            console.log("Socket in Player "+socket.id);
             socket.emit('init',{player: Player.getAllInitPack(),bullet:Bullet.getAllInitPack(),enemy:Enemy.getAllInitPack(),selfId:socket.id});
             socket.emit('mapData', MapController.getMapPack(game.map));
         }
