@@ -78,7 +78,7 @@ function imgLoaded() {
             socket.emit('joinedGame',{gameId: selectedGameId});
         } else{
             if(canCreateGame) socket.emit('createdGame');
-        }
+        } 
     }
 }
 
