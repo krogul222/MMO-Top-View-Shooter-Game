@@ -2214,7 +2214,7 @@ class Particle {
                         let player = Player_1.Player.list[this.parent];
                         let closeEnemies = player.getCloseEnemies();
                         for (let key in closeEnemies) {
-                            let enemy = closeEnemies[key];
+                            let enemy = Enemy_1.Enemy.list[closeEnemies[key]];
                             if (this.testCollision(enemy)) {
                                 enemy.lifeAndBodyController.wasHit(1 * this.life / this.maxLife);
                                 enemy.lifeAndBodyController.startBurn(100);

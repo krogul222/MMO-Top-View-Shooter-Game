@@ -27,10 +27,12 @@ class Particle {
                         let player = Player_1.Player.list[this.parent];
                         let closeEnemies = player.getCloseEnemies();
                         for (let key in closeEnemies) {
-                            let enemy = closeEnemies[key];
-                            if (this.testCollision(enemy)) {
-                                enemy.lifeAndBodyController.wasHit(1 * this.life / this.maxLife);
-                                enemy.lifeAndBodyController.startBurn(100);
+                            let enemy = Enemy_1.Enemy.list[closeEnemies[key]];
+                            if (enemy) {
+                                if (this.testCollision(enemy)) {
+                                    enemy.lifeAndBodyController.wasHit(1 * this.life / this.maxLife);
+                                    enemy.lifeAndBodyController.startBurn(100);
+                                }
                             }
                         }
                         if (GameController_1.GameController.list[this.game] !== undefined) {
