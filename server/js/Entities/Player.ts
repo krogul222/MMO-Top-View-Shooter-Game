@@ -228,7 +228,7 @@ export class Player extends Actor {
         });
 
         game.addPlayer(player);
-
+       // console.log
         socket.emit('init',{player: Player.getAllSpecificInitPack(game.id),enemy:Enemy.getAllSpecificInitPack(game.id),selfId:socket.id});
         //socket.emit('init',{player: Player.getAllInitPack(),bullet:Bullet.getAllInitPack(),enemy:Enemy.getAllInitPack(),selfId:socket.id});
         socket.emit('mapData', MapController.getMapPack(game.map));

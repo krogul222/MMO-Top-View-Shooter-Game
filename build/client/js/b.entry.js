@@ -245,20 +245,20 @@ exports.getRandomInt = getRandomInt;
 
 Object.defineProperty(exports, "__esModule", { value: true });
 const PlayerClient_1 = __webpack_require__(5);
-const Particle_1 = __webpack_require__(14);
+const Particle_1 = __webpack_require__(15);
 const ParticleClient_1 = __webpack_require__(40);
 const UpgradeClient_1 = __webpack_require__(41);
 const BulletClient_1 = __webpack_require__(42);
 const GameSoundManager_1 = __webpack_require__(43);
-const Inventory_1 = __webpack_require__(16);
+const Inventory_1 = __webpack_require__(18);
 const MapControler_1 = __webpack_require__(7);
 const MapClient_1 = __webpack_require__(44);
 const Filters_1 = __webpack_require__(45);
 const Effects_1 = __webpack_require__(46);
 const canvas_1 = __webpack_require__(3);
 const SmokeClient_1 = __webpack_require__(48);
-const EnemyClient_1 = __webpack_require__(12);
-const ExplosionClient_1 = __webpack_require__(20);
+const EnemyClient_1 = __webpack_require__(13);
+const ExplosionClient_1 = __webpack_require__(21);
 let enemyDrawList = [];
 exports.selfId = 0;
 let smokeTest = false;
@@ -292,11 +292,14 @@ socket.on('init', function (data) {
             new SmokeClient_1.SmokeClient(data.smoke[i]);
         }
     }
-    for (let i = 0, length = data.bullet.length; i < length; i++) {
-        let b = new BulletClient_1.BulletClient(data.bullet[i]);
-        b.hit(data.bullet[i].hitCategory, data.bullet[i].hitEntityCategory, data.bullet[i].hitEntityId);
+    if (data.bullet !== undefined) {
+        for (let i = 0, length = data.bullet.length; i < length; i++) {
+            let b = new BulletClient_1.BulletClient(data.bullet[i]);
+            b.hit(data.bullet[i].hitCategory, data.bullet[i].hitEntityCategory, data.bullet[i].hitEntityId);
+        }
     }
     for (let i = 0, length = data.enemy.length; i < length; i++) {
+        console.log("NOWY STWOR");
         new EnemyClient_1.EnemyClient(data.enemy[i]);
     }
     if (data.upgrade !== undefined) {
@@ -683,8 +686,8 @@ let updateMouse = () => {
 /***/ (function(module, exports, __webpack_require__) {
 
 Object.defineProperty(exports, "__esModule", { value: true });
-const Camera_1 = __webpack_require__(22);
-const GUI_1 = __webpack_require__(23);
+const Camera_1 = __webpack_require__(23);
+const GUI_1 = __webpack_require__(24);
 gui = new GUI_1.GUI({ ctx: ctxui, width: WIDTH, height: HEIGHTUI });
 exports.camera = new Camera_1.Camera(canvas, WIDTH, HEIGHT);
 let resizeCanvas = function () {
@@ -775,11 +778,11 @@ function imgLoaded() {
 
 Object.defineProperty(exports, "__esModule", { value: true });
 const GeometryAndPhysics_1 = __webpack_require__(0);
-const FireFlameClient_1 = __webpack_require__(13);
+const FireFlameClient_1 = __webpack_require__(14);
 const game_1 = __webpack_require__(2);
 const canvas_1 = __webpack_require__(3);
 const images_1 = __webpack_require__(4);
-const EnemyClient_1 = __webpack_require__(12);
+const EnemyClient_1 = __webpack_require__(13);
 class PlayerClient {
     constructor(initPack) {
         this.id = -1;
@@ -1214,9 +1217,42 @@ exports.MapController = MapController;
 /***/ (function(module, exports, __webpack_require__) {
 
 Object.defineProperty(exports, "__esModule", { value: true });
-const Pack_1 = __webpack_require__(33);
-exports.initPack = new Pack_1.Pack();
-exports.removePack = new Pack_1.Pack();
+const Pack_1 = __webpack_require__(16);
+const MapControler_1 = __webpack_require__(7);
+class GameController {
+    constructor(param) {
+        this.socketList = {};
+        this.players = {};
+        this.enemies = {};
+        this.smokes = {};
+        this.map = "forest";
+        this.initPack = new Pack_1.Pack();
+        this.removePack = new Pack_1.Pack();
+        this.addSocket = (socket) => {
+            this.socketList[socket.id] = socket.id;
+            console.log("SOCKET ADDED " + this.socketList[socket.id]);
+        };
+        this.addPlayer = (player) => {
+            this.players[player.id] = player;
+            console.log("PLAYER ADDED TO GAME");
+        };
+        this.addEnemy = (enemy) => {
+            this.enemies[enemy.id] = enemy;
+            console.log("Enemy ADDED TO GAME");
+        };
+        this.addSmoke = (smoke) => {
+            this.smokes[smoke.id] = smoke;
+            console.log("Enemy ADDED TO GAME");
+        };
+        this.id = Math.random();
+        this.map = this.id;
+        MapControler_1.MapController.createMap(this.map, 16, 20);
+        MapControler_1.MapController.updatePack.push(MapControler_1.MapController.getMapPack(this.map));
+        GameController.list[this.id] = this;
+    }
+}
+GameController.list = {};
+exports.GameController = GameController;
 
 
 /***/ }),
@@ -1224,12 +1260,21 @@ exports.removePack = new Pack_1.Pack();
 /***/ (function(module, exports, __webpack_require__) {
 
 Object.defineProperty(exports, "__esModule", { value: true });
-const GameController_1 = __webpack_require__(25);
+const Pack_1 = __webpack_require__(16);
+exports.initPack = new Pack_1.Pack();
+exports.removePack = new Pack_1.Pack();
+
+
+/***/ }),
+/* 10 */
+/***/ (function(module, exports, __webpack_require__) {
+
+Object.defineProperty(exports, "__esModule", { value: true });
+const GameController_1 = __webpack_require__(8);
 const Smoke_1 = __webpack_require__(32);
-const globalVariables_1 = __webpack_require__(8);
-const Enemy_1 = __webpack_require__(10);
-const Bullet_1 = __webpack_require__(18);
-const Actor_1 = __webpack_require__(15);
+const globalVariables_1 = __webpack_require__(9);
+const Enemy_1 = __webpack_require__(11);
+const Actor_1 = __webpack_require__(17);
 const GeometryAndPhysics_1 = __webpack_require__(0);
 const enums_1 = __webpack_require__(1);
 const MapControler_1 = __webpack_require__(7);
@@ -1352,43 +1397,46 @@ class Player extends Actor_1.Actor {
         this.closeEnemies = (distance) => {
             let ids = [];
             let e;
-            for (let i in Enemy_1.Enemy.list) {
-                e = Enemy_1.Enemy.list[i];
-                if (Math.abs(e.position.x - this.position.x) < distance && Math.abs(e.position.y - this.position.y) < distance) {
-                    ids.push(e.id);
+            if (GameController_1.GameController.list[this.game] !== undefined) {
+                let enemies = GameController_1.GameController.list[this.game].enemies;
+                for (let i in enemies) {
+                    e = enemies[i];
+                    if (Math.abs(e.position.x - this.position.x) < distance && Math.abs(e.position.y - this.position.y) < distance) {
+                        ids.push(e.id);
+                    }
                 }
+            }
+            else {
+                console.log("PROBLEM " + this.game);
             }
             return ids;
         };
         globalVariables_1.initPack.player.push(this.getInitPack());
         Player.list[param.id] = this;
         this.giveItems();
-        if (Player.monsters) {
-            for (let i = 0; i < 10; i++) {
-                Enemy_1.Enemy.randomlyGenerate(this.map);
-                Enemy_1.Enemy.randomlyGenerate(this.map);
-                Enemy_1.Enemy.randomlyGenerate(this.map);
-                Enemy_1.Enemy.randomlyGenerate(this.map);
-            }
-            Player.monsters = false;
+        if (GameController_1.GameController.list[this.game] !== undefined) {
+            GameController_1.GameController.list[this.game].initPack.player.push(this.getInitPack());
         }
     }
 }
 Player.onConnect = (socket, createdGame = false, gID = -1) => {
+    let game;
     let gameId = gID;
     console.log("Nowy SOCKET " + socket.id);
     let map = 'forest';
     if (createdGame == true) {
-        let game = new GameController_1.GameController();
-        game.addSocket(socket);
+        game = new GameController_1.GameController({ monsters: 40 });
+        for (let i = 0; i < 40; i++) {
+            Enemy_1.Enemy.randomlyGenerate(game);
+        }
         gameId = game.id;
-        map = game.map;
     }
     else {
-        console.log("GAMEID " + gameId);
-        let game = GameController_1.GameController.list[gameId];
-        map = game.map;
+        game = GameController_1.GameController.list[gameId];
+        gameId = game.id;
     }
+    game.addSocket(socket);
+    map = game.map;
     let player = new Player({
         id: socket.id,
         maxSpdX: 12,
@@ -1439,29 +1487,16 @@ Player.onConnect = (socket, createdGame = false, gID = -1) => {
         if (data.inputId == 'space')
             player.attackController.weaponCollection.chooseNextWeaponWithAmmo();
         if (data.inputId == 'smoke')
-            new Smoke_1.Smoke(new GeometryAndPhysics_1.Point(player.position.x - 128, player.position.y - 128), 150, 750, 20, player.map);
+            new Smoke_1.Smoke(new GeometryAndPhysics_1.Point(player.position.x - 128, player.position.y - 128), 150, 750, 20, player.game);
         if (data.inputId == 'map') {
             let gameMap = MapControler_1.MapController.getMap(data.map);
             MapControler_1.MapController.createMap(data.map, gameMap.size, 20);
             MapControler_1.MapController.updatePack.push(MapControler_1.MapController.getMapPack(data.map));
         }
     });
-    if (createdGame == false) {
-        console.log("GAMEID " + gameId);
-        let game = GameController_1.GameController.list[gameId];
-        game.addPlayer(player);
-        game.addSocket(socket);
-        console.log("Socket in Player " + socket.id);
-        socket.emit('init', { player: Player.getAllInitPack(), bullet: Bullet_1.Bullet.getAllInitPack(), enemy: Enemy_1.Enemy.getAllInitPack(), selfId: socket.id });
-        socket.emit('mapData', MapControler_1.MapController.getMapPack(game.map));
-    }
-    else {
-        let game = GameController_1.GameController.list[gameId];
-        game.addPlayer(player);
-        console.log("Socket in Player " + socket.id);
-        socket.emit('init', { player: Player.getAllInitPack(), bullet: Bullet_1.Bullet.getAllInitPack(), enemy: Enemy_1.Enemy.getAllInitPack(), selfId: socket.id });
-        socket.emit('mapData', MapControler_1.MapController.getMapPack(game.map));
-    }
+    game.addPlayer(player);
+    socket.emit('init', { player: Player.getAllSpecificInitPack(game.id), enemy: Enemy_1.Enemy.getAllSpecificInitPack(game.id), selfId: socket.id });
+    socket.emit('mapData', MapControler_1.MapController.getMapPack(game.map));
 };
 Player.getAllInitPack = () => {
     let players = [];
@@ -1470,14 +1505,41 @@ Player.getAllInitPack = () => {
     }
     return players;
 };
+Player.getAllSpecificInitPack = (game) => {
+    let players = [];
+    if (GameController_1.GameController.list[game] !== undefined) {
+        let p = GameController_1.GameController.list[game].players;
+        for (let i in p) {
+            players.push(p[i].getInitPack());
+        }
+    }
+    return players;
+};
 Player.onDisconnect = (socket) => {
     delete Player.list[socket.id];
     globalVariables_1.removePack.player.push(socket.id);
+    for (let key in GameController_1.GameController.list) {
+        let players = GameController_1.GameController.list[key].players;
+        for (let i = 0; i < GameController_1.GameController.list[key].players.length; i++) {
+            if (players[i].id == socket.id) {
+                GameController_1.GameController.list[key].removePack.player.push(socket.id);
+            }
+        }
+    }
 };
 Player.update = () => {
     let pack = [];
     for (let i in Player.list) {
         let player = Player.list[i];
+        player.extendedUpdate();
+        pack.push(player.getUpdatePack());
+    }
+    return pack;
+};
+Player.updateSpecific = (players) => {
+    let pack = [];
+    for (let i in players) {
+        let player = players[i];
         player.extendedUpdate();
         pack.push(player.getUpdatePack());
     }
@@ -1489,15 +1551,16 @@ exports.Player = Player;
 
 
 /***/ }),
-/* 10 */
+/* 11 */
 /***/ (function(module, exports, __webpack_require__) {
 
 Object.defineProperty(exports, "__esModule", { value: true });
-const Actor_1 = __webpack_require__(15);
+const Actor_1 = __webpack_require__(17);
 const GeometryAndPhysics_1 = __webpack_require__(0);
-const globalVariables_1 = __webpack_require__(8);
+const globalVariables_1 = __webpack_require__(9);
 const enums_1 = __webpack_require__(1);
 const MapControler_1 = __webpack_require__(7);
+const GameController_1 = __webpack_require__(8);
 class Enemy extends Actor_1.Actor {
     constructor(param) {
         super(param);
@@ -1655,6 +1718,10 @@ class Enemy extends Actor_1.Actor {
         this.attackController.accuracy = 30;
         this.giveWeapons();
         globalVariables_1.initPack.enemy.push(this.getInitPack());
+        if (GameController_1.GameController.list[this.game] !== undefined) {
+            GameController_1.GameController.list[this.game].initPack.enemy.push(this.getInitPack());
+        }
+        GameController_1.GameController.list[this.game].addEnemy(this);
     }
 }
 Enemy.globalMapControler = new MapControler_1.MapController(null);
@@ -1665,10 +1732,33 @@ Enemy.update = () => {
         let enemy = Enemy.list[i];
         enemy.extendedUpdate();
         if (enemy.toRemove) {
-            let map = enemy.map;
+            let gameId = enemy.game;
             delete Enemy.list[i];
-            Enemy.randomlyGenerate(map);
+            Enemy.randomlyGenerate(GameController_1.GameController.list[gameId]);
             globalVariables_1.removePack.enemy.push(enemy.id);
+        }
+        else {
+            updPack = enemy.getUpdatePack();
+            if (updPack !== {}) {
+                pack.push(updPack);
+            }
+        }
+    }
+    return pack;
+};
+Enemy.updateSpecific = (enemies) => {
+    let pack = [];
+    let updPack;
+    for (let i in enemies) {
+        let enemy = enemies[i];
+        enemy.extendedUpdate();
+        if (enemy.toRemove) {
+            let gameId = enemy.game;
+            delete Enemy.list[i];
+            delete enemies[i];
+            Enemy.randomlyGenerate(GameController_1.GameController.list[gameId]);
+            globalVariables_1.removePack.enemy.push(enemy.id);
+            GameController_1.GameController.list[gameId].removePack.enemy.push(enemy.id);
         }
         else {
             updPack = enemy.getUpdatePack();
@@ -1686,8 +1776,19 @@ Enemy.getAllInitPack = function () {
     }
     return enemies;
 };
-Enemy.randomlyGenerate = function (choosenMap) {
-    let map = MapControler_1.MapController.getMap(choosenMap);
+Enemy.getAllSpecificInitPack = function (game) {
+    let enemies = [];
+    if (GameController_1.GameController.list[game] !== undefined) {
+        let e = GameController_1.GameController.list[game].enemies;
+        for (let i in e) {
+            enemies.push(e[i].getInitPack());
+        }
+    }
+    console.log("ENEMYYYYY " + enemies.length);
+    return enemies;
+};
+Enemy.randomlyGenerate = function (game) {
+    let map = MapControler_1.MapController.getMap(game.map);
     let x = Math.random() * map.width;
     let y = Math.random() * map.height;
     let position = new GeometryAndPhysics_1.Point(x, y);
@@ -1709,10 +1810,11 @@ Enemy.randomlyGenerate = function (choosenMap) {
             height: height,
             hp: 15 * difficulty,
             atkSpd: 0.8 * difficulty,
-            map: choosenMap,
+            map: game.map,
             img: 'scorpion',
             type: 'enemy',
             kind: 'scorpion',
+            game: game.id,
             maxSpdX: 3,
             maxSpdY: 3
         });
@@ -1725,7 +1827,8 @@ Enemy.randomlyGenerate = function (choosenMap) {
             height: height,
             hp: 5 * difficulty,
             atkSpd: 0.4 * difficulty,
-            map: choosenMap,
+            map: game.map,
+            game: game.id,
             img: 'zombie',
             type: 'enemy',
             kind: 'zombie',
@@ -1739,7 +1842,7 @@ exports.Enemy = Enemy;
 
 
 /***/ }),
-/* 11 */
+/* 12 */
 /***/ (function(module, exports, __webpack_require__) {
 
 Object.defineProperty(exports, "__esModule", { value: true });
@@ -1873,17 +1976,17 @@ new WeaponTypes({ weapon: enums_2.WeaponType.claws, name: "claws",
 
 
 /***/ }),
-/* 12 */
+/* 13 */
 /***/ (function(module, exports, __webpack_require__) {
 
 Object.defineProperty(exports, "__esModule", { value: true });
 const game_1 = __webpack_require__(2);
-const FireFlameClient_1 = __webpack_require__(13);
+const FireFlameClient_1 = __webpack_require__(14);
 const PlayerClient_1 = __webpack_require__(5);
 const GeometryAndPhysics_1 = __webpack_require__(0);
 const canvas_1 = __webpack_require__(3);
 const images_1 = __webpack_require__(4);
-const EnemyConstants_1 = __webpack_require__(24);
+const EnemyConstants_1 = __webpack_require__(25);
 class EnemyClient {
     constructor(initPack) {
         this.id = -1;
@@ -2008,12 +2111,12 @@ exports.EnemyClient = EnemyClient;
 
 
 /***/ }),
-/* 13 */
+/* 14 */
 /***/ (function(module, exports, __webpack_require__) {
 
 Object.defineProperty(exports, "__esModule", { value: true });
 const GeometryAndPhysics_1 = __webpack_require__(0);
-const FireParticle_1 = __webpack_require__(21);
+const FireParticle_1 = __webpack_require__(22);
 class FireFlameClient {
     constructor(parent, burn = false) {
         this.particles = [];
@@ -2079,15 +2182,16 @@ exports.FireFlameClient = FireFlameClient;
 
 
 /***/ }),
-/* 14 */
+/* 15 */
 /***/ (function(module, exports, __webpack_require__) {
 
 Object.defineProperty(exports, "__esModule", { value: true });
-const Player_1 = __webpack_require__(9);
-const globalVariables_1 = __webpack_require__(8);
+const GameController_1 = __webpack_require__(8);
+const Player_1 = __webpack_require__(10);
+const globalVariables_1 = __webpack_require__(9);
 const enums_1 = __webpack_require__(1);
 const GeometryAndPhysics_1 = __webpack_require__(0);
-const Enemy_1 = __webpack_require__(10);
+const Enemy_1 = __webpack_require__(11);
 class Particle {
     constructor(param) {
         this.position = new GeometryAndPhysics_1.Point(0, 0);
@@ -2107,20 +2211,24 @@ class Particle {
             if (this.type == enums_1.ParticleType.fire) {
                 switch (this.combatType) {
                     case 'player': {
-                        for (let key in Enemy_1.Enemy.list) {
-                            let enemy = Enemy_1.Enemy.list[key];
+                        let player = Player_1.Player.list[this.parent];
+                        let closeEnemies = player.getCloseEnemies();
+                        for (let key in closeEnemies) {
+                            let enemy = closeEnemies[key];
                             if (this.testCollision(enemy)) {
                                 enemy.lifeAndBodyController.wasHit(1 * this.life / this.maxLife);
                                 enemy.lifeAndBodyController.startBurn(100);
                             }
                         }
-                        let player = Player_1.Player.list[this.parent];
-                        for (let key in Player_1.Player.list) {
-                            if (Player_1.Player.list[key].id !== this.parent) {
-                                let enemyPlayer = Player_1.Player.list[key];
-                                if (this.testCollision(enemyPlayer)) {
-                                    enemyPlayer.lifeAndBodyController.wasHit(1 * this.life / this.maxLife);
-                                    enemyPlayer.lifeAndBodyController.startBurn(100);
+                        if (GameController_1.GameController.list[this.game] !== undefined) {
+                            let players = GameController_1.GameController.list[this.game].players;
+                            for (let key in Player_1.Player.list) {
+                                if (Player_1.Player.list[key].id !== this.parent) {
+                                    let enemyPlayer = Player_1.Player.list[key];
+                                    if (this.testCollision(enemyPlayer)) {
+                                        enemyPlayer.lifeAndBodyController.wasHit(1 * this.life / this.maxLife);
+                                        enemyPlayer.lifeAndBodyController.startBurn(100);
+                                    }
                                 }
                             }
                         }
@@ -2128,19 +2236,25 @@ class Particle {
                     }
                     case 'enemy': {
                         let enemy = Enemy_1.Enemy.list[this.parent];
-                        for (let key in Player_1.Player.list) {
-                            let player = Player_1.Player.list[key];
-                            if (this.testCollision(player)) {
-                                player.lifeAndBodyController.wasHit(1 * this.life / this.maxLife);
-                                player.lifeAndBodyController.startBurn(100);
+                        if (GameController_1.GameController.list[this.game] !== undefined) {
+                            let players = GameController_1.GameController.list[this.game].players;
+                            for (let key in Player_1.Player.list) {
+                                let player = Player_1.Player.list[key];
+                                if (this.testCollision(player)) {
+                                    player.lifeAndBodyController.wasHit(1 * this.life / this.maxLife);
+                                    player.lifeAndBodyController.startBurn(100);
+                                }
                             }
                         }
-                        for (let key in Enemy_1.Enemy.list) {
-                            if (Enemy_1.Enemy.list[key].id !== this.parent) {
-                                let enemy = Enemy_1.Enemy.list[key];
-                                if (this.testCollision(enemy)) {
-                                    enemy.lifeAndBodyController.wasHit(1 * this.life / this.maxLife);
-                                    enemy.lifeAndBodyController.startBurn(100);
+                        if (GameController_1.GameController.list[this.game] !== undefined) {
+                            let enemies = GameController_1.GameController.list[this.game].enemies;
+                            for (let key in enemies) {
+                                if (enemies.id !== this.parent) {
+                                    let enemy = enemies[key];
+                                    if (this.testCollision(enemy)) {
+                                        enemy.lifeAndBodyController.wasHit(1 * this.life / this.maxLife);
+                                        enemy.lifeAndBodyController.startBurn(100);
+                                    }
                                 }
                             }
                         }
@@ -2160,7 +2274,7 @@ class Particle {
             return {
                 id: this.id,
                 position: this.position,
-                map: this.map,
+                map: GameController_1.GameController.list[this.game].map,
                 size: this.size,
                 type: this.type,
                 maxLife: this.maxLife
@@ -2185,7 +2299,7 @@ class Particle {
         }
         this.parent = param.parent ? param.parent : -1;
         this.combatType = param.combatType ? param.combatType : this.combatType;
-        this.map = (param.map !== undefined) ? param.map : 0;
+        this.game = (param.game !== undefined) ? param.game : 0;
         Particle.list[this.id] = this;
     }
 }
@@ -2209,18 +2323,38 @@ exports.Particle = Particle;
 
 
 /***/ }),
-/* 15 */
+/* 16 */
+/***/ (function(module, exports) {
+
+Object.defineProperty(exports, "__esModule", { value: true });
+var initPack = { player: [], bullet: [], enemy: [], upgrade: [] };
+class Pack {
+    constructor() {
+        this.player = [];
+        this.bullet = [];
+        this.enemy = [];
+        this.upgrade = [];
+        this.smoke = [];
+        this.particle = [];
+    }
+}
+exports.Pack = Pack;
+
+
+/***/ }),
+/* 17 */
 /***/ (function(module, exports, __webpack_require__) {
 
 Object.defineProperty(exports, "__esModule", { value: true });
-const Inventory_1 = __webpack_require__(16);
+const GameController_1 = __webpack_require__(8);
+const Inventory_1 = __webpack_require__(18);
 const MapControler_1 = __webpack_require__(7);
-const MovementController_1 = __webpack_require__(35);
-const AttackControler_1 = __webpack_require__(36);
+const MovementController_1 = __webpack_require__(34);
+const AttackControler_1 = __webpack_require__(35);
 const LifeAndBodyController_1 = __webpack_require__(39);
-const Entity_1 = __webpack_require__(19);
-const Player_1 = __webpack_require__(9);
-const Enemy_1 = __webpack_require__(10);
+const Entity_1 = __webpack_require__(20);
+const Player_1 = __webpack_require__(10);
+const Enemy_1 = __webpack_require__(11);
 const GeometryAndPhysics_1 = __webpack_require__(0);
 class Actor extends Entity_1.Entity {
     constructor(param) {
@@ -2236,8 +2370,9 @@ class Actor extends Entity_1.Entity {
             let closestEnemyDistance = 100000;
             let pangle = this.movementController.aimAngle;
             pangle = (pangle < 0) ? pangle + 360 : pangle;
-            for (let i in Player_1.Player.list) {
-                let enemy = Player_1.Player.list[i];
+            let players = GameController_1.GameController.list[this.game].players;
+            for (let i in players) {
+                let enemy = players[i];
                 if (enemy !== this) {
                     let angle = GeometryAndPhysics_1.calculateAngleBetweenEntities(this, enemy);
                     let maxDistance = Math.sqrt(enemy.width * enemy.width / 4 + enemy.height * enemy.height / 4) + distance;
@@ -2261,8 +2396,9 @@ class Actor extends Entity_1.Entity {
             let closestEnemyDistance = 100000;
             let pangle = this.movementController.aimAngle;
             pangle = (pangle < 0) ? pangle + 360 : pangle;
-            for (let i in Enemy_1.Enemy.list) {
-                let enemy = Enemy_1.Enemy.list[i];
+            let enemies = GameController_1.GameController.list[this.game].enemies;
+            for (let i in enemies) {
+                let enemy = enemies[i];
                 let angle = GeometryAndPhysics_1.calculateAngleBetweenEntities(this, enemy);
                 let maxDistance = Math.sqrt(enemy.width * enemy.width / 4 + enemy.height * enemy.height / 4) + distance;
                 let distanceFromEnemy = this.getDistance(enemy);
@@ -2311,12 +2447,12 @@ exports.Actor = Actor;
 
 
 /***/ }),
-/* 16 */
+/* 18 */
 /***/ (function(module, exports, __webpack_require__) {
 
 Object.defineProperty(exports, "__esModule", { value: true });
-const Item_1 = __webpack_require__(34);
-const Player_1 = __webpack_require__(9);
+const Item_1 = __webpack_require__(33);
+const Player_1 = __webpack_require__(10);
 class Inventory {
     constructor(socket, server, owner) {
         this.items = [];
@@ -2412,7 +2548,7 @@ exports.Inventory = Inventory;
 
 
 /***/ }),
-/* 17 */
+/* 19 */
 /***/ (function(module, exports) {
 
 Object.defineProperty(exports, "__esModule", { value: true });
@@ -2448,151 +2584,12 @@ exports.Counter = Counter;
 
 
 /***/ }),
-/* 18 */
+/* 20 */
 /***/ (function(module, exports, __webpack_require__) {
 
 Object.defineProperty(exports, "__esModule", { value: true });
 const GeometryAndPhysics_1 = __webpack_require__(0);
-const Enemy_1 = __webpack_require__(10);
-const Player_1 = __webpack_require__(9);
-const Entity_1 = __webpack_require__(19);
-const globalVariables_1 = __webpack_require__(8);
-const MapControler_1 = __webpack_require__(7);
-class Bullet extends Entity_1.Entity {
-    constructor(param) {
-        super(Bullet.updateParam(param));
-        this.combatType = 'player';
-        this.angle = 0;
-        this.spdX = 1;
-        this.spdY = 1;
-        this.timer = 0;
-        this.toRemove = false;
-        this.hitCategory = 0;
-        this.hitEntityCategory = "";
-        this.hitEntityId = -1;
-        this.update = () => {
-            this.updatePosition();
-            if (this.timer++ > 50)
-                this.toRemove = true;
-            switch (this.combatType) {
-                case 'player': {
-                    let player = Player_1.Player.list[this.parent];
-                    let closeEnemies = player.getCloseEnemies();
-                    for (let key in closeEnemies) {
-                        let enemy = Enemy_1.Enemy.list[closeEnemies[key]];
-                        if (this.testCollision(enemy)) {
-                            this.toRemove = true;
-                            enemy.lifeAndBodyController.wasHit(player.attackController.getDamage());
-                            this.setHitProperties(1, "enemy", enemy.id);
-                            break;
-                        }
-                    }
-                    for (let key in Player_1.Player.list) {
-                        if (Player_1.Player.list[key].id !== this.parent) {
-                            let enemyPlayer = Player_1.Player.list[key];
-                            if (this.testCollision(enemyPlayer)) {
-                                this.toRemove = true;
-                                enemyPlayer.lifeAndBodyController.wasHit(player.attackController.getDamage());
-                                this.setHitProperties(1, "player", enemyPlayer.id);
-                            }
-                        }
-                    }
-                    break;
-                }
-                case 'enemy': {
-                    let enemy = Enemy_1.Enemy.list[this.parent];
-                    for (let key in Player_1.Player.list) {
-                        let player = Player_1.Player.list[key];
-                        if (this.testCollision(player)) {
-                            this.toRemove = true;
-                            this.setHitProperties(1, "player", player.id);
-                            (enemy) ? player.lifeAndBodyController.wasHit(enemy.attackController.getDamage()) : player.lifeAndBodyController.wasHit(1);
-                        }
-                    }
-                    break;
-                }
-            }
-            let map = MapControler_1.MapController.getMap(this.map);
-            if (map.isPositionWall(this.position) > 2) {
-                this.toRemove = true;
-                this.hitCategory = 2;
-            }
-        };
-        this.setHitProperties = (hitCategory, hitEntityCategory, hitEntityId) => {
-            this.hitCategory = hitCategory;
-            this.hitEntityCategory = hitEntityCategory;
-            this.hitEntityId = hitEntityId;
-        };
-        this.getInitPack = () => {
-            return {
-                id: this.id,
-                position: this.position,
-                startPosition: this.startPosition,
-                map: this.map,
-                img: this.img,
-                width: this.width,
-                height: this.height,
-                combatType: this.combatType,
-                hitCategory: this.hitCategory,
-                hitEntityCategory: this.hitEntityCategory,
-                hitEntityId: this.hitEntityId
-            };
-        };
-        this.getUpdatePack = () => {
-            return {
-                id: this.id,
-                position: this.position,
-                hitCategory: this.hitCategory
-            };
-        };
-        this.startPosition = new GeometryAndPhysics_1.Point(this.position.x, this.position.y);
-        this.mapController = new MapControler_1.MapController(null);
-        this.combatType = param.combatType ? param.combatType : this.combatType;
-        this.angle = param.angle ? param.angle : this.angle;
-        if (param.shootspeed !== undefined) {
-            this.spdX = param.shootspeed ? Math.cos(this.angle / 180 * Math.PI) * param.shootspeed : Math.cos(this.angle / 180 * Math.PI);
-            this.spdY = param.shootspeed ? Math.sin(this.angle / 180 * Math.PI) * param.shootspeed : Math.sin(this.angle / 180 * Math.PI);
-        }
-        this.setSpdX(this.spdX);
-        this.setSpdY(this.spdY);
-        this.parent = param.parent ? param.parent : -1;
-        Bullet.list[this.id] = this;
-    }
-    get isToRemove() { return this.toRemove; }
-}
-Bullet.update = () => {
-    for (let i in Bullet.list) {
-        let bullet = Bullet.list[i];
-        if (bullet.toRemove) {
-            globalVariables_1.initPack.bullet.push(bullet.getInitPack());
-            delete Bullet.list[i];
-        }
-        else {
-        }
-    }
-};
-Bullet.getAllInitPack = function () {
-    let bullets = [];
-    for (let i in Bullet.list) {
-        bullets.push(Bullet.list[i].getInitPack());
-    }
-    return bullets;
-};
-Bullet.updateParam = (param) => {
-    param.id = Math.random();
-    return param;
-};
-Bullet.list = {};
-exports.Bullet = Bullet;
-
-
-/***/ }),
-/* 19 */
-/***/ (function(module, exports, __webpack_require__) {
-
-Object.defineProperty(exports, "__esModule", { value: true });
-const GeometryAndPhysics_1 = __webpack_require__(0);
-const globalVariables_1 = __webpack_require__(8);
+const globalVariables_1 = __webpack_require__(9);
 const Constants_1 = __webpack_require__(6);
 class Entity {
     constructor(param) {
@@ -2654,7 +2651,7 @@ exports.Entity = Entity;
 
 
 /***/ }),
-/* 20 */
+/* 21 */
 /***/ (function(module, exports, __webpack_require__) {
 
 Object.defineProperty(exports, "__esModule", { value: true });
@@ -2706,7 +2703,7 @@ exports.ExplosionClient = ExplosionClient;
 
 
 /***/ }),
-/* 21 */
+/* 22 */
 /***/ (function(module, exports, __webpack_require__) {
 
 Object.defineProperty(exports, "__esModule", { value: true });
@@ -2741,7 +2738,7 @@ exports.FireParticle = FireParticle;
 
 
 /***/ }),
-/* 22 */
+/* 23 */
 /***/ (function(module, exports, __webpack_require__) {
 
 Object.defineProperty(exports, "__esModule", { value: true });
@@ -2877,13 +2874,13 @@ exports.Camera = Camera;
 
 
 /***/ }),
-/* 23 */
+/* 24 */
 /***/ (function(module, exports, __webpack_require__) {
 
 Object.defineProperty(exports, "__esModule", { value: true });
 const PlayerClient_1 = __webpack_require__(5);
 const game_1 = __webpack_require__(2);
-const WeaponTypes_1 = __webpack_require__(11);
+const WeaponTypes_1 = __webpack_require__(12);
 const enums_1 = __webpack_require__(1);
 const Constants_1 = __webpack_require__(6);
 const images_1 = __webpack_require__(4);
@@ -3036,7 +3033,7 @@ exports.GUI = GUI;
 
 
 /***/ }),
-/* 24 */
+/* 25 */
 /***/ (function(module, exports) {
 
 Object.defineProperty(exports, "__esModule", { value: true });
@@ -3044,36 +3041,6 @@ exports.framesMove = {};
 exports.framesAttack = {};
 exports.framesMove['zombie'] = 17;
 exports.framesAttack['zombie'] = 9;
-
-
-/***/ }),
-/* 25 */
-/***/ (function(module, exports, __webpack_require__) {
-
-Object.defineProperty(exports, "__esModule", { value: true });
-const MapControler_1 = __webpack_require__(7);
-class GameController {
-    constructor() {
-        this.socketList = {};
-        this.players = {};
-        this.map = "forest";
-        this.addSocket = (socket) => {
-            this.socketList[socket.id] = socket.id;
-            console.log("SOCKET ADDED " + this.socketList[socket.id]);
-        };
-        this.addPlayer = (player) => {
-            this.players[player.id] = player;
-            console.log("PLAYER ADDED TO GAME");
-        };
-        this.id = Math.random();
-        this.map = this.id;
-        MapControler_1.MapController.createMap(this.map, 16, 20);
-        MapControler_1.MapController.updatePack.push(MapControler_1.MapController.getMapPack(this.map));
-        GameController.list[this.id] = this;
-    }
-}
-GameController.list = {};
-exports.GameController = GameController;
 
 
 /***/ }),
@@ -3441,14 +3408,15 @@ exports.MapTile = MapTile;
 /***/ (function(module, exports, __webpack_require__) {
 
 Object.defineProperty(exports, "__esModule", { value: true });
-const globalVariables_1 = __webpack_require__(8);
+const globalVariables_1 = __webpack_require__(9);
+const GameController_1 = __webpack_require__(8);
 class Smoke {
-    constructor(position, maxRadius, time, speed, map) {
+    constructor(position, maxRadius, time, speed, gameId) {
         this.position = position;
         this.maxRadius = maxRadius;
         this.time = time;
         this.speed = speed;
-        this.map = map;
+        this.gameId = gameId;
         this.id = Math.random();
         this.radius = 10;
         this.grow = true;
@@ -3473,7 +3441,7 @@ class Smoke {
                 id: this.id,
                 position: this.position,
                 radius: this.radius,
-                map: this.map,
+                map: GameController_1.GameController.list[this.gameId].map,
                 maxRadius: this.maxRadius,
                 time: this.time
             };
@@ -3486,6 +3454,7 @@ class Smoke {
         };
         Smoke.list[this.id] = this;
         globalVariables_1.initPack.smoke.push(this.getInitPack());
+        GameController_1.GameController.list[this.gameId].addSmoke(this);
     }
 }
 Smoke.update = () => {
@@ -3503,31 +3472,28 @@ Smoke.update = () => {
     }
     return pack;
 };
+Smoke.updateSpecific = (smokes) => {
+    let pack = [];
+    for (let i in smokes) {
+        let smoke = smokes[i];
+        smoke.update();
+        if (smoke.time == 0) {
+            delete Smoke.list[i];
+            delete smokes[i];
+            globalVariables_1.removePack.smoke.push(smoke.id);
+        }
+        else {
+            pack.push(smoke.getUpdatePack());
+        }
+    }
+    return pack;
+};
 Smoke.list = {};
 exports.Smoke = Smoke;
 
 
 /***/ }),
 /* 33 */
-/***/ (function(module, exports) {
-
-Object.defineProperty(exports, "__esModule", { value: true });
-var initPack = { player: [], bullet: [], enemy: [], upgrade: [] };
-class Pack {
-    constructor() {
-        this.player = [];
-        this.bullet = [];
-        this.enemy = [];
-        this.upgrade = [];
-        this.smoke = [];
-        this.particle = [];
-    }
-}
-exports.Pack = Pack;
-
-
-/***/ }),
-/* 34 */
 /***/ (function(module, exports, __webpack_require__) {
 
 Object.defineProperty(exports, "__esModule", { value: true });
@@ -3602,12 +3568,12 @@ new Item(enums_1.WeaponType.claws, "Claws", function (actor) {
 
 
 /***/ }),
-/* 35 */
+/* 34 */
 /***/ (function(module, exports, __webpack_require__) {
 
 Object.defineProperty(exports, "__esModule", { value: true });
 const MapControler_1 = __webpack_require__(7);
-const Counter_1 = __webpack_require__(17);
+const Counter_1 = __webpack_require__(19);
 const GeometryAndPhysics_1 = __webpack_require__(0);
 class MovementController {
     constructor(parent, param) {
@@ -3713,16 +3679,16 @@ exports.MovementController = MovementController;
 
 
 /***/ }),
-/* 36 */
+/* 35 */
 /***/ (function(module, exports, __webpack_require__) {
 
 Object.defineProperty(exports, "__esModule", { value: true });
 const enums_1 = __webpack_require__(1);
-const Flame_1 = __webpack_require__(37);
-const Bullet_1 = __webpack_require__(18);
+const Flame_1 = __webpack_require__(36);
+const Bullet_1 = __webpack_require__(37);
 const WeaponCollection_1 = __webpack_require__(38);
-const Counter_1 = __webpack_require__(17);
-const WeaponTypes_1 = __webpack_require__(11);
+const Counter_1 = __webpack_require__(19);
+const WeaponTypes_1 = __webpack_require__(12);
 const GeometryAndPhysics_1 = __webpack_require__(0);
 class AttackController {
     constructor(parent, param) {
@@ -3804,6 +3770,7 @@ class AttackController {
                 angle: aimAngle,
                 position: new GeometryAndPhysics_1.Point(this.parent.position.x, this.parent.position.y),
                 map: this.parent.map,
+                game: this.parent.game,
                 img: 'bullet',
                 width: 8,
                 height: 8,
@@ -3828,7 +3795,7 @@ class AttackController {
         this._activeWeapon = new WeaponCollection_1.SingleWeapon(this.parent, { weapon: "0", ammo: "20", parent: this.parent });
         if (param.atkSpd)
             this._attackCounter.setInc(param.atkSpd);
-        this._flame = new Flame_1.Flame({ parent: parent, map: this.parent.map, offset: 50, life: 30 });
+        this._flame = new Flame_1.Flame({ parent: parent, map: this.parent.game, offset: 50, life: 30 });
         this.attackCounter.activate();
     }
     get melee() { return this._melee; }
@@ -3846,13 +3813,13 @@ exports.AttackController = AttackController;
 
 
 /***/ }),
-/* 37 */
+/* 36 */
 /***/ (function(module, exports, __webpack_require__) {
 
 Object.defineProperty(exports, "__esModule", { value: true });
 const enums_1 = __webpack_require__(1);
 const GeometryAndPhysics_1 = __webpack_require__(0);
-const Particle_1 = __webpack_require__(14);
+const Particle_1 = __webpack_require__(15);
 class Flame {
     constructor(param) {
         this.id = Math.random();
@@ -3887,7 +3854,7 @@ class Flame {
                     flame = (Math.random() * 2 * this.speed - this.speed) / 6;
                     velocity.x += Math.cos(angleInRad) * flame;
                     velocity.y += Math.sin(angleInRad) * flame;
-                    let p = new Particle_1.Particle({ parent: this.parent.id, combatType: this.parent.type, position: posWithOffset, velocity: velocity, maxLife: this.life, type: enums_1.ParticleType.fire, map: this.map });
+                    let p = new Particle_1.Particle({ parent: this.parent.id, combatType: this.parent.type, position: posWithOffset, velocity: velocity, maxLife: this.life, type: enums_1.ParticleType.fire, game: this.game });
                     this.particles[p.id] = p;
                 }
             }
@@ -3900,7 +3867,7 @@ class Flame {
         this.angle = (param.angle !== undefined) ? param.angle : 0;
         this.offset = (param.offset !== undefined) ? param.offset : 0;
         this.life = (param.life !== undefined) ? param.life : 60;
-        this.map = (param.map !== undefined) ? param.map : 0;
+        this.game = (param.game !== undefined) ? param.game : 0;
         Flame.list[this.id] = this;
     }
 }
@@ -3909,11 +3876,160 @@ exports.Flame = Flame;
 
 
 /***/ }),
+/* 37 */
+/***/ (function(module, exports, __webpack_require__) {
+
+Object.defineProperty(exports, "__esModule", { value: true });
+const GameController_1 = __webpack_require__(8);
+const GeometryAndPhysics_1 = __webpack_require__(0);
+const Enemy_1 = __webpack_require__(11);
+const Player_1 = __webpack_require__(10);
+const Entity_1 = __webpack_require__(20);
+const globalVariables_1 = __webpack_require__(9);
+const MapControler_1 = __webpack_require__(7);
+class Bullet extends Entity_1.Entity {
+    constructor(param) {
+        super(Bullet.updateParam(param));
+        this.combatType = 'player';
+        this.angle = 0;
+        this.spdX = 1;
+        this.spdY = 1;
+        this.timer = 0;
+        this.toRemove = false;
+        this.hitCategory = 0;
+        this.hitEntityCategory = "";
+        this.hitEntityId = -1;
+        this.update = () => {
+            this.updatePosition();
+            if (this.timer++ > 50)
+                this.toRemove = true;
+            switch (this.combatType) {
+                case 'player': {
+                    let player = Player_1.Player.list[this.parent];
+                    let closeEnemies = player.getCloseEnemies();
+                    for (let key in closeEnemies) {
+                        let enemy = Enemy_1.Enemy.list[closeEnemies[key]];
+                        if (this.testCollision(enemy)) {
+                            this.toRemove = true;
+                            enemy.lifeAndBodyController.wasHit(player.attackController.getDamage());
+                            this.setHitProperties(1, "enemy", enemy.id);
+                            break;
+                        }
+                    }
+                    if (GameController_1.GameController.list[this.game] !== undefined) {
+                        let players = GameController_1.GameController.list[this.game].players;
+                        for (let key in players) {
+                            if (players[key].id !== this.parent) {
+                                let enemyPlayer = players[key];
+                                if (this.testCollision(enemyPlayer)) {
+                                    this.toRemove = true;
+                                    enemyPlayer.lifeAndBodyController.wasHit(player.attackController.getDamage());
+                                    this.setHitProperties(1, "player", enemyPlayer.id);
+                                }
+                            }
+                        }
+                    }
+                    break;
+                }
+                case 'enemy': {
+                    let enemy = Enemy_1.Enemy.list[this.parent];
+                    if (GameController_1.GameController.list[this.game] !== undefined) {
+                        let players = GameController_1.GameController.list[this.game].players;
+                        for (let key in players) {
+                            let player = players[key];
+                            if (this.testCollision(player)) {
+                                this.toRemove = true;
+                                this.setHitProperties(1, "player", player.id);
+                                (enemy) ? player.lifeAndBodyController.wasHit(enemy.attackController.getDamage()) : player.lifeAndBodyController.wasHit(1);
+                            }
+                        }
+                    }
+                    break;
+                }
+            }
+            let map = MapControler_1.MapController.getMap(this.map);
+            if (map.isPositionWall(this.position) > 2) {
+                this.toRemove = true;
+                this.hitCategory = 2;
+            }
+        };
+        this.setHitProperties = (hitCategory, hitEntityCategory, hitEntityId) => {
+            this.hitCategory = hitCategory;
+            this.hitEntityCategory = hitEntityCategory;
+            this.hitEntityId = hitEntityId;
+        };
+        this.getInitPack = () => {
+            return {
+                id: this.id,
+                position: this.position,
+                startPosition: this.startPosition,
+                map: this.map,
+                img: this.img,
+                width: this.width,
+                height: this.height,
+                combatType: this.combatType,
+                hitCategory: this.hitCategory,
+                hitEntityCategory: this.hitEntityCategory,
+                hitEntityId: this.hitEntityId
+            };
+        };
+        this.getUpdatePack = () => {
+            return {
+                id: this.id,
+                position: this.position,
+                hitCategory: this.hitCategory
+            };
+        };
+        this.startPosition = new GeometryAndPhysics_1.Point(this.position.x, this.position.y);
+        this.mapController = new MapControler_1.MapController(null);
+        this.combatType = param.combatType ? param.combatType : this.combatType;
+        this.angle = param.angle ? param.angle : this.angle;
+        if (param.shootspeed !== undefined) {
+            this.spdX = param.shootspeed ? Math.cos(this.angle / 180 * Math.PI) * param.shootspeed : Math.cos(this.angle / 180 * Math.PI);
+            this.spdY = param.shootspeed ? Math.sin(this.angle / 180 * Math.PI) * param.shootspeed : Math.sin(this.angle / 180 * Math.PI);
+        }
+        this.setSpdX(this.spdX);
+        this.setSpdY(this.spdY);
+        this.parent = param.parent ? param.parent : -1;
+        Bullet.list[this.id] = this;
+    }
+    get isToRemove() { return this.toRemove; }
+}
+Bullet.update = () => {
+    for (let i in Bullet.list) {
+        let bullet = Bullet.list[i];
+        if (bullet.toRemove) {
+            globalVariables_1.initPack.bullet.push(bullet.getInitPack());
+            GameController_1.GameController.list[bullet.game].initPack.bullet.push(bullet.getInitPack());
+            delete Bullet.list[i];
+        }
+        else {
+        }
+    }
+};
+Bullet.getAllInitPack = function () {
+    let bullets = [];
+    for (let i in Bullet.list) {
+        bullets.push(Bullet.list[i].getInitPack());
+    }
+    return bullets;
+};
+Bullet.getAllSpecificInitPack = function (game) {
+};
+Bullet.updateParam = (param) => {
+    param.id = Math.random();
+    return param;
+};
+Bullet.list = {};
+exports.Bullet = Bullet;
+
+
+/***/ }),
 /* 38 */
 /***/ (function(module, exports, __webpack_require__) {
 
 Object.defineProperty(exports, "__esModule", { value: true });
-const WeaponTypes_1 = __webpack_require__(11);
+const WeaponTypes_1 = __webpack_require__(12);
 const enums_1 = __webpack_require__(1);
 class WeaponCollection {
     constructor(owner) {
@@ -4267,10 +4383,10 @@ exports.UpgradeClient = UpgradeClient;
 
 Object.defineProperty(exports, "__esModule", { value: true });
 const game_1 = __webpack_require__(2);
-const EnemyClient_1 = __webpack_require__(12);
+const EnemyClient_1 = __webpack_require__(13);
 const GeometryAndPhysics_1 = __webpack_require__(0);
 const PlayerClient_1 = __webpack_require__(5);
-const ExplosionClient_1 = __webpack_require__(20);
+const ExplosionClient_1 = __webpack_require__(21);
 const game_2 = __webpack_require__(2);
 const canvas_1 = __webpack_require__(3);
 const images_1 = __webpack_require__(4);

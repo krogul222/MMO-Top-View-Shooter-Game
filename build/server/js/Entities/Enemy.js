@@ -228,6 +228,7 @@ Enemy.getAllSpecificInitPack = function (game) {
             enemies.push(e[i].getInitPack());
         }
     }
+    console.log("ENEMYYYYY " + enemies.length);
     return enemies;
 };
 Enemy.randomlyGenerate = function (game) {

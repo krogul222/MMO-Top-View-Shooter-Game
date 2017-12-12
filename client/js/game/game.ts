@@ -71,12 +71,15 @@ socket.on('init', function(data){
         }    
     }
 
-   for(let i = 0, length = data.bullet.length; i < length; i++){
-        let b = new BulletClient(data.bullet[i]);  
-        b.hit(data.bullet[i].hitCategory, data.bullet[i].hitEntityCategory,data.bullet[i].hitEntityId);
-    } 
+    if(data.bullet !== undefined){
+        for(let i = 0, length = data.bullet.length; i < length; i++){
+            let b = new BulletClient(data.bullet[i]);  
+            b.hit(data.bullet[i].hitCategory, data.bullet[i].hitEntityCategory,data.bullet[i].hitEntityId);
+        } 
+    }
 
     for(let i = 0, length = data.enemy.length; i < length; i++){
+        console.log("NOWY STWOR");
         new EnemyClient(data.enemy[i]);  
     } 
 

@@ -273,7 +273,9 @@ export class Enemy extends Actor {
             for(let i in e){
                 enemies.push(e[i].getInitPack());
             }
-        }
+        } 
+
+        console.log("ENEMYYYYY "+ enemies.length);
         return enemies;
     }
 

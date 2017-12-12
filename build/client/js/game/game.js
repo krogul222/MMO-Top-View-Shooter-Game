@@ -47,11 +47,14 @@ socket.on('init', function (data) {
             new SmokeClient_1.SmokeClient(data.smoke[i]);
         }
     }
-    for (let i = 0, length = data.bullet.length; i < length; i++) {
-        let b = new BulletClient_1.BulletClient(data.bullet[i]);
-        b.hit(data.bullet[i].hitCategory, data.bullet[i].hitEntityCategory, data.bullet[i].hitEntityId);
+    if (data.bullet !== undefined) {
+        for (let i = 0, length = data.bullet.length; i < length; i++) {
+            let b = new BulletClient_1.BulletClient(data.bullet[i]);
+            b.hit(data.bullet[i].hitCategory, data.bullet[i].hitEntityCategory, data.bullet[i].hitEntityId);
+        }
     }
     for (let i = 0, length = data.enemy.length; i < length; i++) {
+        console.log("NOWY STWOR");
         new EnemyClient_1.EnemyClient(data.enemy[i]);
     }
     if (data.upgrade !== undefined) {
