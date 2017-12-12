@@ -51,8 +51,6 @@ function imgLoaded() {
     if (imagesLoaded == ALL_IMAGES) {
         gameDiv.style.display = 'inline-block';
         loadingDiv.style.display = 'none';
-        if (canJoinGame)
-            socket.emit('joinedGame');
     }
 }
 //# sourceMappingURL=images.js.map

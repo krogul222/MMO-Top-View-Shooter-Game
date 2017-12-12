@@ -766,8 +766,6 @@ function imgLoaded() {
     if (imagesLoaded == ALL_IMAGES) {
         gameDiv.style.display = 'inline-block';
         loadingDiv.style.display = 'none';
-        if (canJoinGame)
-            socket.emit('joinedGame');
     }
 }
 
@@ -2215,9 +2213,11 @@ class Particle {
                         let closeEnemies = player.getCloseEnemies();
                         for (let key in closeEnemies) {
                             let enemy = Enemy_1.Enemy.list[closeEnemies[key]];
-                            if (this.testCollision(enemy)) {
-                                enemy.lifeAndBodyController.wasHit(1 * this.life / this.maxLife);
-                                enemy.lifeAndBodyController.startBurn(100);
+                            if (enemy) {
+                                if (this.testCollision(enemy)) {
+                                    enemy.lifeAndBodyController.wasHit(1 * this.life / this.maxLife);
+                                    enemy.lifeAndBodyController.startBurn(100);
+                                }
                             }
                         }
                         if (GameController_1.GameController.list[this.game] !== undefined) {
