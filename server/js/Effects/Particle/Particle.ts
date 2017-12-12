@@ -67,7 +67,7 @@ export class Particle{
                                 enemy.lifeAndBodyController.wasHit(1*this.life/this.maxLife);
                                 enemy.lifeAndBodyController.startBurn(100);
                             }
-                        }
+                        } 
                     }
 
                    // let player: Player= Player.list[this.parent];
