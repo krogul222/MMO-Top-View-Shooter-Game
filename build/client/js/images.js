@@ -1,4 +1,5 @@
 Object.defineProperty(exports, "__esModule", { value: true });
+const login_1 = require("./pregame/login");
 exports.Img = {};
 let gameDiv = document.getElementById("gameDiv");
 let loadingDiv = document.getElementById("loadingDiv");
@@ -51,6 +52,13 @@ function imgLoaded() {
     if (imagesLoaded == ALL_IMAGES) {
         gameDiv.style.display = 'inline-block';
         loadingDiv.style.display = 'none';
+        if (canJoinGame) {
+            socket.emit('joinedGame', { gameId: login_1.selectedGameId });
+        }
+        else {
+            if (canCreateGame)
+                socket.emit('createdGame');
+        }
     }
 }
 //# sourceMappingURL=images.js.map

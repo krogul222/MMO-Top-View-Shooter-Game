@@ -14,12 +14,13 @@ let joinGameDiv = (<HTMLInputElement>document.getElementById("joinGameDiv"));
 let backToGameMenuBtn =  (<HTMLInputElement>document.getElementById("backToGameMenuBtn")); 
 let joinGameBtn =  (<HTMLInputElement>document.getElementById("joinGameBtn")); 
 
-let selectedGameId: number = -1;
+export let selectedGameId: number = -1;
 let gamesId: number[] = [];
 
 declare var socket: any;
 declare var gameDiv: any;
 declare var canJoinGame;
+declare var canCreateGame;
 declare var imagesLoaded;
 declare var ALL_IMAGES;
 
@@ -28,7 +29,7 @@ signDivSignIn.onclick = function(){
 }
 
 createGame.onclick = function(){
-    canJoinGame = true;
+    canCreateGame = true;
     gameMenuDiv.style.display = 'none';
     gameMenuDivContainer.style.display = 'none';
     mainBar.style.display = 'none';
@@ -64,6 +65,7 @@ joinGameMenuBtn.onclick = function(){
 
 joinGameBtn.onclick = function(){
     if(selectedGameId >= 0){
+        canJoinGame = true;
         gameMenuDiv.style.display = 'none';
         gameMenuDivContainer.style.display = 'none';
         joinGameDiv.style.display = 'none';

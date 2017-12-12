@@ -1,9 +1,12 @@
+import { selectedGameId } from "./pregame/login";
+
 export var jsonPlayer; 
 export var jsonGUI; 
 export var jsonIAE; 
 export var jsonMap; 
 declare var socket;
 declare var canJoinGame;
+declare var canCreateGame;
 export var Img: any = {};
 
 declare var imagesLoaded;
@@ -71,7 +74,11 @@ function imgLoaded() {
     if(imagesLoaded == ALL_IMAGES) {
         gameDiv.style.display = 'inline-block';
         loadingDiv.style.display = 'none';
-      //  if(canJoinGame) socket.emit('joinedGame');
+        if(canJoinGame){
+            socket.emit('joinedGame',{gameId: selectedGameId});
+        } else{
+            if(canCreateGame) socket.emit('createdGame');
+        }
     }
 }
 

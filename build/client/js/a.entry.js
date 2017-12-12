@@ -245,20 +245,20 @@ exports.getRandomInt = getRandomInt;
 
 Object.defineProperty(exports, "__esModule", { value: true });
 const PlayerClient_1 = __webpack_require__(5);
-const Particle_1 = __webpack_require__(15);
-const ParticleClient_1 = __webpack_require__(40);
-const UpgradeClient_1 = __webpack_require__(41);
-const BulletClient_1 = __webpack_require__(42);
-const GameSoundManager_1 = __webpack_require__(43);
-const Inventory_1 = __webpack_require__(18);
+const Particle_1 = __webpack_require__(16);
+const ParticleClient_1 = __webpack_require__(41);
+const UpgradeClient_1 = __webpack_require__(42);
+const BulletClient_1 = __webpack_require__(43);
+const GameSoundManager_1 = __webpack_require__(44);
+const Inventory_1 = __webpack_require__(19);
 const MapControler_1 = __webpack_require__(7);
-const MapClient_1 = __webpack_require__(44);
-const Filters_1 = __webpack_require__(45);
-const Effects_1 = __webpack_require__(46);
+const MapClient_1 = __webpack_require__(45);
+const Filters_1 = __webpack_require__(46);
+const Effects_1 = __webpack_require__(47);
 const canvas_1 = __webpack_require__(3);
-const SmokeClient_1 = __webpack_require__(48);
-const EnemyClient_1 = __webpack_require__(13);
-const ExplosionClient_1 = __webpack_require__(21);
+const SmokeClient_1 = __webpack_require__(49);
+const EnemyClient_1 = __webpack_require__(14);
+const ExplosionClient_1 = __webpack_require__(22);
 let enemyDrawList = [];
 exports.selfId = 0;
 let smokeTest = false;
@@ -686,8 +686,8 @@ let updateMouse = () => {
 /***/ (function(module, exports, __webpack_require__) {
 
 Object.defineProperty(exports, "__esModule", { value: true });
-const Camera_1 = __webpack_require__(23);
-const GUI_1 = __webpack_require__(24);
+const Camera_1 = __webpack_require__(24);
+const GUI_1 = __webpack_require__(25);
 gui = new GUI_1.GUI({ ctx: ctxui, width: WIDTH, height: HEIGHTUI });
 exports.camera = new Camera_1.Camera(canvas, WIDTH, HEIGHT);
 let resizeCanvas = function () {
@@ -711,9 +711,10 @@ window.addEventListener('resize', function () {
 
 /***/ }),
 /* 4 */
-/***/ (function(module, exports) {
+/***/ (function(module, exports, __webpack_require__) {
 
 Object.defineProperty(exports, "__esModule", { value: true });
+const login_1 = __webpack_require__(13);
 exports.Img = {};
 let gameDiv = document.getElementById("gameDiv");
 let loadingDiv = document.getElementById("loadingDiv");
@@ -766,6 +767,13 @@ function imgLoaded() {
     if (imagesLoaded == ALL_IMAGES) {
         gameDiv.style.display = 'inline-block';
         loadingDiv.style.display = 'none';
+        if (canJoinGame) {
+            socket.emit('joinedGame', { gameId: login_1.selectedGameId });
+        }
+        else {
+            if (canCreateGame)
+                socket.emit('createdGame');
+        }
     }
 }
 
@@ -776,11 +784,11 @@ function imgLoaded() {
 
 Object.defineProperty(exports, "__esModule", { value: true });
 const GeometryAndPhysics_1 = __webpack_require__(0);
-const FireFlameClient_1 = __webpack_require__(14);
+const FireFlameClient_1 = __webpack_require__(15);
 const game_1 = __webpack_require__(2);
 const canvas_1 = __webpack_require__(3);
 const images_1 = __webpack_require__(4);
-const EnemyClient_1 = __webpack_require__(13);
+const EnemyClient_1 = __webpack_require__(14);
 class PlayerClient {
     constructor(initPack) {
         this.id = -1;
@@ -1021,10 +1029,10 @@ exports.mapObjectCollisions[enums_1.MapObjectType.GR_ER] = [0, 0, 2, 0, 0, 0, 0,
 /***/ (function(module, exports, __webpack_require__) {
 
 Object.defineProperty(exports, "__esModule", { value: true });
-const SpawnObjectMapChecker_1 = __webpack_require__(26);
-const GroundRing_1 = __webpack_require__(27);
-const GameMap_1 = __webpack_require__(30);
-const MapTile_1 = __webpack_require__(31);
+const SpawnObjectMapChecker_1 = __webpack_require__(27);
+const GroundRing_1 = __webpack_require__(28);
+const GameMap_1 = __webpack_require__(31);
+const MapTile_1 = __webpack_require__(32);
 const enums_1 = __webpack_require__(1);
 const GeometryAndPhysics_1 = __webpack_require__(0);
 const Constants_1 = __webpack_require__(6);
@@ -1215,7 +1223,7 @@ exports.MapController = MapController;
 /***/ (function(module, exports, __webpack_require__) {
 
 Object.defineProperty(exports, "__esModule", { value: true });
-const Pack_1 = __webpack_require__(16);
+const Pack_1 = __webpack_require__(17);
 const MapControler_1 = __webpack_require__(7);
 class GameController {
     constructor(param) {
@@ -1258,7 +1266,7 @@ exports.GameController = GameController;
 /***/ (function(module, exports, __webpack_require__) {
 
 Object.defineProperty(exports, "__esModule", { value: true });
-const Pack_1 = __webpack_require__(16);
+const Pack_1 = __webpack_require__(17);
 exports.initPack = new Pack_1.Pack();
 exports.removePack = new Pack_1.Pack();
 
@@ -1269,10 +1277,10 @@ exports.removePack = new Pack_1.Pack();
 
 Object.defineProperty(exports, "__esModule", { value: true });
 const GameController_1 = __webpack_require__(8);
-const Smoke_1 = __webpack_require__(32);
+const Smoke_1 = __webpack_require__(33);
 const globalVariables_1 = __webpack_require__(9);
 const Enemy_1 = __webpack_require__(11);
-const Actor_1 = __webpack_require__(17);
+const Actor_1 = __webpack_require__(18);
 const GeometryAndPhysics_1 = __webpack_require__(0);
 const enums_1 = __webpack_require__(1);
 const MapControler_1 = __webpack_require__(7);
@@ -1553,7 +1561,7 @@ exports.Player = Player;
 /***/ (function(module, exports, __webpack_require__) {
 
 Object.defineProperty(exports, "__esModule", { value: true });
-const Actor_1 = __webpack_require__(17);
+const Actor_1 = __webpack_require__(18);
 const GeometryAndPhysics_1 = __webpack_require__(0);
 const globalVariables_1 = __webpack_require__(9);
 const enums_1 = __webpack_require__(1);
@@ -1975,16 +1983,123 @@ new WeaponTypes({ weapon: enums_2.WeaponType.claws, name: "claws",
 
 /***/ }),
 /* 13 */
+/***/ (function(module, exports) {
+
+Object.defineProperty(exports, "__esModule", { value: true });
+let signDiv = document.getElementById("signDiv");
+let loadingDiv = document.getElementById("loadingDiv");
+let signDivUsername = document.getElementById("signDiv-username");
+let signDivPassword = document.getElementById("signDiv-password");
+let signDivSignIn = document.getElementById("signDiv-signIn");
+let signDivSignUp = document.getElementById("signDiv-signUp");
+let gameMenuDiv = document.getElementById("gameMenuDiv");
+let quickGame = document.getElementById("quickGame");
+let joinGameMenuBtn = document.getElementById("joinGameMenuBtn");
+let createGame = document.getElementById("createGame");
+let mainBar = document.getElementById("mainBar");
+let gameMenuDivContainer = document.getElementById("gameMenuDivContainer");
+let joinGameDiv = document.getElementById("joinGameDiv");
+let backToGameMenuBtn = document.getElementById("backToGameMenuBtn");
+let joinGameBtn = document.getElementById("joinGameBtn");
+exports.selectedGameId = -1;
+let gamesId = [];
+signDivSignIn.onclick = function () {
+    socket.emit('signIn', { username: signDivUsername.value, password: signDivPassword.value });
+};
+createGame.onclick = function () {
+    canCreateGame = true;
+    gameMenuDiv.style.display = 'none';
+    gameMenuDivContainer.style.display = 'none';
+    mainBar.style.display = 'none';
+    if (imagesLoaded !== ALL_IMAGES) {
+        loadingDiv.style.display = 'inline';
+    }
+    else {
+        socket.emit('createdGame');
+    }
+};
+joinGameMenuBtn.onclick = function () {
+    gameMenuDiv.style.display = 'none';
+    gameMenuDivContainer.style.display = 'none';
+    joinGameDiv.style.display = 'inline';
+    socket.emit('getListOfGames');
+};
+joinGameBtn.onclick = function () {
+    if (exports.selectedGameId >= 0) {
+        canJoinGame = true;
+        gameMenuDiv.style.display = 'none';
+        gameMenuDivContainer.style.display = 'none';
+        joinGameDiv.style.display = 'none';
+        mainBar.style.display = 'none';
+        if (imagesLoaded !== ALL_IMAGES) {
+            loadingDiv.style.display = 'inline';
+        }
+        else {
+            socket.emit('joinedGame', { gameId: exports.selectedGameId });
+        }
+    }
+};
+backToGameMenuBtn.onclick = function () {
+    gameMenuDiv.style.display = 'none';
+    gameMenuDivContainer.style.display = 'none';
+    joinGameDiv.style.display = 'none';
+    gameMenuDiv.style.display = 'inline-block';
+    gameMenuDivContainer.style.display = 'block';
+    gameMenuDivContainer.style.margin = 'auto';
+};
+$(document).ready(function () {
+    $("#availableGamesList").on("click", "tr", function () {
+        $(this).closest("tr").siblings().removeClass("table-success");
+        $(this).toggleClass("table-success");
+        let id = parseInt($(this).attr('id'));
+        exports.selectedGameId = gamesId[id];
+    });
+});
+socket.on('ListOfGames', function (data) {
+    $('#availableGamesList tbody').empty();
+    let tbody = '';
+    gamesId = [];
+    for (let i = 0, length = data.length; i < length; i++) {
+        tbody += "<tr id='" + i + "'> <th scope='row'>" + i + " </th> \
+        <td>" + data[i].id + "</td> \
+        </tr>";
+        gamesId[i] = data[i].id;
+    }
+    $('#availableGamesListTbody').html(tbody);
+});
+socket.on('signInResponse', function (data) {
+    if (data.success) {
+        signDiv.style.display = 'none';
+        gameMenuDiv.style.display = 'inline-block';
+        gameMenuDivContainer.style.display = 'block';
+        gameMenuDivContainer.style.margin = 'auto';
+    }
+    else {
+        alert("Sign in unsuccessful.");
+    }
+});
+socket.on('signUpResponse', function (data) {
+    if (data.success) {
+        alert("Sign in successful.");
+    }
+    else {
+        alert("Sign in unsuccessful.");
+    }
+});
+
+
+/***/ }),
+/* 14 */
 /***/ (function(module, exports, __webpack_require__) {
 
 Object.defineProperty(exports, "__esModule", { value: true });
 const game_1 = __webpack_require__(2);
-const FireFlameClient_1 = __webpack_require__(14);
+const FireFlameClient_1 = __webpack_require__(15);
 const PlayerClient_1 = __webpack_require__(5);
 const GeometryAndPhysics_1 = __webpack_require__(0);
 const canvas_1 = __webpack_require__(3);
 const images_1 = __webpack_require__(4);
-const EnemyConstants_1 = __webpack_require__(25);
+const EnemyConstants_1 = __webpack_require__(26);
 class EnemyClient {
     constructor(initPack) {
         this.id = -1;
@@ -2109,12 +2224,12 @@ exports.EnemyClient = EnemyClient;
 
 
 /***/ }),
-/* 14 */
+/* 15 */
 /***/ (function(module, exports, __webpack_require__) {
 
 Object.defineProperty(exports, "__esModule", { value: true });
 const GeometryAndPhysics_1 = __webpack_require__(0);
-const FireParticle_1 = __webpack_require__(22);
+const FireParticle_1 = __webpack_require__(23);
 class FireFlameClient {
     constructor(parent, burn = false) {
         this.particles = [];
@@ -2180,7 +2295,7 @@ exports.FireFlameClient = FireFlameClient;
 
 
 /***/ }),
-/* 15 */
+/* 16 */
 /***/ (function(module, exports, __webpack_require__) {
 
 Object.defineProperty(exports, "__esModule", { value: true });
@@ -2323,7 +2438,7 @@ exports.Particle = Particle;
 
 
 /***/ }),
-/* 16 */
+/* 17 */
 /***/ (function(module, exports) {
 
 Object.defineProperty(exports, "__esModule", { value: true });
@@ -2342,17 +2457,17 @@ exports.Pack = Pack;
 
 
 /***/ }),
-/* 17 */
+/* 18 */
 /***/ (function(module, exports, __webpack_require__) {
 
 Object.defineProperty(exports, "__esModule", { value: true });
 const GameController_1 = __webpack_require__(8);
-const Inventory_1 = __webpack_require__(18);
+const Inventory_1 = __webpack_require__(19);
 const MapControler_1 = __webpack_require__(7);
-const MovementController_1 = __webpack_require__(34);
-const AttackControler_1 = __webpack_require__(35);
-const LifeAndBodyController_1 = __webpack_require__(39);
-const Entity_1 = __webpack_require__(20);
+const MovementController_1 = __webpack_require__(35);
+const AttackControler_1 = __webpack_require__(36);
+const LifeAndBodyController_1 = __webpack_require__(40);
+const Entity_1 = __webpack_require__(21);
 const Player_1 = __webpack_require__(10);
 const Enemy_1 = __webpack_require__(11);
 const GeometryAndPhysics_1 = __webpack_require__(0);
@@ -2447,11 +2562,11 @@ exports.Actor = Actor;
 
 
 /***/ }),
-/* 18 */
+/* 19 */
 /***/ (function(module, exports, __webpack_require__) {
 
 Object.defineProperty(exports, "__esModule", { value: true });
-const Item_1 = __webpack_require__(33);
+const Item_1 = __webpack_require__(34);
 const Player_1 = __webpack_require__(10);
 class Inventory {
     constructor(socket, server, owner) {
@@ -2548,7 +2663,7 @@ exports.Inventory = Inventory;
 
 
 /***/ }),
-/* 19 */
+/* 20 */
 /***/ (function(module, exports) {
 
 Object.defineProperty(exports, "__esModule", { value: true });
@@ -2584,7 +2699,7 @@ exports.Counter = Counter;
 
 
 /***/ }),
-/* 20 */
+/* 21 */
 /***/ (function(module, exports, __webpack_require__) {
 
 Object.defineProperty(exports, "__esModule", { value: true });
@@ -2651,7 +2766,7 @@ exports.Entity = Entity;
 
 
 /***/ }),
-/* 21 */
+/* 22 */
 /***/ (function(module, exports, __webpack_require__) {
 
 Object.defineProperty(exports, "__esModule", { value: true });
@@ -2703,7 +2818,7 @@ exports.ExplosionClient = ExplosionClient;
 
 
 /***/ }),
-/* 22 */
+/* 23 */
 /***/ (function(module, exports, __webpack_require__) {
 
 Object.defineProperty(exports, "__esModule", { value: true });
@@ -2738,7 +2853,7 @@ exports.FireParticle = FireParticle;
 
 
 /***/ }),
-/* 23 */
+/* 24 */
 /***/ (function(module, exports, __webpack_require__) {
 
 Object.defineProperty(exports, "__esModule", { value: true });
@@ -2874,7 +2989,7 @@ exports.Camera = Camera;
 
 
 /***/ }),
-/* 24 */
+/* 25 */
 /***/ (function(module, exports, __webpack_require__) {
 
 Object.defineProperty(exports, "__esModule", { value: true });
@@ -3033,7 +3148,7 @@ exports.GUI = GUI;
 
 
 /***/ }),
-/* 25 */
+/* 26 */
 /***/ (function(module, exports) {
 
 Object.defineProperty(exports, "__esModule", { value: true });
@@ -3044,7 +3159,7 @@ exports.framesAttack['zombie'] = 9;
 
 
 /***/ }),
-/* 26 */
+/* 27 */
 /***/ (function(module, exports, __webpack_require__) {
 
 Object.defineProperty(exports, "__esModule", { value: true });
@@ -3162,11 +3277,11 @@ exports.SpawnObjectMapChecker = SpawnObjectMapChecker;
 
 
 /***/ }),
-/* 27 */
+/* 28 */
 /***/ (function(module, exports, __webpack_require__) {
 
 Object.defineProperty(exports, "__esModule", { value: true });
-const MapObject_1 = __webpack_require__(28);
+const MapObject_1 = __webpack_require__(29);
 const GeometryAndPhysics_1 = __webpack_require__(0);
 const enums_1 = __webpack_require__(1);
 class GroundRing extends MapObject_1.MapObject {
@@ -3246,11 +3361,11 @@ exports.GroundRing = GroundRing;
 
 
 /***/ }),
-/* 28 */
+/* 29 */
 /***/ (function(module, exports, __webpack_require__) {
 
 Object.defineProperty(exports, "__esModule", { value: true });
-const ObjectTile_1 = __webpack_require__(29);
+const ObjectTile_1 = __webpack_require__(30);
 class MapObject {
     constructor() {
         this.objectTiles = [];
@@ -3263,7 +3378,7 @@ exports.MapObject = MapObject;
 
 
 /***/ }),
-/* 29 */
+/* 30 */
 /***/ (function(module, exports, __webpack_require__) {
 
 Object.defineProperty(exports, "__esModule", { value: true });
@@ -3285,7 +3400,7 @@ exports.ObjectTile = ObjectTile;
 
 
 /***/ }),
-/* 30 */
+/* 31 */
 /***/ (function(module, exports, __webpack_require__) {
 
 Object.defineProperty(exports, "__esModule", { value: true });
@@ -3332,7 +3447,7 @@ exports.GameMap = GameMap;
 
 
 /***/ }),
-/* 31 */
+/* 32 */
 /***/ (function(module, exports, __webpack_require__) {
 
 Object.defineProperty(exports, "__esModule", { value: true });
@@ -3404,7 +3519,7 @@ exports.MapTile = MapTile;
 
 
 /***/ }),
-/* 32 */
+/* 33 */
 /***/ (function(module, exports, __webpack_require__) {
 
 Object.defineProperty(exports, "__esModule", { value: true });
@@ -3493,7 +3608,7 @@ exports.Smoke = Smoke;
 
 
 /***/ }),
-/* 33 */
+/* 34 */
 /***/ (function(module, exports, __webpack_require__) {
 
 Object.defineProperty(exports, "__esModule", { value: true });
@@ -3568,12 +3683,12 @@ new Item(enums_1.WeaponType.claws, "Claws", function (actor) {
 
 
 /***/ }),
-/* 34 */
+/* 35 */
 /***/ (function(module, exports, __webpack_require__) {
 
 Object.defineProperty(exports, "__esModule", { value: true });
 const MapControler_1 = __webpack_require__(7);
-const Counter_1 = __webpack_require__(19);
+const Counter_1 = __webpack_require__(20);
 const GeometryAndPhysics_1 = __webpack_require__(0);
 class MovementController {
     constructor(parent, param) {
@@ -3679,15 +3794,15 @@ exports.MovementController = MovementController;
 
 
 /***/ }),
-/* 35 */
+/* 36 */
 /***/ (function(module, exports, __webpack_require__) {
 
 Object.defineProperty(exports, "__esModule", { value: true });
 const enums_1 = __webpack_require__(1);
-const Flame_1 = __webpack_require__(36);
-const Bullet_1 = __webpack_require__(37);
-const WeaponCollection_1 = __webpack_require__(38);
-const Counter_1 = __webpack_require__(19);
+const Flame_1 = __webpack_require__(37);
+const Bullet_1 = __webpack_require__(38);
+const WeaponCollection_1 = __webpack_require__(39);
+const Counter_1 = __webpack_require__(20);
 const WeaponTypes_1 = __webpack_require__(12);
 const GeometryAndPhysics_1 = __webpack_require__(0);
 class AttackController {
@@ -3813,13 +3928,13 @@ exports.AttackController = AttackController;
 
 
 /***/ }),
-/* 36 */
+/* 37 */
 /***/ (function(module, exports, __webpack_require__) {
 
 Object.defineProperty(exports, "__esModule", { value: true });
 const enums_1 = __webpack_require__(1);
 const GeometryAndPhysics_1 = __webpack_require__(0);
-const Particle_1 = __webpack_require__(15);
+const Particle_1 = __webpack_require__(16);
 class Flame {
     constructor(param) {
         this.id = Math.random();
@@ -3876,7 +3991,7 @@ exports.Flame = Flame;
 
 
 /***/ }),
-/* 37 */
+/* 38 */
 /***/ (function(module, exports, __webpack_require__) {
 
 Object.defineProperty(exports, "__esModule", { value: true });
@@ -3884,7 +3999,7 @@ const GameController_1 = __webpack_require__(8);
 const GeometryAndPhysics_1 = __webpack_require__(0);
 const Enemy_1 = __webpack_require__(11);
 const Player_1 = __webpack_require__(10);
-const Entity_1 = __webpack_require__(20);
+const Entity_1 = __webpack_require__(21);
 const globalVariables_1 = __webpack_require__(9);
 const MapControler_1 = __webpack_require__(7);
 class Bullet extends Entity_1.Entity {
@@ -4025,7 +4140,7 @@ exports.Bullet = Bullet;
 
 
 /***/ }),
-/* 38 */
+/* 39 */
 /***/ (function(module, exports, __webpack_require__) {
 
 Object.defineProperty(exports, "__esModule", { value: true });
@@ -4239,7 +4354,7 @@ exports.SingleWeapon = SingleWeapon;
 
 
 /***/ }),
-/* 39 */
+/* 40 */
 /***/ (function(module, exports) {
 
 Object.defineProperty(exports, "__esModule", { value: true });
@@ -4288,7 +4403,7 @@ exports.LifeAndBodyController = LifeAndBodyController;
 
 
 /***/ }),
-/* 40 */
+/* 41 */
 /***/ (function(module, exports, __webpack_require__) {
 
 Object.defineProperty(exports, "__esModule", { value: true });
@@ -4336,7 +4451,7 @@ exports.ParticleClient = ParticleClient;
 
 
 /***/ }),
-/* 41 */
+/* 42 */
 /***/ (function(module, exports, __webpack_require__) {
 
 Object.defineProperty(exports, "__esModule", { value: true });
@@ -4378,15 +4493,15 @@ exports.UpgradeClient = UpgradeClient;
 
 
 /***/ }),
-/* 42 */
+/* 43 */
 /***/ (function(module, exports, __webpack_require__) {
 
 Object.defineProperty(exports, "__esModule", { value: true });
 const game_1 = __webpack_require__(2);
-const EnemyClient_1 = __webpack_require__(13);
+const EnemyClient_1 = __webpack_require__(14);
 const GeometryAndPhysics_1 = __webpack_require__(0);
 const PlayerClient_1 = __webpack_require__(5);
-const ExplosionClient_1 = __webpack_require__(21);
+const ExplosionClient_1 = __webpack_require__(22);
 const game_2 = __webpack_require__(2);
 const canvas_1 = __webpack_require__(3);
 const images_1 = __webpack_require__(4);
@@ -4454,7 +4569,7 @@ exports.BulletClient = BulletClient;
 
 
 /***/ }),
-/* 43 */
+/* 44 */
 /***/ (function(module, exports) {
 
 Object.defineProperty(exports, "__esModule", { value: true });
@@ -4523,7 +4638,7 @@ exports.GameSoundManager = GameSoundManager;
 
 
 /***/ }),
-/* 44 */
+/* 45 */
 /***/ (function(module, exports, __webpack_require__) {
 
 Object.defineProperty(exports, "__esModule", { value: true });
@@ -4597,7 +4712,7 @@ exports.MapClient = MapClient;
 
 
 /***/ }),
-/* 45 */
+/* 46 */
 /***/ (function(module, exports) {
 
 Object.defineProperty(exports, "__esModule", { value: true });
@@ -4652,11 +4767,11 @@ exports.Filters = Filters;
 
 
 /***/ }),
-/* 46 */
+/* 47 */
 /***/ (function(module, exports, __webpack_require__) {
 
 Object.defineProperty(exports, "__esModule", { value: true });
-const Particle_1 = __webpack_require__(47);
+const Particle_1 = __webpack_require__(48);
 const images_1 = __webpack_require__(4);
 class Effects {
     constructor(ctx) {
@@ -4704,7 +4819,7 @@ exports.Effects = Effects;
 
 
 /***/ }),
-/* 47 */
+/* 48 */
 /***/ (function(module, exports, __webpack_require__) {
 
 Object.defineProperty(exports, "__esModule", { value: true });
@@ -4764,11 +4879,11 @@ exports.Particle = Particle;
 
 
 /***/ }),
-/* 48 */
+/* 49 */
 /***/ (function(module, exports, __webpack_require__) {
 
 Object.defineProperty(exports, "__esModule", { value: true });
-const SmokeParticle_1 = __webpack_require__(49);
+const SmokeParticle_1 = __webpack_require__(50);
 const GeometryAndPhysics_1 = __webpack_require__(0);
 const game_1 = __webpack_require__(2);
 const PlayerClient_1 = __webpack_require__(5);
@@ -4828,7 +4943,7 @@ exports.SmokeClient = SmokeClient;
 
 
 /***/ }),
-/* 49 */
+/* 50 */
 /***/ (function(module, exports, __webpack_require__) {
 
 Object.defineProperty(exports, "__esModule", { value: true });

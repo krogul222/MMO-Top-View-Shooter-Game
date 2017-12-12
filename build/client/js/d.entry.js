@@ -60,14 +60,15 @@
 /******/ 	__webpack_require__.p = "/build/client/js";
 /******/
 /******/ 	// Load entry module and return exports
-/******/ 	return __webpack_require__(__webpack_require__.s = 50);
+/******/ 	return __webpack_require__(__webpack_require__.s = 13);
 /******/ })
 /************************************************************************/
 /******/ ({
 
-/***/ 50:
+/***/ 13:
 /***/ (function(module, exports) {
 
+Object.defineProperty(exports, "__esModule", { value: true });
 let signDiv = document.getElementById("signDiv");
 let loadingDiv = document.getElementById("loadingDiv");
 let signDivUsername = document.getElementById("signDiv-username");
@@ -83,13 +84,13 @@ let gameMenuDivContainer = document.getElementById("gameMenuDivContainer");
 let joinGameDiv = document.getElementById("joinGameDiv");
 let backToGameMenuBtn = document.getElementById("backToGameMenuBtn");
 let joinGameBtn = document.getElementById("joinGameBtn");
-let selectedGameId = -1;
+exports.selectedGameId = -1;
 let gamesId = [];
 signDivSignIn.onclick = function () {
     socket.emit('signIn', { username: signDivUsername.value, password: signDivPassword.value });
 };
 createGame.onclick = function () {
-    canJoinGame = true;
+    canCreateGame = true;
     gameMenuDiv.style.display = 'none';
     gameMenuDivContainer.style.display = 'none';
     mainBar.style.display = 'none';
@@ -107,7 +108,8 @@ joinGameMenuBtn.onclick = function () {
     socket.emit('getListOfGames');
 };
 joinGameBtn.onclick = function () {
-    if (selectedGameId >= 0) {
+    if (exports.selectedGameId >= 0) {
+        canJoinGame = true;
         gameMenuDiv.style.display = 'none';
         gameMenuDivContainer.style.display = 'none';
         joinGameDiv.style.display = 'none';
@@ -116,7 +118,7 @@ joinGameBtn.onclick = function () {
             loadingDiv.style.display = 'inline';
         }
         else {
-            socket.emit('joinedGame', { gameId: selectedGameId });
+            socket.emit('joinedGame', { gameId: exports.selectedGameId });
         }
     }
 };
@@ -133,7 +135,7 @@ $(document).ready(function () {
         $(this).closest("tr").siblings().removeClass("table-success");
         $(this).toggleClass("table-success");
         let id = parseInt($(this).attr('id'));
-        selectedGameId = gamesId[id];
+        exports.selectedGameId = gamesId[id];
     });
 });
 socket.on('ListOfGames', function (data) {
