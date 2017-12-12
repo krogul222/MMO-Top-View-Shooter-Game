@@ -6,6 +6,7 @@ import { initPack, removePack } from '../globalVariables';
 import { WeaponType } from '../enums';
 import { MapController } from '../Controllers/MapControler';
 import { Flame } from '../Effects/Flame';
+import { GameController } from '../Controllers/GameController';
 //import { frameCount } from '../../../app';
 
 export class Enemy extends Actor {
@@ -27,6 +28,12 @@ export class Enemy extends Actor {
 
         this.giveWeapons();
         initPack.enemy.push(this.getInitPack());
+
+        if(GameController.list[this.game] !== undefined){
+            GameController.list[this.game].initPack.enemy.push(this.getInitPack());
+        }
+
+        GameController.list[this.game].addEnemy(this);
     } 
 
     extendedUpdate = () => {
@@ -210,12 +217,12 @@ export class Enemy extends Actor {
         let pack: any[] =[];
         let updPack;
         for(let i in Enemy.list){
-            let enemy = Enemy.list[i];
+            let enemy: Enemy = Enemy.list[i];
             enemy.extendedUpdate();
             if(enemy.toRemove){
-                let map = enemy.map;
+                let gameId = enemy.game;
                 delete Enemy.list[i];
-                Enemy.randomlyGenerate(map);
+                Enemy.randomlyGenerate(GameController.list[gameId]);
                 removePack.enemy.push(enemy.id);
             } else {
                 updPack = enemy.getUpdatePack();
@@ -227,6 +234,29 @@ export class Enemy extends Actor {
         return pack;
     }
 
+    static updateSpecific = (enemies) => {
+        let pack: any[] =[];
+        let updPack;
+        for(let i in enemies){
+            let enemy: Enemy = enemies[i];
+            enemy.extendedUpdate();
+            if(enemy.toRemove){
+                let gameId = enemy.game;
+                delete Enemy.list[i];
+                delete enemies[i];
+                Enemy.randomlyGenerate(GameController.list[gameId]);
+                removePack.enemy.push(enemy.id);
+                GameController.list[gameId].removePack.enemy.push(enemy.id);
+            } else {
+                updPack = enemy.getUpdatePack();
+                if(updPack !== {}){
+                    pack.push(updPack); 
+                }
+            }
+        }
+        return pack;   
+    }    
+
     static getAllInitPack = function(){
         let enemies: any[] = [];
         for(let i in Enemy.list){
@@ -235,9 +265,22 @@ export class Enemy extends Actor {
         return enemies;
     }
 
-    static randomlyGenerate = function(choosenMap){
+    static getAllSpecificInitPack = function(game){
+        let enemies: any[] = [];
+
+        if(GameController.list[game] !== undefined){
+            let e = GameController.list[game].enemies;
+            for(let i in e){
+                enemies.push(e[i].getInitPack());
+            }
+        }
+        return enemies;
+    }
+
+    static randomlyGenerate = function(game: GameController){
         
-        let map = MapController.getMap(choosenMap);
+
+        let map = MapController.getMap(game.map);
 
         let x = Math.random()*map.width;
         let y = Math.random()*map.height;
@@ -262,10 +305,11 @@ export class Enemy extends Actor {
                 height: height,
                 hp: 15*difficulty, 
                 atkSpd: 0.8*difficulty,
-                map: choosenMap,
+                map: game.map,
                 img: 'scorpion',
                 type:'enemy',
                 kind:'scorpion',
+                game: game.id,
                 maxSpdX: 3,
                 maxSpdY: 3});
         } else{
@@ -276,7 +320,8 @@ export class Enemy extends Actor {
                 height: height,
                 hp: 5*difficulty, 
                 atkSpd: 0.4*difficulty,
-                map: choosenMap,
+                map: game.map,
+                game: game.id,
                 img: 'zombie',
                 type:'enemy',
                 kind:'zombie',

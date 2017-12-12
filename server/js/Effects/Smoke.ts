@@ -1,14 +1,16 @@
 import { initPack, removePack } from './../globalVariables';
 import { Point } from './../GeometryAndPhysics';
+import { GameController } from '../Controllers/GameController';
 export class Smoke {
 
     id: number = Math.random();
     public radius: number = 10;
     public grow: boolean = true;
 
-    constructor(public position: Point, public maxRadius: number, public time: number, public speed: number, public map){
+    constructor(public position: Point, public maxRadius: number, public time: number, public speed: number, public gameId){
         Smoke.list[this.id] = this;
         initPack.smoke.push(this.getInitPack());
+        GameController.list[this.gameId].addSmoke(this);
     }
 
     update = () => {
@@ -30,7 +32,7 @@ export class Smoke {
             id: this.id,
             position: this.position,
             radius: this.radius,
-            map: this.map,
+            map: GameController.list[this.gameId].map,
             maxRadius: this.maxRadius,
             time: this.time
         };
@@ -50,6 +52,22 @@ export class Smoke {
             smoke.update();
             if(smoke.time == 0){
                 delete Smoke.list[i];
+                removePack.smoke.push(smoke.id);
+            } else {
+                pack.push(smoke.getUpdatePack());
+            }
+        }
+        return pack;
+    }
+
+    static updateSpecific = (smokes) => {
+        let pack: any[] =[];
+        for(let i in smokes){
+            let smoke: Smoke = smokes[i];
+            smoke.update();
+            if(smoke.time == 0){
+                delete Smoke.list[i];
+                delete smokes[i];
                 removePack.smoke.push(smoke.id);
             } else {
                 pack.push(smoke.getUpdatePack());

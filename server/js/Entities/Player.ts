@@ -23,6 +23,10 @@ export class Player extends Actor {
         Player.list[param.id] = this;
         this.giveItems();
 
+        if(GameController.list[this.game] !== undefined){
+            GameController.list[this.game].initPack.player.push(this.getInitPack());
+        }
+/*
         if(Player.monsters){
             for(let i = 0 ; i <10; i++){
                 Enemy.randomlyGenerate(this.map);
@@ -31,7 +35,7 @@ export class Player extends Actor {
                 Enemy.randomlyGenerate(this.map);
                 }
                 Player.monsters = false;
-        }
+        }*/
 
     } 
 
@@ -153,26 +157,12 @@ export class Player extends Actor {
         }
 
         return newPack;
-/*
-        return {
-            id: this.id,
-            position: this.position,
-            hp: this.lifeAndBodyController.hp,
-            moving: this.movementController.moving,
-            aimAngle: this.movementController.aimAngle,
-            attackStarted: attackStartedTmp,
-            weapon: this.attackController.activeWeapon.name,
-            attackMelee: this.attackController.melee,
-            ammo: this.attackController.activeWeapon.ammo,
-            ammoInGun: this.attackController.activeWeapon.ammoInGun,
-            reload: this.attackController.reloadCounter.isActive(),
-            pressingAttack: this.attackController.pressingAttack,
-            burn: this.lifeAndBodyController.burn   
-        }*/
+
     }
 
     static onConnect = (socket, createdGame: boolean = false, gID: number = -1) => {
 
+        let game:GameController; 
         let gameId: number = gID;
         console.log("Nowy SOCKET " + socket.id);
 
@@ -180,15 +170,20 @@ export class Player extends Actor {
         let map = 'forest';
 
         if(createdGame == true) {
-            let game = new GameController();
-            game.addSocket(socket);
+            game = new GameController({monsters: 40});
+          //  map = game.map;
+            for(let i = 0; i < 40; i++){
+                Enemy.randomlyGenerate(game);
+            }
             gameId = game.id;
-            map = game.map;
+
         } else{
-            console.log("GAMEID "+gameId);
-            let game: GameController = GameController.list[gameId];
-            map = game.map;
+            game = GameController.list[gameId];
+            gameId = game.id;
         }
+
+        game.addSocket(socket);
+        map = game.map;
 
         let player:Player = new Player({
              id: socket.id,
@@ -223,7 +218,7 @@ export class Player extends Actor {
             if(data.inputId == '4') player.attackController.weaponCollection.changeWeapon(WeaponType.rifle); 
             if(data.inputId == '5') player.attackController.weaponCollection.changeWeapon(WeaponType.flamethrower); 
             if(data.inputId == 'space') player.attackController.weaponCollection.chooseNextWeaponWithAmmo();
-            if(data.inputId == 'smoke') new Smoke(new Point(player.position.x -128,player.position.y -128), 150, 750, 20, player.map);
+            if(data.inputId == 'smoke') new Smoke(new Point(player.position.x -128,player.position.y -128), 150, 750, 20, player.game);
             if(data.inputId == 'map'){
                 let gameMap : GameMap = MapController.getMap(data.map);
                 MapController.createMap(data.map, gameMap.size, 20);
@@ -232,21 +227,12 @@ export class Player extends Actor {
             } 
         });
 
-        if(createdGame == false) {
-            console.log("GAMEID "+gameId);
-            let game: GameController = GameController.list[gameId];
-            game.addPlayer(player);
-            game.addSocket(socket);
-            console.log("Socket in Player "+socket.id);
-            socket.emit('init',{player: Player.getAllInitPack(),bullet:Bullet.getAllInitPack(),enemy:Enemy.getAllInitPack(),selfId:socket.id});
-            socket.emit('mapData', MapController.getMapPack(game.map));
-        } else {
-            let game: GameController = GameController.list[gameId];
-            game.addPlayer(player);
-            console.log("Socket in Player "+socket.id);
-            socket.emit('init',{player: Player.getAllInitPack(),bullet:Bullet.getAllInitPack(),enemy:Enemy.getAllInitPack(),selfId:socket.id});
-            socket.emit('mapData', MapController.getMapPack(game.map));
-        }
+        game.addPlayer(player);
+
+        socket.emit('init',{player: Player.getAllSpecificInitPack(game.id),enemy:Enemy.getAllSpecificInitPack(game.id),selfId:socket.id});
+        //socket.emit('init',{player: Player.getAllInitPack(),bullet:Bullet.getAllInitPack(),enemy:Enemy.getAllInitPack(),selfId:socket.id});
+        socket.emit('mapData', MapController.getMapPack(game.map));
+        
     }
 
     onDeath = () => {
@@ -269,11 +255,18 @@ export class Player extends Actor {
     closeEnemies = (distance) => {
         let ids: number[] = [];
         let e: Enemy;
-        for(let i in Enemy.list){
-            e = Enemy.list[i];
-            if(Math.abs(e.position.x - this.position.x) < distance && Math.abs(e.position.y - this.position.y) < distance){
-                ids.push(e.id);
+
+        if(GameController.list[this.game] !== undefined) {
+            let enemies = GameController.list[this.game].enemies;
+            
+            for(let i in enemies){
+                e = enemies[i];
+                if(Math.abs(e.position.x - this.position.x) < distance && Math.abs(e.position.y - this.position.y) < distance){
+                    ids.push(e.id);
+                }
             }
+        } else {
+            console.log("PROBLEM " + this.game);
         }
 
         return ids;
@@ -285,15 +278,44 @@ export class Player extends Actor {
         return players;
     }
 
+    static getAllSpecificInitPack = (game) => {
+        let players: any[] = [];
+        if(GameController.list[game] !== undefined){
+            let p = GameController.list[game].players;
+            for(let i in p) { players.push(p[i].getInitPack()); }
+        }
+        
+        return players;
+    }
+
     static onDisconnect = (socket) => {
         delete Player.list[socket.id];
         removePack.player.push(socket.id);
+        
+        for(let key in GameController.list){
+            let players = GameController.list[key].players;
+            for(let i = 0; i < GameController.list[key].players.length; i++){
+                if(players[i].id == socket.id) {
+                    GameController.list[key].removePack.player.push(socket.id);
+                }
+            }
+        }
     }
 
     static update = () => {
         let pack: any[] =[];
         for(let i in Player.list){
             let player = Player.list[i];
+            player.extendedUpdate();
+            pack.push(player.getUpdatePack());
+        }
+        return pack;
+    }
+
+    static updateSpecific = (players) => {
+        let pack: any[] =[];
+        for(let i in players){
+            let player = players[i];
             player.extendedUpdate();
             pack.push(player.getUpdatePack());
         }

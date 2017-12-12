@@ -115,35 +115,38 @@ setInterval(function () {
     let packs = Entity_1.Entity.getFrameUpdateData();
     Particle_1.Particle.update();
     Bullet_1.Bullet.update();
-    let pack = {
-        player: Player_1.Player.update(),
-        enemy: Enemy_1.Enemy.update(),
-        smoke: Smoke_1.Smoke.update()
-    };
     exports.frameCount++;
     for (let i in GameController_1.GameController.list) {
         let game = GameController_1.GameController.list[i];
+        let pack = {
+            player: Player_1.Player.updateSpecific(game.players),
+            enemy: Enemy_1.Enemy.updateSpecific(game.enemies),
+            smoke: Smoke_1.Smoke.updateSpecific(game.smokes)
+        };
         for (let j in game.socketList) {
             let socket = SOCKET_LIST[j];
             if (socket !== undefined) {
-                socket.emit('init', packs.initPack);
+                socket.emit('init', game.initPack);
                 socket.emit('update', pack);
-                socket.emit('remove', packs.removePack);
+                socket.emit('remove', game.removePack);
             }
         }
     }
     MapControler_1.MapController.updatePack.length = 0;
-    packs.initPack.player = [];
-    packs.initPack.bullet = [];
-    packs.initPack.enemy = [];
-    packs.initPack.smoke = [];
-    packs.initPack.particle = [];
-    packs.initPack.upgrade = [];
-    packs.removePack.player = [];
-    packs.removePack.bullet = [];
-    packs.removePack.enemy = [];
-    packs.removePack.upgrade = [];
-    packs.removePack.particle = [];
-    packs.removePack.smoke = [];
+    for (let i in GameController_1.GameController.list) {
+        let game = GameController_1.GameController.list[i];
+        game.initPack.player = [];
+        game.initPack.bullet = [];
+        game.initPack.enemy = [];
+        game.initPack.smoke = [];
+        game.initPack.particle = [];
+        game.initPack.upgrade = [];
+        game.removePack.player = [];
+        game.removePack.bullet = [];
+        game.removePack.enemy = [];
+        game.removePack.upgrade = [];
+        game.removePack.particle = [];
+        game.removePack.smoke = [];
+    }
 }, 1000 / 25);
 //# sourceMappingURL=app.js.map

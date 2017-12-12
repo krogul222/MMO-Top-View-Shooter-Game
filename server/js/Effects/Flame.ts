@@ -15,7 +15,7 @@ export class Flame{
         parent: Actor = null;
         create: boolean = false;
         life: number = 60;
-        map;
+        game;
 
         constructor(param){
     
@@ -28,7 +28,7 @@ export class Flame{
             this.angle = (param.angle !== undefined) ? param.angle : 0;
             this.offset = (param.offset !== undefined) ? param.offset : 0;
             this.life = (param.life !== undefined) ? param.life : 60;
-            this.map = (param.map !== undefined) ? param.map : 0;
+            this.game = (param.game !== undefined) ? param.game : 0;
 
             Flame.list[this.id] = this;
         }
@@ -63,7 +63,7 @@ export class Flame{
                     velocity.x += Math.cos(angleInRad)*flame;
                     velocity.y += Math.sin(angleInRad)*flame;
 
-                    let p = new Particle({parent: this.parent.id, combatType: this.parent.type,position: posWithOffset, velocity: velocity, maxLife: this.life, type: ParticleType.fire, map: this.map});
+                    let p = new Particle({parent: this.parent.id, combatType: this.parent.type,position: posWithOffset, velocity: velocity, maxLife: this.life, type: ParticleType.fire, game: this.game});
                     
                     this.particles[p.id] = p;
                 }

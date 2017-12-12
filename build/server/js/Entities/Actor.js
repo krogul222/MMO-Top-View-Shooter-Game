@@ -1,4 +1,5 @@
 Object.defineProperty(exports, "__esModule", { value: true });
+const GameController_1 = require("./../Controllers/GameController");
 const Inventory_1 = require("./../Inventory/Inventory");
 const MapControler_1 = require("./../Controllers/MapControler");
 const MovementController_1 = require("./../Controllers/MovementController");
@@ -22,8 +23,9 @@ class Actor extends Entity_1.Entity {
             let closestEnemyDistance = 100000;
             let pangle = this.movementController.aimAngle;
             pangle = (pangle < 0) ? pangle + 360 : pangle;
-            for (let i in Player_1.Player.list) {
-                let enemy = Player_1.Player.list[i];
+            let players = GameController_1.GameController.list[this.game].players;
+            for (let i in players) {
+                let enemy = players[i];
                 if (enemy !== this) {
                     let angle = GeometryAndPhysics_1.calculateAngleBetweenEntities(this, enemy);
                     let maxDistance = Math.sqrt(enemy.width * enemy.width / 4 + enemy.height * enemy.height / 4) + distance;
@@ -47,8 +49,9 @@ class Actor extends Entity_1.Entity {
             let closestEnemyDistance = 100000;
             let pangle = this.movementController.aimAngle;
             pangle = (pangle < 0) ? pangle + 360 : pangle;
-            for (let i in Enemy_1.Enemy.list) {
-                let enemy = Enemy_1.Enemy.list[i];
+            let enemies = GameController_1.GameController.list[this.game].enemies;
+            for (let i in enemies) {
+                let enemy = enemies[i];
                 let angle = GeometryAndPhysics_1.calculateAngleBetweenEntities(this, enemy);
                 let maxDistance = Math.sqrt(enemy.width * enemy.width / 4 + enemy.height * enemy.height / 4) + distance;
                 let distanceFromEnemy = this.getDistance(enemy);

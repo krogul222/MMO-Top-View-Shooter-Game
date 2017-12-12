@@ -1,3 +1,4 @@
+import { GameController } from './../Controllers/GameController';
 import { Point } from './../GeometryAndPhysics';
 import { Pack } from './../Pack';
 import { Enemy } from './Enemy';
@@ -51,16 +52,7 @@ export class Bullet extends Entity{
             case 'player': {   //bullet was shot by player
                 let player: Player= Player.list[this.parent];
                 let closeEnemies = player.getCloseEnemies();
-                /*
-                for(let key in Enemy.list){          // check if enemy was hit
-                    let enemy: Enemy = Enemy.list[key]; 
-                    if(this.testCollision(enemy)){
-                        this.toRemove = true;
-                        enemy.lifeAndBodyController.wasHit(player.attackController.getDamage());
-                        this.setHitProperties(1, "enemy", enemy.id);
-                    }
-                }
-*/
+
 
                 for(let key in closeEnemies){          // check if enemy was hit
                     let enemy: Enemy = Enemy.list[closeEnemies[key]]; 
@@ -71,32 +63,41 @@ export class Bullet extends Entity{
                         break;
                     }
                 }
-
-                for(let key in Player.list){         // check if player was hit
-                    if(Player.list[key].id !== this.parent){
-                        let enemyPlayer: Player = Player.list[key];
-                        if(this.testCollision(enemyPlayer)){
-                            this.toRemove = true;
-                            enemyPlayer.lifeAndBodyController.wasHit(player.attackController.getDamage());
-                            this.setHitProperties(1, "player", enemyPlayer.id);
+                if(GameController.list[this.game] !== undefined){
+                    let players = GameController.list[this.game].players;
+                    
+                    for(let key in players){         // check if player was hit
+                        if(players[key].id !== this.parent){
+                            let enemyPlayer: Player = players[key];
+                            if(this.testCollision(enemyPlayer)){
+                                this.toRemove = true;
+                                enemyPlayer.lifeAndBodyController.wasHit(player.attackController.getDamage());
+                                this.setHitProperties(1, "player", enemyPlayer.id);
+                            }
                         }
                     }
                 }
+
                 break;
             }
 
             case 'enemy': {   //bullet was shot by enemy
                 let enemy: Enemy = Enemy.list[this.parent];
 
-                for(let key in Player.list){
-                    let player: Player = Player.list[key];
-                    if(this.testCollision(player)){
-                        this.toRemove = true;
-                        this.setHitProperties(1, "player", player.id);
-                        (enemy) ? player.lifeAndBodyController.wasHit(enemy.attackController.getDamage()) : player.lifeAndBodyController.wasHit(1);
-
-                    }
+                if(GameController.list[this.game] !== undefined){
+                    let players = GameController.list[this.game].players;
+                    
+                                    for(let key in players){
+                                        let player: Player = players[key];
+                                        if(this.testCollision(player)){
+                                            this.toRemove = true;
+                                            this.setHitProperties(1, "player", player.id);
+                                            (enemy) ? player.lifeAndBodyController.wasHit(enemy.attackController.getDamage()) : player.lifeAndBodyController.wasHit(1);
+                    
+                                        }
+                                    }
                 }
+
                 break;
             }
         }
@@ -142,10 +143,11 @@ export class Bullet extends Entity{
     static update = () =>{
       //  let pack: any[] =[];
         for(let i in Bullet.list){
-            let bullet = Bullet.list[i];
+            let bullet: Bullet = Bullet.list[i];
             //bullet.update();
             if(bullet.toRemove){
                 initPack.bullet.push(bullet.getInitPack());
+                GameController.list[bullet.game].initPack.bullet.push(bullet.getInitPack());
                 delete Bullet.list[i];
               //  removePack.bullet.push({id: bullet.id, hitCategory: bullet.hitCategory, hitEntityCategory: bullet.hitEntityCategory, hitEntityId: bullet.hitEntityId});
             } else {
@@ -161,6 +163,17 @@ export class Bullet extends Entity{
             bullets.push(Bullet.list[i].getInitPack());
         }
         return bullets;
+    }
+
+    static getAllSpecificInitPack = function(game){
+  /*      let bullets: any[] = [];
+        if(GameController.list[game] !== undefined){
+            let e = GameController.list[game].enemies;
+            for(let i in Bullet.list){
+                bullets.push(Bullet.list[i].getInitPack());
+            }
+        }
+        return bullets;*/
     }
 
     static updateParam = (param) => {

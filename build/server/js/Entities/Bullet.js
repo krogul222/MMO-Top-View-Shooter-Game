@@ -1,4 +1,5 @@
 Object.defineProperty(exports, "__esModule", { value: true });
+const GameController_1 = require("./../Controllers/GameController");
 const GeometryAndPhysics_1 = require("./../GeometryAndPhysics");
 const Enemy_1 = require("./Enemy");
 const Player_1 = require("./Player");
@@ -34,13 +35,16 @@ class Bullet extends Entity_1.Entity {
                             break;
                         }
                     }
-                    for (let key in Player_1.Player.list) {
-                        if (Player_1.Player.list[key].id !== this.parent) {
-                            let enemyPlayer = Player_1.Player.list[key];
-                            if (this.testCollision(enemyPlayer)) {
-                                this.toRemove = true;
-                                enemyPlayer.lifeAndBodyController.wasHit(player.attackController.getDamage());
-                                this.setHitProperties(1, "player", enemyPlayer.id);
+                    if (GameController_1.GameController.list[this.game] !== undefined) {
+                        let players = GameController_1.GameController.list[this.game].players;
+                        for (let key in players) {
+                            if (players[key].id !== this.parent) {
+                                let enemyPlayer = players[key];
+                                if (this.testCollision(enemyPlayer)) {
+                                    this.toRemove = true;
+                                    enemyPlayer.lifeAndBodyController.wasHit(player.attackController.getDamage());
+                                    this.setHitProperties(1, "player", enemyPlayer.id);
+                                }
                             }
                         }
                     }
@@ -48,12 +52,15 @@ class Bullet extends Entity_1.Entity {
                 }
                 case 'enemy': {
                     let enemy = Enemy_1.Enemy.list[this.parent];
-                    for (let key in Player_1.Player.list) {
-                        let player = Player_1.Player.list[key];
-                        if (this.testCollision(player)) {
-                            this.toRemove = true;
-                            this.setHitProperties(1, "player", player.id);
-                            (enemy) ? player.lifeAndBodyController.wasHit(enemy.attackController.getDamage()) : player.lifeAndBodyController.wasHit(1);
+                    if (GameController_1.GameController.list[this.game] !== undefined) {
+                        let players = GameController_1.GameController.list[this.game].players;
+                        for (let key in players) {
+                            let player = players[key];
+                            if (this.testCollision(player)) {
+                                this.toRemove = true;
+                                this.setHitProperties(1, "player", player.id);
+                                (enemy) ? player.lifeAndBodyController.wasHit(enemy.attackController.getDamage()) : player.lifeAndBodyController.wasHit(1);
+                            }
                         }
                     }
                     break;
@@ -112,6 +119,7 @@ Bullet.update = () => {
         let bullet = Bullet.list[i];
         if (bullet.toRemove) {
             globalVariables_1.initPack.bullet.push(bullet.getInitPack());
+            GameController_1.GameController.list[bullet.game].initPack.bullet.push(bullet.getInitPack());
             delete Bullet.list[i];
         }
         else {
@@ -124,6 +132,8 @@ Bullet.getAllInitPack = function () {
         bullets.push(Bullet.list[i].getInitPack());
     }
     return bullets;
+};
+Bullet.getAllSpecificInitPack = function (game) {
 };
 Bullet.updateParam = (param) => {
     param.id = Math.random();

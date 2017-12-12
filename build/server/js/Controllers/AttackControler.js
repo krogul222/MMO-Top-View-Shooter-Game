@@ -86,6 +86,7 @@ class AttackController {
                 angle: aimAngle,
                 position: new GeometryAndPhysics_1.Point(this.parent.position.x, this.parent.position.y),
                 map: this.parent.map,
+                game: this.parent.game,
                 img: 'bullet',
                 width: 8,
                 height: 8,
@@ -110,7 +111,7 @@ class AttackController {
         this._activeWeapon = new WeaponCollection_1.SingleWeapon(this.parent, { weapon: "0", ammo: "20", parent: this.parent });
         if (param.atkSpd)
             this._attackCounter.setInc(param.atkSpd);
-        this._flame = new Flame_1.Flame({ parent: parent, map: this.parent.map, offset: 50, life: 30 });
+        this._flame = new Flame_1.Flame({ parent: parent, map: this.parent.game, offset: 50, life: 30 });
         this.attackCounter.activate();
     }
     get melee() { return this._melee; }

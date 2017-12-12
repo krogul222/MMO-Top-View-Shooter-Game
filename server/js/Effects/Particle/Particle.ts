@@ -1,3 +1,4 @@
+import { GameController } from './../../Controllers/GameController';
 import { Player } from './../../Entities/Player';
 import { Entity } from './../../Entities/Entity';
 import { initPack, removePack } from './../../globalVariables';
@@ -18,7 +19,7 @@ export class Particle{
     id: number = Math.random();
     parent: number;
     combatType: string = 'player';
-    map;
+    game;
 
     constructor(param){
 
@@ -38,7 +39,7 @@ export class Particle{
         this.parent = param.parent ? param.parent : -1;
         this.combatType = param.combatType ? param.combatType : this.combatType;
 
-        this.map = (param.map !== undefined) ? param.map : 0;
+        this.game = (param.game !== undefined) ? param.game : 0;
 
        // initPack.particle.push(this.getInitPack());
         Particle.list[this.id] = this; 
@@ -55,8 +56,11 @@ export class Particle{
             switch(this.combatType){
                 case 'player': {   //bullet was shot by player
                     
-                    for(let key in Enemy.list){          // check if enemy was hit
-                        let enemy: Enemy = Enemy.list[key]; 
+                    let player: Player= Player.list[this.parent];
+                    let closeEnemies = player.getCloseEnemies();
+
+                    for(let key in closeEnemies){          // check if enemy was hit
+                        let enemy: Enemy = closeEnemies[key]; 
                         if(this.testCollision(enemy)){
                             //this.toRemove = true;
                             enemy.lifeAndBodyController.wasHit(1*this.life/this.maxLife);
@@ -64,15 +68,17 @@ export class Particle{
                         }
                     }
 
-                    let player: Player= Player.list[this.parent];
-
-                    for(let key in Player.list){         // check if player was hit
-                        if(Player.list[key].id !== this.parent){
-                            let enemyPlayer: Player = Player.list[key];
-                            if(this.testCollision(enemyPlayer)){
-                               // this.toRemove = true;
-                                enemyPlayer.lifeAndBodyController.wasHit(1*this.life/this.maxLife);
-                                enemyPlayer.lifeAndBodyController.startBurn(100);
+                   // let player: Player= Player.list[this.parent];
+                   if(GameController.list[this.game] !== undefined){
+                        let players = GameController.list[this.game].players;
+                        for(let key in Player.list){         // check if player was hit
+                            if(Player.list[key].id !== this.parent){
+                                let enemyPlayer: Player = Player.list[key];
+                                if(this.testCollision(enemyPlayer)){
+                                // this.toRemove = true;
+                                    enemyPlayer.lifeAndBodyController.wasHit(1*this.life/this.maxLife);
+                                    enemyPlayer.lifeAndBodyController.startBurn(100);
+                                }
                             }
                         }
                     }
@@ -83,6 +89,9 @@ export class Particle{
                 case 'enemy': {   //bullet was shot by enemy
                     let enemy: Enemy = Enemy.list[this.parent];
                     
+                    if(GameController.list[this.game] !== undefined){
+                        let players = GameController.list[this.game].players;
+
                                     for(let key in Player.list){
                                         let player: Player = Player.list[key];
                                         if(this.testCollision(player)){
@@ -91,11 +100,15 @@ export class Particle{
                                             player.lifeAndBodyController.startBurn(100);
                                         }
                                     }
+                    }
 
+                    if(GameController.list[this.game] !== undefined){
 
-                                    for(let key in Enemy.list){          // check if enemy was hit
-                                        if(Enemy.list[key].id !== this.parent){
-                                            let enemy: Enemy = Enemy.list[key]; 
+                        let enemies = GameController.list[this.game].enemies;
+
+                                    for(let key in enemies){          // check if enemy was hit
+                                        if(enemies.id !== this.parent){
+                                            let enemy: Enemy = enemies[key]; 
                                             if(this.testCollision(enemy)){
                                                 //this.toRemove = true;
                                                 enemy.lifeAndBodyController.wasHit(1*this.life/this.maxLife);
@@ -103,6 +116,7 @@ export class Particle{
                                             }
                                         }
                                     }
+                    }
                     break;
                 }
 
@@ -143,7 +157,7 @@ export class Particle{
         return {
             id: this.id,
             position: this.position,
-            map: this.map,
+            map: GameController.list[this.game].map,
             size: this.size,
             type: this.type,
             maxLife: this.maxLife

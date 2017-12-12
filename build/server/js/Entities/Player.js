@@ -3,7 +3,6 @@ const GameController_1 = require("./../Controllers/GameController");
 const Smoke_1 = require("./../Effects/Smoke");
 const globalVariables_1 = require("./../globalVariables");
 const Enemy_1 = require("./Enemy");
-const Bullet_1 = require("./Bullet");
 const Actor_1 = require("./Actor");
 const GeometryAndPhysics_1 = require("./../GeometryAndPhysics");
 const enums_1 = require("../enums");
@@ -127,43 +126,46 @@ class Player extends Actor_1.Actor {
         this.closeEnemies = (distance) => {
             let ids = [];
             let e;
-            for (let i in Enemy_1.Enemy.list) {
-                e = Enemy_1.Enemy.list[i];
-                if (Math.abs(e.position.x - this.position.x) < distance && Math.abs(e.position.y - this.position.y) < distance) {
-                    ids.push(e.id);
+            if (GameController_1.GameController.list[this.game] !== undefined) {
+                let enemies = GameController_1.GameController.list[this.game].enemies;
+                for (let i in enemies) {
+                    e = enemies[i];
+                    if (Math.abs(e.position.x - this.position.x) < distance && Math.abs(e.position.y - this.position.y) < distance) {
+                        ids.push(e.id);
+                    }
                 }
+            }
+            else {
+                console.log("PROBLEM " + this.game);
             }
             return ids;
         };
         globalVariables_1.initPack.player.push(this.getInitPack());
         Player.list[param.id] = this;
         this.giveItems();
-        if (Player.monsters) {
-            for (let i = 0; i < 10; i++) {
-                Enemy_1.Enemy.randomlyGenerate(this.map);
-                Enemy_1.Enemy.randomlyGenerate(this.map);
-                Enemy_1.Enemy.randomlyGenerate(this.map);
-                Enemy_1.Enemy.randomlyGenerate(this.map);
-            }
-            Player.monsters = false;
+        if (GameController_1.GameController.list[this.game] !== undefined) {
+            GameController_1.GameController.list[this.game].initPack.player.push(this.getInitPack());
         }
     }
 }
 Player.onConnect = (socket, createdGame = false, gID = -1) => {
+    let game;
     let gameId = gID;
     console.log("Nowy SOCKET " + socket.id);
     let map = 'forest';
     if (createdGame == true) {
-        let game = new GameController_1.GameController();
-        game.addSocket(socket);
+        game = new GameController_1.GameController({ monsters: 40 });
+        for (let i = 0; i < 40; i++) {
+            Enemy_1.Enemy.randomlyGenerate(game);
+        }
         gameId = game.id;
-        map = game.map;
     }
     else {
-        console.log("GAMEID " + gameId);
-        let game = GameController_1.GameController.list[gameId];
-        map = game.map;
+        game = GameController_1.GameController.list[gameId];
+        gameId = game.id;
     }
+    game.addSocket(socket);
+    map = game.map;
     let player = new Player({
         id: socket.id,
         maxSpdX: 12,
@@ -214,29 +216,16 @@ Player.onConnect = (socket, createdGame = false, gID = -1) => {
         if (data.inputId == 'space')
             player.attackController.weaponCollection.chooseNextWeaponWithAmmo();
         if (data.inputId == 'smoke')
-            new Smoke_1.Smoke(new GeometryAndPhysics_1.Point(player.position.x - 128, player.position.y - 128), 150, 750, 20, player.map);
+            new Smoke_1.Smoke(new GeometryAndPhysics_1.Point(player.position.x - 128, player.position.y - 128), 150, 750, 20, player.game);
         if (data.inputId == 'map') {
             let gameMap = MapControler_1.MapController.getMap(data.map);
             MapControler_1.MapController.createMap(data.map, gameMap.size, 20);
             MapControler_1.MapController.updatePack.push(MapControler_1.MapController.getMapPack(data.map));
         }
     });
-    if (createdGame == false) {
-        console.log("GAMEID " + gameId);
-        let game = GameController_1.GameController.list[gameId];
-        game.addPlayer(player);
-        game.addSocket(socket);
-        console.log("Socket in Player " + socket.id);
-        socket.emit('init', { player: Player.getAllInitPack(), bullet: Bullet_1.Bullet.getAllInitPack(), enemy: Enemy_1.Enemy.getAllInitPack(), selfId: socket.id });
-        socket.emit('mapData', MapControler_1.MapController.getMapPack(game.map));
-    }
-    else {
-        let game = GameController_1.GameController.list[gameId];
-        game.addPlayer(player);
-        console.log("Socket in Player " + socket.id);
-        socket.emit('init', { player: Player.getAllInitPack(), bullet: Bullet_1.Bullet.getAllInitPack(), enemy: Enemy_1.Enemy.getAllInitPack(), selfId: socket.id });
-        socket.emit('mapData', MapControler_1.MapController.getMapPack(game.map));
-    }
+    game.addPlayer(player);
+    socket.emit('init', { player: Player.getAllSpecificInitPack(game.id), enemy: Enemy_1.Enemy.getAllSpecificInitPack(game.id), selfId: socket.id });
+    socket.emit('mapData', MapControler_1.MapController.getMapPack(game.map));
 };
 Player.getAllInitPack = () => {
     let players = [];
@@ -245,14 +234,41 @@ Player.getAllInitPack = () => {
     }
     return players;
 };
+Player.getAllSpecificInitPack = (game) => {
+    let players = [];
+    if (GameController_1.GameController.list[game] !== undefined) {
+        let p = GameController_1.GameController.list[game].players;
+        for (let i in p) {
+            players.push(p[i].getInitPack());
+        }
+    }
+    return players;
+};
 Player.onDisconnect = (socket) => {
     delete Player.list[socket.id];
     globalVariables_1.removePack.player.push(socket.id);
+    for (let key in GameController_1.GameController.list) {
+        let players = GameController_1.GameController.list[key].players;
+        for (let i = 0; i < GameController_1.GameController.list[key].players.length; i++) {
+            if (players[i].id == socket.id) {
+                GameController_1.GameController.list[key].removePack.player.push(socket.id);
+            }
+        }
+    }
 };
 Player.update = () => {
     let pack = [];
     for (let i in Player.list) {
         let player = Player.list[i];
+        player.extendedUpdate();
+        pack.push(player.getUpdatePack());
+    }
+    return pack;
+};
+Player.updateSpecific = (players) => {
+    let pack = [];
+    for (let i in players) {
+        let player = players[i];
         player.extendedUpdate();
         pack.push(player.getUpdatePack());
     }

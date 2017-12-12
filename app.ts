@@ -143,47 +143,39 @@ setInterval(function(){
     Particle.update();
     Bullet.update();
    // Upgrade.update();
-    let pack = {
+   /* let pack = {
         player: Player.update(),
      //   bullet: Bullet.update(),
     //    particle: Particle.update(),
         enemy: Enemy.update(),
         smoke: Smoke.update()
        // upgrade: Upgrade.update()
-    }
-/*
-    let flame: Flame;
+    }*/
 
-    for(let i in Flame.list){
-        flame = Flame.list[i];
-        flame.update(true);
-    }
-    */
     frameCount++;
 
-    /*
-    for(let i in SOCKET_LIST){
-            let socket = SOCKET_LIST[i];
-            socket.emit('init',packs.initPack);
-            socket.emit('update',pack);
-            socket.emit('remove',packs.removePack);
-            for(let i = 0, length = MapController.updatePack.length; i < length; i++) {
-                socket.emit('mapData', MapController.updatePack[i]);
-            }
-     }
-*/
 
      // Game Controller
      for(let i in GameController.list){
         let game: GameController = GameController.list[i];
+
+        let pack = {
+            player: Player.updateSpecific(game.players),
+            enemy: Enemy.updateSpecific(game.enemies),
+            smoke: Smoke.updateSpecific(game.smokes)
+        }
+
         for(let j in game.socketList){
             let socket = SOCKET_LIST[j];
            // console.log('SOCKETT ' + j);
             if(socket !== undefined){
             //    console.log('SOCKET '+socket.id);
-                socket.emit('init',packs.initPack);
+             /*   socket.emit('init',packs.initPack);
                 socket.emit('update',pack);
-                socket.emit('remove',packs.removePack);
+                socket.emit('remove',packs.removePack);*/
+                socket.emit('init',game.initPack);
+                socket.emit('update',pack);
+                socket.emit('remove',game.removePack);
             }
             /*for(let i = 0, length = MapController.updatePack.length; i < length; i++) {
                 socket.emit('mapData', MapController.updatePack[i]);
@@ -195,6 +187,7 @@ setInterval(function(){
 
     
     MapController.updatePack.length = 0;
+    /*
     packs.initPack.player = [];
     packs.initPack.bullet = [];
     packs.initPack.enemy = [];
@@ -208,4 +201,22 @@ setInterval(function(){
     packs.removePack.upgrade = [];
     packs.removePack.particle = [];
     packs.removePack.smoke = [];
+    */
+    for(let i in GameController.list){
+        let game: GameController = GameController.list[i];
+        game.initPack.player = [];
+        game.initPack.bullet = [];
+        game.initPack.enemy = [];
+        game.initPack.smoke = [];
+        game.initPack.particle = [];
+        game.initPack.upgrade = [];
+        
+        game.removePack.player = [];
+        game.removePack.bullet = [];
+        game.removePack.enemy = [];
+        game.removePack.upgrade = [];
+        game.removePack.particle = [];
+        game.removePack.smoke = [];
+    }
+
 }, 1000/25);

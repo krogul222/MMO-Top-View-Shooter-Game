@@ -4,6 +4,7 @@ const GeometryAndPhysics_1 = require("../GeometryAndPhysics");
 const globalVariables_1 = require("../globalVariables");
 const enums_1 = require("../enums");
 const MapControler_1 = require("../Controllers/MapControler");
+const GameController_1 = require("../Controllers/GameController");
 class Enemy extends Actor_1.Actor {
     constructor(param) {
         super(param);
@@ -161,6 +162,10 @@ class Enemy extends Actor_1.Actor {
         this.attackController.accuracy = 30;
         this.giveWeapons();
         globalVariables_1.initPack.enemy.push(this.getInitPack());
+        if (GameController_1.GameController.list[this.game] !== undefined) {
+            GameController_1.GameController.list[this.game].initPack.enemy.push(this.getInitPack());
+        }
+        GameController_1.GameController.list[this.game].addEnemy(this);
     }
 }
 Enemy.globalMapControler = new MapControler_1.MapController(null);
@@ -171,10 +176,33 @@ Enemy.update = () => {
         let enemy = Enemy.list[i];
         enemy.extendedUpdate();
         if (enemy.toRemove) {
-            let map = enemy.map;
+            let gameId = enemy.game;
             delete Enemy.list[i];
-            Enemy.randomlyGenerate(map);
+            Enemy.randomlyGenerate(GameController_1.GameController.list[gameId]);
             globalVariables_1.removePack.enemy.push(enemy.id);
+        }
+        else {
+            updPack = enemy.getUpdatePack();
+            if (updPack !== {}) {
+                pack.push(updPack);
+            }
+        }
+    }
+    return pack;
+};
+Enemy.updateSpecific = (enemies) => {
+    let pack = [];
+    let updPack;
+    for (let i in enemies) {
+        let enemy = enemies[i];
+        enemy.extendedUpdate();
+        if (enemy.toRemove) {
+            let gameId = enemy.game;
+            delete Enemy.list[i];
+            delete enemies[i];
+            Enemy.randomlyGenerate(GameController_1.GameController.list[gameId]);
+            globalVariables_1.removePack.enemy.push(enemy.id);
+            GameController_1.GameController.list[gameId].removePack.enemy.push(enemy.id);
         }
         else {
             updPack = enemy.getUpdatePack();
@@ -192,8 +220,18 @@ Enemy.getAllInitPack = function () {
     }
     return enemies;
 };
-Enemy.randomlyGenerate = function (choosenMap) {
-    let map = MapControler_1.MapController.getMap(choosenMap);
+Enemy.getAllSpecificInitPack = function (game) {
+    let enemies = [];
+    if (GameController_1.GameController.list[game] !== undefined) {
+        let e = GameController_1.GameController.list[game].enemies;
+        for (let i in e) {
+            enemies.push(e[i].getInitPack());
+        }
+    }
+    return enemies;
+};
+Enemy.randomlyGenerate = function (game) {
+    let map = MapControler_1.MapController.getMap(game.map);
     let x = Math.random() * map.width;
     let y = Math.random() * map.height;
     let position = new GeometryAndPhysics_1.Point(x, y);
@@ -215,10 +253,11 @@ Enemy.randomlyGenerate = function (choosenMap) {
             height: height,
             hp: 15 * difficulty,
             atkSpd: 0.8 * difficulty,
-            map: choosenMap,
+            map: game.map,
             img: 'scorpion',
             type: 'enemy',
             kind: 'scorpion',
+            game: game.id,
             maxSpdX: 3,
             maxSpdY: 3
         });
@@ -231,7 +270,8 @@ Enemy.randomlyGenerate = function (choosenMap) {
             height: height,
             hp: 5 * difficulty,
             atkSpd: 0.4 * difficulty,
-            map: choosenMap,
+            map: game.map,
+            game: game.id,
             img: 'zombie',
             type: 'enemy',
             kind: 'zombie',

@@ -1,3 +1,4 @@
+import { GameController } from './../Controllers/GameController';
 import { Inventory } from './../Inventory/Inventory';
 import { MapController } from './../Controllers/MapControler';
 import { MovementController } from './../Controllers/MovementController';
@@ -40,9 +41,11 @@ export class Actor extends Entity {
     let closestEnemyDistance: number = 100000;
     let pangle = this.movementController.aimAngle;
     pangle = (pangle < 0) ? pangle + 360 : pangle;
+    
+    let players = GameController.list[this.game].players;
 
-    for(let i in Player.list) {
-        let enemy = Player.list[i]; 
+    for(let i in players) {
+        let enemy = players[i]; 
         if(enemy !== this){   
             let angle = calculateAngleBetweenEntities(this, enemy);
             let maxDistance = Math.sqrt(enemy.width*enemy.width/4 +enemy.height*enemy.height/4) + distance;
@@ -70,8 +73,10 @@ export class Actor extends Entity {
         let pangle = this.movementController.aimAngle;
         pangle = (pangle < 0) ? pangle + 360 : pangle;
 
-        for(let i in Enemy.list) {
-            let enemy = Enemy.list[i];    
+        let enemies = GameController.list[this.game].enemies;
+
+        for(let i in enemies) {
+            let enemy = enemies[i];    
             let angle = calculateAngleBetweenEntities(this, enemy);
             let maxDistance = Math.sqrt(enemy.width*enemy.width/4 +enemy.height*enemy.height/4) + distance;
             let distanceFromEnemy = this.getDistance(enemy);
