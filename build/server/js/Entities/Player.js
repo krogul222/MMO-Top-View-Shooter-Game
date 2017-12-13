@@ -160,8 +160,16 @@ Player.onConnect = (socket, createdGame = false, gID = -1, data = {}) => {
         else {
             game = new GameController_1.GameController({});
         }
-        for (let i = 0; i < 40; i++) {
-            Enemy_1.Enemy.randomlyGenerate(game);
+        if (data.monstersnumber !== undefined) {
+            let num = data.monstersnumber;
+            for (let i = 0; i < num; i++) {
+                Enemy_1.Enemy.randomlyGenerate(game);
+            }
+        }
+        else {
+            for (let i = 0; i < 40; i++) {
+                Enemy_1.Enemy.randomlyGenerate(game);
+            }
         }
         gameId = game.id;
     }
