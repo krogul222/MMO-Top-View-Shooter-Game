@@ -292,11 +292,15 @@ export class Player extends Actor {
         delete Player.list[socket.id];
         removePack.player.push(socket.id);
         
+        console.log("Disconnect");
+
         for(let key in GameController.list){
             let players = GameController.list[key].players;
-            for(let i = 0; i < GameController.list[key].players.length; i++){
+            for(let i in players){
                 if(players[i].id == socket.id) {
                     GameController.list[key].removePack.player.push(socket.id);
+                    delete GameController.list[key].socketList[socket.id];
+                    console.log("Disconnect 2");
                 }
             }
         }

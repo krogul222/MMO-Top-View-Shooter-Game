@@ -247,11 +247,14 @@ Player.getAllSpecificInitPack = (game) => {
 Player.onDisconnect = (socket) => {
     delete Player.list[socket.id];
     globalVariables_1.removePack.player.push(socket.id);
+    console.log("Disconnect");
     for (let key in GameController_1.GameController.list) {
         let players = GameController_1.GameController.list[key].players;
-        for (let i = 0; i < GameController_1.GameController.list[key].players.length; i++) {
+        for (let i in players) {
             if (players[i].id == socket.id) {
                 GameController_1.GameController.list[key].removePack.player.push(socket.id);
+                delete GameController_1.GameController.list[key].socketList[socket.id];
+                console.log("Disconnect 2");
             }
         }
     }

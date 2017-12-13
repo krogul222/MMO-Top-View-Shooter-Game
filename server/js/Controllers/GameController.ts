@@ -1,3 +1,4 @@
+import { Smoke } from './../Effects/Smoke';
 import { Pack } from './../Pack';
 import { Player } from './../Entities/Player';
 import { MapController } from './MapControler';
@@ -22,6 +23,39 @@ export class GameController {
         MapController.updatePack.push(MapController.getMapPack(this.map));
 
         GameController.list[this.id] = this;
+    }
+
+    static remove = (id) => {
+
+        let game: GameController = GameController.list[id];
+
+        for(let i in game.players){
+            if(game.players[i]){
+                delete game.players[i];
+                if(Player.list[i])
+                    delete Player.list[i];
+            }
+        }
+
+        for(let i in game.enemies){
+            if(game.enemies[i]){
+                delete game.enemies[i];
+                if(Enemy.list[i])
+                    delete Enemy.list[i];
+            }
+                
+        }
+
+        for(let i in game.smokes){
+            if(game.smokes[i]){
+                delete game.smokes[i];
+                if(Smoke.list[i])
+                    delete Smoke.list[i];
+            }
+        }
+
+        delete GameController.list[id];
+
     }
 
     addSocket = (socket) => {

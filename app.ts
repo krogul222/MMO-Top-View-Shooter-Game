@@ -165,23 +165,24 @@ setInterval(function(){
             smoke: Smoke.updateSpecific(game.smokes)
         }
 
+
+        let flag:boolean = true;
         for(let j in game.socketList){
+            flag = false;
             let socket = SOCKET_LIST[j];
-           // console.log('SOCKETT ' + j);
             if(socket !== undefined){
-            //    console.log('SOCKET '+socket.id);
-             /*   socket.emit('init',packs.initPack);
-                socket.emit('update',pack);
-                socket.emit('remove',packs.removePack);*/
+    
                 socket.emit('init',game.initPack);
                 socket.emit('update',pack);
                 socket.emit('remove',game.removePack);
             }
-            /*for(let i = 0, length = MapController.updatePack.length; i < length; i++) {
-                socket.emit('mapData', MapController.updatePack[i]);
-            }*/
+    
         }
 
+        if(flag){
+            GameController.remove(i);
+            console.log("REMUWUJEMY");
+        }
     }
 
 

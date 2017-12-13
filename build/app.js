@@ -123,13 +123,19 @@ setInterval(function () {
             enemy: Enemy_1.Enemy.updateSpecific(game.enemies),
             smoke: Smoke_1.Smoke.updateSpecific(game.smokes)
         };
+        let flag = true;
         for (let j in game.socketList) {
+            flag = false;
             let socket = SOCKET_LIST[j];
             if (socket !== undefined) {
                 socket.emit('init', game.initPack);
                 socket.emit('update', pack);
                 socket.emit('remove', game.removePack);
             }
+        }
+        if (flag) {
+            GameController_1.GameController.remove(i);
+            console.log("REMUWUJEMY");
         }
     }
     MapControler_1.MapController.updatePack.length = 0;
