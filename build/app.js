@@ -70,7 +70,7 @@ io.sockets.on('connection', function (socket) {
         }
     });
     socket.on('createdGame', function (data) {
-        Player_1.Player.onConnect(socket, true);
+        Player_1.Player.onConnect(socket, true, -1, data);
     });
     socket.on('signUp', function (data) {
         isUsernameTaken(data, function (res) {
@@ -105,7 +105,8 @@ io.sockets.on('connection', function (socket) {
         let pack = [];
         for (let i in GameController_1.GameController.list) {
             let game = GameController_1.GameController.list[i];
-            pack.push({ id: game.id });
+            pack.push({ id: game.id,
+                name: game.name });
         }
         socket.emit('ListOfGames', pack);
     });

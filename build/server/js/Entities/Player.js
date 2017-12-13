@@ -148,13 +148,18 @@ class Player extends Actor_1.Actor {
         }
     }
 }
-Player.onConnect = (socket, createdGame = false, gID = -1) => {
+Player.onConnect = (socket, createdGame = false, gID = -1, data = {}) => {
     let game;
     let gameId = gID;
     console.log("Nowy SOCKET " + socket.id);
     let map = 'forest';
     if (createdGame == true) {
-        game = new GameController_1.GameController({ monsters: 40 });
+        if (data !== undefined) {
+            game = new GameController_1.GameController(data);
+        }
+        else {
+            game = new GameController_1.GameController({});
+        }
         for (let i = 0; i < 40; i++) {
             Enemy_1.Enemy.randomlyGenerate(game);
         }

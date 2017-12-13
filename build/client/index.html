@@ -42,7 +42,7 @@
             <h2 style="color : white; font-family:Calligrapher;">Brykiet</h2><br>
 
             <!-- <a href="#"><button class="btn btn-primary"><strong>Login</strong></button></a> -->
-            <button id = "createGame" class="btn btn-primary">Create Game</button><br><br>
+            <button id = "createGameMenuBtn" class="btn btn-primary">Create Game</button><br><br>
             <button id = "joinGameMenuBtn" class="btn btn-primary">Join Game</button>
             <br><br><br>
         <br/><br/>
@@ -65,6 +65,21 @@
                     <span id = "loadingProgressPercent">0%</span>
                 </div>
             </div>
+        </div>
+    </div>
+
+    <div align="center" id="createGameDiv" style="display:none">
+        <br><br>
+        <h2 style="color : white; font-family:Calligrapher;text-align:center">Create Game</h2><br> 
+
+
+        <div class="container">
+        <form>
+            <span style="color : white; font-family:Calligrapher;text-align:center">Game name:</span><br>
+            <input type="text" name="gamename" id="gamename" value="brykiet game"><br>
+        </form>
+        <button id = "createGameBtn" class="btn btn-primary">Create</button>
+        <button id = "backToGameMenuBtnFromCreate" class="btn btn-primary">Back</button>
         </div>
     </div>
 
@@ -96,7 +111,7 @@
                 </table>
                   <br>
             <button id = "joinGameBtn" class="btn btn-primary">Join</button>
-            <button id = "backToGameMenuBtn" class="btn btn-primary">Back</button>
+            <button id = "backToGameMenuBtnFromJoin" class="btn btn-primary">Back</button>
         </div> 
     </div>
 

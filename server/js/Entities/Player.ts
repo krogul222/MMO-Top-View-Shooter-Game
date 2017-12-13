@@ -160,7 +160,7 @@ export class Player extends Actor {
 
     }
 
-    static onConnect = (socket, createdGame: boolean = false, gID: number = -1) => {
+    static onConnect = (socket, createdGame: boolean = false, gID: number = -1, data = {}) => {
 
         let game:GameController; 
         let gameId: number = gID;
@@ -170,7 +170,13 @@ export class Player extends Actor {
         let map = 'forest';
 
         if(createdGame == true) {
-            game = new GameController({monsters: 40});
+
+            if(data !== undefined){
+                game = new GameController(data);
+            } else{
+                game = new GameController({});
+            }
+            
           //  map = game.map;
             for(let i = 0; i < 40; i++){
                 Enemy.randomlyGenerate(game);

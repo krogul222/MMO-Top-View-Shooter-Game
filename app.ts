@@ -82,7 +82,7 @@ io.sockets.on('connection', function(socket){
 
     socket.on('joinedGame',function(data){
         if(data.gameId !== undefined){
-            Player.onConnect(socket, false, data.gameId );
+            Player.onConnect(socket, false, data.gameId);
         } else{
             Player.onConnect(socket);
         }
@@ -90,7 +90,7 @@ io.sockets.on('connection', function(socket){
     });
 
     socket.on('createdGame',function(data){
-        Player.onConnect(socket, true);
+        Player.onConnect(socket, true, -1, data);
     });
     
     socket.on('signUp',function(data){
@@ -127,7 +127,8 @@ io.sockets.on('connection', function(socket){
         let pack: any[] =[];
         for(let i in GameController.list){
             let game: GameController = GameController.list[i];
-            pack.push({id: game.id});
+            pack.push({id: game.id,
+            name: game.name});
         }
 
         socket.emit('ListOfGames',pack);

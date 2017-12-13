@@ -7,11 +7,14 @@ let signDivSignUp = (<HTMLInputElement>document.getElementById("signDiv-signUp")
 let gameMenuDiv = (<HTMLInputElement>document.getElementById("gameMenuDiv"));
 let quickGame =  (<HTMLInputElement>document.getElementById("quickGame"));
 let joinGameMenuBtn =  (<HTMLInputElement>document.getElementById("joinGameMenuBtn"));
-let createGame =  (<HTMLInputElement>document.getElementById("createGame"));
+let createGameMenuBtn =  (<HTMLInputElement>document.getElementById("createGameMenuBtn"));
+let createGameBtn =  (<HTMLInputElement>document.getElementById("createGameBtn"));
 let mainBar =   (<HTMLInputElement>document.getElementById("mainBar"));
 let gameMenuDivContainer =  (<HTMLInputElement>document.getElementById("gameMenuDivContainer"));
 let joinGameDiv = (<HTMLInputElement>document.getElementById("joinGameDiv")); 
-let backToGameMenuBtn =  (<HTMLInputElement>document.getElementById("backToGameMenuBtn")); 
+let createGameDiv = (<HTMLInputElement>document.getElementById("createGameDiv")); 
+let backToGameMenuBtnFromJoin =  (<HTMLInputElement>document.getElementById("backToGameMenuBtnFromJoin")); 
+let backToGameMenuBtnFromCreate =  (<HTMLInputElement>document.getElementById("backToGameMenuBtnFromCreate")); 
 let joinGameBtn =  (<HTMLInputElement>document.getElementById("joinGameBtn")); 
 
 export let selectedGameId: number = -1;
@@ -28,16 +31,20 @@ signDivSignIn.onclick = function(){
     socket.emit('signIn', {username:signDivUsername.value, password: signDivPassword.value});
 }
 
-createGame.onclick = function(){
+createGameBtn.onclick = function(){
     canCreateGame = true;
     gameMenuDiv.style.display = 'none';
     gameMenuDivContainer.style.display = 'none';
+    createGameDiv.style.display = 'none';
     mainBar.style.display = 'none';
 
     if(imagesLoaded !== ALL_IMAGES){
         loadingDiv.style.display = 'inline';
     } else{
-        socket.emit('createdGame');
+        let name = $("#gamename").val();
+        socket.emit('createdGame',{
+            name: name
+        });
     }
 }
 /*
@@ -63,6 +70,16 @@ joinGameMenuBtn.onclick = function(){
     //mainBar.style.display = 'none'
 }
 
+createGameMenuBtn.onclick = function(){
+    gameMenuDiv.style.display = 'none';
+    gameMenuDivContainer.style.display = 'none';
+    joinGameDiv.style.display = 'none';
+    createGameDiv.style.display = 'inline';
+    
+
+    //mainBar.style.display = 'none'
+}
+
 joinGameBtn.onclick = function(){
     if(selectedGameId >= 0){
         canJoinGame = true;
@@ -81,16 +98,25 @@ joinGameBtn.onclick = function(){
     //mainBar.style.display = 'none'
 }
 
-backToGameMenuBtn.onclick = function(){
-    gameMenuDiv.style.display = 'none';
-    gameMenuDivContainer.style.display = 'none';
+backToGameMenuBtnFromJoin.onclick = function(){
     joinGameDiv.style.display = 'none';
+    
 
     gameMenuDiv.style.display = 'inline-block';
     gameMenuDivContainer.style.display = 'block';
     gameMenuDivContainer.style.margin = 'auto';
 
     selectedGameId= -1;
+
+    //mainBar.style.display = 'none';
+}
+
+backToGameMenuBtnFromCreate.onclick = function(){
+    createGameDiv.style.display = 'none';
+    
+    gameMenuDiv.style.display = 'inline-block';
+    gameMenuDivContainer.style.display = 'block';
+    gameMenuDivContainer.style.margin = 'auto';
 
     //mainBar.style.display = 'none';
 }
@@ -123,7 +149,7 @@ socket.on('ListOfGames', function(data){
     gamesId = [];
     for(let i = 0, length = data.length; i < length; i++){
         tbody +=  "<tr id='"+i+"' class='std'> <th scope='row'>" + i +" </th> \
-        <td>"+data[i].id+"</td> \
+        <td>"+data[i].name+"</td> \
         </tr>";
         gamesId[i] = data[i].id;
     }

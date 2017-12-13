@@ -7,6 +7,7 @@ import { Enemy } from '../Entities/Enemy';
 export class GameController {
  
     id: number;
+    name: string;
     socketList = {};
     players = {};
     enemies = {};
@@ -18,6 +19,9 @@ export class GameController {
     constructor(param){
         this.id = Math.random();
         this.map = this.id;
+        if(param.name !== undefined){
+            this.name = param.name;
+        }
         //create map
         MapController.createMap(this.map, 16, 20);
         MapController.updatePack.push(MapController.getMapPack(this.map));

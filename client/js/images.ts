@@ -77,7 +77,12 @@ function imgLoaded() {
         if(canJoinGame){
             socket.emit('joinedGame',{gameId: selectedGameId});
         } else{
-            if(canCreateGame) socket.emit('createdGame');
+            if(canCreateGame){
+                let name = $("#gamename").val();
+                socket.emit('createdGame',{
+                    name: name
+                });
+            }
         } 
     }
 }

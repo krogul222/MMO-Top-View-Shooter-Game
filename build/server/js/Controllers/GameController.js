@@ -31,6 +31,9 @@ class GameController {
         };
         this.id = Math.random();
         this.map = this.id;
+        if (param.name !== undefined) {
+            this.name = param.name;
+        }
         MapControler_1.MapController.createMap(this.map, 16, 20);
         MapControler_1.MapController.updatePack.push(MapControler_1.MapController.getMapPack(this.map));
         GameController.list[this.id] = this;
