@@ -59,13 +59,17 @@ backToGameMenuBtn.onclick = function () {
     gameMenuDiv.style.display = 'inline-block';
     gameMenuDivContainer.style.display = 'block';
     gameMenuDivContainer.style.margin = 'auto';
+    exports.selectedGameId = -1;
 };
 $(document).ready(function () {
-    $("#availableGamesList").on("click", "tr", function () {
-        $(this).closest("tr").siblings().removeClass("table-success");
-        $(this).toggleClass("table-success");
-        let id = parseInt($(this).attr('id'));
-        exports.selectedGameId = gamesId[id];
+    $("#availableGamesList").on("click", ".std", function () {
+        if (!$(this).hasClass("highlight")) {
+            $(this).closest("tr").siblings().removeClass("highlight");
+            $(this).toggleClass("highlight");
+            console.log("PODSWIETLAJ");
+            let id = parseInt($(this).attr('id'));
+            exports.selectedGameId = gamesId[id];
+        }
     });
 });
 socket.on('ListOfGames', function (data) {
@@ -73,7 +77,7 @@ socket.on('ListOfGames', function (data) {
     let tbody = '';
     gamesId = [];
     for (let i = 0, length = data.length; i < length; i++) {
-        tbody += "<tr id='" + i + "'> <th scope='row'>" + i + " </th> \
+        tbody += "<tr id='" + i + "' class='std'> <th scope='row'>" + i + " </th> \
         <td>" + data[i].id + "</td> \
         </tr>";
         gamesId[i] = data[i].id;
