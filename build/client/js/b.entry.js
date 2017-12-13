@@ -274,7 +274,7 @@ exports.gameSoundManager = new GameSoundManager_1.GameSoundManager();
 exports.canvasFilters = new Filters_1.Filters(ctx);
 exports.effects = new Effects_1.Effects(ctx);
 socket.on('mapData', function (data) {
-    MapControler_1.MapController.createMap(data.name, 16, 20);
+    MapControler_1.MapController.createMap(data.name, data.size, 20);
     MapControler_1.MapController.updateMap(data);
     exports.currentMap.reloadMap(MapControler_1.MapController.getMap(data.name));
     canvas_1.camera.updateWorldSize(exports.currentMap.map.width, exports.currentMap.map.height);
@@ -773,8 +773,15 @@ function imgLoaded() {
         else {
             if (canCreateGame) {
                 let name = $("#gamename").val();
+                let mapsize = $('#mapsize').find(":selected").val();
+                let water = $('#water').find(":selected").val();
+                let seeds = $('#seeds').find(":selected").val();
+                console.log("MAP SIZE " + mapsize);
                 socket.emit('createdGame', {
-                    name: name
+                    name: name,
+                    mapsize: mapsize,
+                    water: water,
+                    seeds: seeds
                 });
             }
         }
@@ -1077,7 +1084,7 @@ MapController.getMapPack = (map) => {
                     }
                 }
             }
-            return { material: material, name: MapController.maps[i].name, sides: sides, objects: objects };
+            return { material: material, name: MapController.maps[i].name, sides: sides, objects: objects, size: gameMap.size };
         }
     }
 };
@@ -1123,7 +1130,7 @@ MapController.updateMap = (param) => {
         }
     }
 };
-MapController.createMap = (name, size, seeds) => {
+MapController.createMap = (name, size, seeds, water = 10) => {
     let mapTiles;
     mapTiles = [];
     let seedPosition = [];
@@ -1131,7 +1138,7 @@ MapController.createMap = (name, size, seeds) => {
     let seedy = 0;
     let seedMaterial = [];
     let seedM = enums_1.TerrainMaterial.dirt;
-    let waterSeeds = Math.floor(seeds / 10);
+    let waterSeeds = Math.floor(seeds * water / 100);
     for (let i = 0; i < seeds - waterSeeds; i++) {
         seedx = enums_1.getRandomInt(1, size);
         seedy = enums_1.getRandomInt(1, size);
@@ -1262,7 +1269,19 @@ class GameController {
         if (param.name !== undefined) {
             this.name = param.name;
         }
-        MapControler_1.MapController.createMap(this.map, 16, 20);
+        let mapsize = 16;
+        let water = 10;
+        let seeds = 20;
+        if (param.mapsize !== undefined) {
+            mapsize = param.mapsize;
+        }
+        if (param.water !== undefined) {
+            water = param.water;
+        }
+        if (param.seeds !== undefined) {
+            seeds = param.seeds;
+        }
+        MapControler_1.MapController.createMap(this.map, mapsize, seeds, water);
         MapControler_1.MapController.updatePack.push(MapControler_1.MapController.getMapPack(this.map));
         GameController.list[this.id] = this;
     }
@@ -1534,11 +1553,6 @@ Player.onConnect = (socket, createdGame = false, gID = -1, data = {}) => {
             player.attackController.weaponCollection.chooseNextWeaponWithAmmo();
         if (data.inputId == 'smoke')
             new Smoke_1.Smoke(new GeometryAndPhysics_1.Point(player.position.x - 128, player.position.y - 128), 150, 750, 20, player.game);
-        if (data.inputId == 'map') {
-            let gameMap = MapControler_1.MapController.getMap(data.map);
-            MapControler_1.MapController.createMap(data.map, gameMap.size, 20);
-            MapControler_1.MapController.updatePack.push(MapControler_1.MapController.getMapPack(data.map));
-        }
     });
     game.addPlayer(player);
     socket.emit('init', { player: Player.getAllSpecificInitPack(game.id), enemy: Enemy_1.Enemy.getAllSpecificInitPack(game.id), selfId: socket.id });
@@ -1619,7 +1633,7 @@ class Enemy extends Actor_1.Actor {
         this.updatePack = {};
         this.extendedUpdate = () => {
             if (this.playerToKill == undefined || this.counter % 40 === 0)
-                this.playerToKill = this.getClosestPlayer(10000, 360);
+                this.playerToKill = this.getClosestPlayer(10000000, 360);
             let diffX = 0;
             let diffY = 0;
             if (this.playerToKill) {
@@ -2269,8 +2283,15 @@ createGameBtn.onclick = function () {
     }
     else {
         let name = $("#gamename").val();
+        let mapsize = $('#mapsize').find(":selected").val();
+        let water = $('#water').find(":selected").val();
+        let seeds = $('#seeds').find(":selected").val();
+        console.log("MAP SIZE " + mapsize);
         socket.emit('createdGame', {
-            name: name
+            name: name,
+            mapsize: mapsize,
+            water: water,
+            seeds: seeds
         });
     }
 };
@@ -2635,7 +2656,7 @@ class Actor extends Entity_1.Entity {
         };
         this.getClosestPlayer = (distance, angleLimit) => {
             let closestEnemyIndex = "0";
-            let closestEnemyDistance = 100000;
+            let closestEnemyDistance = 100000000;
             let pangle = this.movementController.aimAngle;
             pangle = (pangle < 0) ? pangle + 360 : pangle;
             let players = GameController_1.GameController.list[this.game].players;
@@ -2661,7 +2682,7 @@ class Actor extends Entity_1.Entity {
         };
         this.getClosestEnemy = (distance, angleLimit) => {
             let closestEnemyIndex = "-1";
-            let closestEnemyDistance = 100000;
+            let closestEnemyDistance = 100000000;
             let pangle = this.movementController.aimAngle;
             pangle = (pangle < 0) ? pangle + 360 : pangle;
             let enemies = GameController_1.GameController.list[this.game].enemies;
@@ -3902,7 +3923,7 @@ class AttackController {
         };
         this.closeAttack = (aimAngle) => (this.parent.type == 'player') ? this.attackCloseByPlayer(aimAngle) : this.attackCloseByEnemy(aimAngle);
         this.attackCloseByEnemy = (aimAngle) => {
-            let player = this.parent.getClosestPlayer(10000, 360);
+            let player = this.parent.getClosestPlayer(10000000, 360);
             let distance = 80;
             if (player) {
                 let maxDistance = Math.sqrt(player.width * player.width / 4 + player.height * player.height / 4) + distance;
@@ -4179,7 +4200,8 @@ Bullet.update = () => {
         let bullet = Bullet.list[i];
         if (bullet.toRemove) {
             globalVariables_1.initPack.bullet.push(bullet.getInitPack());
-            GameController_1.GameController.list[bullet.game].initPack.bullet.push(bullet.getInitPack());
+            if (GameController_1.GameController.list[bullet.game] !== undefined)
+                GameController_1.GameController.list[bullet.game].initPack.bullet.push(bullet.getInitPack());
             delete Bullet.list[i];
         }
         else {

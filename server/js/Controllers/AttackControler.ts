@@ -63,7 +63,7 @@ export class AttackController {
     closeAttack = (aimAngle) => (this.parent.type == 'player') ? this.attackCloseByPlayer(aimAngle) : this.attackCloseByEnemy(aimAngle);
 
     attackCloseByEnemy = (aimAngle) => {
-        let player: Player = this.parent.getClosestPlayer(10000, 360);
+        let player: Player = this.parent.getClosestPlayer(10000000, 360);
         let distance = 80;
         if(player){
 

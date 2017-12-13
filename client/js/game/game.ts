@@ -49,7 +49,7 @@ export let canvasFilters: Filters = new Filters(ctx);
 export let effects: Effects = new Effects(ctx);
 
 socket.on('mapData', function(data){
-        MapController.createMap(data.name, 16,20);
+        MapController.createMap(data.name, data.size,20);
         MapController.updateMap(data);
   //  if(currentMap.name == data.name){
         currentMap.reloadMap(MapController.getMap(data.name));

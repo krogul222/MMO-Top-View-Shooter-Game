@@ -103,8 +103,15 @@ createGameBtn.onclick = function () {
     }
     else {
         let name = $("#gamename").val();
+        let mapsize = $('#mapsize').find(":selected").val();
+        let water = $('#water').find(":selected").val();
+        let seeds = $('#seeds').find(":selected").val();
+        console.log("MAP SIZE " + mapsize);
         socket.emit('createdGame', {
-            name: name
+            name: name,
+            mapsize: mapsize,
+            water: water,
+            seeds: seeds
         });
     }
 };
@@ -257,8 +264,15 @@ function imgLoaded() {
         else {
             if (canCreateGame) {
                 let name = $("#gamename").val();
+                let mapsize = $('#mapsize').find(":selected").val();
+                let water = $('#water').find(":selected").val();
+                let seeds = $('#seeds').find(":selected").val();
+                console.log("MAP SIZE " + mapsize);
                 socket.emit('createdGame', {
-                    name: name
+                    name: name,
+                    mapsize: mapsize,
+                    water: water,
+                    seeds: seeds
                 });
             }
         }

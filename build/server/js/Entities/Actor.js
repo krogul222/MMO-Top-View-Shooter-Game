@@ -20,7 +20,7 @@ class Actor extends Entity_1.Entity {
         };
         this.getClosestPlayer = (distance, angleLimit) => {
             let closestEnemyIndex = "0";
-            let closestEnemyDistance = 100000;
+            let closestEnemyDistance = 100000000;
             let pangle = this.movementController.aimAngle;
             pangle = (pangle < 0) ? pangle + 360 : pangle;
             let players = GameController_1.GameController.list[this.game].players;
@@ -46,7 +46,7 @@ class Actor extends Entity_1.Entity {
         };
         this.getClosestEnemy = (distance, angleLimit) => {
             let closestEnemyIndex = "-1";
-            let closestEnemyDistance = 100000;
+            let closestEnemyDistance = 100000000;
             let pangle = this.movementController.aimAngle;
             pangle = (pangle < 0) ? pangle + 360 : pangle;
             let enemies = GameController_1.GameController.list[this.game].enemies;

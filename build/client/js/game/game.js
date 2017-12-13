@@ -29,7 +29,7 @@ exports.gameSoundManager = new GameSoundManager_1.GameSoundManager();
 exports.canvasFilters = new Filters_1.Filters(ctx);
 exports.effects = new Effects_1.Effects(ctx);
 socket.on('mapData', function (data) {
-    MapControler_1.MapController.createMap(data.name, 16, 20);
+    MapControler_1.MapController.createMap(data.name, data.size, 20);
     MapControler_1.MapController.updateMap(data);
     exports.currentMap.reloadMap(MapControler_1.MapController.getMap(data.name));
     canvas_1.camera.updateWorldSize(exports.currentMap.map.width, exports.currentMap.map.height);

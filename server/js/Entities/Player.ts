@@ -225,12 +225,12 @@ export class Player extends Actor {
             if(data.inputId == '5') player.attackController.weaponCollection.changeWeapon(WeaponType.flamethrower); 
             if(data.inputId == 'space') player.attackController.weaponCollection.chooseNextWeaponWithAmmo();
             if(data.inputId == 'smoke') new Smoke(new Point(player.position.x -128,player.position.y -128), 150, 750, 20, player.game);
-            if(data.inputId == 'map'){
+            /*if(data.inputId == 'map'){
                 let gameMap : GameMap = MapController.getMap(data.map);
                 MapController.createMap(data.map, gameMap.size, 20);
                 MapController.updatePack.push(MapController.getMapPack(data.map));
                 //socket.emit('mapData', MapController.getMapPack(data.map));
-            } 
+            } */
         });
 
         game.addPlayer(player);

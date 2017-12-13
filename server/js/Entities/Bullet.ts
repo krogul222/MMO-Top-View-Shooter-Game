@@ -147,7 +147,8 @@ export class Bullet extends Entity{
             //bullet.update();
             if(bullet.toRemove){
                 initPack.bullet.push(bullet.getInitPack());
-                GameController.list[bullet.game].initPack.bullet.push(bullet.getInitPack());
+                if(GameController.list[bullet.game] !== undefined)
+                    GameController.list[bullet.game].initPack.bullet.push(bullet.getInitPack());
                 delete Bullet.list[i];
               //  removePack.bullet.push({id: bullet.id, hitCategory: bullet.hitCategory, hitEntityCategory: bullet.hitEntityCategory, hitEntityId: bullet.hitEntityId});
             } else {

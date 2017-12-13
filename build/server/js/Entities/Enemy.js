@@ -14,7 +14,7 @@ class Enemy extends Actor_1.Actor {
         this.updatePack = {};
         this.extendedUpdate = () => {
             if (this.playerToKill == undefined || this.counter % 40 === 0)
-                this.playerToKill = this.getClosestPlayer(10000, 360);
+                this.playerToKill = this.getClosestPlayer(10000000, 360);
             let diffX = 0;
             let diffY = 0;
             if (this.playerToKill) {

@@ -222,11 +222,6 @@ Player.onConnect = (socket, createdGame = false, gID = -1, data = {}) => {
             player.attackController.weaponCollection.chooseNextWeaponWithAmmo();
         if (data.inputId == 'smoke')
             new Smoke_1.Smoke(new GeometryAndPhysics_1.Point(player.position.x - 128, player.position.y - 128), 150, 750, 20, player.game);
-        if (data.inputId == 'map') {
-            let gameMap = MapControler_1.MapController.getMap(data.map);
-            MapControler_1.MapController.createMap(data.map, gameMap.size, 20);
-            MapControler_1.MapController.updatePack.push(MapControler_1.MapController.getMapPack(data.map));
-        }
     });
     game.addPlayer(player);
     socket.emit('init', { player: Player.getAllSpecificInitPack(game.id), enemy: Enemy_1.Enemy.getAllSpecificInitPack(game.id), selfId: socket.id });

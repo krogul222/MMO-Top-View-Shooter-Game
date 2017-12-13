@@ -50,7 +50,7 @@ export class MapController {
                 }
 
                 
-                return { material: material, name: MapController.maps[i].name, sides: sides, objects: objects}
+                return { material: material, name: MapController.maps[i].name, sides: sides, objects: objects, size: gameMap.size}
 
             }
         }
@@ -121,7 +121,7 @@ export class MapController {
         }
     }
 
-    static createMap = (name: string, size: number, seeds: number) => {
+    static createMap = (name: string, size: number, seeds: number, water: number = 10) => {
         let mapTiles: MapTile[][];
         
         mapTiles = [];
@@ -131,7 +131,7 @@ export class MapController {
         let seedMaterial: TerrainMaterial[] = [];
         let seedM: TerrainMaterial = TerrainMaterial.dirt;
 
-        let waterSeeds = Math.floor(seeds/10);
+        let waterSeeds = Math.floor(seeds*water/100);
 
         for(let i = 0; i < seeds-waterSeeds; i++){
             seedx = getRandomInt(1, size);

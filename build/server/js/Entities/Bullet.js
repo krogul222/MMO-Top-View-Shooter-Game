@@ -119,7 +119,8 @@ Bullet.update = () => {
         let bullet = Bullet.list[i];
         if (bullet.toRemove) {
             globalVariables_1.initPack.bullet.push(bullet.getInitPack());
-            GameController_1.GameController.list[bullet.game].initPack.bullet.push(bullet.getInitPack());
+            if (GameController_1.GameController.list[bullet.game] !== undefined)
+                GameController_1.GameController.list[bullet.game].initPack.bullet.push(bullet.getInitPack());
             delete Bullet.list[i];
         }
         else {

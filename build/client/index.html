@@ -77,6 +77,36 @@
         <form>
             <span style="color : white; font-family:Calligrapher;text-align:center">Game name:</span><br>
             <input type="text" name="gamename" id="gamename" value="brykiet game"><br>
+            <br>
+            <span style="color : white; font-family:Calligrapher;text-align:center">Map Size:</span><br>
+            <select id="mapsize">
+                    <option value="8">8x8</option>
+                    <option value="16" selected="selected">16x16</option>
+                    <option value="32">32x32</option>
+                    <option value="64">64x64</option>
+                    <option value="128">128x128</option>
+            </select><br>
+            <span style="color : white; font-family:Calligrapher;text-align:center">Water Percentage:</span><br>
+            <select id="water">
+                    <option value="0">0%</option>
+                    <option value="10" selected="selected">10%</option>
+                    <option value="20">20%</option>
+                    <option value="30">30%</option>
+                    <option value="40">40%</option>
+                    <option value="50">50%</option>
+            </select><br>
+            <span style="color : white; font-family:Calligrapher;text-align:center">Map Seeds:</span><br>
+            <select id="seeds">
+                    <option value="5">5</option>
+                    <option value="10">10</option>
+                    <option value="20"  selected="selected" >20</option>
+                    <option value="30">30</option>
+                    <option value="40">40</option>
+                    <option value="50">50</option>
+                    <option value="100">100</option>
+                    <option value="150">150</option>
+                    <option value="200">200</option>
+            </select><br>
         </form>
         <button id = "createGameBtn" class="btn btn-primary">Create</button>
         <button id = "backToGameMenuBtnFromCreate" class="btn btn-primary">Back</button>

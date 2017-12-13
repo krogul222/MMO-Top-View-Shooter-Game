@@ -39,7 +39,7 @@ class AttackController {
         };
         this.closeAttack = (aimAngle) => (this.parent.type == 'player') ? this.attackCloseByPlayer(aimAngle) : this.attackCloseByEnemy(aimAngle);
         this.attackCloseByEnemy = (aimAngle) => {
-            let player = this.parent.getClosestPlayer(10000, 360);
+            let player = this.parent.getClosestPlayer(10000000, 360);
             let distance = 80;
             if (player) {
                 let maxDistance = Math.sqrt(player.width * player.width / 4 + player.height * player.height / 4) + distance;

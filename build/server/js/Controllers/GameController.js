@@ -34,7 +34,19 @@ class GameController {
         if (param.name !== undefined) {
             this.name = param.name;
         }
-        MapControler_1.MapController.createMap(this.map, 16, 20);
+        let mapsize = 16;
+        let water = 10;
+        let seeds = 20;
+        if (param.mapsize !== undefined) {
+            mapsize = param.mapsize;
+        }
+        if (param.water !== undefined) {
+            water = param.water;
+        }
+        if (param.seeds !== undefined) {
+            seeds = param.seeds;
+        }
+        MapControler_1.MapController.createMap(this.map, mapsize, seeds, water);
         MapControler_1.MapController.updatePack.push(MapControler_1.MapController.getMapPack(this.map));
         GameController.list[this.id] = this;
     }

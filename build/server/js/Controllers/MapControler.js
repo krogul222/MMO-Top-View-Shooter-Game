@@ -43,7 +43,7 @@ MapController.getMapPack = (map) => {
                     }
                 }
             }
-            return { material: material, name: MapController.maps[i].name, sides: sides, objects: objects };
+            return { material: material, name: MapController.maps[i].name, sides: sides, objects: objects, size: gameMap.size };
         }
     }
 };
@@ -89,7 +89,7 @@ MapController.updateMap = (param) => {
         }
     }
 };
-MapController.createMap = (name, size, seeds) => {
+MapController.createMap = (name, size, seeds, water = 10) => {
     let mapTiles;
     mapTiles = [];
     let seedPosition = [];
@@ -97,7 +97,7 @@ MapController.createMap = (name, size, seeds) => {
     let seedy = 0;
     let seedMaterial = [];
     let seedM = enums_1.TerrainMaterial.dirt;
-    let waterSeeds = Math.floor(seeds / 10);
+    let waterSeeds = Math.floor(seeds * water / 100);
     for (let i = 0; i < seeds - waterSeeds; i++) {
         seedx = enums_1.getRandomInt(1, size);
         seedy = enums_1.getRandomInt(1, size);
