@@ -8,6 +8,7 @@ export class GameController {
  
     id: number;
     name: string;
+    monsterRespawn: boolean = true;
     socketList = {};
     players = {};
     enemies = {};
@@ -37,6 +38,11 @@ export class GameController {
 
         if( param.seeds !== undefined){
             seeds = param.seeds;
+        }
+
+        if( param.monstersrespawn !== undefined){
+            this.monsterRespawn = param.monstersrespawn == 1 ? true : false;
+            console.log("MONSTER "+this.monsterRespawn );
         }
 
         MapController.createMap(this.map, mapsize, seeds, water);

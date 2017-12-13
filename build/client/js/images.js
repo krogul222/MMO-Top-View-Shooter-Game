@@ -62,13 +62,15 @@ function imgLoaded() {
                 let water = $('#water').find(":selected").val();
                 let seeds = $('#seeds').find(":selected").val();
                 let monstersnumber = $('#monstersnumber').find(":selected").val();
+                let monstersrespawn = $('#monstersrespawn').find(":selected").val();
                 console.log("MAP SIZE " + mapsize);
                 socket.emit('createdGame', {
                     name: name,
                     mapsize: mapsize,
                     water: water,
                     seeds: seeds,
-                    monstersnumber: monstersnumber
+                    monstersnumber: monstersnumber,
+                    monstersrespawn: monstersrespawn
                 });
             }
         }

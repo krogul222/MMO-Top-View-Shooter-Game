@@ -6,6 +6,7 @@ const MapControler_1 = require("./MapControler");
 const Enemy_1 = require("../Entities/Enemy");
 class GameController {
     constructor(param) {
+        this.monsterRespawn = true;
         this.socketList = {};
         this.players = {};
         this.enemies = {};
@@ -45,6 +46,10 @@ class GameController {
         }
         if (param.seeds !== undefined) {
             seeds = param.seeds;
+        }
+        if (param.monstersrespawn !== undefined) {
+            this.monsterRespawn = param.monstersrespawn == 1 ? true : false;
+            console.log("MONSTER " + this.monsterRespawn);
         }
         MapControler_1.MapController.createMap(this.map, mapsize, seeds, water);
         MapControler_1.MapController.updatePack.push(MapControler_1.MapController.getMapPack(this.map));

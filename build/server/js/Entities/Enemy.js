@@ -200,7 +200,9 @@ Enemy.updateSpecific = (enemies) => {
             let gameId = enemy.game;
             delete Enemy.list[i];
             delete enemies[i];
-            Enemy.randomlyGenerate(GameController_1.GameController.list[gameId]);
+            if (GameController_1.GameController.list[gameId].monsterRespawn == true) {
+                Enemy.randomlyGenerate(GameController_1.GameController.list[gameId]);
+            }
             globalVariables_1.removePack.enemy.push(enemy.id);
             GameController_1.GameController.list[gameId].removePack.enemy.push(enemy.id);
         }

@@ -777,13 +777,15 @@ function imgLoaded() {
                 let water = $('#water').find(":selected").val();
                 let seeds = $('#seeds').find(":selected").val();
                 let monstersnumber = $('#monstersnumber').find(":selected").val();
+                let monstersrespawn = $('#monstersrespawn').find(":selected").val();
                 console.log("MAP SIZE " + mapsize);
                 socket.emit('createdGame', {
                     name: name,
                     mapsize: mapsize,
                     water: water,
                     seeds: seeds,
-                    monstersnumber: monstersnumber
+                    monstersnumber: monstersnumber,
+                    monstersrespawn: monstersrespawn
                 });
             }
         }
@@ -1243,6 +1245,7 @@ const MapControler_1 = __webpack_require__(7);
 const Enemy_1 = __webpack_require__(11);
 class GameController {
     constructor(param) {
+        this.monsterRespawn = true;
         this.socketList = {};
         this.players = {};
         this.enemies = {};
@@ -1282,6 +1285,10 @@ class GameController {
         }
         if (param.seeds !== undefined) {
             seeds = param.seeds;
+        }
+        if (param.monstersrespawn !== undefined) {
+            this.monsterRespawn = param.monstersrespawn == 1 ? true : false;
+            console.log("MONSTER " + this.monsterRespawn);
         }
         MapControler_1.MapController.createMap(this.map, mapsize, seeds, water);
         MapControler_1.MapController.updatePack.push(MapControler_1.MapController.getMapPack(this.map));
@@ -1829,7 +1836,9 @@ Enemy.updateSpecific = (enemies) => {
             let gameId = enemy.game;
             delete Enemy.list[i];
             delete enemies[i];
-            Enemy.randomlyGenerate(GameController_1.GameController.list[gameId]);
+            if (GameController_1.GameController.list[gameId].monsterRespawn == true) {
+                Enemy.randomlyGenerate(GameController_1.GameController.list[gameId]);
+            }
             globalVariables_1.removePack.enemy.push(enemy.id);
             GameController_1.GameController.list[gameId].removePack.enemy.push(enemy.id);
         }
@@ -2297,13 +2306,15 @@ createGameBtn.onclick = function () {
         let water = $('#water').find(":selected").val();
         let seeds = $('#seeds').find(":selected").val();
         let monstersnumber = $('#monstersnumber').find(":selected").val();
+        let monstersrespawn = $('#monstersrespawn').find(":selected").val();
         console.log("MAP SIZE " + mapsize);
         socket.emit('createdGame', {
             name: name,
             mapsize: mapsize,
             water: water,
             seeds: seeds,
-            monstersnumber: monstersnumber
+            monstersnumber: monstersnumber,
+            monstersrespawn: monstersrespawn
         });
     }
 };

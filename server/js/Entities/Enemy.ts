@@ -237,6 +237,7 @@ export class Enemy extends Actor {
     static updateSpecific = (enemies) => {
         let pack: any[] =[];
         let updPack;
+        
         for(let i in enemies){
             let enemy: Enemy = enemies[i];
             enemy.extendedUpdate();
@@ -244,7 +245,10 @@ export class Enemy extends Actor {
                 let gameId = enemy.game;
                 delete Enemy.list[i];
                 delete enemies[i];
-                Enemy.randomlyGenerate(GameController.list[gameId]);
+                if(GameController.list[gameId].monsterRespawn == true){
+                    Enemy.randomlyGenerate(GameController.list[gameId]);
+                }
+
                 removePack.enemy.push(enemy.id);
                 GameController.list[gameId].removePack.enemy.push(enemy.id);
             } else {
