@@ -4,12 +4,15 @@ const Pack_1 = require("./../Pack");
 const Player_1 = require("./../Entities/Player");
 const MapControler_1 = require("./MapControler");
 const Enemy_1 = require("../Entities/Enemy");
+const Upgrade_1 = require("./../Entities/Upgrade");
 class GameController {
     constructor(param) {
         this.monsterRespawn = true;
+        this.itemRespawn = true;
         this.socketList = {};
         this.players = {};
         this.enemies = {};
+        this.upgrades = {};
         this.smokes = {};
         this.map = "forest";
         this.initPack = new Pack_1.Pack();
@@ -25,6 +28,10 @@ class GameController {
         this.addEnemy = (enemy) => {
             this.enemies[enemy.id] = enemy;
             console.log("Enemy ADDED TO GAME");
+        };
+        this.addUpgrade = (upgrade) => {
+            this.upgrades[upgrade.id] = upgrade;
+            console.log("Upgrade ADDED TO GAME");
         };
         this.addSmoke = (smoke) => {
             this.smokes[smoke.id] = smoke;
@@ -50,6 +57,9 @@ class GameController {
         if (param.monstersrespawn !== undefined) {
             this.monsterRespawn = param.monstersrespawn == 1 ? true : false;
             console.log("MONSTER " + this.monsterRespawn);
+        }
+        if (param.itemsrespawn !== undefined) {
+            this.itemRespawn = param.itemsrespawn == 1 ? true : false;
         }
         MapControler_1.MapController.createMap(this.map, mapsize, seeds, water);
         MapControler_1.MapController.updatePack.push(MapControler_1.MapController.getMapPack(this.map));
@@ -77,6 +87,13 @@ GameController.remove = (id) => {
             delete game.smokes[i];
             if (Smoke_1.Smoke.list[i])
                 delete Smoke_1.Smoke.list[i];
+        }
+    }
+    for (let i in game.upgrades) {
+        if (game.upgrades[i]) {
+            delete game.upgrades[i];
+            if (Upgrade_1.Upgrade.list[i])
+                delete Upgrade_1.Upgrade.list[i];
         }
     }
     delete GameController.list[id];

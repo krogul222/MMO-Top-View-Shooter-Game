@@ -6,6 +6,7 @@ const Player_1 = require("./server/js/Entities/Player");
 const Entity_1 = require("./server/js/Entities/Entity");
 const Bullet_1 = require("./server/js/Entities/Bullet");
 const Enemy_1 = require("./server/js/Entities/Enemy");
+const Upgrade_1 = require("./server/js/Entities/Upgrade");
 const Particle_1 = require("./server/js/Effects/Particle/Particle");
 var express = require('express');
 var mongojs = require('mongojs');
@@ -122,7 +123,8 @@ setInterval(function () {
         let pack = {
             player: Player_1.Player.updateSpecific(game.players),
             enemy: Enemy_1.Enemy.updateSpecific(game.enemies),
-            smoke: Smoke_1.Smoke.updateSpecific(game.smokes)
+            smoke: Smoke_1.Smoke.updateSpecific(game.smokes),
+            upgrade: Upgrade_1.Upgrade.updateSpecific(game.upgrades)
         };
         let flag = true;
         for (let j in game.socketList) {

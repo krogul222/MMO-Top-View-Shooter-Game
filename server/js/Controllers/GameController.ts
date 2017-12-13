@@ -3,15 +3,18 @@ import { Pack } from './../Pack';
 import { Player } from './../Entities/Player';
 import { MapController } from './MapControler';
 import { Enemy } from '../Entities/Enemy';
+import { Upgrade } from './../Entities/Upgrade';
 
 export class GameController {
  
     id: number;
     name: string;
     monsterRespawn: boolean = true;
+    itemRespawn: boolean = true;
     socketList = {};
     players = {};
     enemies = {};
+    upgrades = {};
     smokes = {};
     map: string = "forest";
     initPack = new Pack();
@@ -43,6 +46,10 @@ export class GameController {
         if( param.monstersrespawn !== undefined){
             this.monsterRespawn = param.monstersrespawn == 1 ? true : false;
             console.log("MONSTER "+this.monsterRespawn );
+        }
+
+        if( param.itemsrespawn !== undefined){
+            this.itemRespawn = param.itemsrespawn == 1 ? true : false;
         }
 
         MapController.createMap(this.map, mapsize, seeds, water);
@@ -80,6 +87,14 @@ export class GameController {
             }
         }
 
+        for(let i in game.upgrades){
+            if(game.upgrades[i]){
+                delete game.upgrades[i];
+                if(Upgrade.list[i])
+                    delete Upgrade.list[i];
+            }
+        }
+
         delete GameController.list[id];
 
     }
@@ -97,6 +112,11 @@ export class GameController {
     addEnemy = (enemy) => {
         this.enemies[enemy.id] = enemy;
         console.log("Enemy ADDED TO GAME");
+    }
+
+    addUpgrade = (upgrade) => {
+        this.upgrades[upgrade.id] = upgrade;
+        console.log("Upgrade ADDED TO GAME");
     }
     
     addSmoke = (smoke) => {

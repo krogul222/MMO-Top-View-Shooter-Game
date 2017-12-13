@@ -163,7 +163,8 @@ setInterval(function(){
         let pack = {
             player: Player.updateSpecific(game.players),
             enemy: Enemy.updateSpecific(game.enemies),
-            smoke: Smoke.updateSpecific(game.smokes)
+            smoke: Smoke.updateSpecific(game.smokes),
+            upgrade: Upgrade.updateSpecific(game.upgrades)
         }
 
 

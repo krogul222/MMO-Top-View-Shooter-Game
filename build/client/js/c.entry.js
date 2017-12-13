@@ -65,7 +65,7 @@
 /************************************************************************/
 /******/ ({
 
-/***/ 15:
+/***/ 16:
 /***/ (function(module, exports) {
 
 Object.defineProperty(exports, "__esModule", { value: true });
@@ -108,6 +108,8 @@ createGameBtn.onclick = function () {
         let seeds = $('#seeds').find(":selected").val();
         let monstersnumber = $('#monstersnumber').find(":selected").val();
         let monstersrespawn = $('#monstersrespawn').find(":selected").val();
+        let itemsnumber = $('#itemsnumber').find(":selected").val();
+        let itemsrespawn = $('#itemsrespawn').find(":selected").val();
         console.log("MAP SIZE " + mapsize);
         socket.emit('createdGame', {
             name: name,
@@ -115,7 +117,9 @@ createGameBtn.onclick = function () {
             water: water,
             seeds: seeds,
             monstersnumber: monstersnumber,
-            monstersrespawn: monstersrespawn
+            monstersrespawn: monstersrespawn,
+            itemsnumber: itemsnumber,
+            itemsrespawn: itemsrespawn
         });
     }
 };
@@ -209,7 +213,7 @@ socket.on('signUpResponse', function (data) {
 /***/ (function(module, exports, __webpack_require__) {
 
 Object.defineProperty(exports, "__esModule", { value: true });
-const login_1 = __webpack_require__(15);
+const login_1 = __webpack_require__(16);
 exports.Img = {};
 let gameDiv = document.getElementById("gameDiv");
 let loadingDiv = document.getElementById("loadingDiv");

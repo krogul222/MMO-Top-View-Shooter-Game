@@ -1,4 +1,5 @@
 Object.defineProperty(exports, "__esModule", { value: true });
+const Upgrade_1 = require("./Upgrade");
 const GameController_1 = require("./../Controllers/GameController");
 const Smoke_1 = require("./../Effects/Smoke");
 const globalVariables_1 = require("./../globalVariables");
@@ -169,6 +170,17 @@ Player.onConnect = (socket, createdGame = false, gID = -1, data = {}) => {
         else {
             for (let i = 0; i < 40; i++) {
                 Enemy_1.Enemy.randomlyGenerate(game);
+            }
+        }
+        if (data.itemsnumber !== undefined) {
+            let num = data.itemsnumber;
+            for (let i = 0; i < num; i++) {
+                Upgrade_1.Upgrade.randomlyGenerate(game);
+            }
+        }
+        else {
+            for (let i = 0; i < 20; i++) {
+                Upgrade_1.Upgrade.randomlyGenerate(game);
             }
         }
         gameId = game.id;

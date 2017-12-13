@@ -1,3 +1,4 @@
+import { Upgrade } from './Upgrade';
 import { GameController } from './../Controllers/GameController';
 import { Flame } from './../Effects/Flame';
 import { Smoke } from './../Effects/Smoke';
@@ -187,6 +188,19 @@ export class Player extends Actor {
                     Enemy.randomlyGenerate(game);
                 }
             }
+
+            if(data.itemsnumber !== undefined){
+                let num = data.itemsnumber;
+                for(let i = 0; i < num; i++){
+                    Upgrade.randomlyGenerate(game);
+                }
+            } else{
+                for(let i = 0; i < 20; i++){
+                    Upgrade.randomlyGenerate(game);
+                }
+            }
+
+
           //  map = game.map;
 
             gameId = game.id;

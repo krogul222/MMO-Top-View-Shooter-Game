@@ -6,6 +6,7 @@ import { frameCount } from '../../../app';
 import { Point } from '../GeometryAndPhysics';
 import { UpgradeCategory, randomEnum, ItemType, WeaponAmmoType } from '../enums';
 import { MapController } from '../Controllers/MapControler';
+import { GameController } from './../Controllers/GameController';
 
 export class Upgrade extends Entity{
     static MapController: any;
@@ -20,8 +21,14 @@ export class Upgrade extends Entity{
         this.kind = (param.kind !== undefined) ? param.kind : this.kind;
         this.value = param.value ? param.value : this.value;
         
-        initPack.upgrade.push(this.getInitPack());
+        //initPack.upgrade.push(this.getInitPack());
         Upgrade.list[this.id] = this;
+
+        if(GameController.list[this.game] !== undefined){
+            GameController.list[this.game].initPack.upgrade.push(this.getInitPack());
+        }
+
+        GameController.list[this.game].addUpgrade(this);
     }
 
     getInitPack = function(){
@@ -52,7 +59,7 @@ export class Upgrade extends Entity{
     static update = () => {
         let pack: any = [];
         
-        if(frameCount % 200 === 0) Upgrade.randomlyGenerate('forest'); //every 10 sec
+        //if(frameCount % 200 === 0) Upgrade.randomlyGenerate('forest'); //every 10 sec
 
         for(let key in Upgrade.list){
             let upgrade: Upgrade = Upgrade.list[key];
@@ -82,6 +89,50 @@ export class Upgrade extends Entity{
         return pack;
     }
 
+    static updateSpecific = (upgrades) => {
+        let pack: any = [];
+        
+       // if(frameCount % 200 === 0) Upgrade.randomlyGenerate('forest'); //every 10 sec
+
+        for(let key in upgrades){
+            let upgrade: Upgrade = Upgrade.list[key];
+            upgrade.update();
+            pack.push(upgrade.getUpdatePack());
+            
+            let gameId = upgrades[key].game;
+
+            for(let i in Player.list){
+                let player: Player = Player.list[i];
+
+                let isColliding = player.testCollision(upgrade);
+
+                if(isColliding) {
+                    console.log("UPG CAT "+ upgrade.category);
+                    if(upgrade.category === UpgradeCategory.item) player.inventory.addItem(upgrade.kind, 1);
+
+                    if(upgrade.category === UpgradeCategory.ammo) player.attackController.weaponCollection.addWeaponAmmo(upgrade.kind-1000, upgrade.value);
+                
+                    removePack.upgrade.push(upgrade.id);   
+                    
+                    GameController.list[gameId].removePack.upgrade.push(upgrade.id);
+
+                    delete Upgrade.list[key];
+                    delete upgrades[key];
+
+                    if(GameController.list[gameId].itemRespawn == true){
+                        Upgrade.randomlyGenerate(GameController.list[gameId]);
+                    }
+
+                    break;
+                }
+
+            }
+            
+        }
+
+        return pack;
+    }    
+
     static getAllInitPack = function(){
         let upgrades: any = [];
         for(let i in Upgrade.list){
@@ -90,8 +141,8 @@ export class Upgrade extends Entity{
         return upgrades;
     }
 
-    static randomlyGenerate = (choosenMap: any, category: any = null, kind: any = null) => {
-        let map = MapController.getMap(choosenMap);
+    static randomlyGenerate = (game: GameController, category: any = null, kind: any = null) => {
+        let map = MapController.getMap(game.map);
         
         let x = Math.random()*map.width;
         let y = Math.random()*map.height;
@@ -127,7 +178,7 @@ export class Upgrade extends Entity{
 
         img = imageName[upgKind]; 
         console.log("Kategoria:" +upgCategory + " Kind:"+upgKind);
-        new Upgrade({id: id, position: position, width: width, height: height, category: upgCategory, kind: upgKind , map: choosenMap, img: img, value: upgValue});
+        new Upgrade({id: id, position: position, width: width, game: game.id, height: height, category: upgCategory, kind: upgKind , map: game.map, img: img, value: upgValue});
     }
     static list = {};
 }

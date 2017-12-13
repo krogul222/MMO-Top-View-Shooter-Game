@@ -3,10 +3,10 @@ const Constants_1 = require("./../Constants");
 const Player_1 = require("./Player");
 const Entity_1 = require("./Entity");
 const globalVariables_1 = require("../globalVariables");
-const app_1 = require("../../../app");
 const GeometryAndPhysics_1 = require("../GeometryAndPhysics");
 const enums_1 = require("../enums");
 const MapControler_1 = require("../Controllers/MapControler");
+const GameController_1 = require("./../Controllers/GameController");
 class Upgrade extends Entity_1.Entity {
     constructor(param) {
         super(Upgrade.updateParam(param));
@@ -33,8 +33,11 @@ class Upgrade extends Entity_1.Entity {
         this.category = (param.category !== undefined) ? param.category : this.category;
         this.kind = (param.kind !== undefined) ? param.kind : this.kind;
         this.value = param.value ? param.value : this.value;
-        globalVariables_1.initPack.upgrade.push(this.getInitPack());
         Upgrade.list[this.id] = this;
+        if (GameController_1.GameController.list[this.game] !== undefined) {
+            GameController_1.GameController.list[this.game].initPack.upgrade.push(this.getInitPack());
+        }
+        GameController_1.GameController.list[this.game].addUpgrade(this);
     }
 }
 Upgrade.globalMapControler = new MapControler_1.MapController(null);
@@ -44,8 +47,6 @@ Upgrade.updateParam = (param) => {
 };
 Upgrade.update = () => {
     let pack = [];
-    if (app_1.frameCount % 200 === 0)
-        Upgrade.randomlyGenerate('forest');
     for (let key in Upgrade.list) {
         let upgrade = Upgrade.list[key];
         upgrade.update();
@@ -67,6 +68,35 @@ Upgrade.update = () => {
     }
     return pack;
 };
+Upgrade.updateSpecific = (upgrades) => {
+    let pack = [];
+    for (let key in upgrades) {
+        let upgrade = Upgrade.list[key];
+        upgrade.update();
+        pack.push(upgrade.getUpdatePack());
+        let gameId = upgrades[key].game;
+        for (let i in Player_1.Player.list) {
+            let player = Player_1.Player.list[i];
+            let isColliding = player.testCollision(upgrade);
+            if (isColliding) {
+                console.log("UPG CAT " + upgrade.category);
+                if (upgrade.category === enums_1.UpgradeCategory.item)
+                    player.inventory.addItem(upgrade.kind, 1);
+                if (upgrade.category === enums_1.UpgradeCategory.ammo)
+                    player.attackController.weaponCollection.addWeaponAmmo(upgrade.kind - 1000, upgrade.value);
+                globalVariables_1.removePack.upgrade.push(upgrade.id);
+                GameController_1.GameController.list[gameId].removePack.upgrade.push(upgrade.id);
+                delete Upgrade.list[key];
+                delete upgrades[key];
+                if (GameController_1.GameController.list[gameId].itemRespawn == true) {
+                    Upgrade.randomlyGenerate(GameController_1.GameController.list[gameId]);
+                }
+                break;
+            }
+        }
+    }
+    return pack;
+};
 Upgrade.getAllInitPack = function () {
     let upgrades = [];
     for (let i in Upgrade.list) {
@@ -74,8 +104,8 @@ Upgrade.getAllInitPack = function () {
     }
     return upgrades;
 };
-Upgrade.randomlyGenerate = (choosenMap, category = null, kind = null) => {
-    let map = MapControler_1.MapController.getMap(choosenMap);
+Upgrade.randomlyGenerate = (game, category = null, kind = null) => {
+    let map = MapControler_1.MapController.getMap(game.map);
     let x = Math.random() * map.width;
     let y = Math.random() * map.height;
     let position = new GeometryAndPhysics_1.Point(x, y);
@@ -107,7 +137,7 @@ Upgrade.randomlyGenerate = (choosenMap, category = null, kind = null) => {
     }
     img = Constants_1.imageName[upgKind];
     console.log("Kategoria:" + upgCategory + " Kind:" + upgKind);
-    new Upgrade({ id: id, position: position, width: width, height: height, category: upgCategory, kind: upgKind, map: choosenMap, img: img, value: upgValue });
+    new Upgrade({ id: id, position: position, width: width, game: game.id, height: height, category: upgCategory, kind: upgKind, map: game.map, img: img, value: upgValue });
 };
 Upgrade.list = {};
 exports.Upgrade = Upgrade;
