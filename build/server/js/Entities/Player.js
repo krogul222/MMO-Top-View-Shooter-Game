@@ -13,6 +13,8 @@ class Player extends Actor_1.Actor {
         super(param);
         this.updatePack = {};
         this.counter = 0;
+        this.fragPlayer = 0;
+        this.fragEnemy = 0;
         this.giveItems = () => {
             this.inventory.addItem(enums_1.ItemType.knife, 1);
             this.inventory.addItem(enums_1.ItemType.pistol, 1);
@@ -42,7 +44,9 @@ class Player extends Actor_1.Actor {
                 attackMelee: this.attackController.melee,
                 ammo: this.attackController.activeWeapon.ammo,
                 ammoInGun: this.attackController.activeWeapon.ammoInGun,
-                burn: this.lifeAndBodyController.burn
+                burn: this.lifeAndBodyController.burn,
+                fragPlayer: this.fragPlayer,
+                fragEnemy: this.fragEnemy
             };
         };
         this.extendedUpdate = () => {
@@ -54,6 +58,12 @@ class Player extends Actor_1.Actor {
         };
         this.getCloseEnemies = () => {
             return this.closeEnemiesArr;
+        };
+        this.incFragPlayer = () => {
+            this.fragPlayer++;
+        };
+        this.incFragEnemy = () => {
+            this.fragEnemy++;
         };
         this.getUpdatePack = () => {
             let attackStartedTmp = this.attackController.attackStarted;
@@ -108,6 +118,14 @@ class Player extends Actor_1.Actor {
             if (this.updatePack['burn'] !== this.lifeAndBodyController.burn) {
                 newPack['burn'] = this.lifeAndBodyController.burn;
                 this.updatePack['burn'] = this.lifeAndBodyController.burn;
+            }
+            if (this.updatePack['fragPlayer'] !== this.fragPlayer) {
+                newPack['fragPlayer'] = this.fragPlayer;
+                this.updatePack['fragPlayer'] = this.fragPlayer;
+            }
+            if (this.updatePack['fragEnemy'] !== this.fragEnemy) {
+                newPack['fragEnemy'] = this.fragEnemy;
+                this.updatePack['fragEnemy'] = this.fragEnemy;
             }
             return newPack;
         };

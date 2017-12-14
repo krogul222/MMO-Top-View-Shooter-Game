@@ -17,6 +17,8 @@ export class Player extends Actor {
     private updatePack = {};
     private closeEnemiesArr: number[];
     private counter: number = 0;
+    private fragPlayer: number = 0;
+    private fragEnemy: number = 0;
 
     constructor(param) { 
         super(param);
@@ -71,7 +73,9 @@ export class Player extends Actor {
             attackMelee: this.attackController.melee,
             ammo: this.attackController.activeWeapon.ammo,
             ammoInGun: this.attackController.activeWeapon.ammoInGun,
-            burn: this.lifeAndBodyController.burn   
+            burn: this.lifeAndBodyController.burn,
+            fragPlayer: this.fragPlayer,
+            fragEnemy: this.fragEnemy
         };
     }
 
@@ -86,6 +90,14 @@ export class Player extends Actor {
 
     getCloseEnemies = () => {
         return this.closeEnemiesArr;
+    }
+
+    incFragPlayer = () => {
+        this.fragPlayer++;
+    }
+
+    incFragEnemy = () => {
+        this.fragEnemy++;    
     }
 
     getUpdatePack = () => {
@@ -156,6 +168,16 @@ export class Player extends Actor {
             newPack['burn'] = this.lifeAndBodyController.burn;
             this.updatePack['burn'] = this.lifeAndBodyController.burn;
         }
+
+        if(this.updatePack['fragPlayer'] !== this.fragPlayer){
+            newPack['fragPlayer'] = this.fragPlayer;
+            this.updatePack['fragPlayer'] = this.fragPlayer;
+        }
+
+        if(this.updatePack['fragEnemy'] !== this.fragEnemy){
+            newPack['fragEnemy'] = this.fragEnemy;
+            this.updatePack['fragEnemy'] = this.fragEnemy;
+        }        
 
         return newPack;
 

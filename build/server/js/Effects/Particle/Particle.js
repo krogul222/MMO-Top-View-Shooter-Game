@@ -33,17 +33,22 @@ class Particle {
                                     if (this.testCollision(enemy)) {
                                         enemy.lifeAndBodyController.wasHit(1 * this.life / this.maxLife);
                                         enemy.lifeAndBodyController.startBurn(100);
+                                        if (enemy.lifeAndBodyController.isDead() && enemy.getScore() > 0) {
+                                            player.incFragEnemy();
+                                        }
                                     }
                                 }
                             }
                         }
                         if (GameController_1.GameController.list[this.game] !== undefined) {
                             let players = GameController_1.GameController.list[this.game].players;
-                            for (let key in Player_1.Player.list) {
-                                if (Player_1.Player.list[key].id !== this.parent) {
-                                    let enemyPlayer = Player_1.Player.list[key];
+                            for (let key in players) {
+                                if (players[key].id !== this.parent) {
+                                    let enemyPlayer = players[key];
                                     if (this.testCollision(enemyPlayer)) {
-                                        enemyPlayer.lifeAndBodyController.wasHit(1 * this.life / this.maxLife);
+                                        if (enemyPlayer.lifeAndBodyController.wasHit(1 * this.life / this.maxLife)) {
+                                            player.incFragPlayer();
+                                        }
                                         enemyPlayer.lifeAndBodyController.startBurn(100);
                                     }
                                 }

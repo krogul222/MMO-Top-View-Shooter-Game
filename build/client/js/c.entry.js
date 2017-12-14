@@ -341,6 +341,12 @@ socket.on('update', function (data) {
             if (pack.ammoInGun !== undefined) {
                 p.ammoInGun = pack.ammoInGun;
             }
+            if (pack.fragEnemy !== undefined) {
+                p.fragEnemy = pack.fragEnemy;
+            }
+            if (pack.fragPlayer !== undefined) {
+                p.fragPlayer = pack.fragPlayer;
+            }
             if (pack.reload !== undefined) {
                 if (pack.reload) {
                     p.reload = true;
@@ -707,6 +713,9 @@ exports.leaveGame = () => {
     exports.selfId = 0;
     menuDuringGameDiv.style.display = 'none';
 };
+exports.enableSound = (sound) => {
+    exports.gameSoundManager.turnSound(sound);
+};
 
 
 /***/ }),
@@ -851,6 +860,8 @@ class PlayerClient {
         this.weapon = "pistol";
         this.ammo = 0;
         this.ammoInGun = 0;
+        this.fragPlayer = 0;
+        this.fragEnemy = 0;
         this.flame = new FireFlameClient_1.FireFlameClient(this);
         this.burn = new FireFlameClient_1.FireFlameClient(this, true);
         this.draw = () => {
@@ -1400,6 +1411,8 @@ class Player extends Actor_1.Actor {
         super(param);
         this.updatePack = {};
         this.counter = 0;
+        this.fragPlayer = 0;
+        this.fragEnemy = 0;
         this.giveItems = () => {
             this.inventory.addItem(enums_1.ItemType.knife, 1);
             this.inventory.addItem(enums_1.ItemType.pistol, 1);
@@ -1429,7 +1442,9 @@ class Player extends Actor_1.Actor {
                 attackMelee: this.attackController.melee,
                 ammo: this.attackController.activeWeapon.ammo,
                 ammoInGun: this.attackController.activeWeapon.ammoInGun,
-                burn: this.lifeAndBodyController.burn
+                burn: this.lifeAndBodyController.burn,
+                fragPlayer: this.fragPlayer,
+                fragEnemy: this.fragEnemy
             };
         };
         this.extendedUpdate = () => {
@@ -1441,6 +1456,12 @@ class Player extends Actor_1.Actor {
         };
         this.getCloseEnemies = () => {
             return this.closeEnemiesArr;
+        };
+        this.incFragPlayer = () => {
+            this.fragPlayer++;
+        };
+        this.incFragEnemy = () => {
+            this.fragEnemy++;
         };
         this.getUpdatePack = () => {
             let attackStartedTmp = this.attackController.attackStarted;
@@ -1495,6 +1516,14 @@ class Player extends Actor_1.Actor {
             if (this.updatePack['burn'] !== this.lifeAndBodyController.burn) {
                 newPack['burn'] = this.lifeAndBodyController.burn;
                 this.updatePack['burn'] = this.lifeAndBodyController.burn;
+            }
+            if (this.updatePack['fragPlayer'] !== this.fragPlayer) {
+                newPack['fragPlayer'] = this.fragPlayer;
+                this.updatePack['fragPlayer'] = this.fragPlayer;
+            }
+            if (this.updatePack['fragEnemy'] !== this.fragEnemy) {
+                newPack['fragEnemy'] = this.fragEnemy;
+                this.updatePack['fragEnemy'] = this.fragEnemy;
             }
             return newPack;
         };
@@ -2431,17 +2460,22 @@ class Particle {
                                     if (this.testCollision(enemy)) {
                                         enemy.lifeAndBodyController.wasHit(1 * this.life / this.maxLife);
                                         enemy.lifeAndBodyController.startBurn(100);
+                                        if (enemy.lifeAndBodyController.isDead() && enemy.getScore() > 0) {
+                                            player.incFragEnemy();
+                                        }
                                     }
                                 }
                             }
                         }
                         if (GameController_1.GameController.list[this.game] !== undefined) {
                             let players = GameController_1.GameController.list[this.game].players;
-                            for (let key in Player_1.Player.list) {
-                                if (Player_1.Player.list[key].id !== this.parent) {
-                                    let enemyPlayer = Player_1.Player.list[key];
+                            for (let key in players) {
+                                if (players[key].id !== this.parent) {
+                                    let enemyPlayer = players[key];
                                     if (this.testCollision(enemyPlayer)) {
-                                        enemyPlayer.lifeAndBodyController.wasHit(1 * this.life / this.maxLife);
+                                        if (enemyPlayer.lifeAndBodyController.wasHit(1 * this.life / this.maxLife)) {
+                                            player.incFragPlayer();
+                                        }
                                         enemyPlayer.lifeAndBodyController.startBurn(100);
                                     }
                                 }
@@ -2812,11 +2846,17 @@ const GeometryAndPhysics_1 = __webpack_require__(0);
 class Actor extends Entity_1.Entity {
     constructor(param) {
         super(param);
+        this.score = 1;
         this.update = () => {
             this.movementController.updateSpd();
             this.attackController.update();
             this.lifeAndBodyController.update();
             this.updatePosition();
+        };
+        this.getScore = () => {
+            let score = this.score;
+            this.score = 0;
+            return score;
         };
         this.getClosestPlayer = (distance, angleLimit) => {
             let closestEnemyIndex = "0";
@@ -3286,7 +3326,9 @@ class GUI {
                 this.drawAmmo();
                 this.drawFace();
                 this.drawItems();
-                this.ctx.fillText('Hit points: ' + Math.ceil(PlayerClient_1.PlayerClient.list[game_1.selfId].hp) + '/' + PlayerClient_1.PlayerClient.list[game_1.selfId].hpMax, 0, 0.6 * this.height);
+                this.ctx.fillText('Hit points: ' + Math.ceil(PlayerClient_1.PlayerClient.list[game_1.selfId].hp) + '/' + PlayerClient_1.PlayerClient.list[game_1.selfId].hpMax, 0, 0.3 * this.height);
+                this.ctx.fillText('Frags (enemies): ' + PlayerClient_1.PlayerClient.list[game_1.selfId].fragEnemy, 0, 0.6 * this.height);
+                this.ctx.fillText('Frags (players): ' + PlayerClient_1.PlayerClient.list[game_1.selfId].fragPlayer, 0, 0.9 * this.height);
                 this.drawMinimap();
             }
         };
@@ -3444,6 +3486,7 @@ let backToGameMenuBtnFromCreate = document.getElementById("backToGameMenuBtnFrom
 let joinGameBtn = document.getElementById("joinGameBtn");
 let menuDuringGameDiv = document.getElementById("menuDuringGameDiv");
 let backToMainMenuFromGameBtn = document.getElementById("backToMainMenuFromGameBtn");
+let turnSound = document.getElementById("turnSound");
 exports.selectedGameId = -1;
 let gamesId = [];
 signDivSignIn.onclick = function () {
@@ -3541,6 +3584,18 @@ backToGameMenuBtnFromCreate.onclick = function () {
     gameMenuDiv.style.display = 'inline-block';
     gameMenuDivContainer.style.display = 'block';
     gameMenuDivContainer.style.margin = 'auto';
+};
+turnSound.onclick = function () {
+    if (soundOn) {
+        $("#turnSound").html('Sound: Off');
+        game_1.enableSound(false);
+        soundOn = false;
+    }
+    else {
+        $("#turnSound").html('Sound: On');
+        game_1.enableSound(true);
+        soundOn = true;
+    }
 };
 $(document).ready(function () {
     $("#availableGamesList").on("click", ".std", function () {
@@ -4260,7 +4315,7 @@ class AttackController {
         this._activeWeapon = new WeaponCollection_1.SingleWeapon(this.parent, { weapon: "0", ammo: "20", parent: this.parent });
         if (param.atkSpd)
             this._attackCounter.setInc(param.atkSpd);
-        this._flame = new Flame_1.Flame({ parent: parent, map: this.parent.game, offset: 50, life: 30 });
+        this._flame = new Flame_1.Flame({ parent: parent, game: this.parent.game, offset: 50, life: 30 });
         this.attackCounter.activate();
     }
     get melee() { return this._melee; }
@@ -4377,6 +4432,9 @@ class Bullet extends Entity_1.Entity {
                         if (this.testCollision(enemy)) {
                             this.toRemove = true;
                             enemy.lifeAndBodyController.wasHit(player.attackController.getDamage());
+                            if (enemy.lifeAndBodyController.isDead() && enemy.getScore() > 0) {
+                                player.incFragEnemy();
+                            }
                             this.setHitProperties(1, "enemy", enemy.id);
                             break;
                         }
@@ -4388,7 +4446,9 @@ class Bullet extends Entity_1.Entity {
                                 let enemyPlayer = players[key];
                                 if (this.testCollision(enemyPlayer)) {
                                     this.toRemove = true;
-                                    enemyPlayer.lifeAndBodyController.wasHit(player.attackController.getDamage());
+                                    if (enemyPlayer.lifeAndBodyController.wasHit(player.attackController.getDamage())) {
+                                        player.incFragPlayer();
+                                    }
                                     this.setHitProperties(1, "player", enemyPlayer.id);
                                 }
                             }
@@ -4738,6 +4798,16 @@ class LifeAndBodyController {
             this._hp = (this._hp >= 0) ? this._hp : 0;
             if (this._hp == 0) {
                 this.parent.onDeath();
+                return true;
+            }
+            return false;
+        };
+        this.isDead = () => {
+            if (this._hp <= 0) {
+                return true;
+            }
+            else {
+                return false;
             }
         };
         this.reset = () => {
@@ -4926,6 +4996,7 @@ exports.BulletClient = BulletClient;
 Object.defineProperty(exports, "__esModule", { value: true });
 class GameSoundManager {
     constructor() {
+        this.soundOn = true;
         this.loadSounds = () => {
             soundManager.onload = function () {
                 soundManager.createSound('gunshot', '/client/mp3/gunshot.mp3');
@@ -4954,33 +5025,43 @@ class GameSoundManager {
             });
         };
         this.playWeaponReload = (weapon) => {
-            soundManager.play(weapon + "reload");
+            if (this.soundOn)
+                soundManager.play(weapon + "reload");
         };
         this.playWeaponAttack = (weapon, melee, stop = true) => {
-            if (melee) {
-                (weapon == "knife" || weapon == "claws") ? soundManager.play("knife_swing") : soundManager.play("gun_swing");
-            }
-            else {
-                if (weapon == "flamethrower") {
-                    let s = soundManager.getSoundById(weapon + "_fire");
-                    this.loopSound(s, stop);
+            if (this.soundOn) {
+                if (melee) {
+                    (weapon == "knife" || weapon == "claws") ? soundManager.play("knife_swing") : soundManager.play("gun_swing");
                 }
                 else {
-                    soundManager.play(weapon + "_fire");
+                    if (weapon == "flamethrower") {
+                        let s = soundManager.getSoundById(weapon + "_fire");
+                        this.loopSound(s, stop);
+                    }
+                    else {
+                        soundManager.play(weapon + "_fire");
+                    }
                 }
             }
         };
         this.playHit = (category) => {
-            if (category == "player")
-                soundManager.play("pain");
-            if (category == "enemy") {
-                (Math.random() < 0.5) ? soundManager.play("squishy1") : soundManager.play("squishy2");
+            if (this.soundOn) {
+                if (category == "player")
+                    soundManager.play("pain");
+                if (category == "enemy") {
+                    (Math.random() < 0.5) ? soundManager.play("squishy1") : soundManager.play("squishy2");
+                }
             }
         };
         this.playDeath = (kind) => {
-            console.log("KILLED " + kind);
-            if (kind == "zombie")
-                soundManager.play("death1");
+            if (this.soundOn) {
+                console.log("KILLED " + kind);
+                if (kind == "zombie")
+                    soundManager.play("death1");
+            }
+        };
+        this.turnSound = (sound) => {
+            this.soundOn = sound;
         };
         this.loadSounds();
     }

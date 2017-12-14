@@ -12,11 +12,17 @@ const GeometryAndPhysics_1 = require("../GeometryAndPhysics");
 class Actor extends Entity_1.Entity {
     constructor(param) {
         super(param);
+        this.score = 1;
         this.update = () => {
             this.movementController.updateSpd();
             this.attackController.update();
             this.lifeAndBodyController.update();
             this.updatePosition();
+        };
+        this.getScore = () => {
+            let score = this.score;
+            this.score = 0;
+            return score;
         };
         this.getClosestPlayer = (distance, angleLimit) => {
             let closestEnemyIndex = "0";

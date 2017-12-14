@@ -21,7 +21,9 @@ class GUI {
                 this.drawAmmo();
                 this.drawFace();
                 this.drawItems();
-                this.ctx.fillText('Hit points: ' + Math.ceil(PlayerClient_1.PlayerClient.list[game_1.selfId].hp) + '/' + PlayerClient_1.PlayerClient.list[game_1.selfId].hpMax, 0, 0.6 * this.height);
+                this.ctx.fillText('Hit points: ' + Math.ceil(PlayerClient_1.PlayerClient.list[game_1.selfId].hp) + '/' + PlayerClient_1.PlayerClient.list[game_1.selfId].hpMax, 0, 0.3 * this.height);
+                this.ctx.fillText('Frags (enemies): ' + PlayerClient_1.PlayerClient.list[game_1.selfId].fragEnemy, 0, 0.6 * this.height);
+                this.ctx.fillText('Frags (players): ' + PlayerClient_1.PlayerClient.list[game_1.selfId].fragPlayer, 0, 0.9 * this.height);
                 this.drawMinimap();
             }
         };

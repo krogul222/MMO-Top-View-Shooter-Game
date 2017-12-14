@@ -24,6 +24,8 @@ class PlayerClient {
         this.weapon = "pistol";
         this.ammo = 0;
         this.ammoInGun = 0;
+        this.fragPlayer = 0;
+        this.fragEnemy = 0;
         this.flame = new FireFlameClient_1.FireFlameClient(this);
         this.burn = new FireFlameClient_1.FireFlameClient(this, true);
         this.draw = () => {

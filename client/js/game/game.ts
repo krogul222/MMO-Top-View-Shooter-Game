@@ -28,6 +28,7 @@ declare var gui: GUI;
 let menuDuringGameDiv =  (<HTMLInputElement>document.getElementById("menuDuringGameDiv")); 
 let enemyDrawList: string[] = [];
 
+
 export var selfId: number = 0;
 let smokeTest: boolean = false;
 
@@ -139,6 +140,15 @@ socket.on('update', function(data){
             if(pack.ammoInGun !== undefined){
                 p.ammoInGun = pack.ammoInGun;
             } 
+
+            if(pack.fragEnemy !== undefined){
+                p.fragEnemy = pack.fragEnemy;
+            } 
+
+            if(pack.fragPlayer !== undefined){
+                p.fragPlayer = pack.fragPlayer;
+            } 
+
 
            if(pack.reload !== undefined){
                if(pack.reload){
@@ -600,8 +610,12 @@ export let leaveGame = () => {
 
     selfId = 0;
     menuDuringGameDiv.style.display = 'none';
+    
 }
 
+export let enableSound = (sound: boolean) => {
+    gameSoundManager.turnSound(sound);
+}
 /*
 $(document).keydown(function(e) {
 if (e.which == 32) {

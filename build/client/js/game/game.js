@@ -96,6 +96,12 @@ socket.on('update', function (data) {
             if (pack.ammoInGun !== undefined) {
                 p.ammoInGun = pack.ammoInGun;
             }
+            if (pack.fragEnemy !== undefined) {
+                p.fragEnemy = pack.fragEnemy;
+            }
+            if (pack.fragPlayer !== undefined) {
+                p.fragPlayer = pack.fragPlayer;
+            }
             if (pack.reload !== undefined) {
                 if (pack.reload) {
                     p.reload = true;
@@ -461,5 +467,8 @@ exports.leaveGame = () => {
     }
     exports.selfId = 0;
     menuDuringGameDiv.style.display = 'none';
+};
+exports.enableSound = (sound) => {
+    exports.gameSoundManager.turnSound(sound);
 };
 //# sourceMappingURL=game.js.map

@@ -32,6 +32,8 @@ export class PlayerClient{
     public weapon = "pistol";
     public ammo = 0;
     public ammoInGun = 0;
+    public fragPlayer: number = 0;
+    public fragEnemy: number = 0;
     public flame:FireFlameClient = new FireFlameClient(this);
     public burn:FireFlameClient = new FireFlameClient(this, true);
 

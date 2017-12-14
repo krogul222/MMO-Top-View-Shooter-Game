@@ -26,7 +26,7 @@ export class AttackController {
         this._activeWeapon = new SingleWeapon(this.parent, {weapon: "0", ammo: "20", parent: this.parent});
         if(param.atkSpd) this._attackCounter.setInc(param.atkSpd);
 
-        this._flame = new Flame({parent: parent, map: this.parent.game, offset: 50, life: 30});
+        this._flame = new Flame({parent: parent, game: this.parent.game, offset: 50, life: 30});
         
         //this.equip(WeaponType.knife);
         this.attackCounter.activate();

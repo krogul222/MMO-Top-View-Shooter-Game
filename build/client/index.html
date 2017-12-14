@@ -186,6 +186,7 @@
     <div id="gameDiv" style="display:none;">
         <div align="center" id="menuDuringGameDiv" style="display:none">
                 <button id = "backToMainMenuFromGameBtn" class="btn btn-primary">Go to Main Menu</button>
+                <button id = "turnSound" class="btn btn-primary">Sound: On</button>        
         </div>
         <canvas id="canvas" width=500 height="500" style="border:1px solid #000000;cursor:crosshair"></canvas>
         <canvas id="canvasui" width=500 height="100" style="border:1px solid #000000;cursor:crosshair"></canvas>
@@ -215,6 +216,7 @@
     var mouseWheelTrigger = 2;
     var canJoinGame = false;
     var canCreateGame = false;
+    var soundOn = true;
     const CAMERA_BOX_ADJUSTMENT = 4;
     const TILE_SIZE = 32;
 </script>

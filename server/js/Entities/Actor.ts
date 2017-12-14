@@ -18,6 +18,7 @@ export class Actor extends Entity {
     movementController: MovementController;
     mapController: MapController;
     inventory: Inventory;
+    score: number = 1;
 
     constructor(param) {
          super(param);
@@ -33,7 +34,12 @@ export class Actor extends Entity {
         this.attackController.update();
         this.lifeAndBodyController.update();
         this.updatePosition();
-	}
+    }
+    getScore = () => {
+        let score = this.score;
+        this.score = 0;
+        return score;
+    }
 
     getClosestPlayer = (distance: number, angleLimit: number)  => {
 

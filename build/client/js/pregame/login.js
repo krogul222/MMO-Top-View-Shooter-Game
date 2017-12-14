@@ -20,6 +20,7 @@ let backToGameMenuBtnFromCreate = document.getElementById("backToGameMenuBtnFrom
 let joinGameBtn = document.getElementById("joinGameBtn");
 let menuDuringGameDiv = document.getElementById("menuDuringGameDiv");
 let backToMainMenuFromGameBtn = document.getElementById("backToMainMenuFromGameBtn");
+let turnSound = document.getElementById("turnSound");
 exports.selectedGameId = -1;
 let gamesId = [];
 signDivSignIn.onclick = function () {
@@ -117,6 +118,18 @@ backToGameMenuBtnFromCreate.onclick = function () {
     gameMenuDiv.style.display = 'inline-block';
     gameMenuDivContainer.style.display = 'block';
     gameMenuDivContainer.style.margin = 'auto';
+};
+turnSound.onclick = function () {
+    if (soundOn) {
+        $("#turnSound").html('Sound: Off');
+        game_1.enableSound(false);
+        soundOn = false;
+    }
+    else {
+        $("#turnSound").html('Sound: On');
+        game_1.enableSound(true);
+        soundOn = true;
+    }
 };
 $(document).ready(function () {
     $("#availableGamesList").on("click", ".std", function () {

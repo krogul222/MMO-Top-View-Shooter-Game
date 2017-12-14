@@ -28,6 +28,16 @@ class LifeAndBodyController {
             this._hp = (this._hp >= 0) ? this._hp : 0;
             if (this._hp == 0) {
                 this.parent.onDeath();
+                return true;
+            }
+            return false;
+        };
+        this.isDead = () => {
+            if (this._hp <= 0) {
+                return true;
+            }
+            else {
+                return false;
             }
         };
         this.reset = () => {

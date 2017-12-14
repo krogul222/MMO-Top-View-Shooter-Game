@@ -37,7 +37,9 @@ export class GUI {
             this.drawAmmo();
             this.drawFace();
             this.drawItems();
-            this.ctx.fillText('Hit points: '+Math.ceil(PlayerClient.list[selfId].hp) + '/'+PlayerClient.list[selfId].hpMax, 0, 0.6*this.height);
+            this.ctx.fillText('Hit points: '+Math.ceil(PlayerClient.list[selfId].hp) + '/'+PlayerClient.list[selfId].hpMax, 0, 0.3*this.height);
+            this.ctx.fillText('Frags (enemies): '+PlayerClient.list[selfId].fragEnemy, 0, 0.6*this.height);
+            this.ctx.fillText('Frags (players): '+PlayerClient.list[selfId].fragPlayer, 0, 0.9*this.height);
             this.drawMinimap();
         }
 

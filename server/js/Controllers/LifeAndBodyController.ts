@@ -42,7 +42,17 @@ export class LifeAndBodyController {
         this._hp = this._hp - damage;
         this._hp = (this._hp >= 0) ? this._hp : 0;
 
-        if(this._hp == 0) { this.parent.onDeath(); }
+        if(this._hp == 0) { this.parent.onDeath(); return true;}
+
+        return false;
+    }
+
+    isDead = () => {
+        if(this._hp <= 0){
+            return true;
+        } else{
+            return false;
+        }
     }
 
     reset = () => {

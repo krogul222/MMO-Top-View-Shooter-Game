@@ -1,4 +1,4 @@
-import { leaveGame } from './../game/game';
+import { leaveGame, enableSound } from './../game/game';
 let signDiv = (<HTMLInputElement>document.getElementById("signDiv"));
 let loadingDiv = (<HTMLInputElement>document.getElementById("loadingDiv"));
 let signDivUsername = (<HTMLInputElement>document.getElementById("signDiv-username"));
@@ -19,6 +19,7 @@ let backToGameMenuBtnFromCreate =  (<HTMLInputElement>document.getElementById("b
 let joinGameBtn =  (<HTMLInputElement>document.getElementById("joinGameBtn")); 
 let menuDuringGameDiv =  (<HTMLInputElement>document.getElementById("menuDuringGameDiv")); 
 let backToMainMenuFromGameBtn =  (<HTMLInputElement>document.getElementById("backToMainMenuFromGameBtn")); 
+let turnSound =  (<HTMLInputElement>document.getElementById("turnSound")); 
 
 export let selectedGameId: number = -1;
 let gamesId: number[] = [];
@@ -29,6 +30,7 @@ declare var canJoinGame;
 declare var canCreateGame;
 declare var imagesLoaded;
 declare var ALL_IMAGES;
+declare var soundOn;
 
 signDivSignIn.onclick = function(){
     socket.emit('signIn', {username:signDivUsername.value, password: signDivPassword.value});
@@ -164,6 +166,21 @@ backToGameMenuBtnFromCreate.onclick = function(){
     gameMenuDiv.style.display = 'inline-block';
     gameMenuDivContainer.style.display = 'block';
     gameMenuDivContainer.style.margin = 'auto';
+
+    //mainBar.style.display = 'none';
+}
+
+turnSound.onclick = function(){
+    if(soundOn){
+        $("#turnSound").html('Sound: Off');
+        enableSound(false);
+        soundOn = false;
+    } else{
+        $("#turnSound").html('Sound: On');
+        enableSound(true);
+        soundOn = true;
+    }
+
 
     //mainBar.style.display = 'none';
 }

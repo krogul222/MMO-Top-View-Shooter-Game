@@ -67,6 +67,9 @@ export class Particle{
                                         //this.toRemove = true;
                                         enemy.lifeAndBodyController.wasHit(1*this.life/this.maxLife);
                                         enemy.lifeAndBodyController.startBurn(100);
+                                        if(enemy.lifeAndBodyController.isDead() && enemy.getScore()>0){
+                                            player.incFragEnemy();
+                                        }
                                     }
                                 } 
                             }
@@ -76,12 +79,15 @@ export class Particle{
                    // let player: Player= Player.list[this.parent];
                    if(GameController.list[this.game] !== undefined){
                         let players = GameController.list[this.game].players;
-                        for(let key in Player.list){         // check if player was hit
-                            if(Player.list[key].id !== this.parent){
-                                let enemyPlayer: Player = Player.list[key];
+                        for(let key in players){         // check if player was hit
+                            if(players[key].id !== this.parent){
+                                let enemyPlayer: Player = players[key];
                                 if(this.testCollision(enemyPlayer)){
                                 // this.toRemove = true;
-                                    enemyPlayer.lifeAndBodyController.wasHit(1*this.life/this.maxLife);
+
+                                    if(enemyPlayer.lifeAndBodyController.wasHit(1*this.life/this.maxLife)){
+                                        player.incFragPlayer();
+                                    }
                                     enemyPlayer.lifeAndBodyController.startBurn(100);
                                 }
                             }

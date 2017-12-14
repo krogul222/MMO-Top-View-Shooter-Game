@@ -1,6 +1,7 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 class GameSoundManager {
     constructor() {
+        this.soundOn = true;
         this.loadSounds = () => {
             soundManager.onload = function () {
                 soundManager.createSound('gunshot', '/client/mp3/gunshot.mp3');
@@ -29,33 +30,43 @@ class GameSoundManager {
             });
         };
         this.playWeaponReload = (weapon) => {
-            soundManager.play(weapon + "reload");
+            if (this.soundOn)
+                soundManager.play(weapon + "reload");
         };
         this.playWeaponAttack = (weapon, melee, stop = true) => {
-            if (melee) {
-                (weapon == "knife" || weapon == "claws") ? soundManager.play("knife_swing") : soundManager.play("gun_swing");
-            }
-            else {
-                if (weapon == "flamethrower") {
-                    let s = soundManager.getSoundById(weapon + "_fire");
-                    this.loopSound(s, stop);
+            if (this.soundOn) {
+                if (melee) {
+                    (weapon == "knife" || weapon == "claws") ? soundManager.play("knife_swing") : soundManager.play("gun_swing");
                 }
                 else {
-                    soundManager.play(weapon + "_fire");
+                    if (weapon == "flamethrower") {
+                        let s = soundManager.getSoundById(weapon + "_fire");
+                        this.loopSound(s, stop);
+                    }
+                    else {
+                        soundManager.play(weapon + "_fire");
+                    }
                 }
             }
         };
         this.playHit = (category) => {
-            if (category == "player")
-                soundManager.play("pain");
-            if (category == "enemy") {
-                (Math.random() < 0.5) ? soundManager.play("squishy1") : soundManager.play("squishy2");
+            if (this.soundOn) {
+                if (category == "player")
+                    soundManager.play("pain");
+                if (category == "enemy") {
+                    (Math.random() < 0.5) ? soundManager.play("squishy1") : soundManager.play("squishy2");
+                }
             }
         };
         this.playDeath = (kind) => {
-            console.log("KILLED " + kind);
-            if (kind == "zombie")
-                soundManager.play("death1");
+            if (this.soundOn) {
+                console.log("KILLED " + kind);
+                if (kind == "zombie")
+                    soundManager.play("death1");
+            }
+        };
+        this.turnSound = (sound) => {
+            this.soundOn = sound;
         };
         this.loadSounds();
     }

@@ -111,7 +111,7 @@ class AttackController {
         this._activeWeapon = new WeaponCollection_1.SingleWeapon(this.parent, { weapon: "0", ammo: "20", parent: this.parent });
         if (param.atkSpd)
             this._attackCounter.setInc(param.atkSpd);
-        this._flame = new Flame_1.Flame({ parent: parent, map: this.parent.game, offset: 50, life: 30 });
+        this._flame = new Flame_1.Flame({ parent: parent, game: this.parent.game, offset: 50, life: 30 });
         this.attackCounter.activate();
     }
     get melee() { return this._melee; }

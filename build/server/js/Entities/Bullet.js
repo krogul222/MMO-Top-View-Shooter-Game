@@ -31,6 +31,9 @@ class Bullet extends Entity_1.Entity {
                         if (this.testCollision(enemy)) {
                             this.toRemove = true;
                             enemy.lifeAndBodyController.wasHit(player.attackController.getDamage());
+                            if (enemy.lifeAndBodyController.isDead() && enemy.getScore() > 0) {
+                                player.incFragEnemy();
+                            }
                             this.setHitProperties(1, "enemy", enemy.id);
                             break;
                         }
@@ -42,7 +45,9 @@ class Bullet extends Entity_1.Entity {
                                 let enemyPlayer = players[key];
                                 if (this.testCollision(enemyPlayer)) {
                                     this.toRemove = true;
-                                    enemyPlayer.lifeAndBodyController.wasHit(player.attackController.getDamage());
+                                    if (enemyPlayer.lifeAndBodyController.wasHit(player.attackController.getDamage())) {
+                                        player.incFragPlayer();
+                                    }
                                     this.setHitProperties(1, "player", enemyPlayer.id);
                                 }
                             }
