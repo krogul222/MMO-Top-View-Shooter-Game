@@ -70,7 +70,7 @@ export class Actor extends Entity {
    
     if(closestEnemyIndex == "-1") return null;
 
-    return Player.list[closestEnemyIndex];    
+    return players[closestEnemyIndex];    
     }
 
     getClosestEnemy = (distance: number, angleLimit: number) => {
@@ -99,7 +99,7 @@ export class Actor extends Entity {
        
         if(closestEnemyIndex == "-1") return null;
 
-        return Enemy.list[closestEnemyIndex];
+        return enemies[closestEnemyIndex];
     }
 
     getClosestPlayerorEnemy = (distance: number, angleLimit: number) => {

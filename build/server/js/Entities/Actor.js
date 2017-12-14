@@ -6,8 +6,6 @@ const MovementController_1 = require("./../Controllers/MovementController");
 const AttackControler_1 = require("./../Controllers/AttackControler");
 const LifeAndBodyController_1 = require("./../Controllers/LifeAndBodyController");
 const Entity_1 = require("./Entity");
-const Player_1 = require("./Player");
-const Enemy_1 = require("./Enemy");
 const GeometryAndPhysics_1 = require("../GeometryAndPhysics");
 class Actor extends Entity_1.Entity {
     constructor(param) {
@@ -48,7 +46,7 @@ class Actor extends Entity_1.Entity {
             }
             if (closestEnemyIndex == "-1")
                 return null;
-            return Player_1.Player.list[closestEnemyIndex];
+            return players[closestEnemyIndex];
         };
         this.getClosestEnemy = (distance, angleLimit) => {
             let closestEnemyIndex = "-1";
@@ -72,7 +70,7 @@ class Actor extends Entity_1.Entity {
             }
             if (closestEnemyIndex == "-1")
                 return null;
-            return Enemy_1.Enemy.list[closestEnemyIndex];
+            return enemies[closestEnemyIndex];
         };
         this.getClosestPlayerorEnemy = (distance, angleLimit) => {
             let enemy = this.getClosestEnemy(distance, angleLimit);
