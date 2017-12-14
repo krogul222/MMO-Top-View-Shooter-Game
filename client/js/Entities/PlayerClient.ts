@@ -58,8 +58,10 @@ export class PlayerClient{
 
     draw = () => {
 
+        console.log("SELF "+selfId);
         let p: PlayerClient = PlayerClient.list[selfId];
 
+        console.log("SELF "+p.map+" "+this.map);
         if(p.map !== this.map){
             return;  
         }

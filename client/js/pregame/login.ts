@@ -1,3 +1,4 @@
+import { leaveGame } from './../game/game';
 let signDiv = (<HTMLInputElement>document.getElementById("signDiv"));
 let loadingDiv = (<HTMLInputElement>document.getElementById("loadingDiv"));
 let signDivUsername = (<HTMLInputElement>document.getElementById("signDiv-username"));
@@ -16,6 +17,8 @@ let createGameDiv = (<HTMLInputElement>document.getElementById("createGameDiv"))
 let backToGameMenuBtnFromJoin =  (<HTMLInputElement>document.getElementById("backToGameMenuBtnFromJoin")); 
 let backToGameMenuBtnFromCreate =  (<HTMLInputElement>document.getElementById("backToGameMenuBtnFromCreate")); 
 let joinGameBtn =  (<HTMLInputElement>document.getElementById("joinGameBtn")); 
+let menuDuringGameDiv =  (<HTMLInputElement>document.getElementById("menuDuringGameDiv")); 
+let backToMainMenuFromGameBtn =  (<HTMLInputElement>document.getElementById("backToMainMenuFromGameBtn")); 
 
 export let selectedGameId: number = -1;
 let gamesId: number[] = [];
@@ -37,6 +40,8 @@ createGameBtn.onclick = function(){
     gameMenuDivContainer.style.display = 'none';
     createGameDiv.style.display = 'none';
     mainBar.style.display = 'none';
+
+    console.log("TWORZYMY");
 
     if(imagesLoaded !== ALL_IMAGES){
         loadingDiv.style.display = 'inline';
@@ -61,6 +66,8 @@ createGameBtn.onclick = function(){
             itemsnumber: itemsnumber,
             itemsrespawn: itemsrespawn
         });
+        gameDiv.style.display = 'inline-block';
+        loadingDiv.style.display = 'none';
     }
 }
 /*
@@ -86,6 +93,26 @@ joinGameMenuBtn.onclick = function(){
     //mainBar.style.display = 'none'
 }
 
+backToMainMenuFromGameBtn.onclick = function(){
+
+    gameMenuDiv.style.display = 'inline-block';
+    gameMenuDivContainer.style.display = 'block';
+    gameMenuDivContainer.style.margin = 'auto';
+    gameMenuDiv.style.display = 'inline-block';
+    gameMenuDivContainer.style.display = 'block';
+    gameMenuDivContainer.style.margin = 'auto';
+    gameDiv.style.display = 'none';
+    loadingDiv.style.display = 'none';
+
+    selectedGameId= -1;
+    canJoinGame = false;
+    canCreateGame = false;
+
+    leaveGame();
+
+    socket.emit('PlayerLeftGame');
+}
+
 createGameMenuBtn.onclick = function(){
     gameMenuDiv.style.display = 'none';
     gameMenuDivContainer.style.display = 'none';
@@ -107,6 +134,9 @@ joinGameBtn.onclick = function(){
             loadingDiv.style.display = 'inline';
         } else{
             socket.emit('joinedGame', {gameId: selectedGameId});
+
+            gameDiv.style.display = 'inline-block';
+            loadingDiv.style.display = 'none';
         }
     }
    // socket.emit('getListOfGames');
@@ -123,7 +153,8 @@ backToGameMenuBtnFromJoin.onclick = function(){
     gameMenuDivContainer.style.margin = 'auto';
 
     selectedGameId= -1;
-
+    canJoinGame = false;
+    canCreateGame = false;
     //mainBar.style.display = 'none';
 }
 
@@ -157,6 +188,7 @@ $(document).ready(function(){
 signDivSignUp.onclick = function(){
     socket.emit('signUp', {username:signDivUsername.value, password: signDivPassword.value});
 }    */
+
 
 socket.on('ListOfGames', function(data){
 

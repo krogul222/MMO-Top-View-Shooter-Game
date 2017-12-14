@@ -255,6 +255,10 @@ export class Player extends Actor {
             } */
         });
 
+        socket.on('PlayerLeftGame', function(data){
+            Player.onDisconnect(socket);
+        });
+
         game.addPlayer(player);
        // console.log
         socket.emit('init',{player: Player.getAllSpecificInitPack(game.id),enemy:Enemy.getAllSpecificInitPack(game.id),selfId:socket.id});

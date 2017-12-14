@@ -243,6 +243,9 @@ Player.onConnect = (socket, createdGame = false, gID = -1, data = {}) => {
         if (data.inputId == 'smoke')
             new Smoke_1.Smoke(new GeometryAndPhysics_1.Point(player.position.x - 128, player.position.y - 128), 150, 750, 20, player.game);
     });
+    socket.on('PlayerLeftGame', function (data) {
+        Player.onDisconnect(socket);
+    });
     game.addPlayer(player);
     socket.emit('init', { player: Player.getAllSpecificInitPack(game.id), enemy: Enemy_1.Enemy.getAllSpecificInitPack(game.id), selfId: socket.id });
     socket.emit('mapData', MapControler_1.MapController.getMapPack(game.map));

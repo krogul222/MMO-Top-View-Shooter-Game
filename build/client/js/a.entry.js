@@ -245,12 +245,12 @@ exports.getRandomInt = getRandomInt;
 
 Object.defineProperty(exports, "__esModule", { value: true });
 const PlayerClient_1 = __webpack_require__(5);
-const Particle_1 = __webpack_require__(17);
+const Particle_1 = __webpack_require__(16);
 const ParticleClient_1 = __webpack_require__(42);
 const UpgradeClient_1 = __webpack_require__(43);
 const BulletClient_1 = __webpack_require__(44);
 const GameSoundManager_1 = __webpack_require__(45);
-const Inventory_1 = __webpack_require__(22);
+const Inventory_1 = __webpack_require__(21);
 const MapControler_1 = __webpack_require__(7);
 const MapClient_1 = __webpack_require__(46);
 const Filters_1 = __webpack_require__(47);
@@ -258,7 +258,8 @@ const Effects_1 = __webpack_require__(48);
 const canvas_1 = __webpack_require__(3);
 const SmokeClient_1 = __webpack_require__(50);
 const EnemyClient_1 = __webpack_require__(13);
-const ExplosionClient_1 = __webpack_require__(24);
+const ExplosionClient_1 = __webpack_require__(23);
+let menuDuringGameDiv = document.getElementById("menuDuringGameDiv");
 let enemyDrawList = [];
 exports.selfId = 0;
 let smokeTest = false;
@@ -455,7 +456,9 @@ socket.on('remove', function (data) {
         delete BulletClient_1.BulletClient.list[data.bullet[i].id];
     }
     for (let i = 0, length = data.enemy.length; i < length; i++) {
-        exports.gameSoundManager.playDeath(EnemyClient_1.EnemyClient.list[data.enemy[i]].kind);
+        if (EnemyClient_1.EnemyClient.list[data.enemy[i]] !== undefined) {
+            exports.gameSoundManager.playDeath(EnemyClient_1.EnemyClient.list[data.enemy[i]].kind);
+        }
         delete EnemyClient_1.EnemyClient.list[data.enemy[i]];
     }
     for (let i = 0, length = data.upgrade.length; i < length; i++) {
@@ -586,7 +589,13 @@ document.onkeydown = function (event) {
         return false;
     }
     else if (event.keyCode === 77) {
-        socket.emit('keyPress', { inputId: 'map', state: true, map: exports.currentMap.map.name });
+        console.log("MENU");
+        if (menuDuringGameDiv.style.display == 'none') {
+            menuDuringGameDiv.style.display = 'block';
+        }
+        else {
+            menuDuringGameDiv.style.display = 'none';
+        }
     }
     if (event.keyCode === 107) {
         exports.canvasFilters.bAdjustment++;
@@ -679,6 +688,25 @@ let updateMouse = () => {
         socket.emit('keyPress', { inputId: 'mouseAngle', state: angle });
     }
 };
+exports.leaveGame = () => {
+    for (let i in PlayerClient_1.PlayerClient.list) {
+        delete PlayerClient_1.PlayerClient.list[i];
+    }
+    for (let i in EnemyClient_1.EnemyClient.list) {
+        delete EnemyClient_1.EnemyClient.list[i];
+    }
+    for (let i in UpgradeClient_1.UpgradeClient.list) {
+        delete UpgradeClient_1.UpgradeClient.list[i];
+    }
+    for (let i in SmokeClient_1.SmokeClient.list) {
+        delete SmokeClient_1.SmokeClient.list[i];
+    }
+    for (let i in BulletClient_1.BulletClient.list) {
+        delete BulletClient_1.BulletClient.list[i];
+    }
+    exports.selfId = 0;
+    menuDuringGameDiv.style.display = 'none';
+};
 
 
 /***/ }),
@@ -686,8 +714,8 @@ let updateMouse = () => {
 /***/ (function(module, exports, __webpack_require__) {
 
 Object.defineProperty(exports, "__esModule", { value: true });
-const Camera_1 = __webpack_require__(26);
-const GUI_1 = __webpack_require__(27);
+const Camera_1 = __webpack_require__(25);
+const GUI_1 = __webpack_require__(26);
 gui = new GUI_1.GUI({ ctx: ctxui, width: WIDTH, height: HEIGHTUI });
 exports.camera = new Camera_1.Camera(canvas, WIDTH, HEIGHT);
 let resizeCanvas = function () {
@@ -714,7 +742,7 @@ window.addEventListener('resize', function () {
 /***/ (function(module, exports, __webpack_require__) {
 
 Object.defineProperty(exports, "__esModule", { value: true });
-const login_1 = __webpack_require__(16);
+const login_1 = __webpack_require__(27);
 exports.Img = {};
 let gameDiv = document.getElementById("gameDiv");
 let loadingDiv = document.getElementById("loadingDiv");
@@ -826,7 +854,9 @@ class PlayerClient {
         this.flame = new FireFlameClient_1.FireFlameClient(this);
         this.burn = new FireFlameClient_1.FireFlameClient(this, true);
         this.draw = () => {
+            console.log("SELF " + game_1.selfId);
             let p = PlayerClient.list[game_1.selfId];
+            console.log("SELF " + p.map + " " + this.map);
             if (p.map !== this.map) {
                 return;
             }
@@ -1238,12 +1268,12 @@ exports.MapController = MapController;
 /***/ (function(module, exports, __webpack_require__) {
 
 Object.defineProperty(exports, "__esModule", { value: true });
-const Smoke_1 = __webpack_require__(18);
-const Pack_1 = __webpack_require__(19);
+const Smoke_1 = __webpack_require__(17);
+const Pack_1 = __webpack_require__(18);
 const Player_1 = __webpack_require__(10);
 const MapControler_1 = __webpack_require__(7);
 const Enemy_1 = __webpack_require__(11);
-const Upgrade_1 = __webpack_require__(20);
+const Upgrade_1 = __webpack_require__(19);
 class GameController {
     constructor(param) {
         this.monsterRespawn = true;
@@ -1346,7 +1376,7 @@ exports.GameController = GameController;
 /***/ (function(module, exports, __webpack_require__) {
 
 Object.defineProperty(exports, "__esModule", { value: true });
-const Pack_1 = __webpack_require__(19);
+const Pack_1 = __webpack_require__(18);
 exports.initPack = new Pack_1.Pack();
 exports.removePack = new Pack_1.Pack();
 
@@ -1356,12 +1386,12 @@ exports.removePack = new Pack_1.Pack();
 /***/ (function(module, exports, __webpack_require__) {
 
 Object.defineProperty(exports, "__esModule", { value: true });
-const Upgrade_1 = __webpack_require__(20);
+const Upgrade_1 = __webpack_require__(19);
 const GameController_1 = __webpack_require__(8);
-const Smoke_1 = __webpack_require__(18);
+const Smoke_1 = __webpack_require__(17);
 const globalVariables_1 = __webpack_require__(9);
 const Enemy_1 = __webpack_require__(11);
-const Actor_1 = __webpack_require__(21);
+const Actor_1 = __webpack_require__(20);
 const GeometryAndPhysics_1 = __webpack_require__(0);
 const enums_1 = __webpack_require__(1);
 const MapControler_1 = __webpack_require__(7);
@@ -1600,6 +1630,9 @@ Player.onConnect = (socket, createdGame = false, gID = -1, data = {}) => {
         if (data.inputId == 'smoke')
             new Smoke_1.Smoke(new GeometryAndPhysics_1.Point(player.position.x - 128, player.position.y - 128), 150, 750, 20, player.game);
     });
+    socket.on('PlayerLeftGame', function (data) {
+        Player.onDisconnect(socket);
+    });
     game.addPlayer(player);
     socket.emit('init', { player: Player.getAllSpecificInitPack(game.id), enemy: Enemy_1.Enemy.getAllSpecificInitPack(game.id), selfId: socket.id });
     socket.emit('mapData', MapControler_1.MapController.getMapPack(game.map));
@@ -1664,7 +1697,7 @@ exports.Player = Player;
 /***/ (function(module, exports, __webpack_require__) {
 
 Object.defineProperty(exports, "__esModule", { value: true });
-const Actor_1 = __webpack_require__(21);
+const Actor_1 = __webpack_require__(20);
 const GeometryAndPhysics_1 = __webpack_require__(0);
 const globalVariables_1 = __webpack_require__(9);
 const enums_1 = __webpack_require__(1);
@@ -2294,7 +2327,7 @@ exports.Entity = Entity;
 
 Object.defineProperty(exports, "__esModule", { value: true });
 const GeometryAndPhysics_1 = __webpack_require__(0);
-const FireParticle_1 = __webpack_require__(25);
+const FireParticle_1 = __webpack_require__(24);
 class FireFlameClient {
     constructor(parent, burn = false) {
         this.particles = [];
@@ -2361,149 +2394,6 @@ exports.FireFlameClient = FireFlameClient;
 
 /***/ }),
 /* 16 */
-/***/ (function(module, exports) {
-
-Object.defineProperty(exports, "__esModule", { value: true });
-let signDiv = document.getElementById("signDiv");
-let loadingDiv = document.getElementById("loadingDiv");
-let signDivUsername = document.getElementById("signDiv-username");
-let signDivPassword = document.getElementById("signDiv-password");
-let signDivSignIn = document.getElementById("signDiv-signIn");
-let signDivSignUp = document.getElementById("signDiv-signUp");
-let gameMenuDiv = document.getElementById("gameMenuDiv");
-let quickGame = document.getElementById("quickGame");
-let joinGameMenuBtn = document.getElementById("joinGameMenuBtn");
-let createGameMenuBtn = document.getElementById("createGameMenuBtn");
-let createGameBtn = document.getElementById("createGameBtn");
-let mainBar = document.getElementById("mainBar");
-let gameMenuDivContainer = document.getElementById("gameMenuDivContainer");
-let joinGameDiv = document.getElementById("joinGameDiv");
-let createGameDiv = document.getElementById("createGameDiv");
-let backToGameMenuBtnFromJoin = document.getElementById("backToGameMenuBtnFromJoin");
-let backToGameMenuBtnFromCreate = document.getElementById("backToGameMenuBtnFromCreate");
-let joinGameBtn = document.getElementById("joinGameBtn");
-exports.selectedGameId = -1;
-let gamesId = [];
-signDivSignIn.onclick = function () {
-    socket.emit('signIn', { username: signDivUsername.value, password: signDivPassword.value });
-};
-createGameBtn.onclick = function () {
-    canCreateGame = true;
-    gameMenuDiv.style.display = 'none';
-    gameMenuDivContainer.style.display = 'none';
-    createGameDiv.style.display = 'none';
-    mainBar.style.display = 'none';
-    if (imagesLoaded !== ALL_IMAGES) {
-        loadingDiv.style.display = 'inline';
-    }
-    else {
-        let name = $("#gamename").val();
-        let mapsize = $('#mapsize').find(":selected").val();
-        let water = $('#water').find(":selected").val();
-        let seeds = $('#seeds').find(":selected").val();
-        let monstersnumber = $('#monstersnumber').find(":selected").val();
-        let monstersrespawn = $('#monstersrespawn').find(":selected").val();
-        let itemsnumber = $('#itemsnumber').find(":selected").val();
-        let itemsrespawn = $('#itemsrespawn').find(":selected").val();
-        console.log("MAP SIZE " + mapsize);
-        socket.emit('createdGame', {
-            name: name,
-            mapsize: mapsize,
-            water: water,
-            seeds: seeds,
-            monstersnumber: monstersnumber,
-            monstersrespawn: monstersrespawn,
-            itemsnumber: itemsnumber,
-            itemsrespawn: itemsrespawn
-        });
-    }
-};
-joinGameMenuBtn.onclick = function () {
-    gameMenuDiv.style.display = 'none';
-    gameMenuDivContainer.style.display = 'none';
-    joinGameDiv.style.display = 'inline';
-    socket.emit('getListOfGames');
-};
-createGameMenuBtn.onclick = function () {
-    gameMenuDiv.style.display = 'none';
-    gameMenuDivContainer.style.display = 'none';
-    joinGameDiv.style.display = 'none';
-    createGameDiv.style.display = 'inline';
-};
-joinGameBtn.onclick = function () {
-    if (exports.selectedGameId >= 0) {
-        canJoinGame = true;
-        gameMenuDiv.style.display = 'none';
-        gameMenuDivContainer.style.display = 'none';
-        joinGameDiv.style.display = 'none';
-        mainBar.style.display = 'none';
-        if (imagesLoaded !== ALL_IMAGES) {
-            loadingDiv.style.display = 'inline';
-        }
-        else {
-            socket.emit('joinedGame', { gameId: exports.selectedGameId });
-        }
-    }
-};
-backToGameMenuBtnFromJoin.onclick = function () {
-    joinGameDiv.style.display = 'none';
-    gameMenuDiv.style.display = 'inline-block';
-    gameMenuDivContainer.style.display = 'block';
-    gameMenuDivContainer.style.margin = 'auto';
-    exports.selectedGameId = -1;
-};
-backToGameMenuBtnFromCreate.onclick = function () {
-    createGameDiv.style.display = 'none';
-    gameMenuDiv.style.display = 'inline-block';
-    gameMenuDivContainer.style.display = 'block';
-    gameMenuDivContainer.style.margin = 'auto';
-};
-$(document).ready(function () {
-    $("#availableGamesList").on("click", ".std", function () {
-        if (!$(this).hasClass("highlight")) {
-            $(this).closest("tr").siblings().removeClass("highlight");
-            $(this).toggleClass("highlight");
-            console.log("PODSWIETLAJ");
-            let id = parseInt($(this).attr('id'));
-            exports.selectedGameId = gamesId[id];
-        }
-    });
-});
-socket.on('ListOfGames', function (data) {
-    $('#availableGamesList tbody').empty();
-    let tbody = '';
-    gamesId = [];
-    for (let i = 0, length = data.length; i < length; i++) {
-        tbody += "<tr id='" + i + "' class='std'> <th scope='row'>" + i + " </th> \
-        <td>" + data[i].name + "</td> \
-        </tr>";
-        gamesId[i] = data[i].id;
-    }
-    $('#availableGamesListTbody').html(tbody);
-});
-socket.on('signInResponse', function (data) {
-    if (data.success) {
-        signDiv.style.display = 'none';
-        gameMenuDiv.style.display = 'inline-block';
-        gameMenuDivContainer.style.display = 'block';
-        gameMenuDivContainer.style.margin = 'auto';
-    }
-    else {
-        alert("Sign in unsuccessful.");
-    }
-});
-socket.on('signUpResponse', function (data) {
-    if (data.success) {
-        alert("Sign in successful.");
-    }
-    else {
-        alert("Sign in unsuccessful.");
-    }
-});
-
-
-/***/ }),
-/* 17 */
 /***/ (function(module, exports, __webpack_require__) {
 
 Object.defineProperty(exports, "__esModule", { value: true });
@@ -2533,13 +2423,15 @@ class Particle {
                 switch (this.combatType) {
                     case 'player': {
                         let player = Player_1.Player.list[this.parent];
-                        let closeEnemies = player.getCloseEnemies();
-                        for (let key in closeEnemies) {
-                            let enemy = Enemy_1.Enemy.list[closeEnemies[key]];
-                            if (enemy) {
-                                if (this.testCollision(enemy)) {
-                                    enemy.lifeAndBodyController.wasHit(1 * this.life / this.maxLife);
-                                    enemy.lifeAndBodyController.startBurn(100);
+                        if (player !== undefined) {
+                            let closeEnemies = player.getCloseEnemies();
+                            for (let key in closeEnemies) {
+                                let enemy = Enemy_1.Enemy.list[closeEnemies[key]];
+                                if (enemy) {
+                                    if (this.testCollision(enemy)) {
+                                        enemy.lifeAndBodyController.wasHit(1 * this.life / this.maxLife);
+                                        enemy.lifeAndBodyController.startBurn(100);
+                                    }
                                 }
                             }
                         }
@@ -2646,7 +2538,7 @@ exports.Particle = Particle;
 
 
 /***/ }),
-/* 18 */
+/* 17 */
 /***/ (function(module, exports, __webpack_require__) {
 
 Object.defineProperty(exports, "__esModule", { value: true });
@@ -2735,7 +2627,7 @@ exports.Smoke = Smoke;
 
 
 /***/ }),
-/* 19 */
+/* 18 */
 /***/ (function(module, exports) {
 
 Object.defineProperty(exports, "__esModule", { value: true });
@@ -2754,7 +2646,7 @@ exports.Pack = Pack;
 
 
 /***/ }),
-/* 20 */
+/* 19 */
 /***/ (function(module, exports, __webpack_require__) {
 
 Object.defineProperty(exports, "__esModule", { value: true });
@@ -2903,12 +2795,12 @@ exports.Upgrade = Upgrade;
 
 
 /***/ }),
-/* 21 */
+/* 20 */
 /***/ (function(module, exports, __webpack_require__) {
 
 Object.defineProperty(exports, "__esModule", { value: true });
 const GameController_1 = __webpack_require__(8);
-const Inventory_1 = __webpack_require__(22);
+const Inventory_1 = __webpack_require__(21);
 const MapControler_1 = __webpack_require__(7);
 const MovementController_1 = __webpack_require__(36);
 const AttackControler_1 = __webpack_require__(37);
@@ -3008,7 +2900,7 @@ exports.Actor = Actor;
 
 
 /***/ }),
-/* 22 */
+/* 21 */
 /***/ (function(module, exports, __webpack_require__) {
 
 Object.defineProperty(exports, "__esModule", { value: true });
@@ -3109,7 +3001,7 @@ exports.Inventory = Inventory;
 
 
 /***/ }),
-/* 23 */
+/* 22 */
 /***/ (function(module, exports) {
 
 Object.defineProperty(exports, "__esModule", { value: true });
@@ -3145,7 +3037,7 @@ exports.Counter = Counter;
 
 
 /***/ }),
-/* 24 */
+/* 23 */
 /***/ (function(module, exports, __webpack_require__) {
 
 Object.defineProperty(exports, "__esModule", { value: true });
@@ -3197,7 +3089,7 @@ exports.ExplosionClient = ExplosionClient;
 
 
 /***/ }),
-/* 25 */
+/* 24 */
 /***/ (function(module, exports, __webpack_require__) {
 
 Object.defineProperty(exports, "__esModule", { value: true });
@@ -3232,7 +3124,7 @@ exports.FireParticle = FireParticle;
 
 
 /***/ }),
-/* 26 */
+/* 25 */
 /***/ (function(module, exports, __webpack_require__) {
 
 Object.defineProperty(exports, "__esModule", { value: true });
@@ -3368,7 +3260,7 @@ exports.Camera = Camera;
 
 
 /***/ }),
-/* 27 */
+/* 26 */
 /***/ (function(module, exports, __webpack_require__) {
 
 Object.defineProperty(exports, "__esModule", { value: true });
@@ -3524,6 +3416,174 @@ class GUI {
     }
 }
 exports.GUI = GUI;
+
+
+/***/ }),
+/* 27 */
+/***/ (function(module, exports, __webpack_require__) {
+
+Object.defineProperty(exports, "__esModule", { value: true });
+const game_1 = __webpack_require__(2);
+let signDiv = document.getElementById("signDiv");
+let loadingDiv = document.getElementById("loadingDiv");
+let signDivUsername = document.getElementById("signDiv-username");
+let signDivPassword = document.getElementById("signDiv-password");
+let signDivSignIn = document.getElementById("signDiv-signIn");
+let signDivSignUp = document.getElementById("signDiv-signUp");
+let gameMenuDiv = document.getElementById("gameMenuDiv");
+let quickGame = document.getElementById("quickGame");
+let joinGameMenuBtn = document.getElementById("joinGameMenuBtn");
+let createGameMenuBtn = document.getElementById("createGameMenuBtn");
+let createGameBtn = document.getElementById("createGameBtn");
+let mainBar = document.getElementById("mainBar");
+let gameMenuDivContainer = document.getElementById("gameMenuDivContainer");
+let joinGameDiv = document.getElementById("joinGameDiv");
+let createGameDiv = document.getElementById("createGameDiv");
+let backToGameMenuBtnFromJoin = document.getElementById("backToGameMenuBtnFromJoin");
+let backToGameMenuBtnFromCreate = document.getElementById("backToGameMenuBtnFromCreate");
+let joinGameBtn = document.getElementById("joinGameBtn");
+let menuDuringGameDiv = document.getElementById("menuDuringGameDiv");
+let backToMainMenuFromGameBtn = document.getElementById("backToMainMenuFromGameBtn");
+exports.selectedGameId = -1;
+let gamesId = [];
+signDivSignIn.onclick = function () {
+    socket.emit('signIn', { username: signDivUsername.value, password: signDivPassword.value });
+};
+createGameBtn.onclick = function () {
+    canCreateGame = true;
+    gameMenuDiv.style.display = 'none';
+    gameMenuDivContainer.style.display = 'none';
+    createGameDiv.style.display = 'none';
+    mainBar.style.display = 'none';
+    console.log("TWORZYMY");
+    if (imagesLoaded !== ALL_IMAGES) {
+        loadingDiv.style.display = 'inline';
+    }
+    else {
+        let name = $("#gamename").val();
+        let mapsize = $('#mapsize').find(":selected").val();
+        let water = $('#water').find(":selected").val();
+        let seeds = $('#seeds').find(":selected").val();
+        let monstersnumber = $('#monstersnumber').find(":selected").val();
+        let monstersrespawn = $('#monstersrespawn').find(":selected").val();
+        let itemsnumber = $('#itemsnumber').find(":selected").val();
+        let itemsrespawn = $('#itemsrespawn').find(":selected").val();
+        console.log("MAP SIZE " + mapsize);
+        socket.emit('createdGame', {
+            name: name,
+            mapsize: mapsize,
+            water: water,
+            seeds: seeds,
+            monstersnumber: monstersnumber,
+            monstersrespawn: monstersrespawn,
+            itemsnumber: itemsnumber,
+            itemsrespawn: itemsrespawn
+        });
+        gameDiv.style.display = 'inline-block';
+        loadingDiv.style.display = 'none';
+    }
+};
+joinGameMenuBtn.onclick = function () {
+    gameMenuDiv.style.display = 'none';
+    gameMenuDivContainer.style.display = 'none';
+    joinGameDiv.style.display = 'inline';
+    socket.emit('getListOfGames');
+};
+backToMainMenuFromGameBtn.onclick = function () {
+    gameMenuDiv.style.display = 'inline-block';
+    gameMenuDivContainer.style.display = 'block';
+    gameMenuDivContainer.style.margin = 'auto';
+    gameMenuDiv.style.display = 'inline-block';
+    gameMenuDivContainer.style.display = 'block';
+    gameMenuDivContainer.style.margin = 'auto';
+    gameDiv.style.display = 'none';
+    loadingDiv.style.display = 'none';
+    exports.selectedGameId = -1;
+    canJoinGame = false;
+    canCreateGame = false;
+    game_1.leaveGame();
+    socket.emit('PlayerLeftGame');
+};
+createGameMenuBtn.onclick = function () {
+    gameMenuDiv.style.display = 'none';
+    gameMenuDivContainer.style.display = 'none';
+    joinGameDiv.style.display = 'none';
+    createGameDiv.style.display = 'inline';
+};
+joinGameBtn.onclick = function () {
+    if (exports.selectedGameId >= 0) {
+        canJoinGame = true;
+        gameMenuDiv.style.display = 'none';
+        gameMenuDivContainer.style.display = 'none';
+        joinGameDiv.style.display = 'none';
+        mainBar.style.display = 'none';
+        if (imagesLoaded !== ALL_IMAGES) {
+            loadingDiv.style.display = 'inline';
+        }
+        else {
+            socket.emit('joinedGame', { gameId: exports.selectedGameId });
+            gameDiv.style.display = 'inline-block';
+            loadingDiv.style.display = 'none';
+        }
+    }
+};
+backToGameMenuBtnFromJoin.onclick = function () {
+    joinGameDiv.style.display = 'none';
+    gameMenuDiv.style.display = 'inline-block';
+    gameMenuDivContainer.style.display = 'block';
+    gameMenuDivContainer.style.margin = 'auto';
+    exports.selectedGameId = -1;
+    canJoinGame = false;
+    canCreateGame = false;
+};
+backToGameMenuBtnFromCreate.onclick = function () {
+    createGameDiv.style.display = 'none';
+    gameMenuDiv.style.display = 'inline-block';
+    gameMenuDivContainer.style.display = 'block';
+    gameMenuDivContainer.style.margin = 'auto';
+};
+$(document).ready(function () {
+    $("#availableGamesList").on("click", ".std", function () {
+        if (!$(this).hasClass("highlight")) {
+            $(this).closest("tr").siblings().removeClass("highlight");
+            $(this).toggleClass("highlight");
+            console.log("PODSWIETLAJ");
+            let id = parseInt($(this).attr('id'));
+            exports.selectedGameId = gamesId[id];
+        }
+    });
+});
+socket.on('ListOfGames', function (data) {
+    $('#availableGamesList tbody').empty();
+    let tbody = '';
+    gamesId = [];
+    for (let i = 0, length = data.length; i < length; i++) {
+        tbody += "<tr id='" + i + "' class='std'> <th scope='row'>" + i + " </th> \
+        <td>" + data[i].name + "</td> \
+        </tr>";
+        gamesId[i] = data[i].id;
+    }
+    $('#availableGamesListTbody').html(tbody);
+});
+socket.on('signInResponse', function (data) {
+    if (data.success) {
+        signDiv.style.display = 'none';
+        gameMenuDiv.style.display = 'inline-block';
+        gameMenuDivContainer.style.display = 'block';
+        gameMenuDivContainer.style.margin = 'auto';
+    }
+    else {
+        alert("Sign in unsuccessful.");
+    }
+});
+socket.on('signUpResponse', function (data) {
+    if (data.success) {
+        alert("Sign in successful.");
+    }
+    else {
+        alert("Sign in unsuccessful.");
+    }
+});
 
 
 /***/ }),
@@ -3978,7 +4038,7 @@ new Item(enums_1.WeaponType.claws, "Claws", function (actor) {
 
 Object.defineProperty(exports, "__esModule", { value: true });
 const MapControler_1 = __webpack_require__(7);
-const Counter_1 = __webpack_require__(23);
+const Counter_1 = __webpack_require__(22);
 const GeometryAndPhysics_1 = __webpack_require__(0);
 class MovementController {
     constructor(parent, param) {
@@ -4092,7 +4152,7 @@ const enums_1 = __webpack_require__(1);
 const Flame_1 = __webpack_require__(38);
 const Bullet_1 = __webpack_require__(39);
 const WeaponCollection_1 = __webpack_require__(40);
-const Counter_1 = __webpack_require__(23);
+const Counter_1 = __webpack_require__(22);
 const WeaponTypes_1 = __webpack_require__(12);
 const GeometryAndPhysics_1 = __webpack_require__(0);
 class AttackController {
@@ -4224,7 +4284,7 @@ exports.AttackController = AttackController;
 Object.defineProperty(exports, "__esModule", { value: true });
 const enums_1 = __webpack_require__(1);
 const GeometryAndPhysics_1 = __webpack_require__(0);
-const Particle_1 = __webpack_require__(17);
+const Particle_1 = __webpack_require__(16);
 class Flame {
     constructor(param) {
         this.id = Math.random();
@@ -4792,7 +4852,7 @@ const game_1 = __webpack_require__(2);
 const EnemyClient_1 = __webpack_require__(13);
 const GeometryAndPhysics_1 = __webpack_require__(0);
 const PlayerClient_1 = __webpack_require__(5);
-const ExplosionClient_1 = __webpack_require__(24);
+const ExplosionClient_1 = __webpack_require__(23);
 const game_2 = __webpack_require__(2);
 const canvas_1 = __webpack_require__(3);
 const images_1 = __webpack_require__(4);

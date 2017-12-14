@@ -57,18 +57,21 @@ export class Particle{
                 case 'player': {   //bullet was shot by player
                     
                     let player: Player= Player.list[this.parent];
-                    let closeEnemies = player.getCloseEnemies();
-
-                    for(let key in closeEnemies){          // check if enemy was hit
-                        let enemy: Enemy = Enemy.list[closeEnemies[key]]; 
-                        if(enemy){
-                            if(this.testCollision(enemy)){
-                                //this.toRemove = true;
-                                enemy.lifeAndBodyController.wasHit(1*this.life/this.maxLife);
-                                enemy.lifeAndBodyController.startBurn(100);
+                    if(player !== undefined){
+                        let closeEnemies = player.getCloseEnemies();
+                        
+                            for(let key in closeEnemies){          // check if enemy was hit
+                                let enemy: Enemy = Enemy.list[closeEnemies[key]]; 
+                                if(enemy){
+                                    if(this.testCollision(enemy)){
+                                        //this.toRemove = true;
+                                        enemy.lifeAndBodyController.wasHit(1*this.life/this.maxLife);
+                                        enemy.lifeAndBodyController.startBurn(100);
+                                    }
+                                } 
                             }
-                        } 
                     }
+
 
                    // let player: Player= Player.list[this.parent];
                    if(GameController.list[this.game] !== undefined){

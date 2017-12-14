@@ -25,7 +25,7 @@ declare const CAMERA_BOX_ADJUSTMENT: any;
 declare var mouseX: any;
 declare var mouseY: any;
 declare var gui: GUI;
-
+let menuDuringGameDiv =  (<HTMLInputElement>document.getElementById("menuDuringGameDiv")); 
 let enemyDrawList: string[] = [];
 
 export var selfId: number = 0;
@@ -294,7 +294,10 @@ socket.on('remove', function(data){
         delete BulletClient.list[data.bullet[i].id];
     } 
     for(let i = 0, length = data.enemy.length; i < length; i++){
-        gameSoundManager.playDeath(EnemyClient.list[data.enemy[i]].kind);
+        if(EnemyClient.list[data.enemy[i]] !== undefined){
+            gameSoundManager.playDeath(EnemyClient.list[data.enemy[i]].kind);
+        }
+
         delete EnemyClient.list[data.enemy[i]];
     } 
     
@@ -456,7 +459,13 @@ document.onkeydown = function(event){
         return false;
     }
     else if(event.keyCode === 77){
-        socket.emit('keyPress', {inputId:'map', state:true, map: currentMap.map.name});
+       // socket.emit('keyPress', {inputId:'map', state:true, map: currentMap.map.name});
+       console.log("MENU");
+       if(menuDuringGameDiv.style.display == 'none'){
+           menuDuringGameDiv.style.display = 'block';
+       } else {
+           menuDuringGameDiv.style.display = 'none';
+       }
     }
     
     if(event.keyCode === 107){
@@ -566,6 +575,31 @@ let updateMouse = () => {
         player.aimAngle = angle;
         socket.emit('keyPress', {inputId:'mouseAngle', state: angle});
     }  
+}
+
+export let leaveGame = () => {
+    for(let i in PlayerClient.list){
+        delete PlayerClient.list[i];
+    }
+
+    for(let i in EnemyClient.list){
+        delete EnemyClient.list[i];
+    }
+
+    for(let i in UpgradeClient.list){
+        delete UpgradeClient.list[i];
+    }
+
+    for(let i in SmokeClient.list){
+        delete SmokeClient.list[i];
+    }
+
+    for(let i in BulletClient.list){
+        delete BulletClient.list[i];
+    }
+
+    selfId = 0;
+    menuDuringGameDiv.style.display = 'none';
 }
 
 /*

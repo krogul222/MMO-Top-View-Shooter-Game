@@ -14,6 +14,7 @@ const canvas_1 = require("../pregame/canvas");
 const SmokeClient_1 = require("../Effects/SmokeClient");
 const EnemyClient_1 = require("../Entities/EnemyClient");
 const ExplosionClient_1 = require("../Entities/ExplosionClient");
+let menuDuringGameDiv = document.getElementById("menuDuringGameDiv");
 let enemyDrawList = [];
 exports.selfId = 0;
 let smokeTest = false;
@@ -210,7 +211,9 @@ socket.on('remove', function (data) {
         delete BulletClient_1.BulletClient.list[data.bullet[i].id];
     }
     for (let i = 0, length = data.enemy.length; i < length; i++) {
-        exports.gameSoundManager.playDeath(EnemyClient_1.EnemyClient.list[data.enemy[i]].kind);
+        if (EnemyClient_1.EnemyClient.list[data.enemy[i]] !== undefined) {
+            exports.gameSoundManager.playDeath(EnemyClient_1.EnemyClient.list[data.enemy[i]].kind);
+        }
         delete EnemyClient_1.EnemyClient.list[data.enemy[i]];
     }
     for (let i = 0, length = data.upgrade.length; i < length; i++) {
@@ -341,7 +344,13 @@ document.onkeydown = function (event) {
         return false;
     }
     else if (event.keyCode === 77) {
-        socket.emit('keyPress', { inputId: 'map', state: true, map: exports.currentMap.map.name });
+        console.log("MENU");
+        if (menuDuringGameDiv.style.display == 'none') {
+            menuDuringGameDiv.style.display = 'block';
+        }
+        else {
+            menuDuringGameDiv.style.display = 'none';
+        }
     }
     if (event.keyCode === 107) {
         exports.canvasFilters.bAdjustment++;
@@ -433,5 +442,24 @@ let updateMouse = () => {
         player.aimAngle = angle;
         socket.emit('keyPress', { inputId: 'mouseAngle', state: angle });
     }
+};
+exports.leaveGame = () => {
+    for (let i in PlayerClient_1.PlayerClient.list) {
+        delete PlayerClient_1.PlayerClient.list[i];
+    }
+    for (let i in EnemyClient_1.EnemyClient.list) {
+        delete EnemyClient_1.EnemyClient.list[i];
+    }
+    for (let i in UpgradeClient_1.UpgradeClient.list) {
+        delete UpgradeClient_1.UpgradeClient.list[i];
+    }
+    for (let i in SmokeClient_1.SmokeClient.list) {
+        delete SmokeClient_1.SmokeClient.list[i];
+    }
+    for (let i in BulletClient_1.BulletClient.list) {
+        delete BulletClient_1.BulletClient.list[i];
+    }
+    exports.selfId = 0;
+    menuDuringGameDiv.style.display = 'none';
 };
 //# sourceMappingURL=game.js.map

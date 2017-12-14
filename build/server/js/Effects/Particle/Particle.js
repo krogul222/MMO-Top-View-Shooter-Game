@@ -25,13 +25,15 @@ class Particle {
                 switch (this.combatType) {
                     case 'player': {
                         let player = Player_1.Player.list[this.parent];
-                        let closeEnemies = player.getCloseEnemies();
-                        for (let key in closeEnemies) {
-                            let enemy = Enemy_1.Enemy.list[closeEnemies[key]];
-                            if (enemy) {
-                                if (this.testCollision(enemy)) {
-                                    enemy.lifeAndBodyController.wasHit(1 * this.life / this.maxLife);
-                                    enemy.lifeAndBodyController.startBurn(100);
+                        if (player !== undefined) {
+                            let closeEnemies = player.getCloseEnemies();
+                            for (let key in closeEnemies) {
+                                let enemy = Enemy_1.Enemy.list[closeEnemies[key]];
+                                if (enemy) {
+                                    if (this.testCollision(enemy)) {
+                                        enemy.lifeAndBodyController.wasHit(1 * this.life / this.maxLife);
+                                        enemy.lifeAndBodyController.startBurn(100);
+                                    }
                                 }
                             }
                         }

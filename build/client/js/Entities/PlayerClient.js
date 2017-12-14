@@ -27,7 +27,9 @@ class PlayerClient {
         this.flame = new FireFlameClient_1.FireFlameClient(this);
         this.burn = new FireFlameClient_1.FireFlameClient(this, true);
         this.draw = () => {
+            console.log("SELF " + game_1.selfId);
             let p = PlayerClient.list[game_1.selfId];
+            console.log("SELF " + p.map + " " + this.map);
             if (p.map !== this.map) {
                 return;
             }

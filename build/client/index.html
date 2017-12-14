@@ -149,6 +149,8 @@
         </div>
     </div>
 
+
+
     <div align="center" id="joinGameDiv" style="display:none">
         <br><br>
         <h2 style="color : white; font-family:Calligrapher;text-align:center">Available Games</h2><br>
@@ -182,6 +184,9 @@
     </div>
 
     <div id="gameDiv" style="display:none;">
+        <div align="center" id="menuDuringGameDiv" style="display:none">
+                <button id = "backToMainMenuFromGameBtn" class="btn btn-primary">Go to Main Menu</button>
+        </div>
         <canvas id="canvas" width=500 height="500" style="border:1px solid #000000;cursor:crosshair"></canvas>
         <canvas id="canvasui" width=500 height="100" style="border:1px solid #000000;cursor:crosshair"></canvas>
        <div id = "inventory"></div>
@@ -214,7 +219,6 @@
     const TILE_SIZE = 32;
 </script>
 
-<script src="/client/js/d.entry.js"></script>
 <script src="/client/js/pregame/chat.js"></script>
 
 <script>
