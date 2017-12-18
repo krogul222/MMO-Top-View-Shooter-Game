@@ -20,6 +20,7 @@ export class Player extends Actor {
     private counter: number = 0;
     private fragPlayer: number = 0;
     private fragEnemy: number = 0;
+    private updateFreqyencyFactor: number = 0;
 
     constructor(param) { 
         super(param);
@@ -90,9 +91,10 @@ export class Player extends Actor {
         this.update();
         this.counter++;
 
-        if(this.counter % 40){
+        if(this.counter % (30+this.updateFreqyencyFactor)){
             this.closeEnemiesArr = this.closeEnemies(800);
             this.closeUpgradesArr = this.closeUpgrades(800);
+            this.updateFreqyencyFactor = Math.floor(20*Math.random());
         }
     }
 

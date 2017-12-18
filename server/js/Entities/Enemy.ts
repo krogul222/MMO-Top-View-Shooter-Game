@@ -16,6 +16,7 @@ export class Enemy extends Actor {
     private playerToKill: Player;
     private counter: number = 0;
     private updatePack = {};
+    private updateFreqyencyFactor:number = 0;
 
     constructor(param) {
         super(param);
@@ -35,8 +36,11 @@ export class Enemy extends Actor {
 
     extendedUpdate = () => {
         
-        if( this.playerToKill == undefined || this.counter % 40 === 0)
+        if( this.playerToKill == undefined || this.counter % (30+this.updateFreqyencyFactor) === 0){
             this.playerToKill = this.getClosestPlayer(MAX_DISTANCE, 360);
+            this.updateFreqyencyFactor = Math.floor(Math.random()*20);
+        }
+            
 
         let diffX = 0;
         let diffY = 0;
@@ -48,7 +52,7 @@ export class Enemy extends Actor {
 
         if(Math.abs(diffX) < 800 && Math.abs(diffY) < 800){
             this.update();
-            if(  this.counter % 10 === 0){
+            if(  this.counter % (8+Math.floor(this.updateFreqyencyFactor/5)) === 0){
                 this.updateAim(this.playerToKill, diffX, diffY);
                 this.updateKeyPress(this.playerToKill, diffX, diffY);
             }

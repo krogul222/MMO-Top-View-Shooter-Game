@@ -15,6 +15,7 @@ class Player extends Actor_1.Actor {
         this.counter = 0;
         this.fragPlayer = 0;
         this.fragEnemy = 0;
+        this.updateFreqyencyFactor = 0;
         this.giveItems = (startingPack) => {
             if (startingPack >= enums_1.ActorStartingPack.BASIC) {
                 this.inventory.addItem(enums_1.ItemType.knife, 1);
@@ -65,9 +66,10 @@ class Player extends Actor_1.Actor {
         this.extendedUpdate = () => {
             this.update();
             this.counter++;
-            if (this.counter % 40) {
+            if (this.counter % (30 + this.updateFreqyencyFactor)) {
                 this.closeEnemiesArr = this.closeEnemies(800);
                 this.closeUpgradesArr = this.closeUpgrades(800);
+                this.updateFreqyencyFactor = Math.floor(20 * Math.random());
             }
         };
         this.getCloseEnemies = () => {
