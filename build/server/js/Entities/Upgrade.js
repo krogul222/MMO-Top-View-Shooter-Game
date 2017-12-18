@@ -27,35 +27,32 @@ class Upgrade extends Entity_1.Entity {
         };
         this.getUpdatePack = function () {
             return {
+                id: this.id,
                 position: this.position
             };
         };
         this.category = (param.category !== undefined) ? param.category : this.category;
         this.kind = (param.kind !== undefined) ? param.kind : this.kind;
-        this.value = param.value ? param.value : this.value;
+        this.value = (param.value !== undefined) ? param.value : this.value;
         Upgrade.list[this.id] = this;
-        if (GameController_1.GameController.list[this.game] !== undefined) {
+        if (GameController_1.GameController.list[this.game] !== undefined)
             GameController_1.GameController.list[this.game].initPack.upgrade.push(this.getInitPack());
-        }
         GameController_1.GameController.list[this.game].addUpgrade(this);
     }
 }
-Upgrade.globalMapControler = new MapControler_1.MapController(null);
 Upgrade.updateParam = (param) => {
     param.type = "upgrade";
     return param;
 };
 Upgrade.update = () => {
     let pack = [];
-    for (let key in Upgrade.list) {
-        let upgrade = Upgrade.list[key];
-        upgrade.update();
-        pack.push(upgrade.getUpdatePack());
-        for (let i in Player_1.Player.list) {
-            let player = Player_1.Player.list[i];
+    for (let i in Player_1.Player.list) {
+        let player = Player_1.Player.list[i];
+        let closeUpgrades = player.getCloseUpgrades();
+        for (let key in closeUpgrades) {
+            let upgrade = Upgrade.list[closeUpgrades[key]];
             let isColliding = player.testCollision(upgrade);
             if (isColliding) {
-                console.log("UPG CAT " + upgrade.category);
                 if (upgrade.category === enums_1.UpgradeCategory.item)
                     player.inventory.addItem(upgrade.kind, 1);
                 if (upgrade.category === enums_1.UpgradeCategory.ammo)
@@ -70,28 +67,27 @@ Upgrade.update = () => {
 };
 Upgrade.updateSpecific = (upgrades) => {
     let pack = [];
-    for (let key in upgrades) {
-        let upgrade = Upgrade.list[key];
-        upgrade.update();
-        pack.push(upgrade.getUpdatePack());
-        let gameId = upgrades[key].game;
-        for (let i in Player_1.Player.list) {
-            let player = Player_1.Player.list[i];
-            let isColliding = player.testCollision(upgrade);
-            if (isColliding) {
-                console.log("UPG CAT " + upgrade.category);
-                if (upgrade.category === enums_1.UpgradeCategory.item)
-                    player.inventory.addItem(upgrade.kind, 1);
-                if (upgrade.category === enums_1.UpgradeCategory.ammo)
-                    player.attackController.weaponCollection.addWeaponAmmo(upgrade.kind - 1000, upgrade.value);
-                globalVariables_1.removePack.upgrade.push(upgrade.id);
-                GameController_1.GameController.list[gameId].removePack.upgrade.push(upgrade.id);
-                delete Upgrade.list[key];
-                delete upgrades[key];
-                if (GameController_1.GameController.list[gameId].itemRespawn == true) {
-                    Upgrade.randomlyGenerate(GameController_1.GameController.list[gameId]);
+    for (let i in Player_1.Player.list) {
+        let player = Player_1.Player.list[i];
+        let closeUpgrades = player.getCloseUpgrades();
+        for (let key in closeUpgrades) {
+            let upgrade = Upgrade.list[closeUpgrades[key]];
+            if (upgrade !== undefined) {
+                let gameId = upgrade.game;
+                let isColliding = player.testCollision(upgrade);
+                if (isColliding) {
+                    if (upgrade.category === enums_1.UpgradeCategory.item)
+                        player.inventory.addItem(upgrade.kind, 1);
+                    if (upgrade.category === enums_1.UpgradeCategory.ammo)
+                        player.attackController.weaponCollection.addWeaponAmmo(upgrade.kind - 1000, upgrade.value);
+                    globalVariables_1.removePack.upgrade.push(upgrade.id);
+                    GameController_1.GameController.list[gameId].removePack.upgrade.push(upgrade.id);
+                    delete Upgrade.list[closeUpgrades[key]];
+                    delete closeUpgrades[key];
+                    if (GameController_1.GameController.list[gameId].itemRespawn == true)
+                        Upgrade.randomlyGenerate(GameController_1.GameController.list[gameId]);
+                    break;
                 }
-                break;
             }
         }
     }
@@ -99,9 +95,8 @@ Upgrade.updateSpecific = (upgrades) => {
 };
 Upgrade.getAllInitPack = function () {
     let upgrades = [];
-    for (let i in Upgrade.list) {
+    for (let i in Upgrade.list)
         upgrades.push(Upgrade.list[i].getInitPack());
-    }
     return upgrades;
 };
 Upgrade.randomlyGenerate = (game, category = null, kind = null) => {
@@ -112,7 +107,6 @@ Upgrade.randomlyGenerate = (game, category = null, kind = null) => {
     while (map.isPositionWall(position) !== 0) {
         x = Math.random() * map.width;
         y = Math.random() * map.height;
-        console.log(position.x + " " + position.y);
         position.updatePosition(x, y);
     }
     let height = 32;
@@ -136,7 +130,6 @@ Upgrade.randomlyGenerate = (game, category = null, kind = null) => {
         }
     }
     img = Constants_1.imageName[upgKind];
-    console.log("Kategoria:" + upgCategory + " Kind:" + upgKind);
     new Upgrade({ id: id, position: position, width: width, game: game.id, height: height, category: upgCategory, kind: upgKind, map: game.map, img: img, value: upgValue });
 };
 Upgrade.list = {};

@@ -63,4 +63,11 @@ class Velocity {
     }
 }
 exports.Velocity = Velocity;
+class Acceleration {
+    constructor(x = 0, y = 0) {
+        this.x = x;
+        this.y = y;
+    }
+}
+exports.Acceleration = Acceleration;
 //# sourceMappingURL=GeometryAndPhysics.js.map

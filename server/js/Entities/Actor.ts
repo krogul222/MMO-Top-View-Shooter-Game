@@ -1,3 +1,4 @@
+import { MAX_DISTANCE } from './../globalVariables';
 import { GameController } from './../Controllers/GameController';
 import { Inventory } from './../Inventory/Inventory';
 import { MapController } from './../Controllers/MapControler';
@@ -10,29 +11,34 @@ import { Player } from './Player';
 import { Enemy } from './Enemy';
 import { calculateAngleBetweenEntities } from '../GeometryAndPhysics';
 
-
 export class Actor extends Entity {
     
-    lifeAndBodyController: LifeAndBodyController;
-    attackController: AttackController;
-    movementController: MovementController;
-    mapController: MapController;
-    inventory: Inventory;
-    score: number = 1;
+    private _lifeAndBodyController: LifeAndBodyController;
+    private _attackController: AttackController;
+    private _movementController: MovementController;
+    private _mapController: MapController;
+    private _inventory: Inventory;
+    private score: number = 1;
 
     constructor(param) {
          super(param);
-         this.lifeAndBodyController = new LifeAndBodyController(this, param); 
-         this.attackController = new AttackController(this, param);
-         this.movementController = new MovementController(this, param);
-         this.mapController = new MapController(param);
-         this.inventory = new Inventory(param.socket, true, this);
+         this._lifeAndBodyController = new LifeAndBodyController(this, param); 
+         this._attackController = new AttackController(this, param);
+         this._movementController = new MovementController(this, param);
+         this._mapController = new MapController(param);
+         this._inventory = new Inventory(param.socket, true, this);
         }
 
+    get lifeAndBodyController(){ return this._lifeAndBodyController; }
+    get attackController(){ return this._attackController; }
+    get movementController(){ return this._movementController; }
+    get mapController(){ return this._mapController; }
+    get inventory(){ return this._inventory; }
+
 	update = () => {
-        this.movementController.updateSpd();
-        this.attackController.update();
-        this.lifeAndBodyController.update();
+        this._movementController.updateSpd();
+        this._attackController.update();
+        this._lifeAndBodyController.update();
         this.updatePosition();
     }
     getScore = () => {
@@ -42,41 +48,40 @@ export class Actor extends Entity {
     }
 
     getClosestPlayer = (distance: number, angleLimit: number)  => {
+        let closestEnemyIndex: string = "0";
+        let closestEnemyDistance: number = MAX_DISTANCE;
+        let pangle = this._movementController.aimAngle;
+        pangle = (pangle < 0) ? pangle + 360 : pangle;
+        
+        let players = GameController.list[this.game].players;
 
-    let closestEnemyIndex: string = "0";
-    let closestEnemyDistance: number = 100000000;
-    let pangle = this.movementController.aimAngle;
-    pangle = (pangle < 0) ? pangle + 360 : pangle;
-    
-    let players = GameController.list[this.game].players;
+        for(let i in players) {
+            let enemy = players[i]; 
+            if(enemy !== this){   
+                let angle = calculateAngleBetweenEntities(this, enemy);
+                let maxDistance = Math.sqrt(enemy.width*enemy.width/4 +enemy.height*enemy.height/4) + distance;
+                let distanceFromEnemy = this.getDistance(enemy);
 
-    for(let i in players) {
-        let enemy = players[i]; 
-        if(enemy !== this){   
-            let angle = calculateAngleBetweenEntities(this, enemy);
-            let maxDistance = Math.sqrt(enemy.width*enemy.width/4 +enemy.height*enemy.height/4) + distance;
-            let distanceFromEnemy = this.getDistance(enemy);
-
-            if(distanceFromEnemy < maxDistance){
-                if((angle < (pangle + angleLimit)) && (angle > pangle - angleLimit)){
-                    if(closestEnemyDistance > distanceFromEnemy){
-                        closestEnemyDistance = distanceFromEnemy;
-                        closestEnemyIndex = i; 
+                if(distanceFromEnemy < maxDistance){
+                    if((angle < (pangle + angleLimit)) && (angle > pangle - angleLimit)){
+                        if(closestEnemyDistance > distanceFromEnemy){
+                            closestEnemyDistance = distanceFromEnemy;
+                            closestEnemyIndex = i; 
+                        }
                     }
                 }
             }
         }
-    }
-   
-    if(closestEnemyIndex == "-1") return null;
+    
+        if(closestEnemyIndex == "-1") return null;
 
-    return players[closestEnemyIndex];    
+        return players[closestEnemyIndex];    
     }
 
     getClosestEnemy = (distance: number, angleLimit: number) => {
         let closestEnemyIndex: string = "-1";
-        let closestEnemyDistance: number = 100000000;
-        let pangle = this.movementController.aimAngle;
+        let closestEnemyDistance: number = MAX_DISTANCE;
+        let pangle = this._movementController.aimAngle;
         pangle = (pangle < 0) ? pangle + 360 : pangle;
 
         let enemies = GameController.list[this.game].enemies;
@@ -107,19 +112,16 @@ export class Actor extends Entity {
         let player: Player = this.getClosestPlayer(distance, angleLimit);
 
         if(this.getDistance(enemy) < this.getDistance(player)){
-            if(enemy !== null){
+            if(enemy !== undefined)
                 return enemy;
-            } else{
+            else
                 return null;
-            }
         } else{
-            if(player !== null){
+            if(player !== undefined)
                 return player;
-            } else{
+            else
                 return null;
-            }
         }
-    
     }
     onDeath = () => {}
 }

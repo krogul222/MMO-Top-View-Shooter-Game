@@ -1,1 +1,1 @@
-{"version":3,"file":"globalVariables.js","sourceRoot":"","sources":["../../../server/js/globalVariables.ts"],"names":[],"mappings":";AAAA,iCAA8B;AACnB,QAAA,QAAQ,GAAG,IAAI,WAAI,EAAE,CAAC;AACtB,QAAA,UAAU,GAAG,IAAI,WAAI,EAAE,CAAC"}
+{"version":3,"file":"globalVariables.js","sourceRoot":"","sources":["../../../server/js/globalVariables.ts"],"names":[],"mappings":";AAAA,iCAA8B;AACnB,QAAA,QAAQ,GAAG,IAAI,WAAI,EAAE,CAAC;AACtB,QAAA,UAAU,GAAG,IAAI,WAAI,EAAE,CAAC;AAEtB,QAAA,YAAY,GAAG,QAAQ,CAAC"}

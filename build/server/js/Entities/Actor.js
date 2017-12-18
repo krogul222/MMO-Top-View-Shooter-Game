@@ -1,4 +1,5 @@
 Object.defineProperty(exports, "__esModule", { value: true });
+const globalVariables_1 = require("./../globalVariables");
 const GameController_1 = require("./../Controllers/GameController");
 const Inventory_1 = require("./../Inventory/Inventory");
 const MapControler_1 = require("./../Controllers/MapControler");
@@ -12,9 +13,9 @@ class Actor extends Entity_1.Entity {
         super(param);
         this.score = 1;
         this.update = () => {
-            this.movementController.updateSpd();
-            this.attackController.update();
-            this.lifeAndBodyController.update();
+            this._movementController.updateSpd();
+            this._attackController.update();
+            this._lifeAndBodyController.update();
             this.updatePosition();
         };
         this.getScore = () => {
@@ -24,8 +25,8 @@ class Actor extends Entity_1.Entity {
         };
         this.getClosestPlayer = (distance, angleLimit) => {
             let closestEnemyIndex = "0";
-            let closestEnemyDistance = 100000000;
-            let pangle = this.movementController.aimAngle;
+            let closestEnemyDistance = globalVariables_1.MAX_DISTANCE;
+            let pangle = this._movementController.aimAngle;
             pangle = (pangle < 0) ? pangle + 360 : pangle;
             let players = GameController_1.GameController.list[this.game].players;
             for (let i in players) {
@@ -50,8 +51,8 @@ class Actor extends Entity_1.Entity {
         };
         this.getClosestEnemy = (distance, angleLimit) => {
             let closestEnemyIndex = "-1";
-            let closestEnemyDistance = 100000000;
-            let pangle = this.movementController.aimAngle;
+            let closestEnemyDistance = globalVariables_1.MAX_DISTANCE;
+            let pangle = this._movementController.aimAngle;
             pangle = (pangle < 0) ? pangle + 360 : pangle;
             let enemies = GameController_1.GameController.list[this.game].enemies;
             for (let i in enemies) {
@@ -76,29 +77,30 @@ class Actor extends Entity_1.Entity {
             let enemy = this.getClosestEnemy(distance, angleLimit);
             let player = this.getClosestPlayer(distance, angleLimit);
             if (this.getDistance(enemy) < this.getDistance(player)) {
-                if (enemy !== null) {
+                if (enemy !== undefined)
                     return enemy;
-                }
-                else {
+                else
                     return null;
-                }
             }
             else {
-                if (player !== null) {
+                if (player !== undefined)
                     return player;
-                }
-                else {
+                else
                     return null;
-                }
             }
         };
         this.onDeath = () => { };
-        this.lifeAndBodyController = new LifeAndBodyController_1.LifeAndBodyController(this, param);
-        this.attackController = new AttackControler_1.AttackController(this, param);
-        this.movementController = new MovementController_1.MovementController(this, param);
-        this.mapController = new MapControler_1.MapController(param);
-        this.inventory = new Inventory_1.Inventory(param.socket, true, this);
+        this._lifeAndBodyController = new LifeAndBodyController_1.LifeAndBodyController(this, param);
+        this._attackController = new AttackControler_1.AttackController(this, param);
+        this._movementController = new MovementController_1.MovementController(this, param);
+        this._mapController = new MapControler_1.MapController(param);
+        this._inventory = new Inventory_1.Inventory(param.socket, true, this);
     }
+    get lifeAndBodyController() { return this._lifeAndBodyController; }
+    get attackController() { return this._attackController; }
+    get movementController() { return this._movementController; }
+    get mapController() { return this._mapController; }
+    get inventory() { return this._inventory; }
 }
 exports.Actor = Actor;
 //# sourceMappingURL=Actor.js.map

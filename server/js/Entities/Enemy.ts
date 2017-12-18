@@ -1,3 +1,4 @@
+import { MAX_DISTANCE } from './../globalVariables';
 import { Player } from './Player';
 import { Actor } from './Actor';
 import { Pack } from '../Pack';
@@ -7,7 +8,6 @@ import { WeaponType } from '../enums';
 import { MapController } from '../Controllers/MapControler';
 import { Flame } from '../Effects/Flame';
 import { GameController } from '../Controllers/GameController';
-//import { frameCount } from '../../../app';
 
 export class Enemy extends Actor {
 
@@ -16,22 +16,19 @@ export class Enemy extends Actor {
     private playerToKill: Player;
     private counter: number = 0;
     private updatePack = {};
-    static globalMapControler = new MapController(null); 
-    public superUpdate;
 
     constructor(param) {
         super(param);
         Enemy.list[param.id] = this;
-        if(param.kind) this.kind = param.kind;
+        if(param.kind !== undefined) this.kind = param.kind;
         this.attackController.pressingAttack = true;
         this.attackController.accuracy = 30;
 
         this.giveWeapons();
         initPack.enemy.push(this.getInitPack());
 
-        if(GameController.list[this.game] !== undefined){
+        if(GameController.list[this.game] !== undefined)
             GameController.list[this.game].initPack.enemy.push(this.getInitPack());
-        }
 
         GameController.list[this.game].addEnemy(this);
     } 
@@ -39,7 +36,7 @@ export class Enemy extends Actor {
     extendedUpdate = () => {
         
         if( this.playerToKill == undefined || this.counter % 40 === 0)
-            this.playerToKill = this.getClosestPlayer(10000000, 360);
+            this.playerToKill = this.getClosestPlayer(MAX_DISTANCE, 360);
 
         let diffX = 0;
         let diffY = 0;
@@ -51,15 +48,12 @@ export class Enemy extends Actor {
 
         if(Math.abs(diffX) < 800 && Math.abs(diffY) < 800){
             this.update();
-            
-                    if(  this.counter % 10 === 0){
-                        this.updateAim(this.playerToKill, diffX, diffY);
-                        this.updateKeyPress(this.playerToKill, diffX, diffY);
-                    }
-            
-                    this.updateAttack(this.playerToKill, diffX, diffY);
+            if(  this.counter % 10 === 0){
+                this.updateAim(this.playerToKill, diffX, diffY);
+                this.updateKeyPress(this.playerToKill, diffX, diffY);
+            }
+            this.updateAttack(this.playerToKill, diffX, diffY);
         }
-
         this.counter++;
 	}
 
@@ -87,14 +81,11 @@ export class Enemy extends Actor {
         
         let distance = 400;
 
-        if(this.attackController.activeWeapon._weapon == WeaponType.flamethrower ){
+        if(this.attackController.activeWeapon._weapon == WeaponType.flamethrower )
             distance = 200;
-        } 
-
-        if(!this.attackController.melee && Math.sqrt(diffX*diffX+diffY*diffY)<distance){
+        
+        if(!this.attackController.melee && Math.sqrt(diffX*diffX+diffY*diffY)<distance)
             this.attackController.pressingAttack = true;
-        }
-
     }
 	onDeath = () => {
 		this.toRemove = true;
@@ -201,14 +192,13 @@ export class Enemy extends Actor {
             this.attackController.weaponCollection.setWeaponAmmo(WeaponType.rifle, 5);
             this.attackController.weaponCollection.setWeaponAmmo(WeaponType.flamethrower, 200);
                 
-            if(Math.random()<0.6){
+            if(Math.random()<0.6)
                 this.inventory.useItem(WeaponType.pistol);
-            } else{
-                if(Math.random()< 0.5){
+            else{
+                if(Math.random()< 0.5)
                     this.inventory.useItem(WeaponType.shotgun);
-                } else{
+                else
                     this.inventory.useItem(WeaponType.rifle);
-                }
             }
         }
     }
@@ -226,9 +216,8 @@ export class Enemy extends Actor {
                 removePack.enemy.push(enemy.id);
             } else {
                 updPack = enemy.getUpdatePack();
-                if(updPack !== {}){
+                if(updPack !== {})
                     pack.push(updPack); 
-                }
             }
         }
         return pack;
@@ -245,17 +234,14 @@ export class Enemy extends Actor {
                 let gameId = enemy.game;
                 delete Enemy.list[i];
                 delete enemies[i];
-                if(GameController.list[gameId].monsterRespawn == true){
+                if(GameController.list[gameId].monsterRespawn == true)
                     Enemy.randomlyGenerate(GameController.list[gameId]);
-                }
-
                 removePack.enemy.push(enemy.id);
                 GameController.list[gameId].removePack.enemy.push(enemy.id);
             } else {
                 updPack = enemy.getUpdatePack();
-                if(updPack !== {}){
+                if(updPack !== {})
                     pack.push(updPack); 
-                }
             }
         }
         return pack;   
@@ -274,12 +260,9 @@ export class Enemy extends Actor {
 
         if(GameController.list[game] !== undefined){
             let e = GameController.list[game].enemies;
-            for(let i in e){
+            for(let i in e)
                 enemies.push(e[i].getInitPack());
-            }
         } 
-
-        console.log("ENEMYYYYY "+ enemies.length);
         return enemies;
     }
 

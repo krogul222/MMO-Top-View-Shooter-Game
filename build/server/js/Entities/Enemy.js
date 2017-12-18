@@ -1,7 +1,8 @@
 Object.defineProperty(exports, "__esModule", { value: true });
+const globalVariables_1 = require("./../globalVariables");
 const Actor_1 = require("./Actor");
 const GeometryAndPhysics_1 = require("../GeometryAndPhysics");
-const globalVariables_1 = require("../globalVariables");
+const globalVariables_2 = require("../globalVariables");
 const enums_1 = require("../enums");
 const MapControler_1 = require("../Controllers/MapControler");
 const GameController_1 = require("../Controllers/GameController");
@@ -14,7 +15,7 @@ class Enemy extends Actor_1.Actor {
         this.updatePack = {};
         this.extendedUpdate = () => {
             if (this.playerToKill == undefined || this.counter % 40 === 0)
-                this.playerToKill = this.getClosestPlayer(10000000, 360);
+                this.playerToKill = this.getClosestPlayer(globalVariables_1.MAX_DISTANCE, 360);
             let diffX = 0;
             let diffY = 0;
             if (this.playerToKill) {
@@ -48,12 +49,10 @@ class Enemy extends Actor_1.Actor {
                 this.attackController.pressingAttack = true;
             }
             let distance = 400;
-            if (this.attackController.activeWeapon._weapon == enums_1.WeaponType.flamethrower) {
+            if (this.attackController.activeWeapon._weapon == enums_1.WeaponType.flamethrower)
                 distance = 200;
-            }
-            if (!this.attackController.melee && Math.sqrt(diffX * diffX + diffY * diffY) < distance) {
+            if (!this.attackController.melee && Math.sqrt(diffX * diffX + diffY * diffY) < distance)
                 this.attackController.pressingAttack = true;
-            }
         };
         this.onDeath = () => {
             this.toRemove = true;
@@ -142,33 +141,28 @@ class Enemy extends Actor_1.Actor {
                 this.attackController.weaponCollection.setWeaponAmmo(enums_1.WeaponType.pistol, 20);
                 this.attackController.weaponCollection.setWeaponAmmo(enums_1.WeaponType.rifle, 5);
                 this.attackController.weaponCollection.setWeaponAmmo(enums_1.WeaponType.flamethrower, 200);
-                if (Math.random() < 0.6) {
+                if (Math.random() < 0.6)
                     this.inventory.useItem(enums_1.WeaponType.pistol);
-                }
                 else {
-                    if (Math.random() < 0.5) {
+                    if (Math.random() < 0.5)
                         this.inventory.useItem(enums_1.WeaponType.shotgun);
-                    }
-                    else {
+                    else
                         this.inventory.useItem(enums_1.WeaponType.rifle);
-                    }
                 }
             }
         };
         Enemy.list[param.id] = this;
-        if (param.kind)
+        if (param.kind !== undefined)
             this.kind = param.kind;
         this.attackController.pressingAttack = true;
         this.attackController.accuracy = 30;
         this.giveWeapons();
-        globalVariables_1.initPack.enemy.push(this.getInitPack());
-        if (GameController_1.GameController.list[this.game] !== undefined) {
+        globalVariables_2.initPack.enemy.push(this.getInitPack());
+        if (GameController_1.GameController.list[this.game] !== undefined)
             GameController_1.GameController.list[this.game].initPack.enemy.push(this.getInitPack());
-        }
         GameController_1.GameController.list[this.game].addEnemy(this);
     }
 }
-Enemy.globalMapControler = new MapControler_1.MapController(null);
 Enemy.update = () => {
     let pack = [];
     let updPack;
@@ -179,13 +173,12 @@ Enemy.update = () => {
             let gameId = enemy.game;
             delete Enemy.list[i];
             Enemy.randomlyGenerate(GameController_1.GameController.list[gameId]);
-            globalVariables_1.removePack.enemy.push(enemy.id);
+            globalVariables_2.removePack.enemy.push(enemy.id);
         }
         else {
             updPack = enemy.getUpdatePack();
-            if (updPack !== {}) {
+            if (updPack !== {})
                 pack.push(updPack);
-            }
         }
     }
     return pack;
@@ -200,17 +193,15 @@ Enemy.updateSpecific = (enemies) => {
             let gameId = enemy.game;
             delete Enemy.list[i];
             delete enemies[i];
-            if (GameController_1.GameController.list[gameId].monsterRespawn == true) {
+            if (GameController_1.GameController.list[gameId].monsterRespawn == true)
                 Enemy.randomlyGenerate(GameController_1.GameController.list[gameId]);
-            }
-            globalVariables_1.removePack.enemy.push(enemy.id);
+            globalVariables_2.removePack.enemy.push(enemy.id);
             GameController_1.GameController.list[gameId].removePack.enemy.push(enemy.id);
         }
         else {
             updPack = enemy.getUpdatePack();
-            if (updPack !== {}) {
+            if (updPack !== {})
                 pack.push(updPack);
-            }
         }
     }
     return pack;
@@ -226,11 +217,9 @@ Enemy.getAllSpecificInitPack = function (game) {
     let enemies = [];
     if (GameController_1.GameController.list[game] !== undefined) {
         let e = GameController_1.GameController.list[game].enemies;
-        for (let i in e) {
+        for (let i in e)
             enemies.push(e[i].getInitPack());
-        }
     }
-    console.log("ENEMYYYYY " + enemies.length);
     return enemies;
 };
 Enemy.randomlyGenerate = function (game) {

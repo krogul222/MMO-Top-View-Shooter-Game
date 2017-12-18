@@ -143,18 +143,8 @@ setInterval(function(){
     
     Particle.update();
     Bullet.update();
-   // Upgrade.update();
-   /* let pack = {
-        player: Player.update(),
-     //   bullet: Bullet.update(),
-    //    particle: Particle.update(),
-        enemy: Enemy.update(),
-        smoke: Smoke.update()
-       // upgrade: Upgrade.update()
-    }*/
 
     frameCount++;
-
 
      // Game Controller
      for(let i in GameController.list){
@@ -167,44 +157,23 @@ setInterval(function(){
             upgrade: Upgrade.updateSpecific(game.upgrades)
         }
 
-
         let flag:boolean = true;
         for(let j in game.socketList){
             flag = false;
             let socket = SOCKET_LIST[j];
             if(socket !== undefined){
-    
                 socket.emit('init',game.initPack);
                 socket.emit('update',pack);
                 socket.emit('remove',game.removePack);
             }
-    
         }
 
-        if(flag){
+        if(flag)
             GameController.remove(i);
-            console.log("REMUWUJEMY");
-        }
     }
 
-
-    
     MapController.updatePack.length = 0;
-    /*
-    packs.initPack.player = [];
-    packs.initPack.bullet = [];
-    packs.initPack.enemy = [];
-    packs.initPack.smoke = [];
-    packs.initPack.particle = [];
-    packs.initPack.upgrade = [];
-    
-    packs.removePack.player = [];
-    packs.removePack.bullet = [];
-    packs.removePack.enemy = [];
-    packs.removePack.upgrade = [];
-    packs.removePack.particle = [];
-    packs.removePack.smoke = [];
-    */
+
     for(let i in GameController.list){
         let game: GameController = GameController.list[i];
         game.initPack.player = [];

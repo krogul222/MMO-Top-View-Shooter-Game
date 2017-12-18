@@ -9,24 +9,19 @@ import { MapController } from '../Controllers/MapControler';
 import { GameController } from './../Controllers/GameController';
 
 export class Upgrade extends Entity{
-    static MapController: any;
     private category: number = -1;
     private kind: number = -1;
-    value: number = 0;
-    static globalMapControler = new MapController(null); 
+    value: number = 0; 
     
     constructor(param) {
         super(Upgrade.updateParam(param));
         this.category = (param.category !== undefined) ? param.category: this.category;
         this.kind = (param.kind !== undefined) ? param.kind : this.kind;
-        this.value = param.value ? param.value : this.value;
-        
-        //initPack.upgrade.push(this.getInitPack());
+        this.value = (param.value !== undefined) ? param.value : this.value;
         Upgrade.list[this.id] = this;
 
-        if(GameController.list[this.game] !== undefined){
+        if(GameController.list[this.game] !== undefined)
             GameController.list[this.game].initPack.upgrade.push(this.getInitPack());
-        }
 
         GameController.list[this.game].addUpgrade(this);
     }
@@ -46,7 +41,7 @@ export class Upgrade extends Entity{
     
     getUpdatePack = function(){
         return {
-  //         id: this.id,
+           id: this.id,
            position: this.position
         };
     }   
@@ -59,85 +54,71 @@ export class Upgrade extends Entity{
     static update = () => {
         let pack: any = [];
         
-        //if(frameCount % 200 === 0) Upgrade.randomlyGenerate('forest'); //every 10 sec
-
-        for(let key in Upgrade.list){
-            let upgrade: Upgrade = Upgrade.list[key];
-            upgrade.update();
-            pack.push(upgrade.getUpdatePack());
-            
-            for(let i in Player.list){
-                let player: Player = Player.list[i];
+        for(let i in Player.list){
+            let player: Player = Player.list[i];
+            let closeUpgrades = player.getCloseUpgrades();
+            for(let key in closeUpgrades){
+                let upgrade: Upgrade = Upgrade.list[closeUpgrades[key]];
+              /*  upgrade.update();
+                pack.push(upgrade.getUpdatePack());*/
 
                 let isColliding = player.testCollision(upgrade);
 
                 if(isColliding) {
-                    console.log("UPG CAT "+ upgrade.category);
                     if(upgrade.category === UpgradeCategory.item) player.inventory.addItem(upgrade.kind, 1);
 
                     if(upgrade.category === UpgradeCategory.ammo) player.attackController.weaponCollection.addWeaponAmmo(upgrade.kind-1000, upgrade.value);
-                
+    
                     removePack.upgrade.push(upgrade.id);               
                     delete Upgrade.list[key];
                     break;
                 }
-
             }
-            
         }
-
         return pack;
     }
 
     static updateSpecific = (upgrades) => {
         let pack: any = [];
         
-       // if(frameCount % 200 === 0) Upgrade.randomlyGenerate('forest'); //every 10 sec
-
-        for(let key in upgrades){
-            let upgrade: Upgrade = Upgrade.list[key];
-            upgrade.update();
-            pack.push(upgrade.getUpdatePack());
-            
-            let gameId = upgrades[key].game;
-
-            for(let i in Player.list){
-                let player: Player = Player.list[i];
-
-                let isColliding = player.testCollision(upgrade);
-
-                if(isColliding) {
-                    console.log("UPG CAT "+ upgrade.category);
-                    if(upgrade.category === UpgradeCategory.item) player.inventory.addItem(upgrade.kind, 1);
-
-                    if(upgrade.category === UpgradeCategory.ammo) player.attackController.weaponCollection.addWeaponAmmo(upgrade.kind-1000, upgrade.value);
-                
-                    removePack.upgrade.push(upgrade.id);   
+        for(let i in Player.list){
+            let player: Player = Player.list[i];
+            let closeUpgrades = player.getCloseUpgrades();
+            for(let key in closeUpgrades){
+                let upgrade: Upgrade = Upgrade.list[closeUpgrades[key]];
+                /*upgrade.update();
+                pack.push(upgrade.getUpdatePack());*/
+                if(upgrade !== undefined){
+                    let gameId = upgrade.game;
+                    let isColliding = player.testCollision(upgrade);
+    
+                    if(isColliding) {
+                        if(upgrade.category === UpgradeCategory.item) player.inventory.addItem(upgrade.kind, 1);
+    
+                        if(upgrade.category === UpgradeCategory.ammo) player.attackController.weaponCollection.addWeaponAmmo(upgrade.kind-1000, upgrade.value);
                     
-                    GameController.list[gameId].removePack.upgrade.push(upgrade.id);
-
-                    delete Upgrade.list[key];
-                    delete upgrades[key];
-
-                    if(GameController.list[gameId].itemRespawn == true){
-                        Upgrade.randomlyGenerate(GameController.list[gameId]);
+                        removePack.upgrade.push(upgrade.id);   
+                        
+                        GameController.list[gameId].removePack.upgrade.push(upgrade.id);
+    
+                        delete Upgrade.list[closeUpgrades[key]];
+                        delete closeUpgrades[key];
+    
+                        if(GameController.list[gameId].itemRespawn == true)
+                            Upgrade.randomlyGenerate(GameController.list[gameId]);
+                        
+                        break;
                     }
-
-                    break;
                 }
-
             }
-            
         }
-
         return pack;
     }    
 
     static getAllInitPack = function(){
         let upgrades: any = [];
-        for(let i in Upgrade.list){
+        for(let i in Upgrade.list)
             upgrades.push(Upgrade.list[i].getInitPack());
-        }
         return upgrades;
     }
 
@@ -151,7 +132,6 @@ export class Upgrade extends Entity{
         while(map.isPositionWall(position) !== 0){
             x = Math.random() * map.width; 
             y = Math.random() * map.height;  
-            console.log(position.x+" "+position.y);
             position.updatePosition(x, y);
         }
 
@@ -175,9 +155,7 @@ export class Upgrade extends Entity{
                 upgValue = 20;
             } 
         }
-
         img = imageName[upgKind]; 
-        console.log("Kategoria:" +upgCategory + " Kind:"+upgKind);
         new Upgrade({id: id, position: position, width: width, game: game.id, height: height, category: upgCategory, kind: upgKind , map: game.map, img: img, value: upgValue});
     }
     static list = {};

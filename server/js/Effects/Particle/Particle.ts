@@ -9,17 +9,17 @@ import { Enemy } from '../../Entities/Enemy';
 declare var ctx: any;
 
 export class Particle{
-    position: Point = new Point(0, 0);  // Set the initial x and y positions
-    velocity: Point = new Point(0, 0);  // Set the initial velocity
-    size: number = 40;
-    life: number = 0;
-    maxLife: number = 10;
-    toRemove: boolean = false;
-    type: ParticleType;
-    id: number = Math.random();
-    parent: number;
-    combatType: string = 'player';
-    game;
+    private position: Point = new Point(0, 0);  // Set the initial x and y positions
+    private velocity: Point = new Point(0, 0);  // Set the initial velocity
+    private size: number = 40;
+    private life: number = 0;
+    private maxLife: number = 10;
+    private toRemove: boolean = false;
+    private type: ParticleType;
+    private _id: number = Math.random();
+    private parent: number = -1;
+    private combatType: string = 'player';
+    private game;
 
     constructor(param){
 
@@ -36,14 +36,15 @@ export class Particle{
             this.velocity.y = param.velocity.y;
         }
 
-        this.parent = param.parent ? param.parent : -1;
-        this.combatType = param.combatType ? param.combatType : this.combatType;
+        if(param.parent !== undefined) this.parent = param.parent;
+        if(param.combatType !== undefined) this.combatType = param.combatType;
 
         this.game = (param.game !== undefined) ? param.game : 0;
 
-       // initPack.particle.push(this.getInitPack());
         Particle.list[this.id] = this; 
     }
+
+    get id() { return this._id; }
 
     update = () => {
         this.position.x += this.velocity.x;
@@ -114,32 +115,25 @@ export class Particle{
                     }
 
                     if(GameController.list[this.game] !== undefined){
-
                         let enemies = GameController.list[this.game].enemies;
-
-                                    for(let key in enemies){          // check if enemy was hit
-                                        if(enemies.id !== this.parent){
-                                            let enemy: Enemy = enemies[key]; 
-                                            if(this.testCollision(enemy)){
-                                                //this.toRemove = true;
-                                                enemy.lifeAndBodyController.wasHit(1*this.life/this.maxLife);
-                                                enemy.lifeAndBodyController.startBurn(100);
-                                            }
-                                        }
-                                    }
+                        for(let key in enemies){          // check if enemy was hit
+                            if(enemies.id !== this.parent){
+                                let enemy: Enemy = enemies[key]; 
+                                if(this.testCollision(enemy)){
+                                    //this.toRemove = true;
+                                    enemy.lifeAndBodyController.wasHit(1*this.life/this.maxLife);
+                                    enemy.lifeAndBodyController.startBurn(100);
+                                }
+                            }
+                        }
                     }
                     break;
                 }
-
-
             }
-
-
         }
     }
 
     testCollision = (entity: Entity) => {
-        
                 let pos1 = new Point(this.position.x - (this.size/4), this.position.y - (this.size/4));
                 let pos2 = new Point(entity.position.x - (entity.width/4), entity.position.y - (entity.height/4));
                 
@@ -152,13 +146,13 @@ export class Particle{
     static update = () => {
         let pack: any[] =[];
         for(let i in Particle.list){
-            let particle = Particle.list[i];
+            let particle: Particle = Particle.list[i];
             particle.update();
             if(particle.toRemove){
                 delete Particle.list[i];
-                removePack.particle.push({id: particle.id});
+                //removePack.particle.push({id: particle.id});
             } else {
-                pack.push(particle.getUpdatePack());     
+                //pack.push(particle.getUpdatePack());     
             }
         }
         return pack;

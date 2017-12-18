@@ -1,7 +1,6 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 const GameController_1 = require("./../../Controllers/GameController");
 const Player_1 = require("./../../Entities/Player");
-const globalVariables_1 = require("./../../globalVariables");
 const enums_1 = require("./../../enums");
 const GeometryAndPhysics_1 = require("./../../GeometryAndPhysics");
 const Enemy_1 = require("../../Entities/Enemy");
@@ -13,7 +12,8 @@ class Particle {
         this.life = 0;
         this.maxLife = 10;
         this.toRemove = false;
-        this.id = Math.random();
+        this._id = Math.random();
+        this.parent = -1;
         this.combatType = 'player';
         this.update = () => {
             this.position.x += this.velocity.x;
@@ -119,11 +119,14 @@ class Particle {
             this.velocity.x = param.velocity.x;
             this.velocity.y = param.velocity.y;
         }
-        this.parent = param.parent ? param.parent : -1;
-        this.combatType = param.combatType ? param.combatType : this.combatType;
+        if (param.parent !== undefined)
+            this.parent = param.parent;
+        if (param.combatType !== undefined)
+            this.combatType = param.combatType;
         this.game = (param.game !== undefined) ? param.game : 0;
         Particle.list[this.id] = this;
     }
+    get id() { return this._id; }
 }
 Particle.update = () => {
     let pack = [];
@@ -132,10 +135,8 @@ Particle.update = () => {
         particle.update();
         if (particle.toRemove) {
             delete Particle.list[i];
-            globalVariables_1.removePack.particle.push({ id: particle.id });
         }
         else {
-            pack.push(particle.getUpdatePack());
         }
     }
     return pack;

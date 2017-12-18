@@ -14,6 +14,7 @@ var WeaponAmmoType;
     WeaponAmmoType[WeaponAmmoType["pistol"] = 1001] = "pistol";
     WeaponAmmoType[WeaponAmmoType["shotgun"] = 1002] = "shotgun";
     WeaponAmmoType[WeaponAmmoType["rifle"] = 1003] = "rifle";
+    WeaponAmmoType[WeaponAmmoType["flamethrower"] = 1004] = "flamethrower";
 })(WeaponAmmoType = exports.WeaponAmmoType || (exports.WeaponAmmoType = {}));
 ;
 var ItemType;
@@ -67,6 +68,13 @@ var AttackType;
     AttackType[AttackType["fire"] = 1] = "fire";
     AttackType[AttackType["contact"] = 2] = "contact";
 })(AttackType = exports.AttackType || (exports.AttackType = {}));
+;
+var ActorStartingPack;
+(function (ActorStartingPack) {
+    ActorStartingPack[ActorStartingPack["BASIC"] = 0] = "BASIC";
+    ActorStartingPack[ActorStartingPack["MODERATE"] = 1] = "MODERATE";
+    ActorStartingPack[ActorStartingPack["FULL"] = 2] = "FULL";
+})(ActorStartingPack = exports.ActorStartingPack || (exports.ActorStartingPack = {}));
 ;
 var MapObjectType;
 (function (MapObjectType) {

@@ -1,6 +1,8 @@
 Object.defineProperty(exports, "__esModule", { value: true });
+const PhysicsEntity_1 = require("./../PhysicsEngine/PhysicsEntity");
+const globalVariables_1 = require("./../globalVariables");
 const GeometryAndPhysics_1 = require("./../GeometryAndPhysics");
-const globalVariables_1 = require("../globalVariables");
+const globalVariables_2 = require("../globalVariables");
 const Constants_1 = require("../Constants");
 class Entity {
     constructor(param) {
@@ -17,7 +19,7 @@ class Entity {
         this.update = () => this.updatePosition();
         this.getDistance = (entity) => {
             if (entity == null)
-                return 10000000;
+                return globalVariables_1.MAX_DISTANCE;
             return this._position.getDistance(entity.position);
         };
         this.testCollision = (entity) => {
@@ -30,17 +32,25 @@ class Entity {
         this.setSpdX = (speedX) => { this._speed.x = speedX; };
         this.setSpdY = (speedY) => { this._speed.y = speedY; };
         if (param) {
-            this._position = param.position ? param.position : this._position;
-            this._width = param.width ? param.width : this._width;
-            this._height = param.height ? param.height : this._height;
-            this._speed = param.speed ? param.speed : this._speed;
-            this._id = param.id ? param.id : this._id;
-            this._map = param.map ? param.map : this._map;
-            this._type = param.type ? param.type : this._type;
-            this._img = param.img ? param.img : this._img;
-            if (param.game !== undefined) {
+            if (param.position !== undefined)
+                this._position = param.position;
+            if (param.width !== undefined)
+                this._width = param.width;
+            if (param.height !== undefined)
+                this._height = param.height;
+            if (param.speed !== undefined)
+                this._speed = param.speed;
+            if (param.id !== undefined)
+                this._id = param.id;
+            if (param.map !== undefined)
+                this._map = param.map;
+            if (param.type !== undefined)
+                this._type = param.type;
+            if (param.img !== undefined)
+                this._img = param.img;
+            if (param.game !== undefined)
                 this._game = param.game;
-            }
+            this.physicsEntity = new PhysicsEntity_1.PhysicsEntity({ id: this.id, width: this.width / 2, height: this.height / 2 });
         }
     }
     get type() { return this._type; }
@@ -57,6 +67,6 @@ class Entity {
         this._position.y = position.y;
     }
 }
-Entity.getFrameUpdateData = () => { return { removePack: globalVariables_1.removePack, initPack: globalVariables_1.initPack }; };
+Entity.getFrameUpdateData = () => { return { removePack: globalVariables_2.removePack, initPack: globalVariables_2.initPack }; };
 exports.Entity = Entity;
 //# sourceMappingURL=Entity.js.map

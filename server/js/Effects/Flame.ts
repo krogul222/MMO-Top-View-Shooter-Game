@@ -6,16 +6,16 @@ import { Actor } from '../Entities/Actor';
 
 export class Flame{
 
-        id = Math.random();
-        particles = {};
-        angle: number = 0;
-        position: Point = new Point(0, 0);
-        speed: number = 3; 
-        offset: number = 0;
-        parent: Actor = null;
-        create: boolean = false;
-        life: number = 60;
-        game;
+        private _id = Math.random();
+        private particles = {};
+        private angle: number = 0;
+        private position: Point = new Point(0, 0);
+        private speed: number = 3; 
+        private offset: number = 0;
+        private parent: Actor = null;
+        private create: boolean = false;
+        private life: number = 60;
+        private game;
 
         constructor(param){
     
@@ -33,6 +33,7 @@ export class Flame{
             Flame.list[this.id] = this;
         }
     
+        get id() { return this._id; }
 
         update = () => {
             if(this.create){

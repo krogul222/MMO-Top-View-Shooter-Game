@@ -8,7 +8,7 @@ import { Bullet } from './Bullet';
 import { Actor } from "./Actor";
 import { Point } from './../GeometryAndPhysics';
 import { Pack } from '../Pack';
-import { WeaponType, ItemType } from '../enums';
+import { WeaponType, ItemType, ActorStartingPack } from '../enums';
 import { MapController } from '../Controllers/MapControler';
 import { GameMap } from '../Map/GameMap';
 
@@ -16,6 +16,7 @@ import { GameMap } from '../Map/GameMap';
 export class Player extends Actor {
     private updatePack = {};
     private closeEnemiesArr: number[];
+    private closeUpgradesArr: number[];
     private counter: number = 0;
     private fragPlayer: number = 0;
     private fragEnemy: number = 0;
@@ -24,37 +25,43 @@ export class Player extends Actor {
         super(param);
         initPack.player.push(this.getInitPack());
         Player.list[param.id] = this;
-        this.giveItems();
+        this.giveItems(ActorStartingPack.FULL);
 
         if(GameController.list[this.game] !== undefined){
             GameController.list[this.game].initPack.player.push(this.getInitPack());
         }
-/*
-        if(Player.monsters){
-            for(let i = 0 ; i <10; i++){
-                Enemy.randomlyGenerate(this.map);
-                Enemy.randomlyGenerate(this.map);
-                Enemy.randomlyGenerate(this.map);
-                Enemy.randomlyGenerate(this.map);
-                }
-                Player.monsters = false;
-        }*/
 
+        GameController.list[this.game].addPlayer(this);
     } 
 
-    giveItems = () => {
-        this.inventory.addItem(ItemType.knife,1);
-        this.inventory.addItem(ItemType.pistol,1);
-        this.inventory.addItem(ItemType.shotgun,1);
-        this.inventory.addItem(ItemType.rifle,1);
-        this.inventory.addItem(ItemType.flamethrower,1);
-        this.attackController.weaponCollection.setWeaponAmmo(WeaponType.shotgun, 100);
-        this.attackController.weaponCollection.setWeaponAmmo(WeaponType.pistol, 200);
-        this.attackController.weaponCollection.setWeaponAmmo(WeaponType.rifle, 100);
-        this.attackController.weaponCollection.setWeaponAmmo(WeaponType.flamethrower, 400);
+    giveItems = (startingPack: ActorStartingPack) => {
 
-        this.inventory.addItem(ItemType.medicalkit,4);  
-        this.inventory.useItem(WeaponType.shotgun);
+        if(startingPack >= ActorStartingPack.BASIC){
+            this.inventory.addItem(ItemType.knife,1);
+            this.inventory.addItem(ItemType.pistol,1);
+            this.attackController.weaponCollection.setWeaponAmmo(WeaponType.pistol, 50);
+            this.inventory.useItem(WeaponType.pistol);
+        }
+        
+        if(startingPack >= ActorStartingPack.MODERATE){
+            this.inventory.addItem(ItemType.shotgun,1);
+            this.inventory.addItem(ItemType.rifle,1);
+            this.inventory.addItem(ItemType.medicalkit,2); 
+            this.attackController.weaponCollection.setWeaponAmmo(WeaponType.shotgun, 40);
+            this.attackController.weaponCollection.setWeaponAmmo(WeaponType.pistol, 100);
+            this.attackController.weaponCollection.setWeaponAmmo(WeaponType.rifle, 40);
+            this.inventory.useItem(WeaponType.shotgun);
+        }      
+
+        if(startingPack >= ActorStartingPack.FULL){
+            this.inventory.addItem(ItemType.flamethrower,1);
+            this.inventory.addItem(ItemType.medicalkit,2); 
+            this.attackController.weaponCollection.setWeaponAmmo(WeaponType.shotgun, 100);
+            this.attackController.weaponCollection.setWeaponAmmo(WeaponType.pistol, 200);
+            this.attackController.weaponCollection.setWeaponAmmo(WeaponType.rifle, 100);
+            this.attackController.weaponCollection.setWeaponAmmo(WeaponType.flamethrower, 400);
+            this.inventory.useItem(WeaponType.shotgun);
+        }      
     }
 
     getInitPack = () => {
@@ -85,11 +92,16 @@ export class Player extends Actor {
 
         if(this.counter % 40){
             this.closeEnemiesArr = this.closeEnemies(800);
+            this.closeUpgradesArr = this.closeUpgrades(800);
         }
     }
 
     getCloseEnemies = () => {
         return this.closeEnemiesArr;
+    }
+
+    getCloseUpgrades = () => {
+        return this.closeUpgradesArr;
     }
 
     incFragPlayer = () => {
@@ -105,12 +117,10 @@ export class Player extends Actor {
         this.attackController.attackStarted = false;
 
         let newPack = {};
-        
+    
         this.updatePack['id'] = this.id;
         newPack['id'] = this.id;
         
-
-
         if(this.updatePack['position'] !== this.position){
             newPack['position'] = this.position;
             this.updatePack['position'] = new Point(this.position.x, this.position.y);
@@ -187,10 +197,6 @@ export class Player extends Actor {
 
         let game:GameController; 
         let gameId: number = gID;
-        console.log("Nowy SOCKET " + socket.id);
-
-
-        let map = 'forest';
 
         if(createdGame == true) {
 
@@ -222,9 +228,6 @@ export class Player extends Actor {
                 }
             }
 
-
-          //  map = game.map;
-
             gameId = game.id;
 
         } else{
@@ -233,7 +236,7 @@ export class Player extends Actor {
         }
 
         game.addSocket(socket);
-        map = game.map;
+        let map = game.map;
 
         let player:Player = new Player({
              id: socket.id,
@@ -269,29 +272,19 @@ export class Player extends Actor {
             if(data.inputId == '5') player.attackController.weaponCollection.changeWeapon(WeaponType.flamethrower); 
             if(data.inputId == 'space') player.attackController.weaponCollection.chooseNextWeaponWithAmmo();
             if(data.inputId == 'smoke') new Smoke(new Point(player.position.x -128,player.position.y -128), 150, 750, 20, player.game);
-            /*if(data.inputId == 'map'){
-                let gameMap : GameMap = MapController.getMap(data.map);
-                MapController.createMap(data.map, gameMap.size, 20);
-                MapController.updatePack.push(MapController.getMapPack(data.map));
-                //socket.emit('mapData', MapController.getMapPack(data.map));
-            } */
         });
 
         socket.on('PlayerLeftGame', function(data){
             Player.onDisconnect(socket);
         });
 
-        game.addPlayer(player);
-       // console.log
         socket.emit('init',{player: Player.getAllSpecificInitPack(game.id),enemy:Enemy.getAllSpecificInitPack(game.id),selfId:socket.id});
-        //socket.emit('init',{player: Player.getAllInitPack(),bullet:Bullet.getAllInitPack(),enemy:Enemy.getAllInitPack(),selfId:socket.id});
         socket.emit('mapData', MapController.getMapPack(game.map));
         
     }
 
     onDeath = () => {
         this.lifeAndBodyController.reset();
-
         let map = MapController.getMap(this.map);
         let x = Math.random() * map.width; 
         let y = Math.random() * map.height; 
@@ -312,17 +305,29 @@ export class Player extends Actor {
 
         if(GameController.list[this.game] !== undefined) {
             let enemies = GameController.list[this.game].enemies;
-            
             for(let i in enemies){
                 e = enemies[i];
                 if(Math.abs(e.position.x - this.position.x) < distance && Math.abs(e.position.y - this.position.y) < distance){
                     ids.push(e.id);
                 }
             }
-        } else {
-            console.log("PROBLEM " + this.game);
         }
+        return ids;
+    }
 
+    closeUpgrades = (distance) => {
+        let ids: number[] = [];
+        let u: Upgrade;
+
+        if(GameController.list[this.game] !== undefined) {
+            let upgrades = GameController.list[this.game].upgrades;
+            for(let i in upgrades){
+                u = upgrades[i];
+                if(Math.abs(u.position.x - this.position.x) < distance && Math.abs(u.position.y - this.position.y) < distance){
+                    ids.push(u.id);
+                }
+            }
+        }
         return ids;
     }
 
@@ -354,7 +359,6 @@ export class Player extends Actor {
                 if(players[i].id == socket.id) {
                     GameController.list[key].removePack.player.push(socket.id);
                     delete GameController.list[key].socketList[socket.id];
-                    console.log("Disconnect 2");
                 }
             }
         }
@@ -379,8 +383,6 @@ export class Player extends Actor {
         }
         return pack;
     }
-
-    static monsters = true;
 
     static list = {};
 }

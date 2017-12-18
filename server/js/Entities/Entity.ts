@@ -1,3 +1,5 @@
+import { PhysicsEntity } from './../PhysicsEngine/PhysicsEntity';
+import { MAX_DISTANCE } from './../globalVariables';
 import { Point, Size, Velocity, Rectangle, testCollisionRectRect } from './../GeometryAndPhysics';
 import { Pack } from '../Pack';
 import { removePack, initPack } from '../globalVariables';
@@ -5,7 +7,6 @@ import { GAME_SPEED_TOOLINGFACTOR } from '../Constants';
 
 export class Entity {
     private _position: Point = new Point(250, 250);
-    //private _size: Size = new Size(32, 32);
     private _width: number = 32;
     private _height: number = 32;
     private _speed: Velocity = new Velocity(0, 0);
@@ -14,30 +15,31 @@ export class Entity {
     private _type: string = "entity";
     private _img: string = "";
     private _game: number = -1;
+    private physicsEntity: PhysicsEntity;
 
     constructor(param){
         if(param){
-            this._position = param.position ? param.position : this._position;
-            this._width = param.width ? param.width : this._width;
-            this._height = param.height ? param.height : this._height;
-            this._speed = param.speed ? param.speed : this._speed;
-            this._id = param.id ? param.id : this._id;
-            this._map = param.map ? param.map : this._map;
-            this._type = param.type ? param.type : this._type;
-            this._img = param.img ? param.img : this._img;
-            
-            if(param.game !== undefined){
-                this._game = param.game;
-            }
+            if(param.position !== undefined)  this._position = param.position; 
+            if(param.width !== undefined)  this._width = param.width;
+            if(param.height !== undefined)  this._height = param.height; 
+            if(param.speed !== undefined)  this._speed = param.speed; 
+            if(param.id !== undefined)  this._id = param.id; 
+            if(param.map !== undefined)  this._map = param.map; 
+            if(param.type !== undefined)  this._type = param.type; 
+            if(param.img !== undefined)  this._img = param.img; 
+            if(param.game !== undefined)  this._game = param.game; 
+
+            this.physicsEntity = new PhysicsEntity({id: this.id, width: this.width/2, height: this.height/2});
         }
     }
 
-    updatePosition = () => this._position.changePosition(this._speed.x*GAME_SPEED_TOOLINGFACTOR, this._speed.y*GAME_SPEED_TOOLINGFACTOR);
+    // add vector to current position
+    updatePosition = () => this._position.changePosition(this._speed.x*GAME_SPEED_TOOLINGFACTOR, this._speed.y*GAME_SPEED_TOOLINGFACTOR);  
     
     update = () => this.updatePosition();
 
     getDistance = (entity: Entity) => { 
-        if(entity == null) return 10000000;
+        if(entity == null) return MAX_DISTANCE;
         return this._position.getDistance(entity.position);
     }
 
@@ -61,8 +63,10 @@ export class Entity {
     get id() { return this._id; }
     get img() { return this._img; }
     get game() { return this._game; }
+
     setSpdX = ( speedX ) => { this._speed.x = speedX;}
     setSpdY = ( speedY ) => { this._speed.y = speedY;}
+
     static getFrameUpdateData = () => {return {removePack: removePack, initPack: initPack};}
 
     setPosition(position: Point) {

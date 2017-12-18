@@ -4,7 +4,7 @@ const GeometryAndPhysics_1 = require("./../GeometryAndPhysics");
 const Particle_1 = require("./Particle/Particle");
 class Flame {
     constructor(param) {
-        this.id = Math.random();
+        this._id = Math.random();
         this.particles = {};
         this.angle = 0;
         this.position = new GeometryAndPhysics_1.Point(0, 0);
@@ -52,6 +52,7 @@ class Flame {
         this.game = (param.game !== undefined) ? param.game : 0;
         Flame.list[this.id] = this;
     }
+    get id() { return this._id; }
 }
 Flame.list = {};
 exports.Flame = Flame;

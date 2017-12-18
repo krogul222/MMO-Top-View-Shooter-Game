@@ -9,6 +9,7 @@ export let mapObjectCollisions: any = {};
 
 export const GAME_SPEED_TOOLINGFACTOR = 0.75;
 export const TILE_SIZE = 8;
+export const STICKY_THRESHOLD = 0.01;
 
 imageName[ ItemType.pistol ] = "pistol";
 //imageName[ ItemType.claws ] = "claws";
@@ -22,6 +23,7 @@ imageName[ ItemType.flamethrower ] = "flamethrower";
 imageName[ WeaponAmmoType.pistol ] = "pistolammo";
 imageName[ WeaponAmmoType.shotgun ] = "shotgunammo";
 imageName[ WeaponAmmoType.rifle ] = "rifleammo";
+imageName[ WeaponAmmoType.flamethrower ] = "flamethrowerammo";
 
 //mapTileImageName[ TerrainMaterial.grass ] = "grass";
 mapTileImageName[ TerrainMaterial.dirt ] = "dirt";

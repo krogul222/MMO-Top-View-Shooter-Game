@@ -42,7 +42,6 @@ export class WeaponCollection {
                                 inc++;
                             }
                         }
-    
                         return;
                     }
                 } 
@@ -50,7 +49,6 @@ export class WeaponCollection {
         }
 
         choosePrevWeaponWithAmmo = () => {
-            
         }
 
 
@@ -142,7 +140,6 @@ export class WeaponCollection {
                 }
             }
             this.weapons.push({id:id,amount:amount, ammo: 10, ammoInGun: WeaponTypes.list[id].reloadAmmo});
-            //self.refreshRender();
         }
     }
 

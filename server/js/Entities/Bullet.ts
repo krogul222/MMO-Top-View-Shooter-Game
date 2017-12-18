@@ -39,7 +39,6 @@ export class Bullet extends Entity{
         
         this.parent = param.parent ? param.parent : -1;
         
-       // initPack.bullet.push(this.getInitPack());
         Bullet.list[this.id] = this;
     }
 
@@ -53,7 +52,6 @@ export class Bullet extends Entity{
                 let player: Player= Player.list[this.parent];
                 let closeEnemies = player.getCloseEnemies();
 
-
                 for(let key in closeEnemies){          // check if enemy was hit
                     let enemy: Enemy = Enemy.list[closeEnemies[key]]; 
                     if(this.testCollision(enemy)){
@@ -66,6 +64,7 @@ export class Bullet extends Entity{
                         break;
                     }
                 }
+
                 if(GameController.list[this.game] !== undefined){
                     let players = GameController.list[this.game].players;
                     
@@ -147,21 +146,15 @@ export class Bullet extends Entity{
     }  
 
     static update = () =>{
-      //  let pack: any[] =[];
         for(let i in Bullet.list){
             let bullet: Bullet = Bullet.list[i];
-            //bullet.update();
             if(bullet.toRemove){
                 initPack.bullet.push(bullet.getInitPack());
                 if(GameController.list[bullet.game] !== undefined)
                     GameController.list[bullet.game].initPack.bullet.push(bullet.getInitPack());
                 delete Bullet.list[i];
-              //  removePack.bullet.push({id: bullet.id, hitCategory: bullet.hitCategory, hitEntityCategory: bullet.hitEntityCategory, hitEntityId: bullet.hitEntityId});
-            } else {
-               // pack.push(bullet.getUpdatePack());     
-            }
+            } 
         }
-      //  return pack;
     }
 
     static getAllInitPack = function(){
@@ -170,17 +163,6 @@ export class Bullet extends Entity{
             bullets.push(Bullet.list[i].getInitPack());
         }
         return bullets;
-    }
-
-    static getAllSpecificInitPack = function(game){
-  /*      let bullets: any[] = [];
-        if(GameController.list[game] !== undefined){
-            let e = GameController.list[game].enemies;
-            for(let i in Bullet.list){
-                bullets.push(Bullet.list[i].getInitPack());
-            }
-        }
-        return bullets;*/
     }
 
     static updateParam = (param) => {

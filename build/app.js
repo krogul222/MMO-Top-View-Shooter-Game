@@ -136,10 +136,8 @@ setInterval(function () {
                 socket.emit('remove', game.removePack);
             }
         }
-        if (flag) {
+        if (flag)
             GameController_1.GameController.remove(i);
-            console.log("REMUWUJEMY");
-        }
     }
     MapControler_1.MapController.updatePack.length = 0;
     for (let i in GameController_1.GameController.list) {

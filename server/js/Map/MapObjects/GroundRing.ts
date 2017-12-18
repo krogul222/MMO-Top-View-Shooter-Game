@@ -13,8 +13,6 @@ export class GroundRing extends MapObject{
     enter: Point;
     enterOrientation: Orientation;
 
-
-
     constructor(width: number, height: number, enterOrientation: Orientation){
         super();
 
@@ -73,28 +71,23 @@ export class GroundRing extends MapObject{
             } else if(enterOrientation == Orientation.left){
                 this.addObjectTile(this.enter, MapObjectType.GR_EL);
             }                        
-
-            
         }
-
     }
 
     isColliding = (mapTiles: MapTile[][], position: Point) =>{
-        
-                for(let i = 0; i < (this.sidesU.length+2); i++){
-                    if(mapTiles[position.y][position.x+i].collisions || mapTiles[position.y+ this.sidesR.length+1][position.x+i].collisions){
-                        return true;
-                    }
-                }
-        
-                for(let i = 0; i < (this.sidesR.length+2); i++){
-                    if(mapTiles[position.y+i][position.x].collisions || mapTiles[position.y+ i][position.x+this.sidesD.length+1].collisions){
-                        return true;
-                    }
-                }
-        
-                return false;
-        
+        for(let i = 0; i < (this.sidesU.length+2); i++){
+            if(mapTiles[position.y][position.x+i].collisions || mapTiles[position.y+ this.sidesR.length+1][position.x+i].collisions){
+                return true;
             }
+        }
+        
+        for(let i = 0; i < (this.sidesR.length+2); i++){
+            if(mapTiles[position.y+i][position.x].collisions || mapTiles[position.y+ i][position.x+this.sidesD.length+1].collisions){
+                return true;
+            }
+        }
+
+        return false;
+    }
 
 }

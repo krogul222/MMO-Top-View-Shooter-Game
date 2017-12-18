@@ -15,18 +15,31 @@ class Player extends Actor_1.Actor {
         this.counter = 0;
         this.fragPlayer = 0;
         this.fragEnemy = 0;
-        this.giveItems = () => {
-            this.inventory.addItem(enums_1.ItemType.knife, 1);
-            this.inventory.addItem(enums_1.ItemType.pistol, 1);
-            this.inventory.addItem(enums_1.ItemType.shotgun, 1);
-            this.inventory.addItem(enums_1.ItemType.rifle, 1);
-            this.inventory.addItem(enums_1.ItemType.flamethrower, 1);
-            this.attackController.weaponCollection.setWeaponAmmo(enums_1.WeaponType.shotgun, 100);
-            this.attackController.weaponCollection.setWeaponAmmo(enums_1.WeaponType.pistol, 200);
-            this.attackController.weaponCollection.setWeaponAmmo(enums_1.WeaponType.rifle, 100);
-            this.attackController.weaponCollection.setWeaponAmmo(enums_1.WeaponType.flamethrower, 400);
-            this.inventory.addItem(enums_1.ItemType.medicalkit, 4);
-            this.inventory.useItem(enums_1.WeaponType.shotgun);
+        this.giveItems = (startingPack) => {
+            if (startingPack >= enums_1.ActorStartingPack.BASIC) {
+                this.inventory.addItem(enums_1.ItemType.knife, 1);
+                this.inventory.addItem(enums_1.ItemType.pistol, 1);
+                this.attackController.weaponCollection.setWeaponAmmo(enums_1.WeaponType.pistol, 50);
+                this.inventory.useItem(enums_1.WeaponType.pistol);
+            }
+            if (startingPack >= enums_1.ActorStartingPack.MODERATE) {
+                this.inventory.addItem(enums_1.ItemType.shotgun, 1);
+                this.inventory.addItem(enums_1.ItemType.rifle, 1);
+                this.inventory.addItem(enums_1.ItemType.medicalkit, 2);
+                this.attackController.weaponCollection.setWeaponAmmo(enums_1.WeaponType.shotgun, 40);
+                this.attackController.weaponCollection.setWeaponAmmo(enums_1.WeaponType.pistol, 100);
+                this.attackController.weaponCollection.setWeaponAmmo(enums_1.WeaponType.rifle, 40);
+                this.inventory.useItem(enums_1.WeaponType.shotgun);
+            }
+            if (startingPack >= enums_1.ActorStartingPack.FULL) {
+                this.inventory.addItem(enums_1.ItemType.flamethrower, 1);
+                this.inventory.addItem(enums_1.ItemType.medicalkit, 2);
+                this.attackController.weaponCollection.setWeaponAmmo(enums_1.WeaponType.shotgun, 100);
+                this.attackController.weaponCollection.setWeaponAmmo(enums_1.WeaponType.pistol, 200);
+                this.attackController.weaponCollection.setWeaponAmmo(enums_1.WeaponType.rifle, 100);
+                this.attackController.weaponCollection.setWeaponAmmo(enums_1.WeaponType.flamethrower, 400);
+                this.inventory.useItem(enums_1.WeaponType.shotgun);
+            }
         };
         this.getInitPack = () => {
             return {
@@ -54,10 +67,14 @@ class Player extends Actor_1.Actor {
             this.counter++;
             if (this.counter % 40) {
                 this.closeEnemiesArr = this.closeEnemies(800);
+                this.closeUpgradesArr = this.closeUpgrades(800);
             }
         };
         this.getCloseEnemies = () => {
             return this.closeEnemiesArr;
+        };
+        this.getCloseUpgrades = () => {
+            return this.closeUpgradesArr;
         };
         this.incFragPlayer = () => {
             this.fragPlayer++;
@@ -154,24 +171,34 @@ class Player extends Actor_1.Actor {
                     }
                 }
             }
-            else {
-                console.log("PROBLEM " + this.game);
+            return ids;
+        };
+        this.closeUpgrades = (distance) => {
+            let ids = [];
+            let u;
+            if (GameController_1.GameController.list[this.game] !== undefined) {
+                let upgrades = GameController_1.GameController.list[this.game].upgrades;
+                for (let i in upgrades) {
+                    u = upgrades[i];
+                    if (Math.abs(u.position.x - this.position.x) < distance && Math.abs(u.position.y - this.position.y) < distance) {
+                        ids.push(u.id);
+                    }
+                }
             }
             return ids;
         };
         globalVariables_1.initPack.player.push(this.getInitPack());
         Player.list[param.id] = this;
-        this.giveItems();
+        this.giveItems(enums_1.ActorStartingPack.FULL);
         if (GameController_1.GameController.list[this.game] !== undefined) {
             GameController_1.GameController.list[this.game].initPack.player.push(this.getInitPack());
         }
+        GameController_1.GameController.list[this.game].addPlayer(this);
     }
 }
 Player.onConnect = (socket, createdGame = false, gID = -1, data = {}) => {
     let game;
     let gameId = gID;
-    console.log("Nowy SOCKET " + socket.id);
-    let map = 'forest';
     if (createdGame == true) {
         if (data !== undefined) {
             game = new GameController_1.GameController(data);
@@ -208,7 +235,7 @@ Player.onConnect = (socket, createdGame = false, gID = -1, data = {}) => {
         gameId = game.id;
     }
     game.addSocket(socket);
-    map = game.map;
+    let map = game.map;
     let player = new Player({
         id: socket.id,
         maxSpdX: 12,
@@ -264,7 +291,6 @@ Player.onConnect = (socket, createdGame = false, gID = -1, data = {}) => {
     socket.on('PlayerLeftGame', function (data) {
         Player.onDisconnect(socket);
     });
-    game.addPlayer(player);
     socket.emit('init', { player: Player.getAllSpecificInitPack(game.id), enemy: Enemy_1.Enemy.getAllSpecificInitPack(game.id), selfId: socket.id });
     socket.emit('mapData', MapControler_1.MapController.getMapPack(game.map));
 };
@@ -295,7 +321,6 @@ Player.onDisconnect = (socket) => {
             if (players[i].id == socket.id) {
                 GameController_1.GameController.list[key].removePack.player.push(socket.id);
                 delete GameController_1.GameController.list[key].socketList[socket.id];
-                console.log("Disconnect 2");
             }
         }
     }
@@ -318,7 +343,6 @@ Player.updateSpecific = (players) => {
     }
     return pack;
 };
-Player.monsters = true;
 Player.list = {};
 exports.Player = Player;
 //# sourceMappingURL=Player.js.map

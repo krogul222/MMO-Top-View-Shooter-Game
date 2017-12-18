@@ -128,8 +128,6 @@ Bullet.update = () => {
                 GameController_1.GameController.list[bullet.game].initPack.bullet.push(bullet.getInitPack());
             delete Bullet.list[i];
         }
-        else {
-        }
     }
 };
 Bullet.getAllInitPack = function () {
@@ -138,8 +136,6 @@ Bullet.getAllInitPack = function () {
         bullets.push(Bullet.list[i].getInitPack());
     }
     return bullets;
-};
-Bullet.getAllSpecificInitPack = function (game) {
 };
 Bullet.updateParam = (param) => {
     param.id = Math.random();

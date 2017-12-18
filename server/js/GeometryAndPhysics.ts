@@ -63,3 +63,7 @@ export class Velocity {
 
     getSpeed = () => { return Math.sqrt(this.x*this.x + this.y*this.y); }
 }
+
+export class Acceleration {
+    constructor(public x: number = 0, public y: number = 0) {}
+}
