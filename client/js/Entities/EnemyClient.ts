@@ -58,7 +58,6 @@ export class EnemyClient{
     draw = () => {
         let p: PlayerClient = PlayerClient.list[selfId];
         if(p.map !== this.map){
-          //  console.log("NIEEEEEEEEEEEEEEEEEEEEEEe");
             return;  
         }
 

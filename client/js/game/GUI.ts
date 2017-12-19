@@ -134,14 +134,17 @@ export class GUI {
         Ra[TerrainMaterial.dirt] = 255;
         Ra[TerrainMaterial.water] = 0;
         Ra[TerrainMaterial.stone] = 128;
+        Ra[TerrainMaterial.darkdirt] = 139;
 
         Ga[TerrainMaterial.dirt] = 255;
         Ga[TerrainMaterial.water] = 0;
         Ga[TerrainMaterial.stone] = 128;
+        Ga[TerrainMaterial.darkdirt] = 69;
 
         Ba[TerrainMaterial.dirt] = 0;
         Ba[TerrainMaterial.water] = 255;
         Ba[TerrainMaterial.stone] = 128;
+        Ba[TerrainMaterial.darkdirt] = 19;
 
         let material: TerrainMaterial;
         //let playerPosition: Point = PlayerClient.list[selfId].position;

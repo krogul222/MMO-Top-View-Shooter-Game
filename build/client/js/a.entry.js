@@ -184,11 +184,13 @@ var TerrainMaterial;
     TerrainMaterial[TerrainMaterial["dirt"] = 1] = "dirt";
     TerrainMaterial[TerrainMaterial["water"] = 2] = "water";
     TerrainMaterial[TerrainMaterial["stone"] = 3] = "stone";
+    TerrainMaterial[TerrainMaterial["darkdirt"] = 4] = "darkdirt";
 })(TerrainMaterial = exports.TerrainMaterial || (exports.TerrainMaterial = {}));
 var TerrainMaterialWithoutWater;
 (function (TerrainMaterialWithoutWater) {
     TerrainMaterialWithoutWater[TerrainMaterialWithoutWater["dirt"] = 1] = "dirt";
     TerrainMaterialWithoutWater[TerrainMaterialWithoutWater["stone"] = 3] = "stone";
+    TerrainMaterialWithoutWater[TerrainMaterialWithoutWater["darkdirt"] = 4] = "darkdirt";
 })(TerrainMaterialWithoutWater = exports.TerrainMaterialWithoutWater || (exports.TerrainMaterialWithoutWater = {}));
 var Orientation;
 (function (Orientation) {
@@ -237,6 +239,8 @@ var MapObjectType;
     MapObjectType[MapObjectType["GR_ED"] = 10] = "GR_ED";
     MapObjectType[MapObjectType["GR_EL"] = 11] = "GR_EL";
     MapObjectType[MapObjectType["GR_ER"] = 12] = "GR_ER";
+    MapObjectType[MapObjectType["SS"] = 13] = "SS";
+    MapObjectType[MapObjectType["RO"] = 14] = "RO";
 })(MapObjectType = exports.MapObjectType || (exports.MapObjectType = {}));
 function randomEnum(myEnum) {
     const enumValues = Object.keys(myEnum)
@@ -261,19 +265,19 @@ exports.getRandomInt = getRandomInt;
 Object.defineProperty(exports, "__esModule", { value: true });
 const PlayerClient_1 = __webpack_require__(5);
 const Particle_1 = __webpack_require__(16);
-const ParticleClient_1 = __webpack_require__(43);
-const UpgradeClient_1 = __webpack_require__(44);
-const BulletClient_1 = __webpack_require__(45);
-const GameSoundManager_1 = __webpack_require__(46);
-const Inventory_1 = __webpack_require__(21);
-const MapControler_1 = __webpack_require__(8);
-const MapClient_1 = __webpack_require__(47);
-const Filters_1 = __webpack_require__(48);
-const Effects_1 = __webpack_require__(49);
+const ParticleClient_1 = __webpack_require__(44);
+const UpgradeClient_1 = __webpack_require__(45);
+const BulletClient_1 = __webpack_require__(46);
+const GameSoundManager_1 = __webpack_require__(47);
+const Inventory_1 = __webpack_require__(23);
+const MapControler_1 = __webpack_require__(9);
+const MapClient_1 = __webpack_require__(48);
+const Filters_1 = __webpack_require__(49);
+const Effects_1 = __webpack_require__(50);
 const canvas_1 = __webpack_require__(3);
-const SmokeClient_1 = __webpack_require__(51);
+const SmokeClient_1 = __webpack_require__(52);
 const EnemyClient_1 = __webpack_require__(13);
-const ExplosionClient_1 = __webpack_require__(23);
+const ExplosionClient_1 = __webpack_require__(25);
 let menuDuringGameDiv = document.getElementById("menuDuringGameDiv");
 let enemyDrawList = [];
 exports.selfId = 0;
@@ -543,7 +547,7 @@ setInterval(function () {
         console.log("Enemy draw " + i);
     }
     for (let i in ExplosionClient_1.ExplosionClient.list) {
-        ExplosionClient_1.ExplosionClient.list[i].spriteAnimCounter += 0.4;
+        ExplosionClient_1.ExplosionClient.list[i].spriteAnimCounter += 1;
         if (ExplosionClient_1.ExplosionClient.list[i].isCompleted()) {
             delete ExplosionClient_1.ExplosionClient.list[i];
         }
@@ -738,8 +742,8 @@ exports.enableSound = (sound) => {
 /***/ (function(module, exports, __webpack_require__) {
 
 Object.defineProperty(exports, "__esModule", { value: true });
-const Camera_1 = __webpack_require__(25);
-const GUI_1 = __webpack_require__(26);
+const Camera_1 = __webpack_require__(27);
+const GUI_1 = __webpack_require__(28);
 gui = new GUI_1.GUI({ ctx: ctxui, width: WIDTH, height: HEIGHTUI });
 exports.camera = new Camera_1.Camera(canvas, WIDTH, HEIGHT);
 let resizeCanvas = function () {
@@ -766,7 +770,7 @@ window.addEventListener('resize', function () {
 /***/ (function(module, exports, __webpack_require__) {
 
 Object.defineProperty(exports, "__esModule", { value: true });
-const login_1 = __webpack_require__(27);
+const login_1 = __webpack_require__(29);
 exports.Img = {};
 let gameDiv = document.getElementById("gameDiv");
 let loadingDiv = document.getElementById("loadingDiv");
@@ -1016,7 +1020,7 @@ exports.PlayerClient = PlayerClient;
 /***/ (function(module, exports, __webpack_require__) {
 
 Object.defineProperty(exports, "__esModule", { value: true });
-const Pack_1 = __webpack_require__(18);
+const Pack_1 = __webpack_require__(19);
 exports.initPack = new Pack_1.Pack();
 exports.removePack = new Pack_1.Pack();
 exports.MAX_DISTANCE = 10000000;
@@ -1050,22 +1054,27 @@ exports.imageName[enums_1.WeaponAmmoType.flamethrower] = "flamethrowerammo";
 exports.mapTileImageName[enums_1.TerrainMaterial.dirt] = "dirt";
 exports.mapTileImageName[enums_1.TerrainMaterial.water] = "water";
 exports.mapTileImageName[enums_1.TerrainMaterial.stone] = "stone";
+exports.mapTileImageName[enums_1.TerrainMaterial.darkdirt] = "darkDirt";
 exports.mapTileSideImageName[enums_1.Orientation.left] = {};
 exports.mapTileSideImageName[enums_1.Orientation.left][enums_1.TerrainMaterial.stone] = "stoneL";
 exports.mapTileSideImageName[enums_1.Orientation.left][enums_1.TerrainMaterial.dirt] = "dirtL";
 exports.mapTileSideImageName[enums_1.Orientation.left][enums_1.TerrainMaterial.water] = "waterL";
+exports.mapTileSideImageName[enums_1.Orientation.left][enums_1.TerrainMaterial.darkdirt] = "darkDirtL";
 exports.mapTileSideImageName[enums_1.Orientation.right] = {};
 exports.mapTileSideImageName[enums_1.Orientation.right][enums_1.TerrainMaterial.stone] = "stoneR";
 exports.mapTileSideImageName[enums_1.Orientation.right][enums_1.TerrainMaterial.dirt] = "dirtR";
 exports.mapTileSideImageName[enums_1.Orientation.right][enums_1.TerrainMaterial.water] = "waterR";
+exports.mapTileSideImageName[enums_1.Orientation.right][enums_1.TerrainMaterial.darkdirt] = "darkDirtR";
 exports.mapTileSideImageName[enums_1.Orientation.up] = {};
 exports.mapTileSideImageName[enums_1.Orientation.up][enums_1.TerrainMaterial.stone] = "stoneU";
 exports.mapTileSideImageName[enums_1.Orientation.up][enums_1.TerrainMaterial.dirt] = "dirtU";
 exports.mapTileSideImageName[enums_1.Orientation.up][enums_1.TerrainMaterial.water] = "waterU";
+exports.mapTileSideImageName[enums_1.Orientation.up][enums_1.TerrainMaterial.darkdirt] = "darkDirtU";
 exports.mapTileSideImageName[enums_1.Orientation.down] = {};
 exports.mapTileSideImageName[enums_1.Orientation.down][enums_1.TerrainMaterial.stone] = "stoneD";
 exports.mapTileSideImageName[enums_1.Orientation.down][enums_1.TerrainMaterial.dirt] = "dirtD";
 exports.mapTileSideImageName[enums_1.Orientation.down][enums_1.TerrainMaterial.water] = "waterD";
+exports.mapTileSideImageName[enums_1.Orientation.down][enums_1.TerrainMaterial.darkdirt] = "darkDirtD";
 exports.mapTileCornerImageName[enums_1.CornerOrientation.RU] = {};
 exports.mapTileCornerImageName[enums_1.CornerOrientation.RU][enums_1.TerrainMaterial.stone] = "stoneRU";
 exports.mapTileCornerImageName[enums_1.CornerOrientation.RU][enums_1.TerrainMaterial.dirt] = "dirtRU";
@@ -1094,6 +1103,8 @@ exports.mapObjectImageName[enums_1.MapObjectType.GR_EU] = "groundRingUenter";
 exports.mapObjectImageName[enums_1.MapObjectType.GR_ED] = "groundRingDenter";
 exports.mapObjectImageName[enums_1.MapObjectType.GR_EL] = "groundRingLenter";
 exports.mapObjectImageName[enums_1.MapObjectType.GR_ER] = "groundRingRenter";
+exports.mapObjectImageName[enums_1.MapObjectType.SS] = "solidstone";
+exports.mapObjectImageName[enums_1.MapObjectType.RO] = "radiooil";
 exports.mapObjectCollisions[enums_1.MapObjectType.GR_D] = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2];
 exports.mapObjectCollisions[enums_1.MapObjectType.GR_U] = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 2, 2, 2, 2, 2, 2, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
 exports.mapObjectCollisions[enums_1.MapObjectType.GR_L] = [0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 2, 0, 0];
@@ -1106,6 +1117,8 @@ exports.mapObjectCollisions[enums_1.MapObjectType.GR_EU] = [0, 0, 0, 0, 0, 0, 0,
 exports.mapObjectCollisions[enums_1.MapObjectType.GR_ED] = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 0, 0, 0, 2, 2, 2, 1, 1, 2, 2, 2, 2, 2, 2, 1, 1, 2, 2, 2];
 exports.mapObjectCollisions[enums_1.MapObjectType.GR_EL] = [0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 2, 0, 0];
 exports.mapObjectCollisions[enums_1.MapObjectType.GR_ER] = [0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0];
+exports.mapObjectCollisions[enums_1.MapObjectType.SS] = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 3, 3, 0, 0, 0, 0, 0, 0, 3, 3, 3, 0, 0, 0, 0, 0, 3, 3, 3, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
+exports.mapObjectCollisions[enums_1.MapObjectType.RO] = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 0, 0, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
 
 
 /***/ }),
@@ -1113,10 +1126,122 @@ exports.mapObjectCollisions[enums_1.MapObjectType.GR_ER] = [0, 0, 2, 0, 0, 0, 0,
 /***/ (function(module, exports, __webpack_require__) {
 
 Object.defineProperty(exports, "__esModule", { value: true });
-const SpawnObjectMapChecker_1 = __webpack_require__(30);
-const GroundRing_1 = __webpack_require__(31);
-const GameMap_1 = __webpack_require__(34);
-const MapTile_1 = __webpack_require__(35);
+const PhysicsEngine_1 = __webpack_require__(31);
+const Smoke_1 = __webpack_require__(18);
+const Pack_1 = __webpack_require__(19);
+const Player_1 = __webpack_require__(10);
+const MapControler_1 = __webpack_require__(9);
+const Enemy_1 = __webpack_require__(11);
+const Upgrade_1 = __webpack_require__(20);
+class GameController {
+    constructor(param) {
+        this.monsterRespawn = true;
+        this.itemRespawn = true;
+        this.socketList = {};
+        this.players = {};
+        this.enemies = {};
+        this.upgrades = {};
+        this.smokes = {};
+        this.map = "forest";
+        this.initPack = new Pack_1.Pack();
+        this.removePack = new Pack_1.Pack();
+        this._physicsEngine = new PhysicsEngine_1.PhysicsEngine();
+        this.addSocket = (socket) => {
+            this.socketList[socket.id] = socket.id;
+            console.log("SOCKET ADDED " + this.socketList[socket.id]);
+        };
+        this.addPlayer = (player) => {
+            this.players[player.id] = player;
+            console.log("PLAYER ADDED TO GAME");
+        };
+        this.addEnemy = (enemy) => {
+            this.enemies[enemy.id] = enemy;
+            console.log("Enemy ADDED TO GAME");
+        };
+        this.addUpgrade = (upgrade) => {
+            this.upgrades[upgrade.id] = upgrade;
+            console.log("Upgrade ADDED TO GAME");
+        };
+        this.addSmoke = (smoke) => {
+            this.smokes[smoke.id] = smoke;
+            console.log("Enemy ADDED TO GAME");
+        };
+        this.id = Math.random();
+        this.map = this.id;
+        if (param.name !== undefined) {
+            this.name = param.name;
+        }
+        let mapsize = 16;
+        let water = 10;
+        let seeds = 20;
+        if (param.mapsize !== undefined) {
+            mapsize = param.mapsize;
+        }
+        if (param.water !== undefined) {
+            water = param.water;
+        }
+        if (param.seeds !== undefined) {
+            seeds = param.seeds;
+        }
+        if (param.monstersrespawn !== undefined) {
+            this.monsterRespawn = param.monstersrespawn == 1 ? true : false;
+            console.log("MONSTER " + this.monsterRespawn);
+        }
+        if (param.itemsrespawn !== undefined) {
+            this.itemRespawn = param.itemsrespawn == 1 ? true : false;
+        }
+        MapControler_1.MapController.createMap(this.map, mapsize, seeds, water);
+        MapControler_1.MapController.updatePack.push(MapControler_1.MapController.getMapPack(this.map));
+        GameController.list[this.id] = this;
+    }
+    get physicsEngine() { return this._physicsEngine; }
+}
+GameController.remove = (id) => {
+    let game = GameController.list[id];
+    for (let i in game.players) {
+        if (game.players[i]) {
+            delete game.players[i];
+            if (Player_1.Player.list[i])
+                delete Player_1.Player.list[i];
+        }
+    }
+    for (let i in game.enemies) {
+        if (game.enemies[i]) {
+            delete game.enemies[i];
+            if (Enemy_1.Enemy.list[i])
+                delete Enemy_1.Enemy.list[i];
+        }
+    }
+    for (let i in game.smokes) {
+        if (game.smokes[i]) {
+            delete game.smokes[i];
+            if (Smoke_1.Smoke.list[i])
+                delete Smoke_1.Smoke.list[i];
+        }
+    }
+    for (let i in game.upgrades) {
+        if (game.upgrades[i]) {
+            delete game.upgrades[i];
+            if (Upgrade_1.Upgrade.list[i])
+                delete Upgrade_1.Upgrade.list[i];
+        }
+    }
+    delete GameController.list[id];
+};
+GameController.list = {};
+exports.GameController = GameController;
+
+
+/***/ }),
+/* 9 */
+/***/ (function(module, exports, __webpack_require__) {
+
+Object.defineProperty(exports, "__esModule", { value: true });
+const SpawnObjectMapChecker_1 = __webpack_require__(32);
+const GroundRing_1 = __webpack_require__(33);
+const MapObject_1 = __webpack_require__(21);
+const GameMap_1 = __webpack_require__(35);
+const MapTile_1 = __webpack_require__(36);
 const enums_1 = __webpack_require__(1);
 const GeometryAndPhysics_1 = __webpack_require__(0);
 const Constants_1 = __webpack_require__(7);
@@ -1263,6 +1388,8 @@ MapController.createMap = (name, size, seeds, water = 10) => {
         }
     }
     MapController.generateGroundRings(mapTiles, seedMaterial, seedPosition);
+    MapController.generateBasicObject(enums_1.MapObjectType.RO, enums_1.TerrainMaterial.stone, mapTiles, seedMaterial, seedPosition);
+    MapController.generateBasicObject(enums_1.MapObjectType.SS, enums_1.TerrainMaterial.darkdirt, mapTiles, seedMaterial, seedPosition);
     MapController.maps[name] = (new GameMap_1.GameMap(name, mapTiles));
 };
 MapController.getTileDistance = (x, y, tx, ty) => {
@@ -1299,115 +1426,27 @@ MapController.generateGroundRings = (mapTiles, seedMaterial, seedPosition) => {
         }
     }
 };
-exports.MapController = MapController;
-
-
-/***/ }),
-/* 9 */
-/***/ (function(module, exports, __webpack_require__) {
-
-Object.defineProperty(exports, "__esModule", { value: true });
-const Smoke_1 = __webpack_require__(17);
-const Pack_1 = __webpack_require__(18);
-const Player_1 = __webpack_require__(10);
-const MapControler_1 = __webpack_require__(8);
-const Enemy_1 = __webpack_require__(11);
-const Upgrade_1 = __webpack_require__(19);
-class GameController {
-    constructor(param) {
-        this.monsterRespawn = true;
-        this.itemRespawn = true;
-        this.socketList = {};
-        this.players = {};
-        this.enemies = {};
-        this.upgrades = {};
-        this.smokes = {};
-        this.map = "forest";
-        this.initPack = new Pack_1.Pack();
-        this.removePack = new Pack_1.Pack();
-        this.addSocket = (socket) => {
-            this.socketList[socket.id] = socket.id;
-            console.log("SOCKET ADDED " + this.socketList[socket.id]);
-        };
-        this.addPlayer = (player) => {
-            this.players[player.id] = player;
-            console.log("PLAYER ADDED TO GAME");
-        };
-        this.addEnemy = (enemy) => {
-            this.enemies[enemy.id] = enemy;
-            console.log("Enemy ADDED TO GAME");
-        };
-        this.addUpgrade = (upgrade) => {
-            this.upgrades[upgrade.id] = upgrade;
-            console.log("Upgrade ADDED TO GAME");
-        };
-        this.addSmoke = (smoke) => {
-            this.smokes[smoke.id] = smoke;
-            console.log("Enemy ADDED TO GAME");
-        };
-        this.id = Math.random();
-        this.map = this.id;
-        if (param.name !== undefined) {
-            this.name = param.name;
-        }
-        let mapsize = 16;
-        let water = 10;
-        let seeds = 20;
-        if (param.mapsize !== undefined) {
-            mapsize = param.mapsize;
-        }
-        if (param.water !== undefined) {
-            water = param.water;
-        }
-        if (param.seeds !== undefined) {
-            seeds = param.seeds;
-        }
-        if (param.monstersrespawn !== undefined) {
-            this.monsterRespawn = param.monstersrespawn == 1 ? true : false;
-            console.log("MONSTER " + this.monsterRespawn);
-        }
-        if (param.itemsrespawn !== undefined) {
-            this.itemRespawn = param.itemsrespawn == 1 ? true : false;
-        }
-        MapControler_1.MapController.createMap(this.map, mapsize, seeds, water);
-        MapControler_1.MapController.updatePack.push(MapControler_1.MapController.getMapPack(this.map));
-        GameController.list[this.id] = this;
-    }
-}
-GameController.remove = (id) => {
-    let game = GameController.list[id];
-    for (let i in game.players) {
-        if (game.players[i]) {
-            delete game.players[i];
-            if (Player_1.Player.list[i])
-                delete Player_1.Player.list[i];
+MapController.generateBasicObject = (mapObjectType, material, mapTiles, seedMaterial, seedPosition) => {
+    let Checkers = [];
+    Checkers[0] = new SpawnObjectMapChecker_1.SpawnObjectMapChecker(mapTiles, material, new GeometryAndPhysics_1.Point(2, 2));
+    let spawnPosition;
+    let mapObject = new MapObject_1.MapObject();
+    mapObject.addObjectTile(new GeometryAndPhysics_1.Point(0, 0), mapObjectType);
+    let enter;
+    let seeds = seedMaterial.length;
+    for (let k = 0; k < seeds; k++) {
+        if (seedMaterial[k] == material) {
+            for (let i = 0; i < Checkers.length; i++) {
+                spawnPosition = Checkers[i].search(seedPosition[k]);
+                console.log("Pozycja: " + spawnPosition.x + " " + spawnPosition.y);
+                if (spawnPosition.x > -1 && spawnPosition.y > -1) {
+                    MapController.loadObject(mapObject, mapTiles, new GeometryAndPhysics_1.Point(spawnPosition.x, spawnPosition.y));
+                }
+            }
         }
     }
-    for (let i in game.enemies) {
-        if (game.enemies[i]) {
-            delete game.enemies[i];
-            if (Enemy_1.Enemy.list[i])
-                delete Enemy_1.Enemy.list[i];
-        }
-    }
-    for (let i in game.smokes) {
-        if (game.smokes[i]) {
-            delete game.smokes[i];
-            if (Smoke_1.Smoke.list[i])
-                delete Smoke_1.Smoke.list[i];
-        }
-    }
-    for (let i in game.upgrades) {
-        if (game.upgrades[i]) {
-            delete game.upgrades[i];
-            if (Upgrade_1.Upgrade.list[i])
-                delete Upgrade_1.Upgrade.list[i];
-        }
-    }
-    delete GameController.list[id];
 };
-GameController.list = {};
-exports.GameController = GameController;
+exports.MapController = MapController;
 
 
 /***/ }),
@@ -1415,15 +1454,15 @@ exports.GameController = GameController;
 /***/ (function(module, exports, __webpack_require__) {
 
 Object.defineProperty(exports, "__esModule", { value: true });
-const Upgrade_1 = __webpack_require__(19);
-const GameController_1 = __webpack_require__(9);
-const Smoke_1 = __webpack_require__(17);
+const Upgrade_1 = __webpack_require__(20);
+const GameController_1 = __webpack_require__(8);
+const Smoke_1 = __webpack_require__(18);
 const globalVariables_1 = __webpack_require__(6);
 const Enemy_1 = __webpack_require__(11);
-const Actor_1 = __webpack_require__(20);
+const Actor_1 = __webpack_require__(22);
 const GeometryAndPhysics_1 = __webpack_require__(0);
 const enums_1 = __webpack_require__(1);
-const MapControler_1 = __webpack_require__(8);
+const MapControler_1 = __webpack_require__(9);
 class Player extends Actor_1.Actor {
     constructor(param) {
         super(param);
@@ -1431,6 +1470,7 @@ class Player extends Actor_1.Actor {
         this.counter = 0;
         this.fragPlayer = 0;
         this.fragEnemy = 0;
+        this.updateFreqyencyFactor = 0;
         this.giveItems = (startingPack) => {
             if (startingPack >= enums_1.ActorStartingPack.BASIC) {
                 this.inventory.addItem(enums_1.ItemType.knife, 1);
@@ -1481,9 +1521,10 @@ class Player extends Actor_1.Actor {
         this.extendedUpdate = () => {
             this.update();
             this.counter++;
-            if (this.counter % 40) {
+            if (this.counter % (30 + this.updateFreqyencyFactor)) {
                 this.closeEnemiesArr = this.closeEnemies(800);
                 this.closeUpgradesArr = this.closeUpgrades(800);
+                this.updateFreqyencyFactor = Math.floor(20 * Math.random());
             }
         };
         this.getCloseEnemies = () => {
@@ -1769,12 +1810,12 @@ exports.Player = Player;
 
 Object.defineProperty(exports, "__esModule", { value: true });
 const globalVariables_1 = __webpack_require__(6);
-const Actor_1 = __webpack_require__(20);
+const Actor_1 = __webpack_require__(22);
 const GeometryAndPhysics_1 = __webpack_require__(0);
 const globalVariables_2 = __webpack_require__(6);
 const enums_1 = __webpack_require__(1);
-const MapControler_1 = __webpack_require__(8);
-const GameController_1 = __webpack_require__(9);
+const MapControler_1 = __webpack_require__(9);
+const GameController_1 = __webpack_require__(8);
 class Enemy extends Actor_1.Actor {
     constructor(param) {
         super(param);
@@ -1782,9 +1823,12 @@ class Enemy extends Actor_1.Actor {
         this.kind = "";
         this.counter = 0;
         this.updatePack = {};
+        this.updateFreqyencyFactor = 0;
         this.extendedUpdate = () => {
-            if (this.playerToKill == undefined || this.counter % 40 === 0)
+            if (this.playerToKill == undefined || this.counter % (30 + this.updateFreqyencyFactor) === 0) {
                 this.playerToKill = this.getClosestPlayer(globalVariables_1.MAX_DISTANCE, 360);
+                this.updateFreqyencyFactor = Math.floor(Math.random() * 20);
+            }
             let diffX = 0;
             let diffY = 0;
             if (this.playerToKill) {
@@ -1793,7 +1837,7 @@ class Enemy extends Actor_1.Actor {
             }
             if (Math.abs(diffX) < 800 && Math.abs(diffY) < 800) {
                 this.update();
-                if (this.counter % 10 === 0) {
+                if (this.counter % (8 + Math.floor(this.updateFreqyencyFactor / 5)) === 0) {
                     this.updateAim(this.playerToKill, diffX, diffY);
                     this.updateKeyPress(this.playerToKill, diffX, diffY);
                 }
@@ -2190,7 +2234,7 @@ const PlayerClient_1 = __webpack_require__(5);
 const GeometryAndPhysics_1 = __webpack_require__(0);
 const canvas_1 = __webpack_require__(3);
 const images_1 = __webpack_require__(4);
-const EnemyConstants_1 = __webpack_require__(28);
+const EnemyConstants_1 = __webpack_require__(30);
 class EnemyClient {
     constructor(initPack) {
         this.id = -1;
@@ -2319,7 +2363,7 @@ exports.EnemyClient = EnemyClient;
 /***/ (function(module, exports, __webpack_require__) {
 
 Object.defineProperty(exports, "__esModule", { value: true });
-const PhysicsEntity_1 = __webpack_require__(29);
+const PhysicsEntity_1 = __webpack_require__(17);
 const globalVariables_1 = __webpack_require__(6);
 const GeometryAndPhysics_1 = __webpack_require__(0);
 const globalVariables_2 = __webpack_require__(6);
@@ -2370,7 +2414,7 @@ class Entity {
                 this._img = param.img;
             if (param.game !== undefined)
                 this._game = param.game;
-            this.physicsEntity = new PhysicsEntity_1.PhysicsEntity({ id: this.id, width: this.width / 2, height: this.height / 2 });
+            this.physicsEntity = new PhysicsEntity_1.PhysicsEntity({ id: this.id, width: this.width / 2, height: this.height / 2, game: this._game });
         }
     }
     get type() { return this._type; }
@@ -2397,7 +2441,7 @@ exports.Entity = Entity;
 
 Object.defineProperty(exports, "__esModule", { value: true });
 const GeometryAndPhysics_1 = __webpack_require__(0);
-const FireParticle_1 = __webpack_require__(24);
+const FireParticle_1 = __webpack_require__(26);
 class FireFlameClient {
     constructor(parent, burn = false) {
         this.particles = [];
@@ -2467,7 +2511,7 @@ exports.FireFlameClient = FireFlameClient;
 /***/ (function(module, exports, __webpack_require__) {
 
 Object.defineProperty(exports, "__esModule", { value: true });
-const GameController_1 = __webpack_require__(9);
+const GameController_1 = __webpack_require__(8);
 const Player_1 = __webpack_require__(10);
 const enums_1 = __webpack_require__(1);
 const GeometryAndPhysics_1 = __webpack_require__(0);
@@ -2618,8 +2662,96 @@ exports.Particle = Particle;
 /***/ (function(module, exports, __webpack_require__) {
 
 Object.defineProperty(exports, "__esModule", { value: true });
+const GeometryAndPhysics_1 = __webpack_require__(0);
+const GameController_1 = __webpack_require__(8);
+class PhysicsEntity {
+    constructor(param) {
+        this._id = Math.random();
+        this.Collision = {
+            elastic: function (_restitution) {
+                this._restitution = _restitution || .2;
+            },
+            displace: function () {
+            }
+        };
+        this.updateBounds = () => {
+            this._halfWidth = this._width * .5;
+            this._halfHeight = this._height * .5;
+        };
+        this.getMidX = () => {
+            return this._halfWidth + this.position.x;
+        };
+        this.getMidY = () => {
+            return this._halfHeight + this.position.y;
+        };
+        this.getTop = () => {
+            return this.position.y;
+        };
+        this.getLeft = () => {
+            return this.position.x;
+        };
+        this.getRight = () => {
+            return this.position.x + this._width;
+        };
+        this.getBottom = () => {
+            return this.position.y + this._height;
+        };
+        this._type = (param.type !== undefined) ? param.type : PhysicsEntity.DYNAMIC;
+        this._id = (param.id !== undefined) ? param.id : this._id;
+        this.collision = (param.collisionName !== undefined) ? param.collisionName : PhysicsEntity.ELASTIC;
+        this._width = (param.width !== undefined) ? param.width : 20;
+        this._height = (param.height !== undefined) ? param.height : 20;
+        this._alive = (param.alive !== undefined) ? param.alive : true;
+        this._moveable = (param.moveable !== undefined) ? param.moveable : true;
+        this._halfWidth = this._width * .5;
+        this._halfHeight = this._height * .5;
+        let collision = this.Collision[this.collision];
+        collision.call(this);
+        this._position = new GeometryAndPhysics_1.Point(0, 0);
+        this._velocity = new GeometryAndPhysics_1.Velocity(0, 0);
+        this._acceleration = new GeometryAndPhysics_1.Acceleration(0, 0);
+        this.updateBounds();
+        PhysicsEntity.fullList[this._id] = this;
+        if (this.alive == true)
+            PhysicsEntity.aliveList[this._id] = this;
+        if (this.moveable == true)
+            PhysicsEntity.moveableList[this._id] = this;
+        if (param.game !== undefined) {
+            if (GameController_1.GameController.list[param.game] !== undefined) {
+                GameController_1.GameController.list[param.game].physicsEngine.addEntity(this);
+            }
+        }
+    }
+    get halfWidth() { return this._halfWidth; }
+    get halfHeight() { return this._halfHeight; }
+    get restitution() { return this._restitution; }
+    get width() { return this.width; }
+    get height() { return this.height; }
+    get position() { return this._position; }
+    get velocity() { return this._velocity; }
+    get acceleration() { return this._acceleration; }
+    get type() { return this._type; }
+    get alive() { return this._alive; }
+    get moveable() { return this._moveable; }
+    get id() { return this._id; }
+}
+PhysicsEntity.KINEMATIC = 'kinematic';
+PhysicsEntity.DYNAMIC = 'dynamic';
+PhysicsEntity.DISPLACE = 'displace';
+PhysicsEntity.ELASTIC = 'elastic';
+PhysicsEntity.fullList = {};
+PhysicsEntity.moveableList = {};
+PhysicsEntity.aliveList = {};
+exports.PhysicsEntity = PhysicsEntity;
+
+
+/***/ }),
+/* 18 */
+/***/ (function(module, exports, __webpack_require__) {
+
+Object.defineProperty(exports, "__esModule", { value: true });
 const globalVariables_1 = __webpack_require__(6);
-const GameController_1 = __webpack_require__(9);
+const GameController_1 = __webpack_require__(8);
 class Smoke {
     constructor(position, maxRadius, time, speed, gameId) {
         this.position = position;
@@ -2703,7 +2835,7 @@ exports.Smoke = Smoke;
 
 
 /***/ }),
-/* 18 */
+/* 19 */
 /***/ (function(module, exports) {
 
 Object.defineProperty(exports, "__esModule", { value: true });
@@ -2722,7 +2854,7 @@ exports.Pack = Pack;
 
 
 /***/ }),
-/* 19 */
+/* 20 */
 /***/ (function(module, exports, __webpack_require__) {
 
 Object.defineProperty(exports, "__esModule", { value: true });
@@ -2732,8 +2864,8 @@ const Entity_1 = __webpack_require__(14);
 const globalVariables_1 = __webpack_require__(6);
 const GeometryAndPhysics_1 = __webpack_require__(0);
 const enums_1 = __webpack_require__(1);
-const MapControler_1 = __webpack_require__(8);
-const GameController_1 = __webpack_require__(9);
+const MapControler_1 = __webpack_require__(9);
+const GameController_1 = __webpack_require__(8);
 class Upgrade extends Entity_1.Entity {
     constructor(param) {
         super(Upgrade.updateParam(param));
@@ -2799,20 +2931,22 @@ Upgrade.updateSpecific = (upgrades) => {
         let closeUpgrades = player.getCloseUpgrades();
         for (let key in closeUpgrades) {
             let upgrade = Upgrade.list[closeUpgrades[key]];
-            let gameId = upgrades[key].game;
-            let isColliding = player.testCollision(upgrade);
-            if (isColliding) {
-                if (upgrade.category === enums_1.UpgradeCategory.item)
-                    player.inventory.addItem(upgrade.kind, 1);
-                if (upgrade.category === enums_1.UpgradeCategory.ammo)
-                    player.attackController.weaponCollection.addWeaponAmmo(upgrade.kind - 1000, upgrade.value);
-                globalVariables_1.removePack.upgrade.push(upgrade.id);
-                GameController_1.GameController.list[gameId].removePack.upgrade.push(upgrade.id);
-                delete Upgrade.list[key];
-                delete upgrades[key];
-                if (GameController_1.GameController.list[gameId].itemRespawn == true)
-                    Upgrade.randomlyGenerate(GameController_1.GameController.list[gameId]);
-                break;
+            if (upgrade !== undefined) {
+                let gameId = upgrade.game;
+                let isColliding = player.testCollision(upgrade);
+                if (isColliding) {
+                    if (upgrade.category === enums_1.UpgradeCategory.item)
+                        player.inventory.addItem(upgrade.kind, 1);
+                    if (upgrade.category === enums_1.UpgradeCategory.ammo)
+                        player.attackController.weaponCollection.addWeaponAmmo(upgrade.kind - 1000, upgrade.value);
+                    globalVariables_1.removePack.upgrade.push(upgrade.id);
+                    GameController_1.GameController.list[gameId].removePack.upgrade.push(upgrade.id);
+                    delete Upgrade.list[closeUpgrades[key]];
+                    delete closeUpgrades[key];
+                    if (GameController_1.GameController.list[gameId].itemRespawn == true)
+                        Upgrade.randomlyGenerate(GameController_1.GameController.list[gameId]);
+                    break;
+                }
             }
         }
     }
@@ -2862,17 +2996,34 @@ exports.Upgrade = Upgrade;
 
 
 /***/ }),
-/* 20 */
+/* 21 */
+/***/ (function(module, exports, __webpack_require__) {
+
+Object.defineProperty(exports, "__esModule", { value: true });
+const ObjectTile_1 = __webpack_require__(34);
+class MapObject {
+    constructor() {
+        this.objectTiles = [];
+        this.addObjectTile = (position, type) => {
+            this.objectTiles.push(new ObjectTile_1.ObjectTile(position, type));
+        };
+    }
+}
+exports.MapObject = MapObject;
+
+
+/***/ }),
+/* 22 */
 /***/ (function(module, exports, __webpack_require__) {
 
 Object.defineProperty(exports, "__esModule", { value: true });
 const globalVariables_1 = __webpack_require__(6);
-const GameController_1 = __webpack_require__(9);
-const Inventory_1 = __webpack_require__(21);
-const MapControler_1 = __webpack_require__(8);
-const MovementController_1 = __webpack_require__(37);
-const AttackControler_1 = __webpack_require__(38);
-const LifeAndBodyController_1 = __webpack_require__(42);
+const GameController_1 = __webpack_require__(8);
+const Inventory_1 = __webpack_require__(23);
+const MapControler_1 = __webpack_require__(9);
+const MovementController_1 = __webpack_require__(38);
+const AttackControler_1 = __webpack_require__(39);
+const LifeAndBodyController_1 = __webpack_require__(43);
 const Entity_1 = __webpack_require__(14);
 const GeometryAndPhysics_1 = __webpack_require__(0);
 class Actor extends Entity_1.Entity {
@@ -2973,11 +3124,11 @@ exports.Actor = Actor;
 
 
 /***/ }),
-/* 21 */
+/* 23 */
 /***/ (function(module, exports, __webpack_require__) {
 
 Object.defineProperty(exports, "__esModule", { value: true });
-const Item_1 = __webpack_require__(36);
+const Item_1 = __webpack_require__(37);
 const Player_1 = __webpack_require__(10);
 class Inventory {
     constructor(socket, server, owner) {
@@ -3074,7 +3225,7 @@ exports.Inventory = Inventory;
 
 
 /***/ }),
-/* 22 */
+/* 24 */
 /***/ (function(module, exports) {
 
 Object.defineProperty(exports, "__esModule", { value: true });
@@ -3110,7 +3261,7 @@ exports.Counter = Counter;
 
 
 /***/ }),
-/* 23 */
+/* 25 */
 /***/ (function(module, exports, __webpack_require__) {
 
 Object.defineProperty(exports, "__esModule", { value: true });
@@ -3162,7 +3313,7 @@ exports.ExplosionClient = ExplosionClient;
 
 
 /***/ }),
-/* 24 */
+/* 26 */
 /***/ (function(module, exports, __webpack_require__) {
 
 Object.defineProperty(exports, "__esModule", { value: true });
@@ -3197,7 +3348,7 @@ exports.FireParticle = FireParticle;
 
 
 /***/ }),
-/* 25 */
+/* 27 */
 /***/ (function(module, exports, __webpack_require__) {
 
 Object.defineProperty(exports, "__esModule", { value: true });
@@ -3333,7 +3484,7 @@ exports.Camera = Camera;
 
 
 /***/ }),
-/* 26 */
+/* 28 */
 /***/ (function(module, exports, __webpack_require__) {
 
 Object.defineProperty(exports, "__esModule", { value: true });
@@ -3435,12 +3586,15 @@ class GUI {
             Ra[enums_1.TerrainMaterial.dirt] = 255;
             Ra[enums_1.TerrainMaterial.water] = 0;
             Ra[enums_1.TerrainMaterial.stone] = 128;
+            Ra[enums_1.TerrainMaterial.darkdirt] = 139;
             Ga[enums_1.TerrainMaterial.dirt] = 255;
             Ga[enums_1.TerrainMaterial.water] = 0;
             Ga[enums_1.TerrainMaterial.stone] = 128;
+            Ga[enums_1.TerrainMaterial.darkdirt] = 69;
             Ba[enums_1.TerrainMaterial.dirt] = 0;
             Ba[enums_1.TerrainMaterial.water] = 255;
             Ba[enums_1.TerrainMaterial.stone] = 128;
+            Ba[enums_1.TerrainMaterial.darkdirt] = 19;
             let material;
             for (let i = 0; i < imgSize; i++) {
                 for (let j = 0; j < imgSize; j++) {
@@ -3494,7 +3648,7 @@ exports.GUI = GUI;
 
 
 /***/ }),
-/* 27 */
+/* 29 */
 /***/ (function(module, exports, __webpack_require__) {
 
 Object.defineProperty(exports, "__esModule", { value: true });
@@ -3675,7 +3829,7 @@ socket.on('signUpResponse', function (data) {
 
 
 /***/ }),
-/* 28 */
+/* 30 */
 /***/ (function(module, exports) {
 
 Object.defineProperty(exports, "__esModule", { value: true });
@@ -3686,78 +3840,56 @@ exports.framesAttack['zombie'] = 9;
 
 
 /***/ }),
-/* 29 */
+/* 31 */
 /***/ (function(module, exports, __webpack_require__) {
 
 Object.defineProperty(exports, "__esModule", { value: true });
-const GeometryAndPhysics_1 = __webpack_require__(0);
-class PhysicsEntity {
-    constructor(param) {
-        this.id = Math.random();
-        this.Collision = {
-            elastic: function (_restitution) {
-                this._restitution = _restitution || .2;
-            },
-            displace: function () {
+const PhysicsEntity_1 = __webpack_require__(17);
+class PhysicsEngine {
+    constructor() {
+        this.moveableEntities = {};
+        this.aliveEntities = {};
+        this.allEntities = {};
+        this.step = (elapsed) => {
+            let entity;
+            let gx = 0;
+            let gy = 0;
+            for (let i in this.moveableEntities) {
+                entity = this.moveableEntities[i];
+                switch (entity.type) {
+                    case PhysicsEntity_1.PhysicsEntity.DYNAMIC:
+                        entity.velocity.x += entity.acceleration.x * elapsed + gx;
+                        entity.velocity.y += entity.acceleration.y * elapsed + gy;
+                        entity.velocity.x += entity.velocity.x * elapsed;
+                        entity.velocity.y += entity.velocity.y * elapsed;
+                        break;
+                    case PhysicsEntity_1.PhysicsEntity.KINEMATIC:
+                        entity.velocity.x += entity.acceleration.x * elapsed;
+                        entity.velocity.y += entity.acceleration.y * elapsed;
+                        entity.velocity.x += entity.velocity.x * elapsed;
+                        entity.velocity.y += entity.velocity.y * elapsed;
+                        break;
+                }
             }
         };
-        this.updateBounds = () => {
-            this._halfWidth = this._width * .5;
-            this._halfHeight = this._height * .5;
+        this.detectCollisions = () => {
         };
-        this.getMidX = () => {
-            return this._halfWidth + this.position.x;
+        this.addEntity = (entity) => {
+            if (entity !== undefined) {
+                this.allEntities[entity.id] = entity;
+                if (entity.moveable == true)
+                    this.moveableEntities[entity.id] = entity;
+                if (entity.alive == true)
+                    this.aliveEntities[entity.id] = entity;
+            }
         };
-        this.getMidY = () => {
-            return this._halfHeight + this.position.y;
-        };
-        this.getTop = () => {
-            return this.position.y;
-        };
-        this.getLeft = () => {
-            return this.position.x;
-        };
-        this.getRight = () => {
-            return this.position.x + this._width;
-        };
-        this.getBottom = () => {
-            return this.position.y + this._height;
-        };
-        this._type = (param.type !== undefined) ? param.type : PhysicsEntity.DYNAMIC;
-        this.id = (param.id !== undefined) ? param.id : this.id;
-        this.collision = (param.collisionName !== undefined) ? param.collisionName : PhysicsEntity.ELASTIC;
-        this._width = (param.width !== undefined) ? param.width : 20;
-        this._height = (param.height !== undefined) ? param.height : 20;
-        this._halfWidth = this._width * .5;
-        this._halfHeight = this._height * .5;
-        let collision = this.Collision[this.collision];
-        collision.call(this);
-        this._position = new GeometryAndPhysics_1.Point(0, 0);
-        this._velocity = new GeometryAndPhysics_1.Velocity(0, 0);
-        this._acceleration = new GeometryAndPhysics_1.Acceleration(0, 0);
-        this.updateBounds();
-        PhysicsEntity.list[this.id] = this;
     }
-    get halfWidth() { return this._halfWidth; }
-    get halfHeight() { return this._halfHeight; }
-    get restitution() { return this._restitution; }
-    get width() { return this.width; }
-    get height() { return this.height; }
-    get position() { return this._position; }
-    get velocity() { return this._velocity; }
-    get acceleration() { return this._acceleration; }
-    get type() { return this._type; }
 }
-PhysicsEntity.KINEMATIC = 'kinematic';
-PhysicsEntity.DYNAMIC = 'dynamic';
-PhysicsEntity.DISPLACE = 'displace';
-PhysicsEntity.ELASTIC = 'elastic';
-PhysicsEntity.list = {};
-exports.PhysicsEntity = PhysicsEntity;
+exports.PhysicsEngine = PhysicsEngine;
 
 
 /***/ }),
-/* 30 */
+/* 32 */
 /***/ (function(module, exports, __webpack_require__) {
 
 Object.defineProperty(exports, "__esModule", { value: true });
@@ -3875,11 +4007,11 @@ exports.SpawnObjectMapChecker = SpawnObjectMapChecker;
 
 
 /***/ }),
-/* 31 */
+/* 33 */
 /***/ (function(module, exports, __webpack_require__) {
 
 Object.defineProperty(exports, "__esModule", { value: true });
-const MapObject_1 = __webpack_require__(32);
+const MapObject_1 = __webpack_require__(21);
 const GeometryAndPhysics_1 = __webpack_require__(0);
 const enums_1 = __webpack_require__(1);
 class GroundRing extends MapObject_1.MapObject {
@@ -3959,24 +4091,7 @@ exports.GroundRing = GroundRing;
 
 
 /***/ }),
-/* 32 */
-/***/ (function(module, exports, __webpack_require__) {
-
-Object.defineProperty(exports, "__esModule", { value: true });
-const ObjectTile_1 = __webpack_require__(33);
-class MapObject {
-    constructor() {
-        this.objectTiles = [];
-        this.addObjectTile = (position, type) => {
-            this.objectTiles.push(new ObjectTile_1.ObjectTile(position, type));
-        };
-    }
-}
-exports.MapObject = MapObject;
-
-
-/***/ }),
-/* 33 */
+/* 34 */
 /***/ (function(module, exports, __webpack_require__) {
 
 Object.defineProperty(exports, "__esModule", { value: true });
@@ -3998,7 +4113,7 @@ exports.ObjectTile = ObjectTile;
 
 
 /***/ }),
-/* 34 */
+/* 35 */
 /***/ (function(module, exports, __webpack_require__) {
 
 Object.defineProperty(exports, "__esModule", { value: true });
@@ -4045,7 +4160,7 @@ exports.GameMap = GameMap;
 
 
 /***/ }),
-/* 35 */
+/* 36 */
 /***/ (function(module, exports, __webpack_require__) {
 
 Object.defineProperty(exports, "__esModule", { value: true });
@@ -4117,7 +4232,7 @@ exports.MapTile = MapTile;
 
 
 /***/ }),
-/* 36 */
+/* 37 */
 /***/ (function(module, exports, __webpack_require__) {
 
 Object.defineProperty(exports, "__esModule", { value: true });
@@ -4192,12 +4307,12 @@ new Item(enums_1.WeaponType.claws, "Claws", function (actor) {
 
 
 /***/ }),
-/* 37 */
+/* 38 */
 /***/ (function(module, exports, __webpack_require__) {
 
 Object.defineProperty(exports, "__esModule", { value: true });
-const MapControler_1 = __webpack_require__(8);
-const Counter_1 = __webpack_require__(22);
+const MapControler_1 = __webpack_require__(9);
+const Counter_1 = __webpack_require__(24);
 const GeometryAndPhysics_1 = __webpack_require__(0);
 class MovementController {
     constructor(parent, param) {
@@ -4303,15 +4418,15 @@ exports.MovementController = MovementController;
 
 
 /***/ }),
-/* 38 */
+/* 39 */
 /***/ (function(module, exports, __webpack_require__) {
 
 Object.defineProperty(exports, "__esModule", { value: true });
 const enums_1 = __webpack_require__(1);
-const Flame_1 = __webpack_require__(39);
-const Bullet_1 = __webpack_require__(40);
-const WeaponCollection_1 = __webpack_require__(41);
-const Counter_1 = __webpack_require__(22);
+const Flame_1 = __webpack_require__(40);
+const Bullet_1 = __webpack_require__(41);
+const WeaponCollection_1 = __webpack_require__(42);
+const Counter_1 = __webpack_require__(24);
 const WeaponTypes_1 = __webpack_require__(12);
 const GeometryAndPhysics_1 = __webpack_require__(0);
 class AttackController {
@@ -4437,7 +4552,7 @@ exports.AttackController = AttackController;
 
 
 /***/ }),
-/* 39 */
+/* 40 */
 /***/ (function(module, exports, __webpack_require__) {
 
 Object.defineProperty(exports, "__esModule", { value: true });
@@ -4501,17 +4616,17 @@ exports.Flame = Flame;
 
 
 /***/ }),
-/* 40 */
+/* 41 */
 /***/ (function(module, exports, __webpack_require__) {
 
 Object.defineProperty(exports, "__esModule", { value: true });
-const GameController_1 = __webpack_require__(9);
+const GameController_1 = __webpack_require__(8);
 const GeometryAndPhysics_1 = __webpack_require__(0);
 const Enemy_1 = __webpack_require__(11);
 const Player_1 = __webpack_require__(10);
 const Entity_1 = __webpack_require__(14);
 const globalVariables_1 = __webpack_require__(6);
-const MapControler_1 = __webpack_require__(8);
+const MapControler_1 = __webpack_require__(9);
 class Bullet extends Entity_1.Entity {
     constructor(param) {
         super(Bullet.updateParam(param));
@@ -4652,7 +4767,7 @@ exports.Bullet = Bullet;
 
 
 /***/ }),
-/* 41 */
+/* 42 */
 /***/ (function(module, exports, __webpack_require__) {
 
 Object.defineProperty(exports, "__esModule", { value: true });
@@ -4866,7 +4981,7 @@ exports.SingleWeapon = SingleWeapon;
 
 
 /***/ }),
-/* 42 */
+/* 43 */
 /***/ (function(module, exports) {
 
 Object.defineProperty(exports, "__esModule", { value: true });
@@ -4925,7 +5040,7 @@ exports.LifeAndBodyController = LifeAndBodyController;
 
 
 /***/ }),
-/* 43 */
+/* 44 */
 /***/ (function(module, exports, __webpack_require__) {
 
 Object.defineProperty(exports, "__esModule", { value: true });
@@ -4973,7 +5088,7 @@ exports.ParticleClient = ParticleClient;
 
 
 /***/ }),
-/* 44 */
+/* 45 */
 /***/ (function(module, exports, __webpack_require__) {
 
 Object.defineProperty(exports, "__esModule", { value: true });
@@ -4993,7 +5108,6 @@ class UpgradeClient {
             }
             if (p.position.x - this.position.x > WIDTH || p.position.y - this.position.y > HEIGHT)
                 return;
-            console.log(this.img);
             let frame = images_1.jsonIAE["frames"][this.img + ".png"]["frame"];
             let frameWidth = frame["w"];
             let frameHeight = frame["h"];
@@ -5015,7 +5129,7 @@ exports.UpgradeClient = UpgradeClient;
 
 
 /***/ }),
-/* 45 */
+/* 46 */
 /***/ (function(module, exports, __webpack_require__) {
 
 Object.defineProperty(exports, "__esModule", { value: true });
@@ -5023,7 +5137,7 @@ const game_1 = __webpack_require__(2);
 const EnemyClient_1 = __webpack_require__(13);
 const GeometryAndPhysics_1 = __webpack_require__(0);
 const PlayerClient_1 = __webpack_require__(5);
-const ExplosionClient_1 = __webpack_require__(23);
+const ExplosionClient_1 = __webpack_require__(25);
 const game_2 = __webpack_require__(2);
 const canvas_1 = __webpack_require__(3);
 const images_1 = __webpack_require__(4);
@@ -5091,7 +5205,7 @@ exports.BulletClient = BulletClient;
 
 
 /***/ }),
-/* 46 */
+/* 47 */
 /***/ (function(module, exports) {
 
 Object.defineProperty(exports, "__esModule", { value: true });
@@ -5171,7 +5285,7 @@ exports.GameSoundManager = GameSoundManager;
 
 
 /***/ }),
-/* 47 */
+/* 48 */
 /***/ (function(module, exports, __webpack_require__) {
 
 Object.defineProperty(exports, "__esModule", { value: true });
@@ -5245,7 +5359,7 @@ exports.MapClient = MapClient;
 
 
 /***/ }),
-/* 48 */
+/* 49 */
 /***/ (function(module, exports) {
 
 Object.defineProperty(exports, "__esModule", { value: true });
@@ -5300,11 +5414,11 @@ exports.Filters = Filters;
 
 
 /***/ }),
-/* 49 */
+/* 50 */
 /***/ (function(module, exports, __webpack_require__) {
 
 Object.defineProperty(exports, "__esModule", { value: true });
-const Particle_1 = __webpack_require__(50);
+const Particle_1 = __webpack_require__(51);
 const images_1 = __webpack_require__(4);
 class Effects {
     constructor(ctx) {
@@ -5352,7 +5466,7 @@ exports.Effects = Effects;
 
 
 /***/ }),
-/* 50 */
+/* 51 */
 /***/ (function(module, exports, __webpack_require__) {
 
 Object.defineProperty(exports, "__esModule", { value: true });
@@ -5412,11 +5526,11 @@ exports.Particle = Particle;
 
 
 /***/ }),
-/* 51 */
+/* 52 */
 /***/ (function(module, exports, __webpack_require__) {
 
 Object.defineProperty(exports, "__esModule", { value: true });
-const SmokeParticle_1 = __webpack_require__(52);
+const SmokeParticle_1 = __webpack_require__(53);
 const GeometryAndPhysics_1 = __webpack_require__(0);
 const game_1 = __webpack_require__(2);
 const PlayerClient_1 = __webpack_require__(5);
@@ -5476,7 +5590,7 @@ exports.SmokeClient = SmokeClient;
 
 
 /***/ }),
-/* 52 */
+/* 53 */
 /***/ (function(module, exports, __webpack_require__) {
 
 Object.defineProperty(exports, "__esModule", { value: true });

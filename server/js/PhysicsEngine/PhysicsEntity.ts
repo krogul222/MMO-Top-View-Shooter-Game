@@ -1,7 +1,8 @@
 import { Point, Velocity, Acceleration } from './../GeometryAndPhysics';
+import { GameController } from '../Controllers/GameController';
 export class PhysicsEntity{
 
-    private id = Math.random();
+    private _id = Math.random();
     private _type;
     private collision;
     private _width: number;
@@ -12,7 +13,9 @@ export class PhysicsEntity{
     private _velocity: Velocity;
     private _acceleration: Acceleration;
     private _restitution: number;
-
+    private _alive: boolean;
+    private _moveable: boolean;
+    
     private Collision = {
            // Elastic collisions refer to the simple cast where
            // two entities collide and a transfer of energy is
@@ -38,7 +41,7 @@ export class PhysicsEntity{
         // Type represents the collision detector's handling
         this._type = (param.type !== undefined) ? param.type : PhysicsEntity.DYNAMIC;
     
-        this.id = (param.id !== undefined) ? param.id : this.id;
+        this._id = (param.id !== undefined) ? param.id : this._id;
         
         // Collision represents the type of collision
         // another object will receive upon colliding
@@ -47,6 +50,11 @@ export class PhysicsEntity{
         // Take in a width and height
         this._width  = (param.width !== undefined) ? param.width : 20;
         this._height  = (param.height !== undefined) ? param.height : 20;
+
+        //
+        this._alive  = (param.alive !== undefined) ? param.alive : true;
+        //
+        this._moveable  = (param.moveable !== undefined) ? param.moveable : true;
 
         // Store a half size for quicker calculations
         this._halfWidth = this._width * .5;
@@ -68,7 +76,17 @@ export class PhysicsEntity{
         // the half sizes and any other pieces
         this.updateBounds();
 
-        PhysicsEntity.list[this.id] = this;
+        PhysicsEntity.fullList[this._id] = this;
+    
+        if(this.alive == true) PhysicsEntity.aliveList[this._id] = this;
+
+        if(this.moveable == true) PhysicsEntity.moveableList[this._id] = this;
+
+        if(param.game !== undefined){
+            if(GameController.list[param.game] !== undefined){
+                GameController.list[param.game].physicsEngine.addEntity(this);
+            }
+        }
     }
 
     // Update bounds includes the rect's
@@ -114,6 +132,9 @@ export class PhysicsEntity{
     get velocity() { return this._velocity; }
     get acceleration() { return this._acceleration; }
     get type() { return this._type; }
+    get alive() { return this._alive; }
+    get moveable() { return this._moveable; }
+    get id() { return this._id }
 
     // Constants
     
@@ -147,5 +168,9 @@ export class PhysicsEntity{
     // its restituion coefficient
     static ELASTIC = 'elastic';
 
-    static list = {};
+    static fullList = {};
+
+    static moveableList = {};
+
+    static aliveList = {};
 }

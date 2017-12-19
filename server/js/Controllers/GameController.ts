@@ -1,3 +1,4 @@
+import { PhysicsEngine } from './../PhysicsEngine/PhysicsEngine';
 import { Smoke } from './../Effects/Smoke';
 import { Pack } from './../Pack';
 import { Player } from './../Entities/Player';
@@ -19,6 +20,7 @@ export class GameController {
     map: string = "forest";
     initPack = new Pack();
     removePack = new Pack();
+    private _physicsEngine = new PhysicsEngine();
 
     constructor(param){
         this.id = Math.random();
@@ -124,6 +126,7 @@ export class GameController {
         console.log("Enemy ADDED TO GAME");
     }
     
+    get physicsEngine() { return this._physicsEngine; }
 
     static list = {};
 }

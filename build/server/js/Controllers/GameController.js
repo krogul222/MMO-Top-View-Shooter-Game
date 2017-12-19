@@ -1,4 +1,5 @@
 Object.defineProperty(exports, "__esModule", { value: true });
+const PhysicsEngine_1 = require("./../PhysicsEngine/PhysicsEngine");
 const Smoke_1 = require("./../Effects/Smoke");
 const Pack_1 = require("./../Pack");
 const Player_1 = require("./../Entities/Player");
@@ -17,6 +18,7 @@ class GameController {
         this.map = "forest";
         this.initPack = new Pack_1.Pack();
         this.removePack = new Pack_1.Pack();
+        this._physicsEngine = new PhysicsEngine_1.PhysicsEngine();
         this.addSocket = (socket) => {
             this.socketList[socket.id] = socket.id;
             console.log("SOCKET ADDED " + this.socketList[socket.id]);
@@ -65,6 +67,7 @@ class GameController {
         MapControler_1.MapController.updatePack.push(MapControler_1.MapController.getMapPack(this.map));
         GameController.list[this.id] = this;
     }
+    get physicsEngine() { return this._physicsEngine; }
 }
 GameController.remove = (id) => {
     let game = GameController.list[id];

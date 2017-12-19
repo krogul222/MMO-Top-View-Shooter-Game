@@ -384,7 +384,7 @@ setInterval(function(){
     }
 
     for(let i in ExplosionClient.list){
-        ExplosionClient.list[i].spriteAnimCounter += 0.4;
+        ExplosionClient.list[i].spriteAnimCounter += 1;
     
         if(ExplosionClient.list[i].isCompleted()){
             delete ExplosionClient.list[i];

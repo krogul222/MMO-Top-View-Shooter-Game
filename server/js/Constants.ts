@@ -29,26 +29,31 @@ imageName[ WeaponAmmoType.flamethrower ] = "flamethrowerammo";
 mapTileImageName[ TerrainMaterial.dirt ] = "dirt";
 mapTileImageName[ TerrainMaterial.water ] = "water";
 mapTileImageName[ TerrainMaterial.stone ] = "stone";
+mapTileImageName[ TerrainMaterial.darkdirt ] = "darkDirt";
 
 mapTileSideImageName[Orientation.left] = {};
 mapTileSideImageName[Orientation.left][TerrainMaterial.stone] = "stoneL"; 
 mapTileSideImageName[Orientation.left][TerrainMaterial.dirt] = "dirtL"; 
 mapTileSideImageName[Orientation.left][TerrainMaterial.water] = "waterL"; 
+mapTileSideImageName[Orientation.left][TerrainMaterial.darkdirt] = "darkDirtL"; 
 
 mapTileSideImageName[Orientation.right] = {};
 mapTileSideImageName[Orientation.right][TerrainMaterial.stone] = "stoneR"; 
 mapTileSideImageName[Orientation.right][TerrainMaterial.dirt] = "dirtR"; 
 mapTileSideImageName[Orientation.right][TerrainMaterial.water] = "waterR"; 
+mapTileSideImageName[Orientation.right][TerrainMaterial.darkdirt] = "darkDirtR"; 
 
 mapTileSideImageName[Orientation.up] = {};
 mapTileSideImageName[Orientation.up][TerrainMaterial.stone] = "stoneU"; 
 mapTileSideImageName[Orientation.up][TerrainMaterial.dirt] = "dirtU";
 mapTileSideImageName[Orientation.up][TerrainMaterial.water] = "waterU";
+mapTileSideImageName[Orientation.up][TerrainMaterial.darkdirt] = "darkDirtU";
 
 mapTileSideImageName[Orientation.down] = {};
 mapTileSideImageName[Orientation.down][TerrainMaterial.stone] = "stoneD"; 
 mapTileSideImageName[Orientation.down][TerrainMaterial.dirt] = "dirtD";
 mapTileSideImageName[Orientation.down][TerrainMaterial.water] = "waterD";
+mapTileSideImageName[Orientation.down][TerrainMaterial.darkdirt] = "darkDirtD";
 
 mapTileCornerImageName[CornerOrientation.RU] = {};
 mapTileCornerImageName[CornerOrientation.RU][TerrainMaterial.stone] = "stoneRU"; 
@@ -83,6 +88,8 @@ mapObjectImageName[MapObjectType.GR_EU] = "groundRingUenter";
 mapObjectImageName[MapObjectType.GR_ED] = "groundRingDenter";
 mapObjectImageName[MapObjectType.GR_EL] = "groundRingLenter";
 mapObjectImageName[MapObjectType.GR_ER] = "groundRingRenter";
+mapObjectImageName[MapObjectType.SS] = "solidstone";
+mapObjectImageName[MapObjectType.RO] = "radiooil";
 //--------------------------------------------------------
 
 mapObjectCollisions[MapObjectType.GR_D] = [0,0,0,0,0,0,0,0, 0,0,0,0,0,0,0,0, 0,0,0,0,0,0,0,0, 0,0,0,0,0,0,0,0, 0,0,0,0,0,0,0,0, 0,0,0,0,0,0,0,0, 2,2,2,2,2,2,2,2, 2,2,2,2,2,2,2,2]; 
@@ -99,3 +106,6 @@ mapObjectCollisions[MapObjectType.GR_EU] = [0,0,0,0,0,0,0,0, 0,0,0,0,0,0,0,0, 2,
 mapObjectCollisions[MapObjectType.GR_ED] = [0,0,0,0,0,0,0,0, 0,0,0,0,0,0,0,0, 0,0,0,0,0,0,0,0, 0,0,0,0,0,0,0,0, 0,0,0,0,0,0,0,0, 0,0,0,1,1,0,0,0, 2,2,2,1,1,2,2,2, 2,2,2,1,1,2,2,2];
 mapObjectCollisions[MapObjectType.GR_EL] = [0,0,0,0,0,2,0,0, 0,0,0,0,0,2,0,0, 0,0,0,0,0,2,0,0, 0,0,0,0,0,1,1,0, 0,0,0,0,0,1,1,0, 0,0,0,0,0,2,0,0, 0,0,0,0,0,2,0,0, 0,0,0,0,0,2,0,0];
 mapObjectCollisions[MapObjectType.GR_ER] = [0,0,2,0,0,0,0,0, 0,0,2,0,0,0,0,0, 0,0,2,0,0,0,0,0, 0,1,1,0,0,0,0,0, 0,1,1,0,0,0,0,0, 0,0,2,0,0,0,0,0, 0,0,2,0,0,0,0,0, 0,0,2,0,0,0,0,0];
+
+mapObjectCollisions[MapObjectType.SS] = [0,0,0,0,0,0,0,0, 0,0,0,0,0,0,0,0, 0,0,0,3,3,0,0,0, 0,0,0,3,3,3,0,0, 0,0,0,3,3,3,0,0, 0,0,0,0,0,0,0,0, 0,0,0,0,0,0,0,0, 0,0,0,0,0,0,0,0];
+mapObjectCollisions[MapObjectType.RO] = [0,0,0,0,0,0,0,0, 0,0,0,0,0,0,0,0, 0,0,0,0,0,0,0,0, 0,1,1,1,1,1,1,0, 0,1,1,1,1,1,1,0, 0,0,0,0,0,0,0,0, 0,0,0,0,0,0,0,0, 0,0,0,0,0,0,0,0];

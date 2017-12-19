@@ -1,11 +1,10 @@
-import { MapClient } from './../../../client/js/MapClient';
 import { SpawnObjectMapChecker } from './../Map/SpawnObjectMapChecker';
 import { GroundRing } from './../Map/MapObjects/GroundRing';
 import { ObjectTile } from './../Map/MapObjects/ObjectTile';
 import { MapObject } from './../Map/MapObjects/MapObject';
 import { GameMap } from './../Map/GameMap';
 import { MapTile } from '../Map/MapTile';
-import { TerrainMaterial, getRandomInt, randomEnum, TerrainMaterialWithoutWater, Orientation, CornerOrientation } from '../enums';
+import { TerrainMaterial, getRandomInt, randomEnum, TerrainMaterialWithoutWater, Orientation, CornerOrientation, MapObjectType } from '../enums';
 import { Point } from '../GeometryAndPhysics';
 import { TILE_SIZE } from '../Constants';
 import { Enemy } from '../Entities/Enemy';
@@ -193,7 +192,10 @@ export class MapController {
         }
 
         MapController.generateGroundRings(mapTiles, seedMaterial, seedPosition);
-    
+
+       // MapController.generateSolidStones(mapTiles, seedMaterial, seedPosition);
+        MapController.generateBasicObject(MapObjectType.RO, TerrainMaterial.stone ,mapTiles, seedMaterial, seedPosition);
+        MapController.generateBasicObject(MapObjectType.SS, TerrainMaterial.darkdirt ,mapTiles, seedMaterial, seedPosition);
 /*
         let width = getRandomInt(0,4);
         let height = getRandomInt(0,4);
@@ -246,6 +248,33 @@ export class MapController {
                                 if(!gr.isColliding(mapTiles, new Point(grSpawnPosition.x,grSpawnPosition.y))){
                                     MapController.loadObject(gr ,mapTiles, new Point(grSpawnPosition.x,grSpawnPosition.y));
                                 }      
+                            }
+                        }        
+                    }
+               }
+    }
+
+    static generateBasicObject = (mapObjectType :MapObjectType, material : TerrainMaterial,  mapTiles: MapTile[][], seedMaterial: TerrainMaterial[], seedPosition: Point[]) => {
+        let Checkers: SpawnObjectMapChecker[] = [];
+        
+                Checkers[0] = new SpawnObjectMapChecker(mapTiles, material, new Point(2,2));
+                
+                let spawnPosition: Point;
+                let mapObject: MapObject = new MapObject();
+                mapObject.addObjectTile(new Point(0,0) , mapObjectType);
+                let enter: Orientation;
+                let seeds = seedMaterial.length;
+
+                for(let k = 0; k < seeds; k++){
+                    if(seedMaterial[k] == material){
+                        for(let i = 0; i < Checkers.length; i++){
+                            spawnPosition = Checkers[i].search(seedPosition[k]);
+                            console.log("Pozycja: " + spawnPosition.x + " "+ spawnPosition.y);
+                            if(spawnPosition.x > -1 && spawnPosition.y > -1){
+                              //  gr = new GroundRing(grCheckers[i].size.x, grCheckers[i].size.y, enter);
+                              //  if(!gr.isColliding(mapTiles, new Point(grSpawnPosition.x,grSpawnPosition.y))){
+                                    MapController.loadObject(mapObject, mapTiles, new Point(spawnPosition.x,spawnPosition.y));
+                              //  }      
                             }
                         }        
                     }

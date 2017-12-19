@@ -97,12 +97,15 @@ class GUI {
             Ra[enums_1.TerrainMaterial.dirt] = 255;
             Ra[enums_1.TerrainMaterial.water] = 0;
             Ra[enums_1.TerrainMaterial.stone] = 128;
+            Ra[enums_1.TerrainMaterial.darkdirt] = 139;
             Ga[enums_1.TerrainMaterial.dirt] = 255;
             Ga[enums_1.TerrainMaterial.water] = 0;
             Ga[enums_1.TerrainMaterial.stone] = 128;
+            Ga[enums_1.TerrainMaterial.darkdirt] = 69;
             Ba[enums_1.TerrainMaterial.dirt] = 0;
             Ba[enums_1.TerrainMaterial.water] = 255;
             Ba[enums_1.TerrainMaterial.stone] = 128;
+            Ba[enums_1.TerrainMaterial.darkdirt] = 19;
             let material;
             for (let i = 0; i < imgSize; i++) {
                 for (let j = 0; j < imgSize; j++) {

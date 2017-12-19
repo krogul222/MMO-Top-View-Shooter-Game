@@ -37,11 +37,13 @@ var TerrainMaterial;
     TerrainMaterial[TerrainMaterial["dirt"] = 1] = "dirt";
     TerrainMaterial[TerrainMaterial["water"] = 2] = "water";
     TerrainMaterial[TerrainMaterial["stone"] = 3] = "stone";
+    TerrainMaterial[TerrainMaterial["darkdirt"] = 4] = "darkdirt";
 })(TerrainMaterial = exports.TerrainMaterial || (exports.TerrainMaterial = {}));
 var TerrainMaterialWithoutWater;
 (function (TerrainMaterialWithoutWater) {
     TerrainMaterialWithoutWater[TerrainMaterialWithoutWater["dirt"] = 1] = "dirt";
     TerrainMaterialWithoutWater[TerrainMaterialWithoutWater["stone"] = 3] = "stone";
+    TerrainMaterialWithoutWater[TerrainMaterialWithoutWater["darkdirt"] = 4] = "darkdirt";
 })(TerrainMaterialWithoutWater = exports.TerrainMaterialWithoutWater || (exports.TerrainMaterialWithoutWater = {}));
 var Orientation;
 (function (Orientation) {
@@ -90,6 +92,8 @@ var MapObjectType;
     MapObjectType[MapObjectType["GR_ED"] = 10] = "GR_ED";
     MapObjectType[MapObjectType["GR_EL"] = 11] = "GR_EL";
     MapObjectType[MapObjectType["GR_ER"] = 12] = "GR_ER";
+    MapObjectType[MapObjectType["SS"] = 13] = "SS";
+    MapObjectType[MapObjectType["RO"] = 14] = "RO";
 })(MapObjectType = exports.MapObjectType || (exports.MapObjectType = {}));
 function randomEnum(myEnum) {
     const enumValues = Object.keys(myEnum)

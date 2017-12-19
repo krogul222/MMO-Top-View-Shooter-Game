@@ -1,13 +1,18 @@
 import { PhysicsEntity } from './PhysicsEntity';
 export class PhysicsEngine{
-    static step = (elapsed: number) => {
+    
+    moveableEntities = {};
+    aliveEntities = {};
+    allEntities = {};
+    
+    step = (elapsed: number) => {
 
         let entity: PhysicsEntity;
         let gx = 0;
         let gy = 0;
 
-        for (let i in PhysicsEntity.list) {
-            entity = PhysicsEntity.list[i];
+        for (let i in this.moveableEntities) {
+            entity = this.moveableEntities[i];
             switch (entity.type) {
                 case PhysicsEntity.DYNAMIC:
                     entity.velocity.x += entity.acceleration.x * elapsed + gx;
@@ -23,7 +28,7 @@ export class PhysicsEngine{
                     break;
             }
         }
-         
+       /*  
         var collisions = this.collider.detectCollisions(
             this.player, 
             this.collidables
@@ -32,6 +37,18 @@ export class PhysicsEngine{
         if (collisions != null) {
             this.solver.resolve(this.player, collisions);
         }
+    */
+    }
     
+    detectCollisions = () => {
+
+    }
+
+    addEntity = (entity: PhysicsEntity) => {
+        if(entity !== undefined){
+            this.allEntities[entity.id] = entity;
+            if(entity.moveable == true) this.moveableEntities[entity.id] = entity;
+            if(entity.alive == true) this.aliveEntities[entity.id] = entity;
+        }
     }
 }

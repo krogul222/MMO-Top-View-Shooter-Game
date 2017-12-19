@@ -1,6 +1,7 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 const SpawnObjectMapChecker_1 = require("./../Map/SpawnObjectMapChecker");
 const GroundRing_1 = require("./../Map/MapObjects/GroundRing");
+const MapObject_1 = require("./../Map/MapObjects/MapObject");
 const GameMap_1 = require("./../Map/GameMap");
 const MapTile_1 = require("../Map/MapTile");
 const enums_1 = require("../enums");
@@ -149,6 +150,8 @@ MapController.createMap = (name, size, seeds, water = 10) => {
         }
     }
     MapController.generateGroundRings(mapTiles, seedMaterial, seedPosition);
+    MapController.generateBasicObject(enums_1.MapObjectType.RO, enums_1.TerrainMaterial.stone, mapTiles, seedMaterial, seedPosition);
+    MapController.generateBasicObject(enums_1.MapObjectType.SS, enums_1.TerrainMaterial.darkdirt, mapTiles, seedMaterial, seedPosition);
     MapController.maps[name] = (new GameMap_1.GameMap(name, mapTiles));
 };
 MapController.getTileDistance = (x, y, tx, ty) => {
@@ -180,6 +183,26 @@ MapController.generateGroundRings = (mapTiles, seedMaterial, seedPosition) => {
                     if (!gr.isColliding(mapTiles, new GeometryAndPhysics_1.Point(grSpawnPosition.x, grSpawnPosition.y))) {
                         MapController.loadObject(gr, mapTiles, new GeometryAndPhysics_1.Point(grSpawnPosition.x, grSpawnPosition.y));
                     }
+                }
+            }
+        }
+    }
+};
+MapController.generateBasicObject = (mapObjectType, material, mapTiles, seedMaterial, seedPosition) => {
+    let Checkers = [];
+    Checkers[0] = new SpawnObjectMapChecker_1.SpawnObjectMapChecker(mapTiles, material, new GeometryAndPhysics_1.Point(2, 2));
+    let spawnPosition;
+    let mapObject = new MapObject_1.MapObject();
+    mapObject.addObjectTile(new GeometryAndPhysics_1.Point(0, 0), mapObjectType);
+    let enter;
+    let seeds = seedMaterial.length;
+    for (let k = 0; k < seeds; k++) {
+        if (seedMaterial[k] == material) {
+            for (let i = 0; i < Checkers.length; i++) {
+                spawnPosition = Checkers[i].search(seedPosition[k]);
+                console.log("Pozycja: " + spawnPosition.x + " " + spawnPosition.y);
+                if (spawnPosition.x > -1 && spawnPosition.y > -1) {
+                    MapController.loadObject(mapObject, mapTiles, new GeometryAndPhysics_1.Point(spawnPosition.x, spawnPosition.y));
                 }
             }
         }

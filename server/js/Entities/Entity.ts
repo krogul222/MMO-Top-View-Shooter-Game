@@ -29,7 +29,7 @@ export class Entity {
             if(param.img !== undefined)  this._img = param.img; 
             if(param.game !== undefined)  this._game = param.game; 
 
-            this.physicsEntity = new PhysicsEntity({id: this.id, width: this.width/2, height: this.height/2});
+            this.physicsEntity = new PhysicsEntity({id: this.id, width: this.width/2, height: this.height/2, game: this._game });
         }
     }
 

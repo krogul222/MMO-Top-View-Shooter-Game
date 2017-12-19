@@ -283,7 +283,7 @@ setInterval(function () {
         console.log("Enemy draw " + i);
     }
     for (let i in ExplosionClient_1.ExplosionClient.list) {
-        ExplosionClient_1.ExplosionClient.list[i].spriteAnimCounter += 0.4;
+        ExplosionClient_1.ExplosionClient.list[i].spriteAnimCounter += 1;
         if (ExplosionClient_1.ExplosionClient.list[i].isCompleted()) {
             delete ExplosionClient_1.ExplosionClient.list[i];
         }
