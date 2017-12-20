@@ -26,7 +26,11 @@ export class Player extends Actor {
         super(param);
         initPack.player.push(this.getInitPack());
         Player.list[param.id] = this;
-        this.giveItems(ActorStartingPack.FULL);
+
+        if(param.starterPack !== undefined)
+            this.giveItems(param.starterPack);
+        else
+            this.giveItems(ActorStartingPack.FULL);
 
         if(GameController.list[this.game] !== undefined){
             GameController.list[this.game].initPack.player.push(this.getInitPack());
@@ -252,7 +256,8 @@ export class Player extends Actor {
              height: 50, 
              type: "player", 
              hp: 40, 
-             socket: socket});
+             socket: socket,
+             starterPack: game.starterPack});
 
         socket.on('changeWeapon', function(data){
             if(data.state == 'next') { player.attackController.weaponCollection.chooseNextWeaponWithAmmo() }

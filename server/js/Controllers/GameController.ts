@@ -5,6 +5,7 @@ import { Player } from './../Entities/Player';
 import { MapController } from './MapControler';
 import { Enemy } from '../Entities/Enemy';
 import { Upgrade } from './../Entities/Upgrade';
+import { ActorStartingPack } from '../enums';
 
 export class GameController {
  
@@ -20,6 +21,8 @@ export class GameController {
     map: string = "forest";
     initPack = new Pack();
     removePack = new Pack();
+    starterPack: ActorStartingPack;
+
     private _physicsEngine = new PhysicsEngine();
 
     constructor(param){
@@ -45,6 +48,9 @@ export class GameController {
             seeds = param.seeds;
         }
 
+        if( param.playerstarterpack !== undefined){
+            this.starterPack = param.playerstarterpack;
+        }
         if( param.monstersrespawn !== undefined){
             this.monsterRespawn = param.monstersrespawn == 1 ? true : false;
             console.log("MONSTER "+this.monsterRespawn );

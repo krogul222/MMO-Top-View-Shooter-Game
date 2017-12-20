@@ -191,7 +191,10 @@ class Player extends Actor_1.Actor {
         };
         globalVariables_1.initPack.player.push(this.getInitPack());
         Player.list[param.id] = this;
-        this.giveItems(enums_1.ActorStartingPack.FULL);
+        if (param.starterPack !== undefined)
+            this.giveItems(param.starterPack);
+        else
+            this.giveItems(enums_1.ActorStartingPack.FULL);
         if (GameController_1.GameController.list[this.game] !== undefined) {
             GameController_1.GameController.list[this.game].initPack.player.push(this.getInitPack());
         }
@@ -250,7 +253,8 @@ Player.onConnect = (socket, createdGame = false, gID = -1, data = {}) => {
         height: 50,
         type: "player",
         hp: 40,
-        socket: socket
+        socket: socket,
+        starterPack: game.starterPack
     });
     socket.on('changeWeapon', function (data) {
         if (data.state == 'next') {

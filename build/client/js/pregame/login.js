@@ -45,6 +45,7 @@ createGameBtn.onclick = function () {
         let monstersrespawn = $('#monstersrespawn').find(":selected").val();
         let itemsnumber = $('#itemsnumber').find(":selected").val();
         let itemsrespawn = $('#itemsrespawn').find(":selected").val();
+        let playerstarterpack = $('#playerstarterpack').find(":selected").val();
         console.log("MAP SIZE " + mapsize);
         socket.emit('createdGame', {
             name: name,
@@ -54,7 +55,8 @@ createGameBtn.onclick = function () {
             monstersnumber: monstersnumber,
             monstersrespawn: monstersrespawn,
             itemsnumber: itemsnumber,
-            itemsrespawn: itemsrespawn
+            itemsrespawn: itemsrespawn,
+            playerstarterpack: playerstarterpack
         });
         gameDiv.style.display = 'inline-block';
         loadingDiv.style.display = 'none';

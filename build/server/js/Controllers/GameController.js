@@ -56,6 +56,9 @@ class GameController {
         if (param.seeds !== undefined) {
             seeds = param.seeds;
         }
+        if (param.playerstarterpack !== undefined) {
+            this.starterPack = param.playerstarterpack;
+        }
         if (param.monstersrespawn !== undefined) {
             this.monsterRespawn = param.monstersrespawn == 1 ? true : false;
             console.log("MONSTER " + this.monsterRespawn);
