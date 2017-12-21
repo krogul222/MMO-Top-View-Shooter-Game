@@ -80,9 +80,33 @@
 	"spriteSourceSize": {"x":0,"y":0,"w":257,"h":257},
 	"sourceSize": {"w":257,"h":257}
 },
+"flatML.png":
+{
+	"frame": {"x":779,"y":261,"w":257,"h":257},
+	"rotated": false,
+	"trimmed": false,
+	"spriteSourceSize": {"x":0,"y":0,"w":257,"h":257},
+	"sourceSize": {"w":257,"h":257}
+},
+"flatMM.png":
+{
+	"frame": {"x":1038,"y":261,"w":257,"h":257},
+	"rotated": false,
+	"trimmed": false,
+	"spriteSourceSize": {"x":0,"y":0,"w":257,"h":257},
+	"sourceSize": {"w":257,"h":257}
+},
+"flatMR.png":
+{
+	"frame": {"x":1297,"y":261,"w":257,"h":257},
+	"rotated": false,
+	"trimmed": false,
+	"spriteSourceSize": {"x":0,"y":0,"w":257,"h":257},
+	"sourceSize": {"w":257,"h":257}
+},
 "grass.png":
 {
-	"frame": {"x":779,"y":261,"w":256,"h":256},
+	"frame": {"x":1556,"y":261,"w":256,"h":256},
 	"rotated": false,
 	"trimmed": false,
 	"spriteSourceSize": {"x":0,"y":0,"w":256,"h":256},
@@ -90,7 +114,7 @@
 },
 "groundRingD.png":
 {
-	"frame": {"x":1037,"y":261,"w":257,"h":257},
+	"frame": {"x":2,"y":520,"w":257,"h":257},
 	"rotated": false,
 	"trimmed": false,
 	"spriteSourceSize": {"x":0,"y":0,"w":257,"h":257},
@@ -98,7 +122,7 @@
 },
 "groundRingDenter.png":
 {
-	"frame": {"x":1296,"y":261,"w":257,"h":257},
+	"frame": {"x":261,"y":520,"w":257,"h":257},
 	"rotated": false,
 	"trimmed": false,
 	"spriteSourceSize": {"x":0,"y":0,"w":257,"h":257},
@@ -106,7 +130,7 @@
 },
 "groundRingL.png":
 {
-	"frame": {"x":1555,"y":261,"w":257,"h":257},
+	"frame": {"x":520,"y":520,"w":257,"h":257},
 	"rotated": false,
 	"trimmed": false,
 	"spriteSourceSize": {"x":0,"y":0,"w":257,"h":257},
@@ -114,7 +138,7 @@
 },
 "groundRingLD.png":
 {
-	"frame": {"x":2,"y":520,"w":257,"h":257},
+	"frame": {"x":779,"y":520,"w":257,"h":257},
 	"rotated": false,
 	"trimmed": false,
 	"spriteSourceSize": {"x":0,"y":0,"w":257,"h":257},
@@ -122,7 +146,7 @@
 },
 "groundRingLU.png":
 {
-	"frame": {"x":261,"y":520,"w":257,"h":257},
+	"frame": {"x":1038,"y":520,"w":257,"h":257},
 	"rotated": false,
 	"trimmed": false,
 	"spriteSourceSize": {"x":0,"y":0,"w":257,"h":257},
@@ -130,7 +154,7 @@
 },
 "groundRingLenter.png":
 {
-	"frame": {"x":520,"y":520,"w":257,"h":257},
+	"frame": {"x":1297,"y":520,"w":257,"h":257},
 	"rotated": false,
 	"trimmed": false,
 	"spriteSourceSize": {"x":0,"y":0,"w":257,"h":257},
@@ -138,7 +162,7 @@
 },
 "groundRingR.png":
 {
-	"frame": {"x":779,"y":520,"w":257,"h":257},
+	"frame": {"x":1556,"y":520,"w":257,"h":257},
 	"rotated": false,
 	"trimmed": false,
 	"spriteSourceSize": {"x":0,"y":0,"w":257,"h":257},
@@ -146,7 +170,7 @@
 },
 "groundRingRD.png":
 {
-	"frame": {"x":1038,"y":520,"w":257,"h":257},
+	"frame": {"x":2,"y":779,"w":257,"h":257},
 	"rotated": false,
 	"trimmed": false,
 	"spriteSourceSize": {"x":0,"y":0,"w":257,"h":257},
@@ -154,7 +178,7 @@
 },
 "groundRingRU.png":
 {
-	"frame": {"x":1297,"y":520,"w":257,"h":257},
+	"frame": {"x":261,"y":779,"w":257,"h":257},
 	"rotated": false,
 	"trimmed": false,
 	"spriteSourceSize": {"x":0,"y":0,"w":257,"h":257},
@@ -162,7 +186,7 @@
 },
 "groundRingRenter.png":
 {
-	"frame": {"x":1556,"y":520,"w":257,"h":257},
+	"frame": {"x":520,"y":779,"w":257,"h":257},
 	"rotated": false,
 	"trimmed": false,
 	"spriteSourceSize": {"x":0,"y":0,"w":257,"h":257},
@@ -170,7 +194,7 @@
 },
 "groundRingU.png":
 {
-	"frame": {"x":2,"y":779,"w":257,"h":257},
+	"frame": {"x":779,"y":779,"w":257,"h":257},
 	"rotated": false,
 	"trimmed": false,
 	"spriteSourceSize": {"x":0,"y":0,"w":257,"h":257},
@@ -178,7 +202,7 @@
 },
 "groundRingUenter.png":
 {
-	"frame": {"x":261,"y":779,"w":257,"h":257},
+	"frame": {"x":1038,"y":779,"w":257,"h":257},
 	"rotated": false,
 	"trimmed": false,
 	"spriteSourceSize": {"x":0,"y":0,"w":257,"h":257},
@@ -186,7 +210,7 @@
 },
 "radiooil.png":
 {
-	"frame": {"x":520,"y":779,"w":257,"h":257},
+	"frame": {"x":1297,"y":779,"w":257,"h":257},
 	"rotated": false,
 	"trimmed": false,
 	"spriteSourceSize": {"x":0,"y":0,"w":257,"h":257},
@@ -194,7 +218,7 @@
 },
 "solidstone.png":
 {
-	"frame": {"x":779,"y":779,"w":257,"h":257},
+	"frame": {"x":1556,"y":779,"w":257,"h":257},
 	"rotated": false,
 	"trimmed": false,
 	"spriteSourceSize": {"x":0,"y":0,"w":257,"h":257},
@@ -202,7 +226,7 @@
 },
 "stone.png":
 {
-	"frame": {"x":1038,"y":779,"w":257,"h":257},
+	"frame": {"x":2,"y":1038,"w":257,"h":257},
 	"rotated": false,
 	"trimmed": false,
 	"spriteSourceSize": {"x":0,"y":0,"w":257,"h":257},
@@ -210,7 +234,7 @@
 },
 "stoneD.png":
 {
-	"frame": {"x":1297,"y":779,"w":257,"h":257},
+	"frame": {"x":261,"y":1038,"w":257,"h":257},
 	"rotated": false,
 	"trimmed": false,
 	"spriteSourceSize": {"x":0,"y":0,"w":257,"h":257},
@@ -218,7 +242,7 @@
 },
 "stoneL.png":
 {
-	"frame": {"x":1556,"y":779,"w":257,"h":257},
+	"frame": {"x":520,"y":1038,"w":257,"h":257},
 	"rotated": false,
 	"trimmed": false,
 	"spriteSourceSize": {"x":0,"y":0,"w":257,"h":257},
@@ -226,7 +250,7 @@
 },
 "stoneR.png":
 {
-	"frame": {"x":2,"y":1038,"w":257,"h":257},
+	"frame": {"x":779,"y":1038,"w":257,"h":257},
 	"rotated": false,
 	"trimmed": false,
 	"spriteSourceSize": {"x":0,"y":0,"w":257,"h":257},
@@ -234,7 +258,7 @@
 },
 "stoneU.png":
 {
-	"frame": {"x":261,"y":1038,"w":257,"h":257},
+	"frame": {"x":1038,"y":1038,"w":257,"h":257},
 	"rotated": false,
 	"trimmed": false,
 	"spriteSourceSize": {"x":0,"y":0,"w":257,"h":257},
@@ -242,7 +266,7 @@
 },
 "water.png":
 {
-	"frame": {"x":520,"y":1038,"w":257,"h":257},
+	"frame": {"x":1297,"y":1038,"w":257,"h":257},
 	"rotated": false,
 	"trimmed": false,
 	"spriteSourceSize": {"x":0,"y":0,"w":257,"h":257},
@@ -250,7 +274,7 @@
 },
 "waterD.png":
 {
-	"frame": {"x":779,"y":1038,"w":257,"h":257},
+	"frame": {"x":1556,"y":1038,"w":257,"h":257},
 	"rotated": false,
 	"trimmed": false,
 	"spriteSourceSize": {"x":0,"y":0,"w":257,"h":257},
@@ -258,7 +282,7 @@
 },
 "waterL.png":
 {
-	"frame": {"x":1038,"y":1038,"w":257,"h":257},
+	"frame": {"x":2,"y":1297,"w":257,"h":257},
 	"rotated": false,
 	"trimmed": false,
 	"spriteSourceSize": {"x":0,"y":0,"w":257,"h":257},
@@ -266,7 +290,7 @@
 },
 "waterR.png":
 {
-	"frame": {"x":1297,"y":1038,"w":257,"h":257},
+	"frame": {"x":261,"y":1297,"w":257,"h":257},
 	"rotated": false,
 	"trimmed": false,
 	"spriteSourceSize": {"x":0,"y":0,"w":257,"h":257},
@@ -274,7 +298,7 @@
 },
 "waterU.png":
 {
-	"frame": {"x":1556,"y":1038,"w":257,"h":257},
+	"frame": {"x":520,"y":1297,"w":257,"h":257},
 	"rotated": false,
 	"trimmed": false,
 	"spriteSourceSize": {"x":0,"y":0,"w":257,"h":257},
@@ -287,6 +311,6 @@
 	"format": "RGBA8888",
 	"size": {"w":2048,"h":2048},
 	"scale": "1",
-	"smartupdate": "$TexturePacker:SmartUpdate:b8b34049662d7951ca8c068fd3442b74$"
+	"smartupdate": "$TexturePacker:SmartUpdate:2358fa6aac87dae9e9727da619f584e6$"
 }
 }

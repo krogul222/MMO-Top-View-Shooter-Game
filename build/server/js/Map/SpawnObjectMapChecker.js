@@ -28,6 +28,9 @@ class SpawnObjectMapChecker {
                         if (this.checkerArray[i][j] !== this.desiredTerrain) {
                             end = false;
                         }
+                        if (this.map[p.y + i][p.x + j].collisions) {
+                            end = false;
+                        }
                     }
                     else {
                         this.checkerArray[i][j] = -1;
@@ -69,6 +72,12 @@ class SpawnObjectMapChecker {
                     else if (this.checkerArray[0][0] == -1) {
                         deltaPosition.x = 1;
                     }
+                    else {
+                        if (Math.random() > 0.5)
+                            deltaPosition.x = 1;
+                        else
+                            deltaPosition.x = -1;
+                    }
                 }
             }
             leftOrUp = 0;
@@ -92,6 +101,12 @@ class SpawnObjectMapChecker {
                     }
                     else if (this.checkerArray[0][0] == -1) {
                         deltaPosition.y = 1;
+                    }
+                    else {
+                        if (Math.random() > 0.5)
+                            deltaPosition.y = 1;
+                        else
+                            deltaPosition.y = -1;
                     }
                 }
             }

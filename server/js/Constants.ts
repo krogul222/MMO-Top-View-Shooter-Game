@@ -90,6 +90,9 @@ mapObjectImageName[MapObjectType.GR_EL] = "groundRingLenter";
 mapObjectImageName[MapObjectType.GR_ER] = "groundRingRenter";
 mapObjectImageName[MapObjectType.SS] = "solidstone";
 mapObjectImageName[MapObjectType.RO] = "radiooil";
+mapObjectImageName[MapObjectType.FM_L] = "flatML";
+mapObjectImageName[MapObjectType.FM_M] = "flatMM";
+mapObjectImageName[MapObjectType.FM_R] = "flatMR";
 //--------------------------------------------------------
 
 mapObjectCollisions[MapObjectType.GR_D] = [0,0,0,0,0,0,0,0, 0,0,0,0,0,0,0,0, 0,0,0,0,0,0,0,0, 0,0,0,0,0,0,0,0, 0,0,0,0,0,0,0,0, 0,0,0,0,0,0,0,0, 2,2,2,2,2,2,2,2, 2,2,2,2,2,2,2,2]; 
@@ -109,3 +112,7 @@ mapObjectCollisions[MapObjectType.GR_ER] = [0,0,2,0,0,0,0,0, 0,0,2,0,0,0,0,0, 0,
 
 mapObjectCollisions[MapObjectType.SS] = [0,0,0,0,0,0,0,0, 0,0,0,0,0,0,0,0, 0,0,0,3,3,0,0,0, 0,0,0,3,3,3,0,0, 0,0,0,3,3,3,0,0, 0,0,0,0,0,0,0,0, 0,0,0,0,0,0,0,0, 0,0,0,0,0,0,0,0];
 mapObjectCollisions[MapObjectType.RO] = [0,0,0,0,0,0,0,0, 0,0,0,0,0,0,0,0, 0,0,0,0,0,0,0,0, 0,1,1,1,1,1,1,0, 0,1,1,1,1,1,1,0, 0,0,0,0,0,0,0,0, 0,0,0,0,0,0,0,0, 0,0,0,0,0,0,0,0];
+
+mapObjectCollisions[MapObjectType.FM_L] = [0,0,0,0,0,0,0,0, 0,0,0,3,3,0,0,0, 0,0,3,3,3,3,3,3, 0,3,3,3,3,3,3,3, 0,3,3,3,3,3,3,3, 0,3,3,3,3,3,3,3, 0,3,3,3,3,3,3,3, 0,0,3,3,3,3,0,3];
+mapObjectCollisions[MapObjectType.FM_M] = [0,0,0,0,0,0,0,0, 0,0,0,0,0,0,0,0, 3,3,3,3,3,3,3,3, 3,3,3,3,3,3,3,3, 3,3,3,3,3,3,3,3, 3,3,3,3,3,3,3,3, 3,3,3,3,3,3,3,3, 3,0,0,3,3,3,0,3];
+mapObjectCollisions[MapObjectType.FM_R] = [0,0,0,0,0,0,0,0, 0,0,0,0,3,0,0,0, 3,3,3,3,3,3,0,0, 3,3,3,3,3,3,3,0, 3,3,3,3,3,3,3,0, 3,3,3,3,3,3,3,0, 3,3,3,3,3,3,3,0, 3,0,0,3,3,3,0,0];

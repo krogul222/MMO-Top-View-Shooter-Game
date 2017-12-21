@@ -61,6 +61,9 @@ export class SpawnObjectMapChecker {
                     if(this.checkerArray[i][j] !== this.desiredTerrain){
                         end = false;
                     }
+                    if(this.map[p.y+i][p.x+j].collisions){
+                        end = false;
+                    }
                 } else{
                     this.checkerArray[i][j] = -1;
                     end = false;
@@ -105,6 +108,8 @@ export class SpawnObjectMapChecker {
                     deltaPosition.x =-1;
                 } else if(this.checkerArray[0][0] == -1){
                     deltaPosition.x =1;
+                } else{
+                    if(Math.random() > 0.5) deltaPosition.x =1; else deltaPosition.x =-1; 
                 }
             }
 
@@ -131,6 +136,8 @@ export class SpawnObjectMapChecker {
                     deltaPosition.y = -1;
                 } else if(this.checkerArray[0][0] == -1){
                     deltaPosition.y = 1;
+                } else{
+                    if(Math.random() > 0.5) deltaPosition.y =1; else deltaPosition.y =-1; 
                 }
             }
 

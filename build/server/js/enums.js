@@ -94,6 +94,9 @@ var MapObjectType;
     MapObjectType[MapObjectType["GR_ER"] = 12] = "GR_ER";
     MapObjectType[MapObjectType["SS"] = 13] = "SS";
     MapObjectType[MapObjectType["RO"] = 14] = "RO";
+    MapObjectType[MapObjectType["FM_L"] = 15] = "FM_L";
+    MapObjectType[MapObjectType["FM_M"] = 16] = "FM_M";
+    MapObjectType[MapObjectType["FM_R"] = 17] = "FM_R";
 })(MapObjectType = exports.MapObjectType || (exports.MapObjectType = {}));
 function randomEnum(myEnum) {
     const enumValues = Object.keys(myEnum)

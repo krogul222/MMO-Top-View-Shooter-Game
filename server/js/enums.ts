@@ -11,7 +11,7 @@ export enum AttackType { bullet = 0, fire = 1, contact = 2 };
 export enum ActorStartingPack { BASIC = 0, MODERATE = 1, FULL = 2 };
 
 export enum MapObjectType { GR_LU = 1, GR_LD = 2, GR_RU = 3, GR_RD = 4, GR_L = 5, GR_R = 6,
-GR_D = 7, GR_U = 8, GR_EU = 9, GR_ED = 10, GR_EL = 11, GR_ER = 12, SS = 13, RO = 14 }
+GR_D = 7, GR_U = 8, GR_EU = 9, GR_ED = 10, GR_EL = 11, GR_ER = 12, SS = 13, RO = 14, FM_L = 15, FM_M = 16, FM_R = 17 }
 
 
 

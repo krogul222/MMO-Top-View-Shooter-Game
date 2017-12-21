@@ -1,3 +1,4 @@
+import { FlatMountain } from './../Map/MapObjects/FlatMountain';
 import { SpawnObjectMapChecker } from './../Map/SpawnObjectMapChecker';
 import { GroundRing } from './../Map/MapObjects/GroundRing';
 import { ObjectTile } from './../Map/MapObjects/ObjectTile';
@@ -193,10 +194,16 @@ export class MapController {
 
         MapController.generateGroundRings(mapTiles, seedMaterial, seedPosition);
 
+        MapController.generateBasicObject(MapObjectType.SS, TerrainMaterial.darkdirt ,mapTiles, seedMaterial, seedPosition);
+        
+
+
        // MapController.generateSolidStones(mapTiles, seedMaterial, seedPosition);
         MapController.generateBasicObject(MapObjectType.RO, TerrainMaterial.stone ,mapTiles, seedMaterial, seedPosition);
-        MapController.generateBasicObject(MapObjectType.SS, TerrainMaterial.darkdirt ,mapTiles, seedMaterial, seedPosition);
-/*
+        MapController.generateFlatMountains(mapTiles, seedMaterial, seedPosition, TerrainMaterial.darkdirt);
+        MapController.generateFlatMountains(mapTiles, seedMaterial, seedPosition, TerrainMaterial.stone);
+        
+        /*
         let width = getRandomInt(0,4);
         let height = getRandomInt(0,4);
         let enter = Orientation.down;
@@ -275,6 +282,33 @@ export class MapController {
                               //  if(!gr.isColliding(mapTiles, new Point(grSpawnPosition.x,grSpawnPosition.y))){
                                     MapController.loadObject(mapObject, mapTiles, new Point(spawnPosition.x,spawnPosition.y));
                               //  }      
+                            }
+                        }        
+                    }
+               }
+    }
+
+    static generateFlatMountains = (mapTiles: MapTile[][], seedMaterial: TerrainMaterial[], seedPosition: Point[], material: TerrainMaterial) => {
+        let fmCheckers: SpawnObjectMapChecker[] = [];
+        
+                fmCheckers[2] = new SpawnObjectMapChecker(mapTiles, material, new Point(3,2));
+                fmCheckers[1] = new SpawnObjectMapChecker(mapTiles, material, new Point(4,2));
+                fmCheckers[0] = new SpawnObjectMapChecker(mapTiles, material, new Point(5,1));
+                
+                let fmSpawnPosition: Point;
+                let fm: FlatMountain; 
+                let seeds = seedMaterial.length;
+
+                for(let k = 0; k < seeds; k++){
+                    if(seedMaterial[k] == material){
+                        for(let i = 0; i < fmCheckers.length; i++){
+                            fmSpawnPosition = fmCheckers[i].search(seedPosition[k]);
+                            console.log("Pozycja: " + fmSpawnPosition.x + " "+ fmSpawnPosition.y);
+                            if(fmSpawnPosition.x > -1 && fmSpawnPosition.y > -1){
+                                fm = new FlatMountain(fmCheckers[i].size.x);
+                                if(!fm.isColliding(mapTiles, new Point(fmSpawnPosition.x,fmSpawnPosition.y))){
+                                    MapController.loadObject(fm ,mapTiles, new Point(fmSpawnPosition.x,fmSpawnPosition.y));
+                                }      
                             }
                         }        
                     }
